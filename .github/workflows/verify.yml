@@ -31,6 +31,9 @@ jobs:
       - name: install
         run: npm ci
 
+      - name: the shared packages are built, in dependency order
+        run: npm run build:packages
+
       - name: the catalogue is in sync
         run: node scripts/sync-catalogue.mjs --check
 

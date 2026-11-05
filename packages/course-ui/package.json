@@ -18,8 +18,7 @@
   ],
   "scripts": {
     "build": "tsc -b",
-    "typecheck": "tsc -b",
-    "prepare": "tsc -b"
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "@llm-materials/course-core": "*",

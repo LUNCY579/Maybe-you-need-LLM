@@ -10,7 +10,9 @@
     "diffusion-lab", "evaluation-lab", "rlhf-lab", "lm-from-scratch", "mech-interp-lab", "data-lab", "scaling-lab", "systems-lab", "rl-foundations", "retrieval-lab", "agent-bench-lab", "safety-lab", "multimodal-lab"
   ],
   "scripts": {
-    "build": "npm run build -w @llm-materials/course-core && npm run build --workspaces --if-present",
+    "build": "npm run build:packages && npm run build --workspaces --if-present",
+    "build:packages": "npm run build -w @llm-materials/course-core && npm run build -w @llm-materials/course-ui && npm run build -w @llm-materials/course-catalogue",
+    "prepare": "npm run build:packages",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm test --workspaces --if-present && npm run test:scripts",
     "test:scripts": "vitest run scripts",

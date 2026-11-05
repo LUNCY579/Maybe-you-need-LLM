@@ -20,8 +20,7 @@
     "build": "tsc -b",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "prepare": "tsc -b"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@llm-materials/course-core": "*"
