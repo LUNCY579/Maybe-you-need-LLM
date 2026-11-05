@@ -17,8 +17,11 @@ import { join } from 'node:path'
  */
 
 const root = process.cwd()
-const check = process.argv.includes('--check')
-const baseArgument = process.argv.find((argument) => !argument.startsWith('--') && argument.includes('/'))
+// Only the arguments after the script itself: on a POSIX host argv[1] is the
+// script's absolute path, which contains slashes and would be read as the base.
+const args = process.argv.slice(2)
+const check = args.includes('--check')
+const baseArgument = args.find((argument) => !argument.startsWith('--') && argument.includes('/'))
 const base = (baseArgument ?? 'https://llm-materials.example').replace(/\/$/, '')
 
 if (!baseArgument) {
