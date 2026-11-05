@@ -52,31 +52,62 @@ function AttentionRow({
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }} role="group" aria-label={label}>
         {tokens.map((token, position) => {
           const weight = position <= active ? (weights[position] ?? 0) : null
+          /* The cell carries the theme's own ink and never relies on opacity: a bare
+             button otherwise keeps the browser's black text, which is invisible on the
+             dark surface, and transparency drops the small numbers below the contrast
+             threshold. The heat is capped at 40% so full attention still leaves the
+             text readable. The visible figures are decoration over a description that
+             is hidden visually, so the accessible name and the visible content cannot
+             disagree, which is what WCAG 2.5.3 asks for. */
           return (
             <button
               key={position}
               type="button"
               onClick={() => onSelect(position)}
-              aria-label={`position ${position}, token ${letter(token)}, ${
-                weight === null ? 'not yet attended' : `attention ${fmt(weight, 2)}`
-              }`}
               aria-pressed={position === active}
               style={{
                 width: 58,
                 padding: '6px 4px',
                 borderRadius: 8,
-                border: position === active ? '2px solid var(--accent-indigo)' : '1px solid var(--border)',
+                border:
+                  position === active
+                    ? '2px solid var(--accent-indigo)'
+                    : weight === null
+                      ? '1px dashed var(--border)'
+                      : '1px solid var(--border)',
                 background:
                   weight === null
                     ? 'transparent'
-                    : `color-mix(in srgb, var(--accent-indigo) ${Math.round(weight * 100)}%, transparent)`,
-                opacity: weight === null ? 0.35 : 1,
+                    : `color-mix(in srgb, var(--accent-indigo) ${Math.round(weight * 40)}%, transparent)`,
+                color: weight === null ? 'var(--text-muted)' : 'var(--text)',
                 fontSize: 12,
               }}
             >
-              <strong style={{ display: 'block', fontSize: 15 }}>{letter(token)}</strong>
-              <span style={{ display: 'block', opacity: 0.75 }}>{weight === null ? '·' : fmt(weight, 2)}</span>
-              <span style={{ display: 'block', opacity: 0.55, fontSize: 10 }}>{position}</span>
+              <span
+                style={{
+                  position: 'absolute',
+                  width: 1,
+                  height: 1,
+                  margin: -1,
+                  padding: 0,
+                  overflow: 'hidden',
+                  clip: 'rect(0 0 0 0)',
+                  whiteSpace: 'nowrap',
+                  border: 0,
+                }}
+              >
+                position {position}, token {letter(token)},{' '}
+                {weight === null ? 'not yet attended' : `attention ${fmt(weight, 2)}`}
+              </span>
+              <strong aria-hidden="true" style={{ display: 'block', fontSize: 15 }}>
+                {letter(token)}
+              </strong>
+              <span aria-hidden="true" style={{ display: 'block' }}>
+                {weight === null ? '·' : fmt(weight, 2)}
+              </span>
+              <span aria-hidden="true" style={{ display: 'block', fontSize: 10 }}>
+                {position}
+              </span>
             </button>
           )
         })}

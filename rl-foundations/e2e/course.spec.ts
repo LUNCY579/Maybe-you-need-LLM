@@ -75,6 +75,7 @@ test.describe('the student journey', () => {
   test('the policy-gradient laboratory compares the estimate with the exact gradient', async ({ page }) => {
     await page.goto('/#/labs/policygradient')
     await expect(page.getByRole('heading', { name: /Laboratory B/ })).toBeVisible()
+    await page.getByRole('button', { name: 'The estimator' }).click()
     await expect(page.locator('.stat', { hasText: 'The relative error' }).first()).toBeVisible()
   })
 

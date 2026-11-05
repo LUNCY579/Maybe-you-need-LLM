@@ -87,7 +87,7 @@ test.describe('the student journey', () => {
 
   test('the speculation laboratory measures the acceptance rate', async ({ page }) => {
     await page.goto('/#/labs/speculative')
-    await expect(page.getByRole('heading', { name: /Laboratory D/ })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Laboratory E/ })).toBeVisible()
     await expect(page.locator('.stat', { hasText: 'The acceptance rate' }).first()).toBeVisible()
   })
 

@@ -84,9 +84,9 @@ test.describe('the student journey', () => {
   test('the overoptimisation laboratory shows the true reward turning over', async ({ page }) => {
     await page.goto('/#/labs/overoptimisation')
     await expect(page.getByRole('heading', { name: /Laboratory F/ })).toBeVisible()
-    const best = page.locator('.stat', { hasText: 'The best true reward' }).first()
+    const best = page.locator('.stat', { hasText: 'The best gold gain reached' }).first()
     await expect(best.locator('.stat-value')).toBeVisible()
-    const far = page.locator('.stat', { hasText: 'The true reward at the far end' }).first()
+    const far = page.locator('.stat', { hasText: 'The gold gain as far as the tilt can go' }).first()
     await expect(far.locator('.stat-value')).toBeVisible()
   })
 
