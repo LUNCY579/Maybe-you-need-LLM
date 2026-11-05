@@ -1,0 +1,290 @@
+/* The collection's shared styles.
+ *
+ * These are the classes the collection pages use: the course list, the
+ * learning path, the concept index, the source list and the search results.
+ * The colours are the same accent variables the course shell defines, so
+ * the pages sit inside a course's theme without a second palette.
+ */
+
+.catalogue-course-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+}
+
+.catalogue-course-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  height: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border, rgba(127, 127, 127, 0.3));
+  border-radius: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  background: var(--surface, transparent);
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+
+.catalogue-course-link:hover,
+.catalogue-course-link:focus-visible {
+  border-color: var(--accent-indigo, currentColor);
+  transform: translateY(-1px);
+}
+
+.catalogue-course-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.catalogue-course-modules {
+  color: var(--text-muted, #666);
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.catalogue-badge {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+
+.catalogue-badge-built {
+  color: var(--accent-emerald, #2f9e6f);
+}
+
+.catalogue-badge-planned {
+  color: var(--text-muted, #777);
+}
+
+.catalogue-path {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.catalogue-path-level {
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin: 0 0 0.5rem;
+}
+
+.catalogue-path-courses {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+
+.catalogue-path-course {
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border, rgba(127, 127, 127, 0.3));
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.catalogue-path-course-done {
+  opacity: 0.6;
+}
+
+.catalogue-path-course-next {
+  border-color: var(--accent-teal, currentColor);
+  box-shadow: 0 0 0 1px var(--accent-teal, currentColor) inset;
+}
+
+.catalogue-path-course-title {
+  font-weight: 600;
+}
+
+.catalogue-path-course-note {
+  font-size: 0.8rem;
+  color: var(--text-muted, #777);
+}
+
+.catalogue-edge-list,
+.catalogue-concept-list,
+.catalogue-source-list,
+.catalogue-links-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.catalogue-edge {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.4rem 0.6rem;
+  align-items: baseline;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border, rgba(127, 127, 127, 0.2));
+}
+
+.catalogue-edge-arrow {
+  color: var(--text-muted, #777);
+}
+
+.catalogue-edge-reason {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  color: var(--text-muted, #777);
+}
+
+.catalogue-concept {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border, rgba(127, 127, 127, 0.25));
+}
+
+.catalogue-concept-term {
+  font-weight: 600;
+}
+
+.catalogue-concept-summary {
+  font-size: 0.9rem;
+}
+
+.catalogue-concept-courses {
+  font-size: 0.8rem;
+  color: var(--text-muted, #777);
+}
+
+.catalogue-source {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border, rgba(127, 127, 127, 0.2));
+}
+
+.catalogue-source-title {
+  font-weight: 600;
+  color: inherit;
+}
+
+.catalogue-source-venue {
+  font-size: 0.85rem;
+  color: var(--text-muted, #777);
+}
+
+.catalogue-source-licence {
+  font-size: 0.8rem;
+  color: var(--text-muted, #777);
+}
+
+.catalogue-search-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.catalogue-search-hit {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 0.2rem 0.75rem;
+  align-items: baseline;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border, rgba(127, 127, 127, 0.2));
+}
+
+.catalogue-search-kind {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+}
+
+.catalogue-search-title {
+  font-weight: 600;
+  color: inherit;
+}
+
+.catalogue-search-summary {
+  grid-column: 2;
+  font-size: 0.85rem;
+  color: var(--text-muted, #777);
+}
+
+.catalogue-links {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.catalogue-links-heading {
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted, #777);
+  margin: 0 0 0.5rem;
+}
+
+.catalogue-links-note {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted, #777);
+}
+
+.catalogue-links-term {
+  font-weight: 600;
+}
+
+/* The shared-ideas panel, on a course's glossary page. */
+
+.catalogue-shared-concepts {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border, rgba(127, 127, 127, 0.2));
+}
+
+.catalogue-shared-concept-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+}
+
+.catalogue-shared-concept {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border, rgba(127, 127, 127, 0.25));
+  border-radius: 0.6rem;
+}
+
+.catalogue-shared-concept-term {
+  font-weight: 600;
+}
+
+.catalogue-shared-concept-summary {
+  font-size: 0.88rem;
+}
+
+.catalogue-shared-concept-courses {
+  font-size: 0.78rem;
+  color: var(--text-muted, #777);
+}

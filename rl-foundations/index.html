@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Reinforcement Learning Foundations — an interactive course on what an agent is trying to do and how you would check the answer, where every number is computed in front of you, built on Reinforcement Learning: An Introduction by Sutton and Barto." />
+    <meta property="og:title" content="Reinforcement Learning Foundations — an interactive course on diffusion models" />
+    <meta property="og:description" content="Reinforcement Learning Foundations — an interactive course on diffusion probabilistic models, where every number is computed in front of you, built on Denoising Diffusion Probabilistic Models by Ho, Jain and Abbeel." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Reinforcement Learning Foundations — an interactive course on reinforcement learning</title>
+    <script>
+      /*
+        Apply the theme before the first paint, so the page never flashes the
+        wrong surface. The stored choice wins; otherwise the operating system's
+        preference is used. This is the only place the theme is decided — the
+        application reads the result back out of the document element.
+      */
+      try {
+        var stored = window.localStorage.getItem('rl-foundations:theme')
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+        var theme = stored === 'light' || stored === 'dark' ? stored : (prefersLight ? 'light' : 'dark')
+        document.documentElement.classList.toggle('light', theme === 'light')
+        document.documentElement.classList.toggle('dark', theme !== 'light')
+      } catch (error) {
+        document.documentElement.classList.add('dark')
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

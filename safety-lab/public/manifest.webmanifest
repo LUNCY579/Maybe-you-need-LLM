@@ -1,0 +1,19 @@
+{
+  "name": "Safety and Alignment Lab - LLM Materials",
+  "short_name": "Safety and Alignment Lab",
+  "description": "An interactive course from the LLM Materials collection, built on bai-2022-constitutional.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e1014",
+  "theme_color": "#0e1014",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "Deep Learning Theory Explorer",
+  "short_name": "DL Theory",
+  "description": "An interactive mathematical laboratory for The Principles of Deep Learning Theory: initialization, criticality, the kernel recursion, finite-width fluctuations, the neural tangent kernel and representation learning — all computed in the browser.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0e13",
+  "theme_color": "#0b0e13",
+  "categories": ["education", "science", "books"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Physics laboratory", "url": "./#/labs/physics" },
+    { "name": "Theory atlas", "url": "./#/atlas" },
+    { "name": "Lessons", "url": "./#/lessons" },
+    { "name": "Equation explorer", "url": "./#/equations" }
+  ]
+}

@@ -1,0 +1,1735 @@
+{
+  "generatedFrom": "the courses in references/manifest.json",
+  "courses": [
+    {
+      "id": "agent-bench-lab",
+      "title": "Agent Benchmark Lab",
+      "modules": [
+        {
+          "id": "task-design",
+          "title": "Task Design",
+          "tagline": "What a benchmark is made of"
+        },
+        {
+          "id": "verification",
+          "title": "Verification",
+          "tagline": "The criterion that decides the task"
+        },
+        {
+          "id": "the-baselines",
+          "title": "The Baselines",
+          "tagline": "What a score has to beat"
+        },
+        {
+          "id": "variance-and-contamination",
+          "title": "Variance and Contamination",
+          "tagline": "The two ways a benchmark lies to you"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "what-a-task-is",
+          "title": "What a task is",
+          "subtitle": "And what makes a good one",
+          "module": "task-design",
+          "moduleTitle": "Task Design",
+          "minutes": 24,
+          "body": "And what makes a good one Say what a benchmark task is: an environment, a goal and a verdict Explain the three properties a good task set has Describe what a difficulty mix does to a score A task is a starting state, a goal, and something that decides whether the goal was reached. A good task set is diverse, verified, and hard enough that the trivial strategies fail. The difficulty mix is a choice, and it decides what the score means."
+        },
+        {
+          "id": "the-score-and-its-uncertainty",
+          "title": "The score and its uncertainty",
+          "subtitle": "What a number on a task set means",
+          "module": "task-design",
+          "moduleTitle": "Task Design",
+          "minutes": 26,
+          "body": "What a number on a task set means Explain why a score on a task set is an estimate rather than a fact Compute the interval on a score, and say why the usual one is wrong near zero Compute how many tasks a given difference needs The tasks are a sample, and the score estimates the rate on the population. The interval on a proportion is not symmetric, and near zero the normal approximation is nonsense. A difference between two systems has to be bigger than the noise before it means anything."
+        },
+        {
+          "id": "the-evaluation-criterion",
+          "title": "The evaluation criterion",
+          "subtitle": "The two conditions",
+          "module": "verification",
+          "moduleTitle": "Verification",
+          "minutes": 26,
+          "body": "The two conditions State the two conditions a solution must satisfy Say what each condition is for, and what fails without it Explain why the criterion is the hardest part of a benchmark to get right The failing test must start failing and end passing, and the passing tests must keep passing. The first condition alone is satisfied by a solver that changes the test. The second condition is what makes the first one mean something."
+        },
+        {
+          "id": "the-cheat",
+          "title": "The cheat",
+          "subtitle": "What a criterion has to catch",
+          "module": "verification",
+          "moduleTitle": "Verification",
+          "minutes": 22,
+          "body": "What a criterion has to catch Describe the failure mode a solver that changes the test exploits Explain how the criterion catches it Say what a score means when the criterion is weak A solver that can change the test does not have to solve the task. The criterion catches it by requiring the other tests to keep passing, and by distrusting a patch that touches a test. A benchmark whose criterion is weak measures something else, and does not say what."
+        },
+        {
+          "id": "the-agentless-baseline",
+          "title": "The agentless baseline",
+          "subtitle": "What a score has to beat",
+          "module": "the-baselines",
+          "moduleTitle": "The Baselines",
+          "minutes": 24,
+          "body": "What a score has to beat Describe the agentless baseline and what it does Explain why it is the number every agent has to beat Compare it with an agent on the same tasks The baseline retrieves the relevant file and makes one obvious change. Most of what an agent adds is the ability to try again, and that has a price. The comparison has to be on the same tasks, with the same verifier."
+        },
+        {
+          "id": "the-price-of-trying-again",
+          "title": "The price of trying again",
+          "subtitle": "What the agent spends",
+          "module": "the-baselines",
+          "moduleTitle": "The Baselines",
+          "minutes": 22,
+          "body": "What the agent spends Measure the number of attempts an agent makes Compare the agent with the baseline on the same tasks Say what the extra attempts buy and what they cost An agent that tries several times solves more tasks and makes more attempts. The attempts are the cost, and they are paid in model calls. So the comparison is not between the two scores but between the two scores per attempt."
+        },
+        {
+          "id": "one-run-or-many",
+          "title": "One run or many",
+          "subtitle": "The variance, and the pass@k estimator",
+          "module": "variance-and-contamination",
+          "moduleTitle": "Variance and Contamination",
+          "minutes": 26,
+          "body": "The variance, and the pass@k estimator Compute the variance of a score across runs Explain why a single run overstates pass@k, and what the unbiased estimate is Say how many samples a comparison needs A solver is stochastic, so one run is one sample of a distribution. The naive estimate of pass@k is biased upwards, and the correction is what makes two sample budgets comparable. The paired comparison is more sensitive than comparing two independent scores."
+        },
+        {
+          "id": "has-the-model-seen-it",
+          "title": "Has the model seen it?",
+          "subtitle": "Contamination, and the overlap that finds it",
+          "module": "variance-and-contamination",
+          "moduleTitle": "Variance and Contamination",
+          "minutes": 26,
+          "body": "Contamination, and the overlap that finds it Describe what benchmark contamination is and why it invalidates a score Measure it with an n-gram overlap, and report the two rates it gives Say what the length of the n-gram decides, and what the threshold decides A task the model has already seen is not a measurement of anything. The detection is an overlap test, and it has two failure modes: too short a match catches ordinary text, too long a match misses an edited copy. So the length and the threshold are decisions, and the rates they give are the report."
+        }
+      ]
+    },
+    {
+      "id": "data-lab",
+      "title": "Data Lab",
+      "modules": [
+        {
+          "id": "sources",
+          "title": "Sources",
+          "tagline": "What a crawl gives you, and what it costs"
+        },
+        {
+          "id": "filtering",
+          "title": "Filtering",
+          "tagline": "Removing what the model should not have seen"
+        },
+        {
+          "id": "dedup",
+          "title": "Deduplication",
+          "tagline": "The same document twice is not twice the data"
+        },
+        {
+          "id": "mixtures",
+          "title": "Mixtures",
+          "tagline": "A mixture is a policy over domains"
+        },
+        {
+          "id": "collapse",
+          "title": "Collapse",
+          "tagline": "Training on what a model wrote"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "what-a-crawl-gives-you",
+          "title": "What a crawl gives you",
+          "subtitle": "The shape of the raw material",
+          "module": "sources",
+          "moduleTitle": "Sources",
+          "minutes": 22,
+          "body": "The shape of the raw material Describe the four properties of a web crawl that make it hard to train on Explain why a corpus is measured by the model it produces rather than by its size Read the ablation table of a filtering pipeline as a set of measurements A crawl is large, noisy, duplicated and partly adversarial. The score of a filter is the model trained on what survives it, not the number of documents it removed. Filtering is a benchmark: the same rules, the same budget, the same metric."
+        },
+        {
+          "id": "the-quality-frontier",
+          "title": "The quality–quantity frontier",
+          "subtitle": "What a fixed compute budget buys",
+          "module": "sources",
+          "moduleTitle": "Sources",
+          "minutes": 20,
+          "body": "What a fixed compute budget buys State the trade-off a fixed compute budget forces between data quantity and data quality Explain why a smaller, cleaner dataset can beat a larger, noisier one Compute the effective number of tokens a filtering budget actually buys At a fixed compute budget, the tokens you can afford are the ones that matter. Filtering is a trade: you spend compute on selection to buy back the compute you spend on training. A corpus of a hundred billion tokens is not a hundred billion tokens of training."
+        },
+        {
+          "id": "the-filtering-pipeline",
+          "title": "The filtering pipeline",
+          "subtitle": "The order of the filters is part of the method",
+          "module": "filtering",
+          "moduleTitle": "Filtering",
+          "minutes": 26,
+          "body": "The order of the filters is part of the method List the stages of a filtering pipeline in the order they are applied and say why Explain why cheap structural filters run before expensive model-based ones Read a stage-by-stage count and say what it implies about the corpus Structural filters first, model-based filters second, deduplication last. Every filter that runs late has to look at more documents. A filter that removes a document the model would have learned from is a bug, not a filter."
+        },
+        {
+          "id": "the-reference-model",
+          "title": "The reference model",
+          "subtitle": "Perplexity, and why the model has to be an n-gram model",
+          "module": "filtering",
+          "moduleTitle": "Filtering",
+          "minutes": 28,
+          "body": "Perplexity, and why the model has to be an n-gram model Define the perplexity of a document under a language model Explain why a unigram model fails to remove boilerplate and an n-gram model succeeds Compute a document’s perplexity with stupid backoff Perplexity is the exponential of the mean negative log-likelihood per token. Stupid backoff discounts the probability once for every level of context that is missing. Boilerplate has common words in an unusual arrangement, and only the arrangement gives it away."
+        },
+        {
+          "id": "exact-and-fuzzy",
+          "title": "Exact and fuzzy",
+          "subtitle": "Shingles, Jaccard, and a search that is not quadratic",
+          "module": "dedup",
+          "moduleTitle": "Deduplication",
+          "minutes": 25,
+          "body": "Shingles, Jaccard, and a search that is not quadratic Define the Jaccard similarity of two shingle sets Explain how a MinHash signature estimates it and what its error is Describe how Locality-Sensitive Hashing makes the search sub-quadratic A document is a set of its token n-grams, and two documents are duplicates when those sets overlap. A MinHash signature estimates the Jaccard similarity in k hash functions instead of |A ∩ B| comparisons. The band structure of the LSH index decides which pairs are compared for real."
+        },
+        {
+          "id": "decontamination",
+          "title": "Decontamination",
+          "subtitle": "A benchmark the model has seen is not a measurement",
+          "module": "dedup",
+          "moduleTitle": "Deduplication",
+          "minutes": 20,
+          "body": "A benchmark the model has seen is not a measurement Explain what decontamination is for and how it differs from deduplication Apply an n-gram overlap test between a corpus and a benchmark State the two ways a decontamination procedure can be wrong Deduplication removes copies of each other; decontamination removes copies of the test set. The overlap test is an n-gram test, and the n has to be long enough to be unmistakable. A decontamination procedure that is too aggressive removes real data; one that is too lax leaves the leak in."
+        },
+        {
+          "id": "a-mixture-is-a-policy",
+          "title": "A mixture is a policy",
+          "subtitle": "Proportions, domains, and what they cost",
+          "module": "mixtures",
+          "moduleTitle": "Mixtures",
+          "minutes": 22,
+          "body": "Proportions, domains, and what they cost Describe a data mixture as a probability distribution over domains Explain why a mixture is a decision about which capability to buy Measure the per-domain loss of a model trained under a given mixture The mixture decides how much of the model’s capacity goes to each kind of text. A domain that is under-represented is a domain the model will be weak in. The average loss is not the loss that matters when the use is specialised."
+        },
+        {
+          "id": "optimising-the-mixture",
+          "title": "Optimising the mixture",
+          "subtitle": "The worst domain, and a closed-form answer",
+          "module": "mixtures",
+          "moduleTitle": "Mixtures",
+          "minutes": 34,
+          "body": "The worst domain, and a closed-form answer Explain the group distributionally robust objective and the update it produces Fit a linear model of a domain’s loss as a function of its weight Solve the mixture problem in closed form and check the solution Name the two steps of the method, and what has to hold for the proxy’s weights to travel to a bigger model Group DRO raises the weight of whichever group is doing worst, and trains on the reweighted sample. If each domain’s loss is linear in its weight, the optimal mixture equalises the active domains. The optimal mixture is found by a one-dimensional search for the level at which the weights sum to one. The weights are learned on a proxy and extrapolated for the target, so the proxy’s ranking has to agree with the target’s — where it does not, the handed-over weights are the weights of a different run."
+        },
+        {
+          "id": "recursive-training",
+          "title": "Recursive training",
+          "subtitle": "What a model writes, and what a model trained on it keeps",
+          "module": "collapse",
+          "moduleTitle": "Collapse",
+          "minutes": 26,
+          "body": "What a model writes, and what a model trained on it keeps Describe the recursive training loop and the model it produces at each generation Explain why the tail of a distribution is the first thing to disappear Compare a bounded model with an unbounded one, and the two failures Train on data, generate from the model, train on that, and the distribution moves away from the original. A bounded model loses the tail completely; an unbounded model floors it. Real data in the mixture is what keeps the tail alive."
+        },
+        {
+          "id": "the-refinement-loop",
+          "title": "The refinement loop",
+          "subtitle": "Retraining the filter on what it left behind",
+          "module": "collapse",
+          "moduleTitle": "Collapse",
+          "minutes": 24,
+          "body": "Retraining the filter on what it left behind Describe the loop that refits the reference model on the survivors and filters again Explain why a purer corpus can be a worse training set for the model it produces Compare several passes at a given total removal with one pass that removes the same amount at once Refit the reference on the survivors, cut again at the same quantile, and every pass leaves a corpus of higher measured quality. The measured quality of the corpus and the loss on it are two different things: here the first rises while the second does too. Four gentle passes and one hard one can remove exactly the same total, because the removals compose — and only the loop refits the reference on what each earlier pass left behind."
+        }
+      ]
+    },
+    {
+      "id": "diffusion-lab",
+      "title": "Diffusion Lab",
+      "modules": [
+        {
+          "id": "forward",
+          "title": "The Forward Process",
+          "tagline": "How a fixed chain turns data into noise"
+        },
+        {
+          "id": "reverse",
+          "title": "The Reverse Process",
+          "tagline": "Learning to walk the corruption backwards"
+        },
+        {
+          "id": "schedules",
+          "title": "Noise Schedules",
+          "tagline": "Choosing how fast the signal disappears"
+        },
+        {
+          "id": "latent",
+          "title": "Latent Diffusion",
+          "tagline": "Why the diffusion happens in someone else’s space"
+        },
+        {
+          "id": "guidance",
+          "title": "Guidance",
+          "tagline": "Steering a generative model with a condition"
+        },
+        {
+          "id": "design",
+          "title": "The Design Space",
+          "tagline": "The choices that survived"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "what-is-a-diffusion",
+          "title": "What a diffusion model is",
+          "subtitle": "A fixed corruption, and a learned undoing of it",
+          "module": "forward",
+          "moduleTitle": "The Forward Process",
+          "minutes": 18,
+          "body": "A fixed corruption, and a learned undoing of it State the two processes that make up a diffusion model Say what the \"diffusion\" is named after Explain why the forward process has no learnable parameters A diffusion model is a latent variable model whose approximate posterior is fixed. The forward process adds Gaussian noise on a schedule; the reverse process learns to undo it. The prior at the end of the chain is the standard normal, so sampling starts from noise."
+        },
+        {
+          "id": "the-closed-form",
+          "title": "The closed form",
+          "subtitle": "Sampling any timestep in one step",
+          "module": "forward",
+          "moduleTitle": "The Forward Process",
+          "minutes": 22,
+          "body": "Sampling any timestep in one step State q(x_t | x_0) and derive it from the one-step transition Explain why the closed form is what makes diffusion training affordable Verify that the closed form and the Markov chain describe the same distribution x_t = √ᾱ_t · x_0 + √(1 − ᾱ_t) · ε, with ε ~ N(0, I). The state is a scaled copy of the data plus a scaled copy of a noise vector. Training never unrolls the chain: one timestep, one noise draw, one network evaluation."
+        },
+        {
+          "id": "the-posterior",
+          "title": "The posterior",
+          "subtitle": "The one quantity that has to be tractable",
+          "module": "forward",
+          "moduleTitle": "The Forward Process",
+          "minutes": 20,
+          "body": "The one quantity that has to be tractable Write the posterior q(x_{t−1} | x_t, x_0) Explain why a tractable posterior is what makes the variational bound usable Compute the posterior mean and variance for a given step q(x_{t−1} | x_t, x_0) is Gaussian, and so is the reverse process it is compared against. Every KL term in the bound therefore has a closed form instead of a Monte Carlo estimate. The posterior leans on x_0 at small t and on x_t at large t."
+        },
+        {
+          "id": "the-objective",
+          "title": "The training objective",
+          "subtitle": "Why predicting the noise is the same as predicting the score",
+          "module": "reverse",
+          "moduleTitle": "The Reverse Process",
+          "minutes": 26,
+          "body": "Why predicting the noise is the same as predicting the score Derive the ε-prediction parameterisation from the bound State the simplified objective and what it gives up Explain the connection to denoising score matching The reverse mean can be written in terms of a network that predicts ε. With that parameterisation the bound becomes a weighted squared error on ε. Dropping the weight gives the objective the paper actually uses."
+        },
+        {
+          "id": "parameterisations",
+          "title": "Three parameterisations",
+          "subtitle": "ε, x₀, and v",
+          "module": "reverse",
+          "moduleTitle": "The Reverse Process",
+          "minutes": 18,
+          "body": "ε, x₀, and v Convert a prediction in one parameterisation into another State which parameterisation the paper found best and why Predict what changes when the network predicts x₀ instead of ε The three parameterisations describe the same reverse process; only the network target changes. Predicting x₀ is unstable at large t, where the estimate of x₀ is dominated by noise. The v-prediction is the reparameterisation that interpolates between them."
+        },
+        {
+          "id": "sampling",
+          "title": "Sampling",
+          "subtitle": "From noise to a sample, and back again",
+          "module": "reverse",
+          "moduleTitle": "The Reverse Process",
+          "minutes": 24,
+          "body": "From noise to a sample, and back again Run the ancestral sampler and account for the noise it adds Explain what a deterministic sampler does differently Describe the cost of sampling in network evaluations The ancestral sampler adds σ_t · z at every step. A deterministic sampler reuses the same noise and can be run in fewer steps. Sampling is the expensive half: T network evaluations per sample."
+        },
+        {
+          "id": "the-schedule",
+          "title": "Choosing a schedule",
+          "subtitle": "Linear, cosine, and what they do to the signal",
+          "module": "schedules",
+          "moduleTitle": "Noise Schedules",
+          "minutes": 20,
+          "body": "Linear, cosine, and what they do to the signal Write the linear schedule of the original paper Explain what the schedule controls Compute the terminal KL divergence for a given schedule The paper fixes β to grow linearly from 1e-4 to 0.02 over T = 1000 steps. The schedule is the only part of the model that is not learned. A good schedule spends its steps where the denoising task is informative."
+        },
+        {
+          "id": "the-weighting",
+          "title": "The weighting",
+          "subtitle": "Why the simplified objective is not the same objective",
+          "module": "schedules",
+          "moduleTitle": "Noise Schedules",
+          "minutes": 18,
+          "body": "Why the simplified objective is not the same objective Write the weight of the true variational bound at each timestep Explain the consequence of dropping the weight Say what the paper gives up when it uses the simplified objective The true bound weights the loss by β_t² / (2 σ_t² α_t (1 − ᾱ_t)). That weight is enormous at small t and tiny at large t. The simplified objective flattens it, so small t is effectively ignored."
+        },
+        {
+          "id": "latent-space",
+          "title": "The latent space",
+          "subtitle": "Moving the diffusion into an autoencoder",
+          "module": "latent",
+          "moduleTitle": "Latent Diffusion",
+          "minutes": 20,
+          "body": "Moving the diffusion into an autoencoder Compute the reduction in elements and in attention a compression buys Measure the reconstruction error a compression costs Explain the role of the scaling factor A diffusion model in pixel space wastes most of its capacity on high frequencies. An autoencoder moves the problem into a lower dimensional space, and the saving is roughly quadratic. The latents have to be rescaled, because the schedule assumes unit-variance data."
+        },
+        {
+          "id": "classifier-free-guidance",
+          "title": "Classifier-free guidance",
+          "subtitle": "Guiding without a classifier",
+          "module": "guidance",
+          "moduleTitle": "Guidance",
+          "minutes": 24,
+          "body": "Guiding without a classifier Write the guided score Derive it from the conditional and unconditional scores Explain why the guided model is not sampling the training distribution s_guided = s_uncond + w · (s_cond − s_uncond). The guided distribution is the training distribution tilted by p(c | x)^w. Raising w sharpens the samples and reduces their diversity."
+        },
+        {
+          "id": "the-price-of-guidance",
+          "title": "The price of guidance",
+          "subtitle": "What the extra fidelity costs",
+          "module": "guidance",
+          "moduleTitle": "Guidance",
+          "minutes": 18,
+          "body": "What the extra fidelity costs Quantify the trade-off between fidelity and diversity Explain the relationship between guidance weight and the effective temperature Predict what a very large guidance weight does Guidance narrows the distribution: the samples move to the mode and stop spreading. A large guidance weight behaves like a low temperature, but not exactly. The guided model has higher likelihood on some inputs and much lower on others."
+        },
+        {
+          "id": "the-design-space",
+          "title": "The design space",
+          "subtitle": "The choices that turned out to matter",
+          "module": "design",
+          "moduleTitle": "The Design Space",
+          "minutes": 22,
+          "body": "The choices that turned out to matter Compare the timestep parametrisation with the σ parametrisation Explain what a preconditioning function does Count the network evaluations a sampler costs The original paper fixed many choices for convenience; later work separated the ones that matter. Preconditioning decides how the loss at one noise level is weighted against the others. The number of steps is the only number that matters for sampling cost."
+        }
+      ]
+    },
+    {
+      "id": "evaluation-lab",
+      "title": "Evaluation Lab",
+      "modules": [
+        {
+          "id": "judging",
+          "title": "Judging with a Model",
+          "tagline": "A strong model asked to pick the better of two answers"
+        },
+        {
+          "id": "biases",
+          "title": "The Biases of a Judge",
+          "tagline": "Position, verbosity, and liking your own answers"
+        },
+        {
+          "id": "agreement",
+          "title": "Human Agreement",
+          "tagline": "What the agreement number actually tells you"
+        },
+        {
+          "id": "arena",
+          "title": "Arena Rankings",
+          "tagline": "Turning pairwise votes into a leaderboard"
+        },
+        {
+          "id": "benchmark",
+          "title": "Benchmark Design",
+          "tagline": "What you put in the question set decides what comes out"
+        },
+        {
+          "id": "measurement",
+          "title": "Measurement",
+          "tagline": "The number on the leaderboard has an error bar"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "what-a-judge-is",
+          "title": "What a judge is asked to do",
+          "subtitle": "Two answers, one question, one preference",
+          "module": "judging",
+          "moduleTitle": "Judging with a Model",
+          "minutes": 20,
+          "body": "Two answers, one question, one preference State the task the judge is given and the shape of its output Explain why pairwise comparison is easier for a model than scoring Say what the judge is not being asked to do The judge sees two answers to the same question and names the better one. Pairwise comparison avoids writing a reference answer, which is where most benchmarks go wrong. The judge is a model, so its preferences are the model’s preferences."
+        },
+        {
+          "id": "agreement-and-consistency",
+          "title": "Agreement and consistency",
+          "subtitle": "Two different numbers, and the second one is the harder test",
+          "module": "judging",
+          "moduleTitle": "Judging with a Model",
+          "minutes": 22,
+          "body": "Two different numbers, and the second one is the harder test Define agreement with a human and consistency under a permutation Explain what a consistency failure tells you that a low agreement does not Design the swap test Agreement is measured against a human; consistency is measured against the judge itself. Swapping the two answers must not change the preference — and if it does, the judge is answering a different question. A judge can be consistent and still be systematically wrong."
+        },
+        {
+          "id": "position-bias",
+          "title": "Position bias",
+          "subtitle": "The answer in front of it",
+          "module": "biases",
+          "moduleTitle": "The Biases of a Judge",
+          "minutes": 20,
+          "body": "The answer in front of it Define position bias and describe the swap test that detects it Compute the rate at which a judge prefers the first position Explain why a pairwise protocol can fix position bias for free A judge asked the same question twice, with the answers swapped, should answer differently. A fair protocol presents each pair in both orders and takes the majority. The cost is double the votes, which is why arenas that skip it look cheap."
+        },
+        {
+          "id": "verbosity-and-self",
+          "title": "Verbosity and self-enhancement",
+          "subtitle": "Longer answers, and answers like mine",
+          "module": "biases",
+          "moduleTitle": "The Biases of a Judge",
+          "minutes": 22,
+          "body": "Longer answers, and answers like mine Define verbosity bias and self-enhancement bias Isolate each bias in an experiment Say which of the two a protocol can fix and which it cannot A judge prefers the longer answer even when the shorter one is better. A judge prefers answers from models similar to itself. Neither bias is fixed by swapping positions; both have to be measured."
+        },
+        {
+          "id": "what-agreement-means",
+          "title": "What an agreement rate means",
+          "subtitle": "The denominator is doing most of the work",
+          "module": "agreement",
+          "moduleTitle": "Human Agreement",
+          "minutes": 20,
+          "body": "The denominator is doing most of the work Compute an agreement rate and state its denominator Explain why the same judge can score 65% or 85% on two question sets Argue for a human baseline An agreement rate is a measurement with a denominator, and the denominator is a design decision. On a question set where the answers are close, the judge will disagree with the human a lot — correctly. The number to compare against is the agreement of two humans, not 100%."
+        },
+        {
+          "id": "bradley-terry",
+          "title": "From votes to a ranking",
+          "subtitle": "The Bradley–Terry model",
+          "module": "arena",
+          "moduleTitle": "Arena Rankings",
+          "minutes": 26,
+          "body": "The Bradley–Terry model Write the Bradley–Terry model and its likelihood Explain why the strengths are only identified up to a constant Read a fitted ranking and say what the strengths mean Pr(i beats j) = σ(θ_i − θ_j): one number per model, one difference per comparison. The likelihood is a sum of logarithms, and it can be maximised directly. The model is fitted by maximum likelihood, not by an update rule."
+        },
+        {
+          "id": "confidence-and-cost",
+          "title": "The interval and the cost",
+          "subtitle": "How precise is a leaderboard, and what does precision cost?",
+          "module": "arena",
+          "moduleTitle": "Arena Rankings",
+          "minutes": 22,
+          "body": "How precise is a leaderboard, and what does precision cost? Compute a bootstrap interval on a fitted ranking Explain why an Elo rating is not an interval Estimate the number of votes needed to separate two models Resampling the votes and refitting gives an interval on the ranking. Elo is an online update rule, so its result depends on the order the votes arrived in. Votes are not free, and the price of precision is the thing that limits a leaderboard."
+        },
+        {
+          "id": "contamination",
+          "title": "Contamination",
+          "subtitle": "When the test set is in the training set",
+          "module": "benchmark",
+          "moduleTitle": "Benchmark Design",
+          "minutes": 22,
+          "body": "When the test set is in the training set Compute the score inflation a contamination fraction produces Explain why differential contamination moves rankings more than scores Distinguish contamination from saturation and from overfitting A contaminated question is answered from memory rather than from capability. The score inflation is proportional to the contaminated fraction. When only some models are contaminated, the ranking moves more than any single score."
+        },
+        {
+          "id": "what-a-benchmark-is",
+          "title": "What a benchmark is for",
+          "subtitle": "Two things it has to do at once",
+          "module": "benchmark",
+          "moduleTitle": "Benchmark Design",
+          "minutes": 20,
+          "body": "Two things it has to do at once State the two things a benchmark has to do at once Explain the tension between breadth and depth in a question set Say what the holistic framing adds to a single score A benchmark has to be hard enough to separate models and easy enough to run. A single number hides the trade-offs; a set of numbers shows them. The question set is a claim about what matters, and it should be argued for."
+        },
+        {
+          "id": "standard-error",
+          "title": "The standard error",
+          "subtitle": "The number that should be next to the score",
+          "module": "measurement",
+          "moduleTitle": "Measurement",
+          "minutes": 20,
+          "body": "The number that should be next to the score Compute the standard error of a benchmark score Explain the one-over-the-square-root-of-N rule Argue for publishing the interval with the score A score from N binary outcomes is a proportion, with variance p(1−p)/N. To halve the interval you need four times as many questions. A difference smaller than the interval is not a difference."
+        },
+        {
+          "id": "how-many-questions",
+          "title": "How many questions",
+          "subtitle": "The question nobody asks before the benchmark is released",
+          "module": "measurement",
+          "moduleTitle": "Measurement",
+          "minutes": 22,
+          "body": "The question nobody asks before the benchmark is released Compute the number of questions needed to detect a given difference Explain the power of a comparison Say what happens when the difference you care about is smaller than the noise The number of questions needed grows as the square of the inverse of the difference. A benchmark that cannot detect the difference you care about is not measuring it. Halving the effect size quadruples the cost."
+        },
+        {
+          "id": "the-honest-summary",
+          "title": "What to publish",
+          "subtitle": "The minimum a leaderboard should print",
+          "module": "measurement",
+          "moduleTitle": "Measurement",
+          "minutes": 18,
+          "body": "The minimum a leaderboard should print List what a leaderboard should print next to every score Explain why the question count belongs there Argue for reporting the judge against a human baseline A score without an interval is a claim, not a measurement. A score without a question count cannot be compared with anything. A score without the protocol cannot be reproduced."
+        }
+      ]
+    },
+    {
+      "id": "lm-from-scratch",
+      "title": "Language Model from Scratch",
+      "modules": [
+        {
+          "id": "tokenisation",
+          "title": "Tokenisation",
+          "tagline": "The first decision, and the one everything else is priced against"
+        },
+        {
+          "id": "architecture",
+          "title": "The Architecture",
+          "tagline": "A stack of matrices, and the shapes that go with them"
+        },
+        {
+          "id": "accounting",
+          "title": "Resource Accounting",
+          "tagline": "How much arithmetic, and how much memory, and which one binds"
+        },
+        {
+          "id": "systems",
+          "title": "Systems and Parallelism",
+          "tagline": "What it costs to spread a model across machines"
+        },
+        {
+          "id": "data",
+          "title": "Data",
+          "tagline": "The part of the pipeline that decides what the model knows"
+        },
+        {
+          "id": "training",
+          "title": "Training and Evaluation",
+          "tagline": "The loop, the loss, and what the number means"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "the-tokeniser",
+          "title": "The tokeniser",
+          "subtitle": "Learning to merge bytes into words",
+          "module": "tokenisation",
+          "moduleTitle": "Tokenisation",
+          "minutes": 24,
+          "body": "Learning to merge bytes into words State the byte-pair encoding rule and run it by hand on a short example Explain why the encoding starts from bytes rather than characters Compute the bytes-per-token ratio of a corpus The tokeniser is trained, not designed: the merges are whatever the corpus supports. Starting from bytes means the vocabulary can represent any text, at the price of a long sequence. The bytes-per-token ratio is the number that decides your training bill."
+        },
+        {
+          "id": "the-vocabulary-economy",
+          "title": "The vocabulary economy",
+          "subtitle": "Every token you save is a parameter you do not have",
+          "module": "tokenisation",
+          "moduleTitle": "Tokenisation",
+          "minutes": 18,
+          "body": "Every token you save is a parameter you do not have Explain the trade between the vocabulary size and the sequence length Compute the embedding parameters a vocabulary implies Argue for a particular vocabulary size on cost grounds A larger vocabulary means a longer sequence for the same text, and more parameters in the embedding. The cost of a vocabulary is paid twice: in parameters, and in tokens. The optimum depends on the model width, which is why the two cannot be chosen separately."
+        },
+        {
+          "id": "the-decoder-block",
+          "title": "The decoder block",
+          "subtitle": "Attention, a feed-forward layer, and two residual connections",
+          "module": "architecture",
+          "moduleTitle": "The Architecture",
+          "minutes": 26,
+          "body": "Attention, a feed-forward layer, and two residual connections Write the decoder block and name every tensor in it Explain the pre-norm ordering and what it buys Explain why the feed-forward block is usually wider than the residual stream A block is a residual connection around an attention, and another around a feed-forward. The feed-forward block is where most of the parameters live. The pre-norm ordering keeps the residual stream clean, which is what makes deep stacks trainable."
+        },
+        {
+          "id": "the-parameter-budget",
+          "title": "The parameter budget",
+          "subtitle": "Which matrices are large, and why",
+          "module": "architecture",
+          "moduleTitle": "The Architecture",
+          "minutes": 18,
+          "body": "Which matrices are large, and why Break a model’s parameters into their components Explain when the embedding dominates the parameter count Explain what tying the output projection does The embedding and the output projection are the only vocabulary-sized matrices. Tying them halves the largest single block of parameters, at the cost of some capability. Everything else scales with the width and the depth, not the vocabulary."
+        },
+        {
+          "id": "the-flops",
+          "title": "The FLOPs",
+          "subtitle": "What a training step costs before you run it",
+          "module": "accounting",
+          "moduleTitle": "Resource Accounting",
+          "minutes": 24,
+          "body": "What a training step costs before you run it Count the FLOPs of a forward pass from the matrix shapes alone Explain why a training step is about three forward passes Predict how the cost changes with the width, the depth and the sequence length A matrix–matrix multiply of an m × k by a k × n costs 2mnk floating-point operations. The backward pass costs about twice the forward pass, so a step is about three forwards. The cost of a run is the cost of a step times the number of steps, and nothing is a surprise."
+        },
+        {
+          "id": "the-memory-hierarchy",
+          "title": "The memory hierarchy",
+          "subtitle": "The wall your arithmetic runs into",
+          "module": "accounting",
+          "moduleTitle": "Resource Accounting",
+          "minutes": 26,
+          "body": "The wall your arithmetic runs into Compute the memory a training step needs, in all four of its components Compute the arithmetic intensity and compare it with the machine’s balance point Explain why the attention kernel is memory bound even when the whole step is not Four things have to fit: the parameters, the gradients, the optimiser state and the activations. Arithmetic intensity is the number of operations per byte, and it decides what the bottleneck is. The attention kernel’s intensity is fixed by the head dimension, which is why it has to be tiled."
+        },
+        {
+          "id": "parallelism",
+          "title": "Parallelism",
+          "subtitle": "Three ways to split a model, and what each one costs",
+          "module": "systems",
+          "moduleTitle": "Systems and Parallelism",
+          "minutes": 24,
+          "body": "Three ways to split a model, and what each one costs Name data, tensor and pipeline parallelism and what each splits Compute the communication a data-parallel step needs Compute the ratio of communication to computation, and say when it stops paying Data parallelism splits the batch and adds a gradient all-reduce per step. Tensor parallelism splits a single matrix and adds an all-reduce per layer. Pipeline parallelism splits the layers and adds a point-to-point send per stage. The split is worth it when the communication is smaller than the arithmetic it saves."
+        },
+        {
+          "id": "the-data-pipeline",
+          "title": "The data pipeline",
+          "subtitle": "From a crawl to a training set",
+          "module": "data",
+          "moduleTitle": "Data",
+          "minutes": 22,
+          "body": "From a crawl to a training set Name the stages of a language-modeling data pipeline and what each is for Explain why deduplication changes the token count Argue that the mixture is a decision rather than a default Every filtering stage removes tokens, and the stages are not independent. Deduplication is not a tidy-up; it changes what the model learns. The mixture over sources is a research decision, and it should be argued for."
+        },
+        {
+          "id": "the-training-loop",
+          "title": "The training loop",
+          "subtitle": "Batches, gradients, and the loss that falls",
+          "module": "training",
+          "moduleTitle": "Training and Evaluation",
+          "minutes": 26,
+          "body": "Batches, gradients, and the loss that falls Describe the training loop and say what each step does Explain the cross-entropy loss as a sum over tokens Explain what the loss curve does and does not tell you A step is a batch, a forward pass, a backward pass and an update. The loss is the average negative log-probability of the tokens that came next. A falling loss is evidence the model is fitting; it is not evidence it generalises."
+        },
+        {
+          "id": "the-perplexity",
+          "title": "The perplexity, and the number behind it",
+          "subtitle": "What the loss means when you exponentiate it",
+          "module": "training",
+          "moduleTitle": "Training and Evaluation",
+          "minutes": 18,
+          "body": "What the loss means when you exponentiate it Convert a cross-entropy loss into a perplexity State what the perplexity assumes about the distribution Explain why the validation loss is a different measurement The perplexity is the loss, exponentiated: it is a number of effective choices. It assumes the model is being scored against one fixed distribution. A validation loss is a measurement; a training loss is a diagnostic."
+        },
+        {
+          "id": "the-scaling-law",
+          "title": "Projecting the next run",
+          "subtitle": "What a power law lets you say before you spend the money",
+          "module": "training",
+          "moduleTitle": "Training and Evaluation",
+          "minutes": 20,
+          "body": "What a power law lets you say before you spend the money State the shape of the scaling laws and what they predict Explain the compute-optimal allocation and the rule of thumb it gives Say what a scaling law cannot tell you The loss falls as a power law in the compute, the data and the parameters. For a fixed compute, there is an optimal size, and Chinchilla found where. A scaling law is an extrapolation, and its uncertainty grows with the distance."
+        }
+      ]
+    },
+    {
+      "id": "mech-interp-lab",
+      "title": "Mechanistic Interpretability Lab",
+      "modules": [
+        {
+          "id": "superposition",
+          "title": "Superposition",
+          "tagline": "Why a dimension has to hold more than one thing"
+        },
+        {
+          "id": "features",
+          "title": "Features, Not Neurons",
+          "tagline": "A neuron is a mixture; a feature is not"
+        },
+        {
+          "id": "patching",
+          "title": "Patching",
+          "tagline": "From what a neuron responds to, to what it does"
+        },
+        {
+          "id": "circuits",
+          "title": "Circuits",
+          "tagline": "An explanation that accounts for the behaviour"
+        },
+        {
+          "id": "composition",
+          "title": "Composition",
+          "tagline": "One head shifts the keys; another completes the pattern"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "the-toy-model",
+          "title": "The toy model",
+          "subtitle": "A model with fewer dimensions than features",
+          "module": "superposition",
+          "moduleTitle": "Superposition",
+          "minutes": 24,
+          "body": "A model with fewer dimensions than features Write the linear toy model and the loss it minimises Derive the expected squared error of one feature Explain what the interference term is The loss of one feature is 1 − 2‖w_k‖² + Σ_m (w_k·w_m)². When the columns are orthonormal, what is left is pure interference. Interference is the price of putting two features in one direction."
+        },
+        {
+          "id": "the-importance-threshold",
+          "title": "The importance threshold",
+          "subtitle": "When a feature is not worth representing",
+          "module": "superposition",
+          "moduleTitle": "Superposition",
+          "minutes": 20,
+          "body": "When a feature is not worth representing Explain why the model drops some features and keeps others Measure the threshold at which a feature starts to be represented Say what happens to the interference as the tail is dropped Hosting a feature costs the host; dropping it costs the feature itself. The threshold is where those two prices cross. A power law of importances produces a sharp threshold."
+        },
+        {
+          "id": "polysemanticity",
+          "title": "Polysemanticity",
+          "subtitle": "Why a neuron is not a feature",
+          "module": "features",
+          "moduleTitle": "Features, Not Neurons",
+          "minutes": 20,
+          "body": "Why a neuron is not a feature Define polysemanticity Explain why superposition makes it unavoidable Say what a monosemantic feature would look like A neuron that responds to several things is polysemantic. Superposition makes polysemantic neurons the cheap option. A feature is a thing the model represents, not a neuron it represents it with."
+        },
+        {
+          "id": "the-sparse-autoencoder",
+          "title": "The sparse autoencoder",
+          "subtitle": "Asking for a sparse code",
+          "module": "features",
+          "moduleTitle": "Features, Not Neurons",
+          "minutes": 24,
+          "body": "Asking for a sparse code Write the encoder, the decoder and the objective of a sparse autoencoder Explain what the sparsity penalty is for Measure the reconstruction, the sparsity and the explained variance The autoencoder asks for a code that is sparse and reconstructs. The L1 penalty is what makes the code sparse. A dictionary feature that activates for one thing is interpretable."
+        },
+        {
+          "id": "activation-patching",
+          "title": "Activation patching",
+          "subtitle": "The intervention that makes a claim causal",
+          "module": "patching",
+          "moduleTitle": "Patching",
+          "minutes": 24,
+          "body": "The intervention that makes a claim causal Describe activation patching and what it establishes Compute the effect of patching a node and the normalised effect Explain why a self-consistent model is not an explanation Run the model twice, and replace one activation in one of the runs. If the output moves, that node was causally responsible for the move. Correlational evidence survives the patch; causal evidence does not."
+        },
+        {
+          "id": "the-workflow",
+          "title": "The workflow",
+          "subtitle": "Four steps, and what each one is for",
+          "module": "circuits",
+          "moduleTitle": "Circuits",
+          "minutes": 20,
+          "body": "Four steps, and what each one is for State the four steps of the mechanistic-interpretability workflow Say what a node, an edge and a path are in a transformer Argue for a behavioural explanation over a correlational one Choose a behaviour, divide the model into a graph, patch, and explain. A node is a component that does one thing; an edge is a causal influence. A finished explanation accounts for the behaviour, not for a correlation."
+        },
+        {
+          "id": "induction-heads",
+          "title": "Induction heads",
+          "subtitle": "The smallest circuit that is more than one head",
+          "module": "composition",
+          "moduleTitle": "Composition",
+          "minutes": 26,
+          "body": "The smallest circuit that is more than one head Describe the induction algorithm: [A][B] … [A] predicts [B] Explain what the previous-token head contributes to the second head Measure the accuracy of the composed circuit, and of the ablation An induction head matches the current token against the token that came before each earlier position, then copies the token after the match. The previous-token head is what shifts the keys: without it, the second head can only find the current token itself. The paper’s causal test is an ablation, and in the laboratory the ablation takes the accuracy to zero while the fixed circuit is exact."
+        },
+        {
+          "id": "the-ioi-circuit",
+          "title": "The IOI circuit",
+          "subtitle": "A whole behaviour, reverse-engineered",
+          "module": "composition",
+          "moduleTitle": "Composition",
+          "minutes": 26,
+          "body": "A whole behaviour, reverse-engineered Explain how the name-mover heads and the S-inhibition heads divide the work Say what completeness and minimality measure, and why both are needed Describe what the circuit leaves unexplained The circuit has 26 attention heads in seven classes: some move the name, and some decide which name is moved. Completeness asks how much of the behaviour the circuit accounts for; minimality asks whether every part of it is needed. The paper’s own evaluation finds the explanation supported and incomplete at the same time — which is what an honest circuit looks like."
+        },
+        {
+          "id": "the-qk-and-ov-circuits",
+          "title": "The QK and OV circuits",
+          "subtitle": "One head, two matrices, and an exact split of what it contributes",
+          "module": "circuits",
+          "moduleTitle": "Circuits",
+          "minutes": 24,
+          "body": "One head, two matrices, and an exact split of what it contributes Factor one attention head into the circuit that chooses a position and the circuit that writes from it State the pathway decomposition of a last-layer head and why it is an identity rather than an approximation Explain why a head in an earlier layer has no such split, and what can be measured instead Describe what path patching asks that component patching cannot A head is four matrices and two products: W_QᵀW_K decides where it looks, W_OW_V decides what it writes when it gets there. A last-layer head’s effect on a logit difference is exactly the sum over source positions of attention times the write that position is worth — so the decomposition can be checked against an ablation to machine precision. A composed head’s QK circuit is a property of the path into it, which is why the induction circuit cannot be read off either head alone."
+        },
+        {
+          "id": "automating-the-search",
+          "title": "Automating the search",
+          "subtitle": "Edge attribution, pruning, and what a discovered circuit is graded against",
+          "module": "circuits",
+          "moduleTitle": "Circuits",
+          "minutes": 22,
+          "body": "Edge attribution, pruning, and what a discovered circuit is graded against Define the attribution score of an edge and say why it is marginal rather than intrinsic Describe the prune-and-rescore loop and the threshold it stops at State faithfulness and completeness as two different failures Explain why a hand-wired circuit is the only honest ground truth for a discovery algorithm An edge’s score is what the current graph loses when that edge is deleted, so an edge can look essential only because its partner is in the graph — which is why the search re-scores everything at every step. A graph can be faithful without being complete, or complete without being faithful: one names a route that carries the behaviour on its own, the other names everything the behaviour cannot do without. On a random model the strongest available claim is that the numbers are self-consistent. On a model wired by hand the search’s answer is a test."
+        }
+      ]
+    },
+    {
+      "id": "multimodal-lab",
+      "title": "Multimodal Lab",
+      "modules": [
+        {
+          "id": "contrastive",
+          "title": "Contrastive Pretraining",
+          "tagline": "Two encoders, one space, and no labels at all"
+        },
+        {
+          "id": "the-modality-gap",
+          "title": "The Modality Gap",
+          "tagline": "Two spaces that are close, and not the same space"
+        },
+        {
+          "id": "instruction",
+          "title": "Instruction Tuning",
+          "tagline": "Getting better at instructions, and what it costs"
+        },
+        {
+          "id": "the-loss",
+          "title": "The Loss and the Bridge",
+          "tagline": "What the objective normalises, and what the method holds still"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "the-contrastive-objective",
+          "title": "The contrastive objective",
+          "subtitle": "What the loss says, and who provides the negatives",
+          "module": "contrastive",
+          "moduleTitle": "Contrastive Pretraining",
+          "minutes": 28,
+          "body": "What the loss says, and who provides the negatives State the objective in words and write the loss Explain where the negatives come from and what they cost Say what the temperature does to the loss The loss asks for the paired image and caption to be closer than the other pairs in the batch. The negatives are the other pairs in the batch, and they are free. The temperature decides how sharp the distribution over the batch is."
+        },
+        {
+          "id": "the-data-and-the-batch",
+          "title": "The data and the batch",
+          "subtitle": "What the scale of the pretraining buys",
+          "module": "contrastive",
+          "moduleTitle": "Contrastive Pretraining",
+          "minutes": 24,
+          "body": "What the scale of the pretraining buys Say what the number of pairs does to the retrieval Explain why a larger batch gives more negatives and a better estimate Describe the precomputation that makes the index affordable More pairs is more supervision, and the retrieval improves with it. A larger batch is more negatives for the same cost, and a better estimate. The document vectors never change, so the index is a matrix and the search is a matrix product."
+        },
+        {
+          "id": "the-modality-gap",
+          "title": "The modality gap",
+          "subtitle": "One space, and a seam down the middle of it",
+          "module": "the-modality-gap",
+          "moduleTitle": "The Modality Gap",
+          "minutes": 24,
+          "body": "One space, and a seam down the middle of it Define the gap and say how it is measured Explain what it means for a retrieval that works Say what closing it would cost The images and the captions end up in one space, but the two halves are further apart than either half is from itself. A retrieval works anyway, because the *pairs* are close even though the *spaces* are not. So the gap is a property of the representation, not a failure of the method."
+        },
+        {
+          "id": "zero-shot",
+          "title": "Zero-shot",
+          "subtitle": "Classifying with the class names and nothing else",
+          "module": "the-modality-gap",
+          "moduleTitle": "The Modality Gap",
+          "minutes": 26,
+          "body": "Classifying with the class names and nothing else Describe the zero-shot classifier and why it works at all Say what part the prompt plays, and measure what it is worth Explain the connection to the retrieval the model was trained for The class names are embedded with the text encoder, and the image is assigned to the closest of them. The model was never trained to classify; it was trained to match a caption, and the class names are captions. The prompt is part of the method, and a different template gives a different score."
+        },
+        {
+          "id": "the-instruction-recipe",
+          "title": "The instruction recipe",
+          "subtitle": "Three stages, and what each one is for",
+          "module": "instruction",
+          "moduleTitle": "Instruction Tuning",
+          "minutes": 24,
+          "body": "Three stages, and what each one is for Describe the three stages of the recipe Say what the visual instruction tuning adds to it Explain why the stages are in that order Say what the projection changes about a visual token, and what it costs The stages are: align the model to instructions, then teach it to read images, then tune it on visual instructions. Each stage is a different kind of data, and the order is what makes the last one work. The projection is a learned linear map from the vision width to the language width; it changes the width of a token, not its count. The model that comes out is a different model from the one that went in."
+        },
+        {
+          "id": "the-alignment-tax",
+          "title": "The alignment tax",
+          "subtitle": "What the tuning takes away",
+          "module": "instruction",
+          "moduleTitle": "Instruction Tuning",
+          "minutes": 24,
+          "body": "What the tuning takes away Define the alignment tax and say what it is measured on Measure the gain and the tax, and the ratio between them Explain why the tax is a fact about training and not a defect of the method Tuning on instructions makes the model better at instructions and slightly worse at what it was good at. The tax is a measurement on the original task, before and after — not a claim. And it is a consequence of the training, which means it is something the training can be made to avoid."
+        },
+        {
+          "id": "the-sigmoid-loss",
+          "title": "The sigmoid loss",
+          "subtitle": "One decision per pair, and no denominator",
+          "module": "the-loss",
+          "moduleTitle": "The Loss and the Bridge",
+          "minutes": 26,
+          "body": "One decision per pair, and no denominator Say what the softmax normalises and what that couples together Read the same row of a batch under both losses Explain what the bias balances, and why its value depends on the batch The softmax turns each row of the batch into a distribution, so one pair’s loss depends on every other pair. The sigmoid loss is a sum of independent pair decisions, and a pair’s loss is a function of that pair alone. The bias is the count of negatives, written as a probability; it is learned, but its starting point is a fact about the batch."
+        },
+        {
+          "id": "the-frozen-bridge",
+          "title": "The frozen bridge",
+          "subtitle": "Patches, queries, and the towers that do not move",
+          "module": "the-loss",
+          "moduleTitle": "The Loss and the Bridge",
+          "minutes": 28,
+          "body": "Patches, queries, and the towers that do not move Say what the image encoder, the queries and the language model each do Explain why the patch tokens exist, and what a learned query reads from them Read the parameter bill of the bridge, and the share of it that is trained A vision transformer cuts the image into patches and treats each patch as a token, which is what lets an image encoder be a transformer at all. BLIP-2 keeps both towers frozen and trains a small set of queries to read the patch tokens and present them to the language model. Freezing means the towers contribute most of the parameters and none of the gradient; the trainable share is the number the method is selling."
+        },
+        {
+          "id": "the-resampler",
+          "title": "The resampler",
+          "subtitle": "A fixed number of vectors for a variable number of tokens",
+          "module": "the-loss",
+          "moduleTitle": "The Loss and the Bridge",
+          "minutes": 24,
+          "body": "A fixed number of vectors for a variable number of tokens Say what the resampler’s latents read, and what the output length is Explain why the output length is bounded by the latents and not by the image Compare the cost of cross-attention on the latents with attention over every token A resampler is a fixed set of learned latents attending to a variable number of visual tokens; one vector comes out per latent. The output length is therefore the number of latents, whatever the resolution or the number of images: the bound is structural, not a truncation. The cross-attention costs latents × tokens work, where attention over the raw tokens would cost tokens squared."
+        }
+      ]
+    },
+    {
+      "id": "rl-foundations",
+      "title": "Reinforcement Learning Foundations",
+      "modules": [
+        {
+          "id": "the-mdp",
+          "title": "The MDP",
+          "tagline": "The problem, written down exactly"
+        },
+        {
+          "id": "value-functions",
+          "title": "Value functions",
+          "tagline": "What a state is worth, and how to find out"
+        },
+        {
+          "id": "policy-gradients",
+          "title": "Policy gradients",
+          "tagline": "The gradient, and how to estimate it while acting"
+        },
+        {
+          "id": "actor-critic",
+          "title": "Actor–critic",
+          "tagline": "A smaller signal, and what it costs"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "states-and-returns",
+          "title": "States and returns",
+          "subtitle": "The problem, written down exactly",
+          "module": "the-mdp",
+          "moduleTitle": "The MDP",
+          "minutes": 24,
+          "body": "The problem, written down exactly Write down a Markov decision process Compute the return of a trajectory, with and without a discount Say what the Markov property rules out and what it buys A Markov decision process is a tuple: states, actions, a reward function and a transition kernel. The Markov property says the next state depends only on the present one — not on the whole history. The discount is not a preference; it is what makes the infinite sum converge and what makes the problem finite."
+        },
+        {
+          "id": "the-value-function",
+          "title": "The value function",
+          "subtitle": "What a state is worth",
+          "module": "value-functions",
+          "moduleTitle": "Value functions",
+          "minutes": 26,
+          "body": "What a state is worth Define the value of a state under a policy State the Bellman equation and say what each term is Explain why the value is a fixed point, and what that means The value of a state is the expected return from it, under a policy. The Bellman equation says the value is the reward plus the discounted value of the next state. Iterating the equation converges to the value: it is a contraction, and the iteration is a fixed-point method."
+        },
+        {
+          "id": "the-likelihood-ratio-trick",
+          "title": "The likelihood-ratio trick",
+          "subtitle": "How the gradient is turned into something you can measure while acting",
+          "module": "policy-gradients",
+          "moduleTitle": "Policy gradients",
+          "minutes": 28,
+          "body": "How the gradient is turned into something you can measure while acting Derive the likelihood-ratio trick from the definition of the gradient Explain what the trick does to the terms that do not depend on the parameters Write the estimator that follows from it Check the derivation on a problem small enough to compute it exactly The gradient of a log-probability is the score function. Multiplying by the likelihood turns an expectation under one distribution into an expectation under another. Everything that does not depend on the parameters drops out, and what is left can be sampled. With one state the expectation is a finite sum, so the three forms of the gradient can be printed side by side and their difference is arithmetic error rather than luck."
+        },
+        {
+          "id": "the-baseline",
+          "title": "The baseline",
+          "subtitle": "A smaller signal that means the same thing",
+          "module": "actor-critic",
+          "moduleTitle": "Actor–critic",
+          "minutes": 24,
+          "body": "A smaller signal that means the same thing Show that a baseline does not change the expectation of the gradient Explain why a good baseline reduces the variance so much Say what the advantage is, and what it is worth Say which rewards a step may be weighted by, and why the choice is free in expectation Subtracting any function of the state leaves the expected gradient unchanged. The reason is that the baseline does not depend on the action, so its expectation is zero. A good baseline removes the part of the return that was going to happen anyway, and that part is most of the noise. The same argument covers the weighting: the rewards a step arrived with cannot be influenced by it, so dropping them changes the spread and not the mean."
+        },
+        {
+          "id": "the-n-step-return",
+          "title": "The n-step return",
+          "subtitle": "Trading the bias of the bootstrap against the noise of the sample",
+          "module": "actor-critic",
+          "moduleTitle": "Actor–critic",
+          "minutes": 26,
+          "body": "Trading the bias of the bootstrap against the noise of the sample Compute the n-step return Say what makes it biased, and what makes it noisy Explain why the two ends of the range are bad in different ways The n-step return bootstraps after n steps, and the bootstrap is biased while the sample is noisy. The one-step return is the least noisy and the most biased; the Monte Carlo return is the reverse. The λ-return is a mixture, and λ is the knob between them."
+        },
+        {
+          "id": "the-lambda-return",
+          "title": "The λ-return",
+          "subtitle": "A whole family of estimators, and the one knob",
+          "module": "actor-critic",
+          "moduleTitle": "Actor–critic",
+          "minutes": 24,
+          "body": "A whole family of estimators, and the one knob Compute the λ-return and the general advantage estimate Measure the bias and the variance of an estimator, rather than assuming them Say where the best λ is, and why it depends on the horizon The λ-return is a weighted mixture of the n-step returns, with weights (1−λ)λ^(n−1). The general advantage estimate is the same thing, written in terms of the temporal-difference errors. The best λ is the one that matches the estimator to the horizon you actually have."
+        },
+        {
+          "id": "the-actor-critic-loop",
+          "title": "The actor–critic loop",
+          "subtitle": "The two halves, and how they are put together",
+          "module": "actor-critic",
+          "moduleTitle": "Actor–critic",
+          "minutes": 26,
+          "body": "The two halves, and how they are put together Say what the actor does and what the critic does Describe the temporal-difference update the critic makes Run the loop and read the learning curve it produces The critic estimates the value; the actor follows the advantage the critic makes available. The critic is a bootstrapping estimator, so it is biased and it is noisy, and it learns fast. The two halves have different learning rates, and the difference matters."
+        },
+        {
+          "id": "the-optimal-policy",
+          "title": "The optimal policy",
+          "subtitle": "And the answer every laboratory is checked against",
+          "module": "value-functions",
+          "moduleTitle": "Value functions",
+          "minutes": 22,
+          "body": "And the answer every laboratory is checked against Compute the optimal value function by value iteration Read the greedy policy off the optimal value function Say what a policy gradient is trying to find, in these terms The optimal value function is the largest value any policy achieves, and it satisfies its own Bellman equation. The greedy policy with respect to the optimal value function is optimal. A policy gradient is a stochastic way of finding the same thing, without ever writing the equation down."
+        }
+      ]
+    },
+    {
+      "id": "retrieval-lab",
+      "title": "Retrieval Lab",
+      "modules": [
+        {
+          "id": "sparse",
+          "title": "Sparse Retrieval",
+          "tagline": "Matching the words, exactly"
+        },
+        {
+          "id": "dense",
+          "title": "Dense Retrieval",
+          "tagline": "Matching the meaning, approximately"
+        },
+        {
+          "id": "late",
+          "title": "Late Interaction",
+          "tagline": "Token by token, and the index it costs"
+        },
+        {
+          "id": "the-long-context",
+          "title": "The Long Context",
+          "tagline": "Where the evidence is put, and whether it is used"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "the-lexical-index",
+          "title": "The lexical index",
+          "subtitle": "What a lexical retriever stores",
+          "module": "sparse",
+          "moduleTitle": "Sparse Retrieval",
+          "minutes": 22,
+          "body": "What a lexical retriever stores Describe the inverted index, and say what it costs Explain why the index can be precomputed and the query cannot Say what a lexical retriever is matching The index maps each word to the documents that contain it. The size of the index is the number of postings, and that is what a lexical search really spends. A lexical retriever matches words, and it is blind to everything else."
+        },
+        {
+          "id": "bm25",
+          "title": "BM25",
+          "subtitle": "Two terms doing all the work",
+          "module": "sparse",
+          "moduleTitle": "Sparse Retrieval",
+          "minutes": 26,
+          "body": "Two terms doing all the work Write the BM25 score and say what the two parameters do Explain the inverse document frequency and the length normalisation Measure the recall, and see where the lexical retriever fails The inverse document frequency says how rare a word is; the saturation says how much of a match is coincidence. The length normalisation says how much of a document had to be read to get the match. A lexical retriever cannot find an answer that uses different words — and most answers do."
+        },
+        {
+          "id": "the-learned-embedding",
+          "title": "The learned embedding",
+          "subtitle": "A question and a document in the same space",
+          "module": "dense",
+          "moduleTitle": "Dense Retrieval",
+          "minutes": 26,
+          "body": "A question and a document in the same space Describe the dual encoder and what it embeds Explain why the document vectors can be precomputed and the question’s cannot Say what a single vector loses, and what it buys The retriever embeds the question and the document separately and compares the two vectors. The document vectors never change, so the index is a matrix and the search is a matrix product. One vector per document is cheap; one vector per token is not."
+        },
+        {
+          "id": "the-contrastive-objective",
+          "title": "The contrastive objective",
+          "subtitle": "What the embedding is trained to do",
+          "module": "dense",
+          "moduleTitle": "Dense Retrieval",
+          "minutes": 28,
+          "body": "What the embedding is trained to do State the contrastive objective in words Say what the in-batch negatives are, and why they are nearly free Compare the trained retriever with the lexical one on the same questions The objective is that a question should be closer to its own answer than to the other answers in the batch. The other answers in the batch are free negatives, and they are what makes the training cheap. The learned retriever beats the lexical one exactly where the lexical one is blind: the mismatch of words."
+        },
+        {
+          "id": "the-maxsim-score",
+          "title": "The MaxSim score",
+          "subtitle": "Comparing a question and a document word by word",
+          "module": "late",
+          "moduleTitle": "Late Interaction",
+          "minutes": 26,
+          "body": "Comparing a question and a document word by word Write the MaxSim score and say what it compares Explain what the late interaction buys over a single vector Measure the length bias of the score The score is the sum, over the question’s words, of the best-matching word of the document. The document’s vectors can still be precomputed, so the search is still cheap — but there are far more of them. The maximum is taken over more candidates in a longer document, and the score inherits that bias."
+        },
+        {
+          "id": "the-retrieval-augmented-reader",
+          "title": "The retrieval-augmented reader",
+          "subtitle": "What the retrieval is for",
+          "module": "the-long-context",
+          "moduleTitle": "The Long Context",
+          "minutes": 24,
+          "body": "What the retrieval is for Describe the retrieval-augmented reader and what it changes about the model Explain the claim that parametric memory is a poor substitute for a retrieved document Say what the marginal utility of an extra passage is The retriever supplies the facts and the reader supplies the reasoning. More passages help until the noise in them starts to cost more than the facts are worth. The evidence has to be used, not merely present."
+        },
+        {
+          "id": "lost-in-the-middle",
+          "title": "Lost in the middle",
+          "subtitle": "A context is not a place",
+          "module": "the-long-context",
+          "moduleTitle": "The Long Context",
+          "minutes": 26,
+          "body": "A context is not a place Describe the position effect and what it measures Measure how a reader’s use of a document depends on where the document is Compare a long-context reader with one that is given the evidence by retrieval The evidence near the beginning and near the end of a context is used well; the evidence in the middle is not. So a long context is not a substitute for retrieval: it is a place where retrieved evidence can be lost. Putting the evidence where the reader looks is a design decision, and it is measurable."
+        },
+        {
+          "id": "what-retrieval-is-for",
+          "title": "What retrieval is for",
+          "subtitle": "And what a long context is not",
+          "module": "the-long-context",
+          "moduleTitle": "The Long Context",
+          "minutes": 22,
+          "body": "And what a long context is not Put the two arguments together: the retriever finds the facts, and the reader has to use them Say what a long context changes and what it does not Measure the case: retrieval against a long context, on the same questions A long context raises the ceiling on what can be answered and lowers the floor on what is answered well. Retrieval is what puts the evidence where the reader will look at it. The two are not alternatives: the retriever decides what is in the context, and the reader decides whether it is used."
+        }
+      ]
+    },
+    {
+      "id": "rlhf-lab",
+      "title": "RLHF Lab",
+      "modules": [
+        {
+          "id": "gradients",
+          "title": "Policy Gradients",
+          "tagline": "Optimising a distribution by moving its log-probabilities"
+        },
+        {
+          "id": "trust-region",
+          "title": "Trust Regions",
+          "tagline": "Bounding how far one update may move the policy"
+        },
+        {
+          "id": "ppo",
+          "title": "Proximal Policy Optimization",
+          "tagline": "The clipped surrogate, and what the clip actually does"
+        },
+        {
+          "id": "kl-penalty",
+          "title": "The KL Penalty",
+          "tagline": "What keeps the aligned model recognisably itself"
+        },
+        {
+          "id": "details",
+          "title": "The N+ Details",
+          "tagline": "What had to be true for the pipeline to train at all"
+        },
+        {
+          "id": "overoptimisation",
+          "title": "Reward Overoptimisation",
+          "tagline": "The point where optimising harder makes things worse"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "the-objective",
+          "title": "The objective",
+          "subtitle": "Maximising an expectation over a distribution you are also changing",
+          "module": "gradients",
+          "moduleTitle": "Policy Gradients",
+          "minutes": 22,
+          "body": "Maximising an expectation over a distribution you are also changing Write the objective an RLHF pipeline maximises Explain why the gradient of an expectation is not the expectation of the gradient Compute the expected reward of a policy on a finite problem exactly The objective is E_{a~π}[r(a)] — a number that depends on the whole distribution. Moving the policy changes which actions are sampled, so the derivative has to account for that. On a finite problem the expectation is a finite sum, and its gradient is available exactly."
+        },
+        {
+          "id": "the-estimator",
+          "title": "The estimator",
+          "subtitle": "The derivative you do not have to take",
+          "module": "gradients",
+          "moduleTitle": "Policy Gradients",
+          "minutes": 24,
+          "body": "The derivative you do not have to take Write the score-function estimator Explain what it costs to be unbiased instead of low-variance State the conditions the estimator needs ∇E_π[r] = E_π[r · ∇log π] — the model’s own log-probability replaces its derivative. The trick needs the support of π to be unchanged as the parameters move. The estimator is unbiased but high-variance, which is what the value function is for."
+        },
+        {
+          "id": "trust-regions",
+          "title": "The trust region",
+          "subtitle": "Bounding the step, not the reward",
+          "module": "trust-region",
+          "moduleTitle": "Trust Regions",
+          "minutes": 24,
+          "body": "Bounding the step, not the reward Write the trust-region constraint Explain what a large step does to the samples that justified the old estimate Distinguish a KL penalty from a KL constraint The constraint is on the KL between the old and new policies, not on the objective. A KL *penalty* is a soft nudge; a KL *constraint* is a hard boundary that the optimiser respects. The bound is what makes the importance ratio a usable estimate of the new policy."
+        },
+        {
+          "id": "the-kl-penalty",
+          "title": "The KL penalty",
+          "subtitle": "A number that has to be estimated from samples",
+          "module": "kl-penalty",
+          "moduleTitle": "The KL Penalty",
+          "minutes": 26,
+          "body": "A number that has to be estimated from samples State what the penalty measures and against what Write the three estimators and say what each is unbiased for Explain why a penalty must be non-negative The penalty is the KL from the reference policy, and it is a *sample* estimate. The naive estimator is unbiased but can be negative; the squared one is positive but biased. The third estimator is positive, and its expectation is the chi-square divergence minus the KL — a detail most write-ups leave out."
+        },
+        {
+          "id": "the-clipped-objective",
+          "title": "The clipped objective",
+          "subtitle": "Where the gradient goes to zero",
+          "module": "ppo",
+          "moduleTitle": "Proximal Policy Optimization",
+          "minutes": 26,
+          "body": "Where the gradient goes to zero Write the clipped surrogate and find the region where the clip is active Explain why a clipped step has zero gradient rather than a smaller one Compute the clip fraction and say what it is for The objective takes the minimum of the clipped and unclipped terms. When the clip is active the objective is flat, so its gradient is exactly zero. The clip fraction is the diagnostic: it should fall as training goes well."
+        },
+        {
+          "id": "advantages",
+          "title": "Advantages and GAE",
+          "subtitle": "The credit assignment, and its one hyperparameter",
+          "module": "ppo",
+          "moduleTitle": "Proximal Policy Optimization",
+          "minutes": 24,
+          "body": "The credit assignment, and its one hyperparameter Write the one-step temporal-difference residual Derive generalised advantage estimation from it Explain the bias–variance trade-off that λ controls δ_t = r_t + γV(s_{t+1}) − V(s_t) is the one-step surprise. GAE sums the residuals with a geometric discount, and λ sets how far it looks. λ = 0 is the one-step estimate; λ = 1 is the Monte Carlo return."
+        },
+        {
+          "id": "the-pipeline",
+          "title": "The three stages",
+          "subtitle": "Supervised, then ranked, then optimised",
+          "module": "details",
+          "moduleTitle": "The N+ Details",
+          "minutes": 22,
+          "body": "Supervised, then ranked, then optimised Name the three stages of an RLHF pipeline and what each produces Say what each stage can fail at Explain why the reference policy comes from the first stage The supervised stage produces the reference policy that the penalty is measured against. The reward stage produces a *ranking* of responses, which is what the third stage consumes. The third stage optimises a policy against a proxy, and that is where the danger is."
+        },
+        {
+          "id": "the-checklist",
+          "title": "The checklist",
+          "subtitle": "Twenty details, and the argument for listing them",
+          "module": "details",
+          "moduleTitle": "The N+ Details",
+          "minutes": 20,
+          "body": "Twenty details, and the argument for listing them Explain why a training result without its details is not reproducible Give two examples of a detail that silently decides whether training works Argue for publishing the checklist alongside the result The primary source’s contribution is an enumeration, not a new algorithm. Most of the details are about scale: the reward model’s noise, the learning rate, the number of epochs. A result that omits them cannot be reproduced, and cannot be believed."
+        },
+        {
+          "id": "the-overoptimisation-result",
+          "title": "The overoptimisation result",
+          "subtitle": "Goodhart, with a curve",
+          "module": "overoptimisation",
+          "moduleTitle": "Reward Overoptimisation",
+          "minutes": 24,
+          "body": "Goodhart, with a curve State the result: optimising a proxy harder eventually makes the true reward worse Explain why a fixed-size proxy error is enough to cause it Read the turning point of the curve operationally The proxy error does not grow as you push harder, so the gap between the proxy and the truth opens up. The true reward is maximised at a finite distance from the reference, not at infinity. Past that point, every unit of proxy reward costs more true reward than it gains."
+        },
+        {
+          "id": "the-functional-forms",
+          "title": "The functional forms",
+          "subtitle": "Two curves, fitted to a curve",
+          "module": "overoptimisation",
+          "moduleTitle": "Reward Overoptimisation",
+          "minutes": 22,
+          "body": "Two curves, fitted to a curve Write the two functional forms the overoptimisation paper reports Fit them to a controlled setting and read the fit Compare reinforcement learning against best-of-n on the same proxy For best-of-n: R(d) = d(α − β d), a downward parabola through the origin. For reinforcement learning: R(d) = d(α − β log d), which turns over more slowly. Best-of-n optimises the *sample*; reinforcement learning optimises the *policy*, and the two behave differently."
+        },
+        {
+          "id": "the-operational-lesson",
+          "title": "The operational lesson",
+          "subtitle": "Where to stop",
+          "module": "overoptimisation",
+          "moduleTitle": "Reward Overoptimisation",
+          "minutes": 18,
+          "body": "Where to stop Say what the turning point tells an practitioner Explain the role of the KL coefficient as the thing that sets the stopping point Argue for reporting the distance travelled alongside the score The KL coefficient is the dial that decides how far the policy is allowed to travel. The turning point is where the marginal proxy reward equals the marginal true reward. A report that gives a score without the distance travelled cannot be compared with another one."
+        }
+      ]
+    },
+    {
+      "id": "safety-lab",
+      "title": "Safety and Alignment Lab",
+      "modules": [
+        {
+          "id": "harmlessness",
+          "title": "Harmlessness from AI Feedback",
+          "tagline": "A model that critiques itself, against a written rule"
+        },
+        {
+          "id": "red-teaming",
+          "title": "Red Teaming",
+          "tagline": "Finding the failures, and knowing which ones you have not"
+        },
+        {
+          "id": "cued-behaviour",
+          "title": "Cued Behaviour",
+          "tagline": "A harm that arrives with a mark nobody asked about"
+        },
+        {
+          "id": "sycophancy",
+          "title": "Sycophancy",
+          "tagline": "Changing the answer to agree with the person asking"
+        },
+        {
+          "id": "privacy",
+          "title": "Privacy",
+          "tagline": "What a model can be made to give back"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "the-critique-and-revise-loop",
+          "title": "The critique-and-revise loop",
+          "subtitle": "A model, a principle, and a second pass",
+          "module": "harmlessness",
+          "moduleTitle": "Harmlessness from AI Feedback",
+          "minutes": 26,
+          "body": "A model, a principle, and a second pass Describe the loop: a response, a critique against a principle, a revision Say what the loop produces and what it is used for Measure how much of the harm the loop removes The critique names the principle that was violated, so the revision has something to work against. The loop makes a preference dataset; the dataset is what trains the model. A revision should remove the harm and keep the harmless part of the answer."
+        },
+        {
+          "id": "the-judge",
+          "title": "The judge",
+          "subtitle": "Whose opinion the number is",
+          "module": "harmlessness",
+          "moduleTitle": "Harmlessness from AI Feedback",
+          "minutes": 24,
+          "body": "Whose opinion the number is Say what a harmlessness score is an estimate of Explain why the agreement with the labels is the number to report Describe the false positives and false negatives a judge makes A harmlessness score is what a judge believes, and the judge is a model. The agreement with the human labels is what makes the number worth anything. A judge that flags the harmless cases costs you the data you were trying to collect."
+        },
+        {
+          "id": "the-attack",
+          "title": "The attack",
+          "subtitle": "Finding the failure, on purpose",
+          "module": "red-teaming",
+          "moduleTitle": "Red Teaming",
+          "minutes": 24,
+          "body": "Finding the failure, on purpose Describe what a red-team attack is and what it is measured against Say why the attack success rate alone is the wrong number Explain what the coverage of a red team means A red team is a search: the failures it has not found are the ones it cannot rule out. The attack success rate says how weak the model is on the attacks it made. The coverage says how much of the space it looked at, and it is the number that is usually missing."
+        },
+        {
+          "id": "the-taxonomy",
+          "title": "The taxonomy",
+          "subtitle": "What a red team should be measured against",
+          "module": "red-teaming",
+          "moduleTitle": "Red Teaming",
+          "minutes": 22,
+          "body": "What a red team should be measured against Say what a harm taxonomy is and where it comes from Explain the difference between a red-team set and a test set Measure the coverage of a red team against a taxonomy A taxonomy is what makes a red-team set a measurement rather than an anecdote. A red-team set is a sample of the attacks that work, not a test set: it says what fails, not what passes. The coverage of a red team is a claim about the model only where the red team looked."
+        },
+        {
+          "id": "agreeing-with-the-user",
+          "title": "Agreeing with the user",
+          "subtitle": "The flip rate",
+          "module": "sycophancy",
+          "moduleTitle": "Sycophancy",
+          "minutes": 24,
+          "body": "The flip rate Define the flip rate and say what it measures Explain the mechanism behind it Say what a model is being trained to do when it agrees A model asked a question it can answer will sometimes change its answer to agree. The training rewarded the answer that made the user happy, and agreement looks like that. The flip rate is the fraction of correct answers that become wrong under pressure."
+        },
+        {
+          "id": "the-mitigation",
+          "title": "The mitigation",
+          "subtitle": "One sentence in the prompt",
+          "module": "sycophancy",
+          "moduleTitle": "Sycophancy",
+          "minutes": 22,
+          "body": "One sentence in the prompt Describe the mitigation and the size of its effect Say why a mitigation that lives in the prompt is not a fix Measure the effect of the mitigation against the baseline Telling the model the user may be wrong moves the flip rate, and by a measurable amount. A mitigation in the prompt is a mitigation in the prompt: it depends on the system message being there. The right place to fix it is the training, and the measurement is how you would know."
+        },
+        {
+          "id": "memorisation",
+          "title": "Memorisation",
+          "subtitle": "What a model keeps, and what it gives back",
+          "module": "privacy",
+          "moduleTitle": "Privacy",
+          "minutes": 24,
+          "body": "What a model keeps, and what it gives back Describe what memorisation is and when it happens Explain the extraction attack and what its rate depends on Measure the exposure of a training set A model trained on a record it saw once can keep that record exactly. The exposure of a training set is the thing a privacy claim is about. The attack gets easier the more of the record the attacker already has."
+        },
+        {
+          "id": "what-a-claim-is-worth",
+          "title": "What a claim is worth",
+          "subtitle": "Reading a safety result",
+          "module": "harmlessness",
+          "moduleTitle": "Harmlessness from AI Feedback",
+          "minutes": 24,
+          "body": "Reading a safety result Say what a harmlessness number is and is not a measurement of List the things a safety claim leaves out, and why each matters Describe the evidence a claim needs before it is believed A harmlessness score is the opinion of a judge, measured on a sample, against a taxonomy. It is not a statement about the model’s behaviour outside the sample. A claim is worth what its measurement can carry, and the course is about the measurement."
+        },
+        {
+          "id": "the-two-rounds",
+          "title": "The two rounds",
+          "subtitle": "What imitation reaches, and what a preference signal moves",
+          "module": "harmlessness",
+          "moduleTitle": "Harmlessness from AI Feedback",
+          "minutes": 24,
+          "body": "What imitation reaches, and what a preference signal moves Name the two rounds and what each of them is trained on Explain why the first round cannot find the compromise by itself Measure where each round lands on the two objectives The first round imitates the demonstrations it was given, and a demonstration is only what somebody wrote down. The second round is trained against a preference signal, which is the only place in the procedure that a trade-off between being helpful and being harmless can be said. The weighting is a choice, and the same model is a different assistant under a different one."
+        },
+        {
+          "id": "the-critic-that-sees-what-it-cannot",
+          "title": "The critic that sees what it cannot",
+          "subtitle": "Self-critique against an external one",
+          "module": "harmlessness",
+          "moduleTitle": "Harmlessness from AI Feedback",
+          "minutes": 22,
+          "body": "Self-critique against an external one Say what a model can and cannot see in an answer it has just written Explain why the comparison of two critics needs a verdict that is right Measure what each critic misses, and the cost of each A critique written by the model that wrote the answer shares that answer’s blind spots. The comparison is only a comparison if something else decides which critiques were right. What an external critic finds that a self-critic does not is the claim of the method, and it is a rate, not an anecdote."
+        },
+        {
+          "id": "the-search-budget",
+          "title": "The search budget",
+          "subtitle": "How many attacks it takes to find a failure",
+          "module": "red-teaming",
+          "moduleTitle": "Red Teaming",
+          "minutes": 24,
+          "body": "How many attacks it takes to find a failure Say what a discovery rate is measured against Explain why spending a budget evenly over the failures is the ceiling Read the marginal value of the last attack off a curve The question is not whether this many attacks work, but how many it takes to find a given share of the failures. A budget spread over every failure is the best an unguided search can do, and it loses to that before it loses to a guided one. A thousand attacks that find the same failure are worth less than ten that find ten, and the gap is the re-hit count."
+        },
+        {
+          "id": "what-consistency-buys",
+          "title": "What consistency buys",
+          "subtitle": "The number behind a preference label",
+          "module": "sycophancy",
+          "moduleTitle": "Sycophancy",
+          "minutes": 24,
+          "body": "The number behind a preference label Define the repeat agreement of a labeler and say what it measures Explain what a majority of looks does to the label, and what it does not do Say which of fidelity and amplification a consistency number actually buys A preference label is one person’s answer to one question at one moment, and the repeat agreement is what says how much of it is signal. Taking a majority over several looks raises the rate at which the label is the one the labeler means; it does not change what the labeler means. Fidelity and amplification are different claims, and only the first is bought with consistency."
+        },
+        {
+          "id": "the-cue-nobody-asked-about",
+          "title": "The cue nobody asked about",
+          "subtitle": "A classifier that is exact about what it was told",
+          "module": "cued-behaviour",
+          "moduleTitle": "Cued Behaviour",
+          "minutes": 26,
+          "body": "A classifier that is exact about what it was told Describe a conditional behaviour and the cue that switches it Say what a safety classifier is able to count and what it is not Measure the harm an evaluation reports against the harm there is A fit has no opinion about a mark it was never given a column for, and the weight it learns is exactly zero. The cued harm is not mis-classified. It is never counted, which is a different failure and a harder one to see. An evaluation set that never fires the cue reports a rate that is true of the set and not of the model."
+        },
+        {
+          "id": "who-can-tell",
+          "title": "Who can tell",
+          "subtitle": "Membership, and what a budget buys",
+          "module": "privacy",
+          "moduleTitle": "Privacy",
+          "minutes": 24,
+          "body": "Membership, and what a budget buys Describe the membership-inference attack and the score it is built on Explain why the attacker’s query budget is part of the result Say what the near-duplicates in a corpus cost a precision The same memorisation that lets an attacker take a record back lets them test whether it was ever in the set. At one query the test is a coin, and every point above chance on the curve was bought with queries. A corpus with no near-duplicates gives a test that cannot fail, and a real corpus has plenty of them."
+        }
+      ]
+    },
+    {
+      "id": "scaling-lab",
+      "title": "Scaling Lab",
+      "modules": [
+        {
+          "id": "power-laws",
+          "title": "Power Laws",
+          "tagline": "The shape of the loss, and how its exponent is measured"
+        },
+        {
+          "id": "compute",
+          "title": "Compute Optimality",
+          "tagline": "A budget, and where it should be spent"
+        },
+        {
+          "id": "frontier",
+          "title": "The Frontier",
+          "tagline": "Every allocation at every budget, and the law the best ones obey"
+        },
+        {
+          "id": "data-constraints",
+          "title": "Data Constraints",
+          "tagline": "What to do when the data runs out"
+        },
+        {
+          "id": "pruning",
+          "title": "Pruning and Percolation",
+          "tagline": "What a corpus is worth when it is half as big"
+        },
+        {
+          "id": "emergence",
+          "title": "Emergence",
+          "tagline": "The cliff, and the metric that makes it"
+        },
+        {
+          "id": "hardware",
+          "title": "Compute Through Time",
+          "tagline": "The trend under the budgets"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "what-a-power-law-says",
+          "title": "What a power law says",
+          "subtitle": "And why the exponent is the number everyone quotes",
+          "module": "power-laws",
+          "moduleTitle": "Power Laws",
+          "minutes": 24,
+          "body": "And why the exponent is the number everyone quotes State the form of a scaling law and the three quantities in it Convert an exponent into the factor a doubling of the data buys Distinguish a power law in the loss from a power law in the error A power law says that the loss falls as L ∝ N^(−α) — a constant factor for every doubling. The exponent is the whole of the practical content: a doubling buys a factor 2^(−α). The error, not the loss, is the quantity that scales cleanly near the floor."
+        },
+        {
+          "id": "how-the-exponent-is-measured",
+          "title": "How the exponent is measured",
+          "subtitle": "Log–log space, and the range the fit depends on",
+          "module": "power-laws",
+          "moduleTitle": "Power Laws",
+          "minutes": 22,
+          "body": "Log–log space, and the range the fit depends on Fit a power law by least squares in log–log space Read the R² of the fit and say what it does and does not certify Show that the fitted exponent changes with the range of the data The fit is a straight line in log–log space, and ordinary least squares is the right tool for it. A high R² says the points are close to a line; it does not say the line will keep holding. A fitted exponent is an average over a range, and quoting it without the range is quoting half a result."
+        },
+        {
+          "id": "the-compute-budget",
+          "title": "The compute budget",
+          "subtitle": "The constraint that makes the question a question",
+          "module": "compute",
+          "moduleTitle": "Compute Optimality",
+          "minutes": 20,
+          "body": "The constraint that makes the question a question Write the cost of a training run as a function of the parameters and the tokens Explain why a budget turns \"how big\" into \"big in what way\" Measure the loss along a fixed budget The cost of a run is the number of parameters times the number of tokens, times a constant. Under a fixed budget, more parameters means fewer tokens, and the loss of each is measured against the other. A budget is a statement about what cannot be had, and it is the only reason the allocation is a decision."
+        },
+        {
+          "id": "the-compute-optimal-allocation",
+          "title": "The compute-optimal allocation",
+          "subtitle": "Where the two terms of the loss balance",
+          "module": "compute",
+          "moduleTitle": "Compute Optimality",
+          "minutes": 28,
+          "body": "Where the two terms of the loss balance Write the two-variable loss surface and fit it Derive the condition that balances the two terms at the optimum Compute the allocation and the tokens-per-parameter ratio at a given budget The surface is E + A·N^(−α) + B·D^(−β): an irreducible term and two powers. At the optimum the two terms balance in a fixed ratio, and that fixes the allocation. The tokens-per-parameter ratio at the optimum is a consequence, not a setting."
+        },
+        {
+          "id": "the-crossover-between-size-and-data",
+          "title": "The crossover between size and data",
+          "subtitle": "Kaplan’s question: at what budget does the bigger model start to pay?",
+          "module": "compute",
+          "moduleTitle": "Compute Optimality",
+          "minutes": 21,
+          "body": "Kaplan’s question: at what budget does the bigger model start to pay? State what a crossover point is, and which two losses are being set equal Derive the product at which two given capacities are equally good Explain why the crossover moves when the pair of capacities gets wider At a fixed budget the two candidates get D = P/N rows each, so the comparison is one equation in one unknown. Below the crossover the small model trained on more data wins; above it the large model trained on less wins. The crossover is a property of the fitted surface, and it is only as good as the grid of runs the surface was fitted on."
+        },
+        {
+          "id": "the-isoflop-frontier",
+          "title": "The IsoFLOP curves and the frontier",
+          "subtitle": "A U at each budget, and the power law its bottoms obey",
+          "module": "frontier",
+          "moduleTitle": "The Frontier",
+          "minutes": 26,
+          "body": "A U at each budget, and the power law its bottoms obey Write the loss along a fixed budget and find its minimum in closed form State the exponent of the frontier and derive it from the two single-variable exponents Compare the analytic optimum with the one found by numeric search Every point of an IsoFLOP curve costs the same, so the curve is a statement about choice rather than about spend. The bottom is where the two marginal losses balance, and that balance gives N* and D* without a search. The bottoms across budgets fall as C^(−αβ/(α+β)) — the frontier is a consequence of the surface, not a new measurement."
+        },
+        {
+          "id": "the-rule-at-the-frontier",
+          "title": "The twenty-tokens rule, rederived",
+          "subtitle": "What the ratio at the optimum is, and what it is not",
+          "module": "frontier",
+          "moduleTitle": "The Frontier",
+          "minutes": 23,
+          "body": "What the ratio at the optimum is, and what it is not Derive the tokens-per-parameter ratio the optimum chooses for itself Measure the exponent of that ratio against the budget on a fitted surface Say which property of the surface makes the rule a constant, and which makes it a trend The ratio is a consequence: D*/N* has an exponent (α−β)/(α+β) and is flat only when the two exponents agree. The predicted allocation exponents and the measured ones are two instruments on one fact, and the screen prints both. A rule quoted without the budget it was measured at is a number that will not travel."
+        },
+        {
+          "id": "when-the-pool-binds",
+          "title": "When the pool binds",
+          "subtitle": "The budget at which the data runs out, and what happens past it",
+          "module": "frontier",
+          "moduleTitle": "The Frontier",
+          "minutes": 24,
+          "body": "The budget at which the data runs out, and what happens past it Compute the budget at which the optimal allocation asks for the whole corpus Explain why the frontier and the achievable loss come apart past that budget Read the price of the constraint off the optimum at a binding budget The frontier says how much data the optimum wants; a corpus is a finite number of rows, and that is where the two stories diverge. Beyond the binding budget, extra compute buys repeats rather than data, and the loss falls more slowly than the law says. The size of the pool is a variable, and the same budget is unconstrained in one corpus and bound in another."
+        },
+        {
+          "id": "three-phases-of-a-repeated-run",
+          "title": "The three phases of a repeated run",
+          "subtitle": "Warmup, plateau, and the turn upward",
+          "module": "data-constraints",
+          "moduleTitle": "Data Constraints",
+          "minutes": 25,
+          "body": "Warmup, plateau, and the turn upward Name the three phases and say what each one is a fact about Explain why the gap between the repeated and the fresh run is exactly zero at the first epoch Read the decay phase off a held-out curve rather than off a training curve At one epoch the two runs have read the same rows, so they are the same run — the warmup is arithmetic, not behaviour. The plateau is the pool’s empirical optimum in sight and the fresh data still buying real improvements. The decay is the repeated run walking towards a fit to the noise in its own pool, and it shows on held-out data first."
+        },
+        {
+          "id": "how-many-epochs",
+          "title": "How many epochs before repetition dominates",
+          "subtitle": "The dominance epoch, and the fraction that defines it",
+          "module": "data-constraints",
+          "moduleTitle": "Data Constraints",
+          "minutes": 22,
+          "body": "The dominance epoch, and the fraction that defines it Define the dominance epoch and say what it is measured against Show that the epoch you report depends on the fraction you chose Compare the measured dominance epoch with the one the paper’s constant predicts Repetition dominates when the next epoch is worth so little that the compute would have been better spent on new rows. The criterion is a fraction of the fresh run’s gain, and the table of fractions is the honest version of a single number. The closed form says half a fresh epoch at R★·ln 2 passes; the measured curve is allowed to disagree, and the screen prints the disagreement."
+        },
+        {
+          "id": "the-turn-upward",
+          "title": "The turn upward, and the early-stopping epoch",
+          "subtitle": "The pool gets easier while the model gets worse",
+          "module": "data-constraints",
+          "moduleTitle": "Data Constraints",
+          "minutes": 23,
+          "body": "The pool gets easier while the model gets worse Explain why the loss on the pool keeps falling after the held-out loss has turned upward Read the best epoch off a held-out curve, and say what the run loses by passing it State why a single restart is not a curve The pool has its own optimum, which is a fit to the noise planted in the pool; past the shared optimum the two come apart. The third phase is not a change in the optimiser. It is the same descent aimed at a target that is not the task. The compute already spent is not a reason to keep going, and the loss that is visibly falling is not the loss being bought."
+        },
+        {
+          "id": "when-the-data-runs-out",
+          "title": "When the data runs out",
+          "subtitle": "Repeats, and what they are worth",
+          "module": "data-constraints",
+          "moduleTitle": "Data Constraints",
+          "minutes": 24,
+          "body": "Repeats, and what they are worth Define the number of repeats and the effective number of unique tokens Write the loss of a learner trained on repeated data Show that repetition does not change the model a ridge estimator finds E repeats of U unique rows is E·U rows of training and U rows of information. The ridge normal equations are homogeneous in the data, so the solution is unchanged by repetition. What repetition buys is the illusion of progress: the same model, at a higher price."
+        },
+        {
+          "id": "the-price-of-repetition",
+          "title": "The price of repetition",
+          "subtitle": "Fresh rows against the same rows again",
+          "module": "data-constraints",
+          "moduleTitle": "Data Constraints",
+          "minutes": 22,
+          "body": "Fresh rows against the same rows again Compare a repeated run with a fresh run of the same length on the same held-out set Measure how the gap grows with the number of repeats State the practical rule the measurement supports Fresh rows keep improving the estimate; repeated rows stop improving it immediately. The gap between the two is the price of repetition, and it is paid in compute. The rule that falls out is about *unique* tokens, not about tokens."
+        },
+        {
+          "id": "what-a-repeated-corpus-is-worth",
+          "title": "The effective-data law",
+          "subtitle": "D′ = U·(1 + R★·(1 − e^(−R/R★))), evaluated rather than quoted",
+          "module": "data-constraints",
+          "moduleTitle": "Data Constraints",
+          "minutes": 24,
+          "body": "D′ = U·(1 + R★·(1 − e^(−R/R★))), evaluated rather than quoted Write the law and say what each of the three quantities in it is Compute the ceiling a pool is ever worth, and the epoch at which a pass is worth half a fresh one Name the thing the law has no term for, and say which screen measures it The first pass is worth exactly itself; every later pass is worth e^(−R/R★) of a fresh epoch, which is a decay with no knee in it. R★ is the whole of the law’s content: it sets the ceiling U·(1 + R★) and the epoch at which the marginal pass halves. The law saturates and a real run turns upward, so the ceiling bounds the law’s optimism rather than the run’s achievement."
+        },
+        {
+          "id": "the-percolation-threshold",
+          "title": "The percolation threshold",
+          "subtitle": "When the rows going are the rows nothing else can replace",
+          "module": "pruning",
+          "moduleTitle": "Pruning and Percolation",
+          "minutes": 25,
+          "body": "When the rows going are the rows nothing else can replace State the percolation argument for a threshold keep fraction Read a threshold, a best fraction and a cliff edge off one pruning curve Explain why the threshold is a property of the metric’s queue rather than of the pool alone Volume laws say a smaller corpus is a worse corpus in a fixed way; percolation says that past some fraction the loss goes faster, because what is being removed stops being redundant. The rare rows carry the tail directions, and a direction covered by three rows stops existing when two of them are cut. Rank the same pool four ways and the same event happens at four different fractions, because each ranking loses the rare rows when its own queue reaches them."
+        },
+        {
+          "id": "benchmarking-the-pruning-metrics",
+          "title": "Four metrics on one pool",
+          "subtitle": "Oracle, strong, weak, random — and what each ranking costs",
+          "module": "pruning",
+          "moduleTitle": "Pruning and Percolation",
+          "minutes": 27,
+          "body": "Oracle, strong, weak, random — and what each ranking costs Rank four pruning metrics at matched volume and read each one’s own threshold Explain the difference between a comparison at matched volume and one at matched compute Say which of the four metrics a practitioner can actually compute, and what that costs The oracle ranks rows by the information they truly carry and nobody has it; it is the ceiling the computable metrics are scored against rather than a fifth option. A strong metric has to be fitted over the whole pool before it can score a row, so its win on volume has to survive a baseline handed the same number of extra rows. The paper’s ordering — strong beats weak, weak beats random, each with its own cliff — is a claim, and the table is the test of it on this pool with this seed."
+        },
+        {
+          "id": "predicting-the-cliff",
+          "title": "Predicting the cliff before it happens",
+          "subtitle": "m rare rows per direction, and the survival of a queue with error in it",
+          "module": "pruning",
+          "moduleTitle": "Pruning and Percolation",
+          "minutes": 26,
+          "body": "m rare rows per direction, and the survival of a queue with error in it Compute the threshold the structure of a pool predicts, with no free parameter Compare the predicted fraction with the measured one on the same pool Say what the prediction does as the metric’s error grows past the information spread The prediction is a survival calculation: how many rare rows are expected to outrank the cut at each keep fraction, against the number the tail directions need. At zero error the answer is the share of the pool that ranks above the rarest rare row — a property of the pool, not of the loss. Past the information spread a rare row survives a cut exactly as often as a bulk row does, the predicted threshold goes to one, and there is nothing left to prune."
+        },
+        {
+          "id": "what-emergence-looks-like",
+          "title": "What emergence looks like",
+          "subtitle": "A score that is zero, and then is not",
+          "module": "emergence",
+          "moduleTitle": "Emergence",
+          "minutes": 22,
+          "body": "A score that is zero, and then is not Describe the shape of an emergent curve and what makes it striking Read an emergent curve and say what it does not establish about the model Compute the same capability under a second, continuous metric The curve is flat, then steep, and the steep part is where the attention goes. A flat region is not a model that cannot do the task; it is a metric that cannot see it. The same model, scored differently, can look smooth."
+        },
+        {
+          "id": "reproducing-the-artefact",
+          "title": "Reproducing the artefact",
+          "subtitle": "One sweep, two readings, and the gap between them",
+          "module": "emergence",
+          "moduleTitle": "Emergence",
+          "minutes": 24,
+          "body": "One sweep, two readings, and the gap between them Define the reporting floor and read an onset off it Find the widest gap between the per-token accuracy and the whole-sequence score on one sweep Explain why the location of a cliff is a fact about the floor as much as about the model The onset is the first point above a chosen floor, so the claimed discovery moves when the floor moves — and the floor is a defensible choice, which is not the same as a forced one. The gap is widest in the middle of the climb: that is where “the model cannot do this” and “the model gets most of the tokens right” are both true, and only one of them is about the metric. A cliff interval needs two onsets, and the underlying accuracy never has one because it never stops rising."
+        },
+        {
+          "id": "what-causes-the-cliff",
+          "title": "What causes the cliff",
+          "subtitle": "A threshold in the metric, on a smooth capability",
+          "module": "emergence",
+          "moduleTitle": "Emergence",
+          "minutes": 26,
+          "body": "A threshold in the metric, on a smooth capability Derive the whole-sequence score as a power of the per-token accuracy Show that the sharper the metric, the sharper the apparent transition Show that moving the metric’s threshold moves the cliff A whole-sequence score is the per-token accuracy raised to the length of the sequence. The longer the sequence, the steeper the apparent transition — and nothing about the model changed. The cliff is in the metric; the capability underneath it is smooth all the way."
+        },
+        {
+          "id": "three-eras-of-compute",
+          "title": "Three eras and one straight line",
+          "subtitle": "The reported slope, the reported doubling, and the reported range",
+          "module": "hardware",
+          "moduleTitle": "Compute Through Time",
+          "minutes": 22,
+          "body": "The reported slope, the reported doubling, and the reported range Convert a slope in orders of magnitude a year into a doubling time, and back Say why the reported range of an era and the reported slope of it disagree Name which numbers on the screen are quoted from the paper rather than computed A slope and a doubling time are one statement in two units, and the conversion is exact: twelve times log₁₀2 divided by the months. A range is an envelope — the two most extreme runs — and a slope is a trend through a scattered middle, so reading the first as the second is how a headline growth rate is made. The eras are placed by the analyst: one boundary is a date in the middle of a year rather than a bin, because the event it marks is a date."
+        },
+        {
+          "id": "the-break-in-the-trend",
+          "title": "A break in the trend, and what it costs to claim one",
+          "subtitle": "Every split, both sides fitted, and a penalty of two log n",
+          "module": "hardware",
+          "moduleTitle": "Compute Through Time",
+          "minutes": 23,
+          "body": "Every split, both sides fitted, and a penalty of two log n Describe the split search and the penalty a detected break has to pay Explain why a series that is exactly straight must not report a change of slope Say why a break is a claim about the future rather than a description of the past The search tries every split, fits both sides, and keeps the smallest residual sum of squares only once the split has paid for its two extra parameters. Requiring the two slopes to differ is what stops floating-point noise from being read as a discovery. One trend over a broken series is not wrong so much as averaged: it reports the middle of two rates and predicts neither."
+        },
+        {
+          "id": "what-a-trend-buys",
+          "title": "What a trend buys, and the year it became buyable",
+          "subtitle": "Inverting the frontier, dividing by a wall-clock, reading a series",
+          "module": "hardware",
+          "moduleTitle": "Compute Through Time",
+          "minutes": 25,
+          "body": "Inverting the frontier, dividing by a wall-clock, reading a series Name the three steps from a loss target to a year, and what each one assumes Explain why the factor between the budget’s units and FLOP/s moves every date and no shape Read the flag that says whether an answer was interpolated inside the series or projected outside it The frontier inverted gives the budget a loss costs, the budget over the run’s hours gives the rate, and the series read at the rate gives the year. The surface’s budget is in the units of its own runs, so the bridge to FLOP/s is an assumption; halving it changes every date by a predictable amount and changes nothing else. A target at or below the fitted floor cannot be bought at any price, and reporting that is the answer rather than a failure to produce one."
+        }
+      ]
+    },
+    {
+      "id": "systems-lab",
+      "title": "Systems Lab",
+      "modules": [
+        {
+          "id": "attention-memory",
+          "title": "Attention Memory",
+          "tagline": "The matrix you never have to build"
+        },
+        {
+          "id": "the-kv-cache",
+          "title": "The KV Cache",
+          "tagline": "Why decoding is a memory problem"
+        },
+        {
+          "id": "sparse-capacity",
+          "title": "Sparse Capacity",
+          "tagline": "More parameters, the same arithmetic"
+        },
+        {
+          "id": "speculation",
+          "title": "Speculation",
+          "tagline": "A small model proposes; a large one checks"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "the-matrix-you-never-build",
+          "title": "The matrix you never build",
+          "subtitle": "Where the memory goes in a long context",
+          "module": "attention-memory",
+          "moduleTitle": "Attention Memory",
+          "minutes": 24,
+          "body": "Where the memory goes in a long context Write the naive attention and say what it materialises Compute the size of the score matrix and the traffic it causes Distinguish the memory a training run needs from the memory a forward pass needs The score matrix is N by N, and it dwarfs everything else at a long context. It is written once and read once, and then it is thrown away. The training run is worse than the forward pass, because the backward pass needs the matrix kept."
+        },
+        {
+          "id": "the-running-softmax",
+          "title": "The running softmax",
+          "subtitle": "An exact answer, computed without the matrix",
+          "module": "attention-memory",
+          "moduleTitle": "Attention Memory",
+          "minutes": 28,
+          "body": "An exact answer, computed without the matrix Describe the tiling: which block is resident, and which is streamed past Derive the running maximum, the running sum and the rescaling between them Check that the tiled algorithm and the naive one agree The softmax of a row can be accumulated as a running maximum and a running sum. When the maximum moves, the accumulator is rescaled — and that rescaling is what keeps it exact. The answer is identical; only the memory and the traffic differ."
+        },
+        {
+          "id": "decoding-is-memory-bound",
+          "title": "Decoding is memory-bound",
+          "subtitle": "The arithmetic intensity of one token",
+          "module": "the-kv-cache",
+          "moduleTitle": "The KV Cache",
+          "minutes": 24,
+          "body": "The arithmetic intensity of one token Compute the bytes the key and value cache holds for a given context Compute the arithmetic intensity of a decode step Explain why the intensity rises with the batch size and then stops A decode step is a matrix-vector product: two operations per byte of weights. The weights are read once for the batch; the cache is read once per sequence. So the batch amortises the weights and nothing else — and the intensity saturates."
+        },
+        {
+          "id": "the-page-table",
+          "title": "The page table",
+          "subtitle": "Memory you can actually hand out",
+          "module": "the-kv-cache",
+          "moduleTitle": "The KV Cache",
+          "minutes": 22,
+          "body": "Memory you can actually hand out Explain why a contiguous allocation wastes memory on the padding Describe the paged allocation and what it wastes instead Compute the waste of both for a set of sequence lengths A straightforward implementation gives every sequence a buffer as long as the longest one. Paging replaces the buffer with fixed-size blocks that can live anywhere. The waste becomes a fraction of a block per sequence rather than a fraction of the batch."
+        },
+        {
+          "id": "the-router",
+          "title": "The router",
+          "subtitle": "Which experts see this token",
+          "module": "sparse-capacity",
+          "moduleTitle": "Sparse Capacity",
+          "minutes": 24,
+          "body": "Which experts see this token Describe the top-k router and the probabilities it assigns Define the load of an expert and the probability mass it receives Explain what happens when the two disagree The router sends each token to the few experts with the highest scores. The load is what the experts actually got; the probability is what the router wanted. When they disagree, some experts are trained more than others — and the ones trained less are worse."
+        },
+        {
+          "id": "the-auxiliary-loss",
+          "title": "The auxiliary loss",
+          "subtitle": "Paying a little to keep the experts equal",
+          "module": "sparse-capacity",
+          "moduleTitle": "Sparse Capacity",
+          "minutes": 24,
+          "body": "Paying a little to keep the experts equal Compute the auxiliary loss from the load and the probability Show that it grows when the router is biased Measure the overflow that a capacity factor allows The auxiliary loss is the number of tokens times the sum of the products of the two fractions. It is smallest when the load and the probability agree, and it pushes the router there. The capacity factor is the other half of the bargain: a hard limit, and the tokens it drops."
+        },
+        {
+          "id": "proposing-and-checking",
+          "title": "Proposing and checking",
+          "subtitle": "The rule, and what it guarantees",
+          "module": "speculation",
+          "moduleTitle": "Speculation",
+          "minutes": 26,
+          "body": "The rule, and what it guarantees State the acceptance rule and compute the rate it implies Show that the procedure produces the target model’s own distribution Explain why the corrected token is drawn from the excess A drafted token is accepted with probability min(1, p(x)/q(x)). The expected acceptance is one minus the total variation between the two distributions. The two terms of the output distribution — the accepted and the corrected — add up to the target’s."
+        },
+        {
+          "id": "when-speculation-pays",
+          "title": "When speculation pays",
+          "subtitle": "The trade, and its terms",
+          "module": "speculation",
+          "moduleTitle": "Speculation",
+          "minutes": 22,
+          "body": "The trade, and its terms Compute the tokens produced per target step from the acceptance rate Compute the speed-up, and say what it depends on Explain why a closer draft model is worth more than a longer one The speed-up is the tokens per step, divided by the cost of the drafting. A draft that is close to the target is worth more than a long run of a bad one. The output is unchanged: the method buys time, not a different answer."
+        }
+      ]
+    }
+  ]
+}

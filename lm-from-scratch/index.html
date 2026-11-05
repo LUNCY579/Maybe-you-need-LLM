@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Language Model from Scratch — an interactive course in which the tokeniser, the transformer and the optimiser are built from nothing, built on CS336: Language Modeling from Scratch." />
+    <meta property="og:title" content="Language Model from Scratch — an interactive course on building a language model" />
+    <meta property="og:description" content="Language Model from Scratch — an interactive course in which the tokeniser, the transformer and the optimiser are built from nothing, built on CS336: Language Modeling from Scratch." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Language Model from Scratch — an interactive course on building a language model</title>
+    <script>
+      /*
+        Apply the theme before the first paint, so the page never flashes the
+        wrong surface. The stored choice wins; otherwise the operating system's
+        preference is used. This is the only place the theme is decided — the
+        application reads the result back out of the document element.
+      */
+      try {
+        var stored = window.localStorage.getItem('lm-from-scratch:theme')
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+        var theme = stored === 'light' || stored === 'dark' ? stored : (prefersLight ? 'light' : 'dark')
+        document.documentElement.classList.toggle('light', theme === 'light')
+        document.documentElement.classList.toggle('dark', theme !== 'light')
+      } catch (error) {
+        document.documentElement.classList.add('dark')
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

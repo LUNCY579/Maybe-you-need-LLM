@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Diffusion Lab">
+  <rect width="64" height="64" rx="14" fill="#0b0d12" />
+  <g fill="none" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round">
+    <path d="M6 40 C 18 40, 18 20, 32 20 S 46 46, 58 46" opacity="0.95" />
+    <path d="M6 48 C 18 48, 18 30, 32 30 S 46 54, 58 54" opacity="0.45" />
+  </g>
+  <circle cx="32" cy="20" r="3.5" fill="#fbbf24" />
+</svg>

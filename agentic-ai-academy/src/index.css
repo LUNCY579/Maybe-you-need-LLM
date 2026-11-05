@@ -1,0 +1,490 @@
+@import 'tailwindcss';
+
+/*
+  Agentic AI Academy design system.
+  Dark graphite/navy base with electric cyan + violet highlights.
+*/
+
+@theme {
+  --color-ink-950: #05070f;
+  --color-ink-900: #080c18;
+  --color-ink-850: #0b1020;
+  --color-ink-800: #101731;
+  --color-ink-700: #1a2344;
+  --color-ink-600: #273357;
+  --color-ink-500: #3b4a75;
+  --color-slate-soft: #9aa7c7;
+  --color-cyan-glow: #35e6ff;
+  --color-cyan-deep: #0e7f9b;
+  --color-violet-glow: #a78bfa;
+  --color-violet-deep: #6d28d9;
+  --color-amber-glow: #fbbf24;
+  --color-rose-glow: #fb7185;
+  --color-emerald-glow: #34d399;
+  --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+}
+
+:root {
+  --surface-0: #f6f8fc;
+  --surface-1: #ffffff;
+  --surface-2: #eef2f9;
+  --border-soft: rgba(15, 23, 42, 0.12);
+  --text-strong: #0b1020;
+  --text-muted: #4a5878;
+  --accent: #0e7490;
+  --accent-2: #6d28d9;
+  --grid-line: rgba(14, 116, 144, 0.09);
+  /* Callout labels: opaque, contrast-checked in both themes. The translucent
+     values are for borders only — never for text. */
+  --callout-info: #0e7490;
+  --callout-warning: #b45309;
+  --callout-insight: #6d28d9;
+  --callout-source: #047857;
+  color-scheme: light;
+}
+
+.dark {
+  --surface-0: #05070f;
+  --surface-1: #0b1020;
+  --surface-2: #101731;
+  --border-soft: rgba(148, 178, 255, 0.14);
+  --text-strong: #e8edfb;
+  --text-muted: #9aa7c7;
+  --accent: #35e6ff;
+  --accent-2: #a78bfa;
+  --grid-line: rgba(53, 230, 255, 0.07);
+  --callout-info: #35e6ff;
+  --callout-warning: #fbbf24;
+  --callout-insight: #a78bfa;
+  --callout-source: #34d399;
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+/*
+  The header is sticky, so a focused control that lands under it would be
+  hidden from a keyboard user. WCAG 2.4.11 (Focus Not Obscured, AA) requires
+  the focused element to remain visible; scroll padding is the standard way to
+  keep the browser from scrolling it underneath a sticky header.
+*/
+html {
+  scroll-padding-top: 5.5rem;
+  scroll-padding-bottom: 2rem;
+}
+
+@supports (animation-timeline: scroll()) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Route changes cross-fade. The default is a cross-fade already; this makes
+   it slightly quicker and gives the new view a small rise. */
+::view-transition-group(root) {
+  animation-duration: 220ms;
+}
+
+::view-transition-old(root) {
+  animation: 160ms cubic-bezier(0.4, 0, 1, 1) both view-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 220ms cubic-bezier(0, 0, 0.2, 1) both view-fade-in;
+}
+
+@keyframes view-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes view-fade-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+body {
+  margin: 0;
+  background-color: var(--surface-0);
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.app-backdrop {
+  background-image:
+    radial-gradient(900px 500px at 12% -10%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+    radial-gradient(800px 500px at 88% 0%, color-mix(in srgb, var(--accent-2) 16%, transparent), transparent 72%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: auto, auto, 44px 44px, 44px 44px;
+}
+
+.surface {
+  background-color: var(--surface-1);
+  border-color: var(--border-soft);
+}
+
+.surface-2 {
+  background-color: var(--surface-2);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.accent-text {
+  color: var(--accent);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/*
+  Keyboard hints.
+  The colour is set explicitly rather than inherited with an opacity, because
+  a reduced opacity drops the contrast ratio below the WCAG AA threshold for
+  small text. --text-muted on --surface-2 is 7.4:1 in the dark theme and
+  6.1:1 in the light one.
+*/
+kbd {
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  padding: 0.1em 0.35em;
+}
+
+/* A question brought into view by the review queue. */
+.question-focus {
+  animation: question-focus 2s ease-out;
+  border-radius: 14px;
+}
+
+@keyframes question-focus {
+  0% {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  100% {
+    background: transparent;
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .question-focus {
+    animation: none;
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+}
+
+/* Highlight a lesson section that was jumped to from course search. */
+.section-flash {
+  animation: section-flash 1.6s ease-out;
+  border-radius: 12px;
+}
+
+@keyframes section-flash {
+  0% {
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  100% {
+    background: transparent;
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-flash {
+    animation: none;
+  }
+}
+
+/* KaTeX sizing inside lesson prose */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
+.katex {
+  font-size: 1.05em;
+}
+
+/* React Flow theming */
+.react-flow__attribution {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__controls-button {
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border-soft);
+  fill: var(--text-strong);
+}
+
+.react-flow__minimap {
+  background-color: var(--surface-2);
+}
+
+@keyframes trace-pulse {
+  0% { opacity: 0.35; }
+  50% { opacity: 1; }
+  100% { opacity: 0.35; }
+}
+
+.trace-active {
+  animation: trace-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -6px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+.drift {
+  animation: drift 9s ease-in-out infinite;
+}
+
+/* Animated network backdrop: signals travelling along the edges of a sparse
+   agent graph. Decorative only, and disabled under reduced-motion. */
+.net-edges line {
+  stroke: color-mix(in srgb, var(--accent) 32%, transparent);
+  stroke-dasharray: 10 26;
+  stroke-linecap: round;
+  animation: net-flow 7s linear infinite;
+}
+
+.net-nodes circle {
+  fill: color-mix(in srgb, var(--accent-2) 70%, white 10%);
+  opacity: 0.35;
+  animation: net-pulse 5.5s ease-in-out infinite;
+}
+
+@keyframes net-flow {
+  from {
+    stroke-dashoffset: 36;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes net-pulse {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.35);
+  }
+}
+
+/*
+  The inline glossary definition.
+  A native popover renders in the top layer, so it is never clipped by an
+  ancestor with `overflow: hidden` — which matters, because the definition can
+  appear inside a horizontally scrollable table cell.
+*/
+.glossary-popover {
+  width: min(22rem, calc(100vw - 1.5rem));
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.75rem;
+  background: var(--surface-1);
+  color: var(--text-strong);
+  box-shadow: 0 18px 44px -24px rgba(0, 0, 0, 0.9);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/*
+  A closed panel is always hidden, whether or not the browser implements the
+  popover API.
+
+  This has to be stated explicitly. Relying on the user-agent sheet to hide a
+  closed popover is not safe: WebKit implements the popover *API* but its
+  default styling left the closed panel visible, and because the panel lives
+  inside the paragraph it was injecting its own text into the sentence around
+  it.
+*/
+.glossary-popover:not(:popover-open) {
+  display: none;
+}
+
+/* Open, native path. */
+.glossary-popover:popover-open {
+  display: block;
+}
+
+/* Open, fallback path: no popover attribute at all. */
+.glossary-popover[data-open='true']:not([popover]) {
+  display: block;
+}
+
+/* Anchor positioning: place the panel beside the term, and let the browser
+   flip it when it would overflow the viewport. */
+@supports (position-area: block-start) {
+  .glossary-popover {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    position-area: block-start span-inline-end;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    max-inline-size: min(22rem, calc(100vw - 1.5rem));
+  }
+}
+
+/* The entrance animation, using @starting-style so the panel fades in rather
+   than appearing. */
+@starting-style {
+  .glossary-popover {
+    opacity: 0;
+    translate: 0 -4px;
+  }
+}
+
+.glossary-popover {
+  transition:
+    opacity 140ms ease,
+    translate 140ms ease,
+    display 140ms allow-discrete,
+    overlay 140ms allow-discrete;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glossary-popover {
+    transition: none;
+  }
+}
+
+/*
+  WCAG 2.5.8 (Target Size, Minimum) asks for targets of at least 24 by 24 CSS
+  pixels. Small, chip-shaped controls in this interface are given the minimum
+  explicitly rather than relying on their padding, which can fall under it.
+*/
+.tap-target {
+  min-height: 24px;
+  min-width: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+  Modern CSS: the visual language is built on a small set of platform
+  features that have shipped in every current engine, each of which degrades
+  to something reasonable.
+
+  - `color-mix()` for tints that follow the theme.
+  - `text-wrap: balance` on headings, `pretty` on body copy.
+  - Container queries, so a card adapts to the space it is given rather than
+    to the viewport.
+  - `@starting-style`, so elements that appear have somewhere to come from.
+*/
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* A card that reflows to a single column when its container is narrow,
+   rather than when the window is. */
+@container (max-width: 22rem) {
+  .container-aware {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/*
+  The entry animation. `@starting-style` gives the element a starting style
+  that applies only when it is first rendered, which is what makes the
+  transition possible without a class toggle.
+*/
+@starting-style {
+  .enter {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+.enter {
+  transition:
+    opacity 240ms cubic-bezier(0, 0, 0.2, 1),
+    translate 240ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    transition: none;
+  }
+}
+
+/* The skip link is the first thing in the tab order. */
+@media (prefers-reduced-motion: reduce) {
+  .drift,
+  .trace-active {
+    animation: none;
+  }
+
+  .net-edges line,
+  .net-nodes circle {
+    animation: none;
+  }
+
+  .net-nodes circle {
+    opacity: 0.4;
+  }
+}
+
+/* Thin scrollbars for panels */
+.thin-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 999px;
+}
+
+.thin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}

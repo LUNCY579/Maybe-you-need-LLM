@@ -1,0 +1,119 @@
+name: verify
+
+# The collection is verified the same way every time, in the same order:
+# the catalogue is synchronised, the promises the courses make about their
+# laboratories are counted, the types are checked, the code is linted, the
+# unit tests run, the bundles are built, and the browser suites check every
+# page against the accessibility criteria.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: typecheck, lint, test and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: install
+        run: npm ci
+
+      - name: the catalogue is in sync
+        run: node scripts/sync-catalogue.mjs --check
+
+      - name: the catalogue is valid
+        run: npm run validate:sources
+
+      - name: every course cites the catalogue as the catalogue records it
+        run: npm run check:citations
+
+      - name: every declared laboratory idea is accounted for
+        run: npm run check:coverage
+
+      - name: the closed courses stay closed
+        run: npm run check:coverage:strict
+
+      - name: the deployment metadata is in sync
+        run: npm run check:metadata
+
+      - name: typecheck
+        run: npm run typecheck
+
+      - name: lint
+        run: npm run lint
+
+      - name: unit tests
+        run: npm test
+
+      - name: build
+        run: npm run build
+
+  browser:
+    name: the browser suites
+    runs-on: ubuntu-latest
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - hub
+          - diffusion-lab
+          - evaluation-lab
+          - rlhf-lab
+          - lm-from-scratch
+          - mech-interp-lab
+          - data-lab
+          - scaling-lab
+          - systems-lab
+          - rl-foundations
+          - retrieval-lab
+          - agent-bench-lab
+          - safety-lab
+          - multimodal-lab
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: install
+        run: npm ci
+
+      - name: install the browser
+        run: npx playwright install --with-deps chromium
+
+      - name: the browser suite
+        working-directory: ${{ matrix.app }}
+        run: npx playwright test
+
+  live-sources:
+    name: the arXiv identifiers, checked live
+    runs-on: ubuntu-latest
+    # A network check, so it runs on a schedule and on demand rather than on
+    # every push: the point is to notice when a paper is withdrawn or a
+    # version's licence changes, not to block a contribution.
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: check every identifier
+        run: node scripts/validate-sources.mjs --verify

@@ -1,0 +1,17 @@
+{
+  "name": "LLM Materials",
+  "short_name": "LLM Materials",
+  "description": "A collection of interactive, source-mapped learning applications.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e1014",
+  "theme_color": "#0e1014",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

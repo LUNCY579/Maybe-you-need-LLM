@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+coverage/
+
+# Test artefacts
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# Local logs and probe output
+*.log
+.probe-*.json
+
+# The cited papers and their extracted text are cited and linked, never
+# redistributed. The catalogue records where each one lives.
+*.pdf
+.arxiv.xml
+.research/
+
+# Backups of generated manifests
+references/*.bak
+references/*.bak*
+
+# Local agent and editor state
+.freebuff/
+.DS_Store
+Thumbs.db
+
+# The nested course repositories, preserved aside so that one repository holds
+# the whole collection. Move a directory back to restore it as its own repo.
+.git-preserved/

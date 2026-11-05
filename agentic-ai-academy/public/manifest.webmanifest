@@ -1,0 +1,19 @@
+{
+  "name": "Agentic AI Academy - LLM Materials",
+  "short_name": "Agentic AI Academy",
+  "description": "An interactive course from the LLM Materials collection, built on van-duijn-2026.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e1014",
+  "theme_color": "#0e1014",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

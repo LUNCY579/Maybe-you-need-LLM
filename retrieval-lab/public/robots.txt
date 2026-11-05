@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://llm-materials.example/retrieval-lab/sitemap.xml

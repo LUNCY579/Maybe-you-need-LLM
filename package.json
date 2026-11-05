@@ -1,0 +1,38 @@
+{
+  "name": "llm-materials",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A collection of interactive, source-mapped learning applications for language models and deep learning, built on a shared course core.",
+  "workspaces": [
+    "packages/*",
+    "hub",
+    "diffusion-lab", "evaluation-lab", "rlhf-lab", "lm-from-scratch", "mech-interp-lab", "data-lab", "scaling-lab", "systems-lab", "rl-foundations", "retrieval-lab", "agent-bench-lab", "safety-lab", "multimodal-lab"
+  ],
+  "scripts": {
+    "build": "npm run build -w @llm-materials/course-core && npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test --workspaces --if-present && npm run test:scripts",
+    "test:scripts": "vitest run scripts",
+    "lint": "npm run lint --workspaces --if-present",
+    "verify": "npm run collect:lessons && npm run sync:catalogue && npm run sync:metadata && npm run check:citations && npm run check:coverage && npm run typecheck && npm run lint && npm test && npm run build && npm run verify:standalone",
+    "verify:standalone": "node scripts/verify-standalone.mjs",
+    "test:e2e": "node scripts/run-e2e.mjs",
+    "collect:lessons": "node scripts/collect-lessons.mjs",
+    "sync:catalogue": "node scripts/sync-catalogue.mjs",
+    "sync:authors": "node scripts/sync-authors.mjs",
+    "sync:citations": "node scripts/sync-course-citations.mjs",
+    "check:citations": "node scripts/check-course-citations.mjs",
+    "check:coverage": "node scripts/check-lab-coverage.mjs --gaps",
+    "check:coverage:strict": "node scripts/check-lab-coverage.mjs --app mech-interp-lab --app safety-lab --app scaling-lab --strict",
+    "sync:metadata": "node scripts/generate-site-metadata.mjs",
+    "check:metadata": "node scripts/generate-site-metadata.mjs --check",
+    "validate:sources": "node scripts/validate-sources.mjs",
+    "validate:sources:live": "node scripts/validate-sources.mjs --verify",
+    "generate:index": "node scripts/generate-index.mjs"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.5"
+  }
+}

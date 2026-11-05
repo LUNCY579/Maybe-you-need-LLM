@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" role="img" aria-label="LLM Foundations Lab">
+  <title>LLM Foundations Lab</title>
+  <rect width="40" height="40" rx="10" fill="#16223a" stroke="#253252" stroke-width="1.5" />
+  <path d="M9 28 C 15 12, 25 12, 31 28" fill="none" stroke="#818cf8" stroke-width="2.4" stroke-linecap="round" />
+  <path d="M12 12 C 18 26, 22 26, 28 12" fill="none" stroke="#2dd4bf" stroke-width="2.4" stroke-linecap="round" opacity="0.75" />
+  <circle cx="9" cy="28" r="2.6" fill="#2dd4bf" />
+  <circle cx="31" cy="28" r="2.6" fill="#2dd4bf" />
+  <circle cx="12" cy="12" r="2.6" fill="#fbbf24" />
+  <circle cx="28" cy="12" r="2.6" fill="#fbbf24" />
+</svg>

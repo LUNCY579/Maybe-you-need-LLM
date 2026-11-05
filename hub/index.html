@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LLM Materials — a collection of source-mapped learning applications</title>
+    <meta
+      name="description"
+      content="A collection of interactive, source-mapped courses for language models and deep learning. Every number is computed in front of you, every source is cited and its licence recorded, and nothing is redistributed."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta property="og:title" content="LLM Materials" />
+    <meta
+      property="og:description"
+      content="A collection of interactive, source-mapped learning applications for language models and deep learning."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script>
+      // The theme is applied before the first paint, so the page never flashes.
+      (function () {
+        try {
+          var stored = localStorage.getItem('llm-materials:theme')
+          var dark =
+            stored === 'dark' ||
+            (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        } catch (error) {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

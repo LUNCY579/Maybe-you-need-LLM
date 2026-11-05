@@ -1,0 +1,343 @@
+@import 'katex/dist/katex.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * The design tokens.
+ *
+ * These are the single source of truth for colour. The Tailwind config maps the
+ * `lab-*` and `signal-*` scales onto them, so a theme switch is one attribute
+ * change on the document element. The values are mirrored in src/lib/theme.ts,
+ * which is what the charts use.
+ */
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --lab-950: 11 14 19;
+  --lab-900: 15 19 26;
+  --lab-850: 20 25 34;
+  --lab-800: 28 35 50;
+  --lab-700: 43 53 70;
+  --lab-600: 90 106 130;
+  --lab-500: 119 133 154;
+  --lab-400: 139 153 173;
+  --lab-300: 163 176 193;
+  --lab-200: 194 203 216;
+  --lab-100: 231 236 243;
+
+  --signal-blue: 90 169 255;
+  --signal-orange: 255 159 69;
+  --signal-green: 72 213 151;
+  --signal-red: 255 107 107;
+  --signal-violet: 202 130 217;
+
+  --panel-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 10px 30px -18px rgba(0, 0, 0, 0.9);
+  --scrollbar: 90 106 130;
+  --grid-line: 28 35 50;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --lab-950: 246 247 249;
+  --lab-900: 255 255 255;
+  --lab-850: 252 253 254;
+  --lab-800: 240 243 247;
+  --lab-700: 201 208 218;
+  --lab-600: 133 143 160;
+  --lab-500: 101 110 125;
+  --lab-400: 79 90 106;
+  --lab-300: 70 81 96;
+  --lab-200: 43 52 66;
+  --lab-100: 22 28 37;
+
+  --signal-blue: 22 104 196;
+  --signal-orange: 153 75 8;
+  --signal-green: 18 138 90;
+  --signal-red: 192 57 47;
+  --signal-violet: 100 50 166;
+
+  --panel-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 12px 32px -22px rgba(16, 24, 40, 0.35);
+  --scrollbar: 133 143 160;
+  --grid-line: 227 231 238;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-lab-950 text-lab-200 antialiased;
+  font-feature-settings: 'tnum' 1;
+  transition:
+    background-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+a {
+  @apply text-signal-blue hover:text-signal-orange transition-colors;
+}
+
+.katex {
+  font-size: 1.02em;
+}
+
+.katex-display {
+  @apply overflow-x-auto overflow-y-hidden py-1;
+}
+
+/* thin scrollbars for panels */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--scrollbar)) transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--scrollbar));
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+input[type='range'] {
+  @apply h-1 w-full cursor-pointer appearance-none rounded bg-lab-600;
+}
+input[type='range']::-webkit-slider-thumb {
+  @apply h-3.5 w-3.5 appearance-none rounded-full bg-signal-blue;
+  box-shadow: 0 0 0 3px rgb(var(--signal-blue) / 0.18);
+  transition: box-shadow 160ms ease;
+}
+input[type='range']:hover::-webkit-slider-thumb {
+  box-shadow: 0 0 0 5px rgb(var(--signal-blue) / 0.26);
+}
+
+select,
+input[type='number'],
+input[type='search'],
+input[type='text'] {
+  @apply bg-lab-900;
+}
+
+.card {
+  @apply rounded-lg border border-lab-700 bg-lab-900/70;
+  box-shadow: var(--panel-shadow);
+}
+
+/*
+ * Grid and flex children default to min-width:auto, so one long label or a number
+ * input can push a whole panel wider than the viewport and give the page a
+ * horizontal scrollbar. Let the containers shrink and scroll internally instead.
+ */
+.min-w-0-grid > *,
+.grid > * {
+  min-width: 0;
+}
+
+.mono {
+  font-variant-numeric: tabular-nums;
+  @apply font-mono text-[12.5px];
+}
+
+/* A visible focus ring everywhere: this is a keyboard-first research tool. */
+:focus-visible {
+  outline: 2px solid rgb(var(--signal-blue));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Route transitions, when the browser supports them. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: fade-out 120ms ease both;
+}
+::view-transition-new(root) {
+  animation: fade-up 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Respect a reader who has asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Print: a lesson should come out as a readable document.
+ *
+ * The screen is a dark instrument panel; paper is neither. So the print
+ * stylesheet does not try to reproduce the screen. It flattens the colour
+ * scheme to ink on white, drops the controls that cannot be operated on paper,
+ * keeps the argument, the equations, the figures, the measured numbers and
+ * the reader's own notes, and breaks a panel rather than splitting it.
+ */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  /*
+   * Ink on paper. The tokens are the single source of truth for colour, so
+   * redefining them here re-colours the whole application — including the
+   * charts, whose text and grid lines are overridden below — without
+   * touching a single component.
+   */
+  :root,
+  [data-theme='dark'],
+  [data-theme='light'] {
+    color-scheme: light;
+
+    --lab-950: 255 255 255;
+    --lab-900: 255 255 255;
+    --lab-850: 255 255 255;
+    --lab-800: 249 250 251;
+    --lab-700: 203 208 217;
+    --lab-600: 110 118 132;
+    --lab-500: 82 89 103;
+    --lab-400: 60 66 79;
+    --lab-300: 42 47 58;
+    --lab-200: 28 32 41;
+    --lab-100: 12 15 22;
+
+    --signal-blue: 22 104 196;
+    --signal-orange: 168 88 10;
+    --signal-green: 16 110 74;
+    --signal-red: 170 45 38;
+    --signal-violet: 96 58 180;
+
+    --panel-shadow: none;
+    --scrollbar: 203 208 217;
+    --grid-line: 227 231 238;
+  }
+
+  html,
+  body,
+  #root {
+    height: auto !important;
+  }
+
+  /*
+   * The pre-paint script in index.html paints the themed background onto the
+   * document element so that there is no flash before the bundle arrives.
+   * That rule is more specific than the token override above, so the paper
+   * colour has to be set here as well.
+   */
+  html,
+  html[data-theme='dark'],
+  html[data-theme='light'] {
+    background: #fff !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #0c0f16 !important;
+    transition: none !important;
+  }
+
+  /* The instrument panel is not a document: the controls go, the results stay. */
+  nav,
+  button,
+  input[type='range'],
+  input[type='checkbox'] {
+    display: none !important;
+  }
+
+  /* One column, however wide the window was. */
+  main .grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /*
+   * A figure is a control panel beside a chart. On paper the control panel is
+   * meaningless, so it goes and the chart takes the whole width. The chart
+   * re-measures itself when its container changes width.
+   */
+  .figure-controls {
+    display: none !important;
+  }
+
+  .figure-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .card {
+    border-color: #cbd0d9 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  /* The figures, the tables and the reader's notes. */
+  figure,
+  table,
+  .js-plotly-plot,
+  textarea {
+    break-inside: avoid;
+  }
+
+  textarea {
+    border-color: #cbd0d9 !important;
+    color: #0c0f16 !important;
+    background: #fff !important;
+  }
+
+  /*
+   * The charts cannot read the CSS tokens, so their text and grid lines are
+   * overridden directly. Plotly writes these as inline attributes, which a
+   * `!important` declaration still wins over.
+   */
+  .js-plotly-plot text,
+  .js-plotly-plot .xtick text,
+  .js-plotly-plot .ytick text,
+  .js-plotly-plot .legend text,
+  .js-plotly-plot .annotation-text,
+  .js-plotly-plot .gtitle {
+    fill: #1a1e29 !important;
+  }
+
+  .js-plotly-plot .gridlayer path,
+  .js-plotly-plot .xgrid path,
+  .js-plotly-plot .ygrid path {
+    stroke: #e2e6ec !important;
+  }
+
+  .js-plotly-plot .zerolinelayer path,
+  .js-plotly-plot .axisline path,
+  .js-plotly-plot .xaxislayer-above path,
+  .js-plotly-plot .yaxislayer-above path {
+    stroke: #b9bfc9 !important;
+  }
+
+  .js-plotly-plot .bg {
+    fill: #fff !important;
+  }
+
+  /* A link that is followed should not say so twice. */
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 9px;
+    color: #5a6070;
+  }
+}
+

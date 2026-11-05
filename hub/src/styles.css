@@ -1,0 +1,568 @@
+/* The hub's own styles.
+ *
+ * The hub is not a course, so it has its own small stylesheet rather than
+ * the course shell. The accent variables it defines are the same names the
+ * catalogue components use, so the collection pages look like one thing.
+ */
+
+:root {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --text: #16181d;
+  --text-muted: #5d636e;
+  --border: rgba(22, 24, 29, 0.12);
+  --accent-indigo: #4c5fd7;
+  --accent-teal: #1f8f86;
+  --accent-emerald: #2f8f5b;
+  --accent-amber: #a3721c;
+  --accent-rose: #b8445c;
+  --shadow: 0 1px 2px rgba(22, 24, 29, 0.05), 0 8px 24px rgba(22, 24, 29, 0.05);
+  --radius: 0.85rem;
+  --measure: 68ch;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0e1014;
+  --surface: #16191f;
+  --text: #e8eaee;
+  --text-muted: #9aa1ad;
+  --border: rgba(232, 234, 238, 0.14);
+  --accent-indigo: #97a4ff;
+  --accent-teal: #63d6c8;
+  --accent-emerald: #6fd39c;
+  --accent-amber: #e0b25f;
+  --accent-rose: #f08ea3;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent-indigo);
+}
+
+.hub {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hub-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--surface);
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 var(--radius) 0;
+  z-index: 10;
+}
+
+.hub-skip:focus {
+  left: 0;
+}
+
+.hub-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+.hub-header-inner {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hub-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hub-brand-mark {
+  color: var(--accent-indigo);
+}
+
+.hub-brand-note {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.hub-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.92rem;
+}
+
+.hub-nav a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.hub-nav a:hover,
+.hub-nav a:focus-visible {
+  border-bottom-color: var(--accent-indigo);
+}
+
+.hub-theme {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+
+.hub-theme:hover {
+  border-color: var(--accent-indigo);
+}
+
+.hub-main {
+  flex: 1;
+  width: 100%;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 0 1.25rem 4rem;
+}
+
+.hub-hero {
+  padding: 3.5rem 0 2.5rem;
+  max-width: var(--measure);
+}
+
+.hub-hero h1 {
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  line-height: 1.15;
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.hub-lede {
+  color: var(--text-muted);
+  font-size: 1.03rem;
+  margin: 0 0 0.9rem;
+}
+
+.hub-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.hub-stat-value {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.hub-stat-label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.hub-section {
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.hub-section h2 {
+  font-size: 1.35rem;
+  margin: 0 0 0.5rem;
+}
+
+.hub-subheading {
+  font-size: 1rem;
+  margin: 2rem 0 0.75rem;
+  color: var(--text-muted);
+}
+
+.hub-note {
+  color: var(--text-muted);
+  max-width: var(--measure);
+  margin: 0 0 1rem;
+  font-size: 0.93rem;
+}
+
+.hub-search-label {
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.hub-search {
+  width: 100%;
+  max-width: 34rem;
+  font: inherit;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  margin-bottom: 1.25rem;
+}
+
+.hub-search:focus-visible {
+  outline: 2px solid var(--accent-indigo);
+  outline-offset: 1px;
+}
+
+.hub-course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1rem;
+}
+
+.hub-course {
+  padding: 1.1rem 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.hub-course h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.hub-course h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.hub-course h3 a:hover {
+  color: var(--accent-indigo);
+}
+
+.hub-course-modules {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.hub-course-source {
+  margin: 0;
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.hub-course-meta {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.hub-planned {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}
+
+.hub-planned li {
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.hub-planned-title {
+  font-weight: 600;
+}
+
+.hub-planned-note {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.hub-details {
+  margin-top: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+}
+
+.hub-details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.hub-footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 1.25rem 3rem;
+  max-width: 76rem;
+  margin: 0 auto;
+  width: 100%;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.hub-footer p {
+  max-width: var(--measure);
+}
+
+/* The source browser and the glossary. */
+
+.hub-search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.hub-search-row .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 12rem;
+  flex: 1 1 12rem;
+}
+
+.catalogue-source-browser,
+.catalogue-glossary {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.catalogue-source-row,
+.catalogue-glossary-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.catalogue-source-row-title,
+.catalogue-glossary-term {
+  font-weight: 600;
+  color: inherit;
+  text-decoration: none;
+}
+
+.catalogue-source-row-title:hover {
+  color: var(--accent-indigo);
+}
+
+.catalogue-source-row-venue,
+.catalogue-glossary-courses {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.catalogue-source-row-course {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-indigo);
+}
+
+.catalogue-source-row-gap {
+  font-size: 0.9rem;
+}
+
+.catalogue-source-row-licence {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.catalogue-glossary-summary {
+  font-size: 0.95rem;
+}
+
+/* The start panel, the level filter and the search hints. */
+
+.hub-section-start {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.hub-start {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.4rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent-indigo);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.hub-start-copy {
+  flex: 1 1 24rem;
+}
+
+.hub-start-kicker {
+  margin: 0 0 0.2rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-indigo);
+}
+
+.hub-start-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.3rem;
+}
+
+.hub-start-note {
+  margin: 0 0 0.3rem;
+  max-width: var(--measure);
+  font-size: 0.93rem;
+  color: var(--text-muted);
+}
+
+.hub-start-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.hub-start-button {
+  display: inline-block;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.6rem;
+  background: var(--accent-indigo);
+  color: var(--bg);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.hub-start-button:hover,
+.hub-start-button:focus-visible {
+  filter: brightness(1.08);
+}
+
+.hub-start-secondary {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.hub-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.9rem 0 0.8rem;
+}
+
+.hub-filter-button {
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+
+.hub-filter-button:hover {
+  border-color: var(--accent-indigo);
+}
+
+.hub-filter-active {
+  border-color: var(--accent-indigo);
+  background: color-mix(in srgb, var(--accent-indigo) 12%, var(--surface));
+}
+
+.hub-filter-count {
+  margin-left: 0.25rem;
+  color: var(--text-muted);
+}
+
+.hub-level {
+  display: inline-block;
+  margin-right: 0.45rem;
+  padding: 0.02rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.hub-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -0.6rem 0 1.1rem;
+}
+
+.hub-chips-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.hub-chip {
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  cursor: pointer;
+}
+
+.hub-chip:hover,
+.hub-chip:focus-visible {
+  border-color: var(--accent-indigo);
+  color: var(--accent-indigo);
+}

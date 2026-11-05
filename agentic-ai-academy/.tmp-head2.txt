@@ -1,0 +1,271 @@
+import { createContext, useContext, useLayoutEffect, useMemo, useReducer, type ReactNode } from 'react'
+import type { LessonDifficulty } from '../types/curriculum'
+import { ALL_QUESTIONS, LESSONS } from '../content/lessons'
+
+/**
+ * Student progress store.
+ *
+ * Everything is local-first: the state lives in memory and is mirrored to
+ * localStorage under a versioned key. No account, no network, no backend.
+ */
+
+export const STORAGE_KEY = 'agentic-ai-academy/progress'
+export const PROGRESS_VERSION = 1 as const
+
+/**
+ * Where earlier versions of the course wrote the state.
+ *
+ * The version used to live in the storage key, which meant that changing the
+ * schema would orphan a student's progress: the new key would be empty and
+ * the old one would simply be ignored. The version now lives in the payload
+ * and is migrated, and these keys are read once — on first load, and only if
+ * the current key is empty — and then left alone.
+ */
+export const LEGACY_STORAGE_KEYS = ['agentic-ai-academy/progress/v1'] as const
+
+export interface QuizAttempt {
+  questionId: string
+  lessonSlug: string
+  chosen: number
+  correct: boolean
+  /** ISO timestamp (kept for attempt history ordering). */
+  at: string
+}
+
+export interface LabActivity {
+  labId: string
+  metric: string
+  at: string
+}
+
+export interface ProgressState {
+  version: typeof PROGRESS_VERSION
+  completedLessons: string[]
+  bookmarks: string[]
+  quizAttempts: QuizAttempt[]
+  labActivity: LabActivity[]
+  difficultyOverrides: Record<string, LessonDifficulty>
+  /**
+   * Learning objectives the student has marked as understood.
+   *
+   * Keyed by `<lessonSlug>#<objectiveIndex>` so that the set survives a
+   * lesson being re-ordered and stays meaningful across sessions.
+   */
+  objectiveChecks: string[]
+  lastLessonSlug: string | null
+  updatedAt: string | null
+}
+
+type Action =
+  | { type: 'complete-lesson'; slug: string }
+  | { type: 'uncomplete-lesson'; slug: string }
+  | { type: 'toggle-bookmark'; slug: string }
+  | { type: 'record-attempt'; attempt: Omit<QuizAttempt, 'at'> }
+  | { type: 'record-lab'; labId: string; metric: string }
+  | { type: 'set-difficulty'; slug: string; difficulty: LessonDifficulty }
+  | { type: 'toggle-objective'; key: string }
+  | { type: 'visit-lesson'; slug: string }
+  | { type: 'import'; state: ProgressState }
+  | { type: 'reset' }
+
+export const initialProgress: ProgressState = {
+  version: PROGRESS_VERSION,
+  completedLessons: [],
+  bookmarks: [],
+  quizAttempts: [],
+  labActivity: [],
+  difficultyOverrides: {},
+  objectiveChecks: [],
+  lastLessonSlug: null,
+  updatedAt: null,
+}
+
+/** The key used to record that one learning objective has been understood. */
+export function objectiveKey(lessonSlug: string, index: number): string {
+  return `${lessonSlug}#${index}`
+}
+
+function nowIso(): string {
+  return new Date().toISOString()
+}
+
+export function progressReducer(state: ProgressState, action: Action): ProgressState {
+  switch (action.type) {
+    case 'complete-lesson':
+      if (state.completedLessons.includes(action.slug)) return state
+      return { ...state, completedLessons: [...state.completedLessons, action.slug], updatedAt: nowIso() }
+    case 'uncomplete-lesson':
+      return {
+        ...state,
+        completedLessons: state.completedLessons.filter((slug) => slug !== action.slug),
+        updatedAt: nowIso(),
+      }
+    case 'toggle-bookmark':
+      return {
+        ...state,
+        bookmarks: state.bookmarks.includes(action.slug)
+          ? state.bookmarks.filter((slug) => slug !== action.slug)
+          : [...state.bookmarks, action.slug],
+        updatedAt: nowIso(),
+      }
+    case 'record-attempt':
+      return {
+        ...state,
+        quizAttempts: [...state.quizAttempts, { ...action.attempt, at: nowIso() }],
+        updatedAt: nowIso(),
+      }
+    case 'record-lab':
+      return {
+        ...state,
+        labActivity: [...state.labActivity.slice(-49), { labId: action.labId, metric: action.metric, at: nowIso() }],
+        updatedAt: nowIso(),
+      }
+    case 'set-difficulty':
+      return { ...state, difficultyOverrides: { ...state.difficultyOverrides, [action.slug]: action.difficulty }, updatedAt: nowIso() }
+    case 'toggle-objective':
+      return {
+        ...state,
+        objectiveChecks: state.objectiveChecks.includes(action.key)
+          ? state.objectiveChecks.filter((key) => key !== action.key)
+          : [...state.objectiveChecks, action.key],
+        updatedAt: nowIso(),
+      }
+    case 'visit-lesson':
+      return { ...state, lastLessonSlug: action.slug, updatedAt: nowIso() }
+    case 'import':
+      return { ...action.state, version: PROGRESS_VERSION, updatedAt: nowIso() }
+    case 'reset':
+      return { ...initialProgress }
+    default:
+      return state
+  }
+}
+
+/**
+ * The steps that bring an old payload up to the current version.
+ *
+ * Each step receives the payload as it looked at version *n* and returns it
+ * as version *n + 1*. Adding a field to the schema needs no step, because
+ * `parseProgress` fills in the missing values; renaming a field, changing
+ * the shape of one, or moving one does.
+ *
+ * The list is indexed by the version being upgraded *from*, so the last entry
+ * must be for version `PROGRESS_VERSION - 1`.
+ */
+const MIGRATIONS: ((payload: Record<string, unknown>) => Record<string, unknown>)[] = [
+  // 0 -> 1: the first release recorded the difficulty override as a bare
+  // string and kept the attempts in a `history` array. Both were renamed.
+  (payload) => {
+    const next = { ...payload }
+    if (Array.isArray(next.history) && !Array.isArray(next.quizAttempts)) {
+      next.quizAttempts = next.history
+      delete next.history
+    }
+    if (next.difficulty && typeof next.difficulty === 'string' && !next.difficultyOverrides) {
+      next.difficultyOverrides = {}
+      delete next.difficulty
+    }
+    return next
+  },
+]
+
+/**
+ * Bring a stored payload up to the current schema version.
+ *
+ * A payload from a *newer* version is left as it is: this build might not
+ * understand it, but the field-by-field normalisation below keeps whatever it
+ * can recognise, and losing a student's history because they opened an older
+ * build of the course would be worse than ignoring a field.
+ */
+export function migrateProgress(payload: Record<string, unknown>): Record<string, unknown> {
+  const from = typeof payload.version === 'number' && Number.isFinite(payload.version) ? payload.version : 0
+  let current = payload
+  for (let version = Math.max(0, from); version < PROGRESS_VERSION; version++) {
+    const step = MIGRATIONS[version]
+    if (!step) break
+    current = step(current)
+  }
+  return { ...current, version: PROGRESS_VERSION }
+}
+
+/** The two difficulty tracks, and the only values an override may hold. */
+const DIFFICULTIES: LessonDifficulty[] = ['core', 'advanced']
+
+/**
+ * Keep only the difficulty overrides that are meaningful.
+ *
+ * A payload can name any lesson and any value; only a known lesson with a
+ * known track is worth carrying forward.
+ */
+function normaliseDifficultyOverrides(value: unknown): Record<string, LessonDifficulty> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+  const known = new Set(LESSONS.map((lesson) => lesson.slug))
+  const result: Record<string, LessonDifficulty> = {}
+  for (const [slug, difficulty] of Object.entries(value as Record<string, unknown>)) {
+    if (!known.has(slug)) continue
+    if (typeof difficulty === 'string' && DIFFICULTIES.includes(difficulty as LessonDifficulty)) {
+      result[slug] = difficulty as LessonDifficulty
+    }
+  }
+  return result
+}
+
+/** Defensive loader: unknown or corrupt payloads fall back to a clean state. */
+export function parseProgress(raw: string | null): ProgressState {
+  if (!raw) return initialProgress
+  try {
+    const parsed = migrateProgress(JSON.parse(raw) as Record<string, unknown>)
+    const knownQuestionIds = new Set(ALL_QUESTIONS.map((question) => question.id))
+    return {
+      version: PROGRESS_VERSION,
+      completedLessons: Array.isArray(parsed.completedLessons) ? parsed.completedLessons.filter((slug) => typeof slug === 'string') : [],
+      bookmarks: Array.isArray(parsed.bookmarks) ? parsed.bookmarks.filter((slug) => typeof slug === 'string') : [],
+      quizAttempts: Array.isArray(parsed.quizAttempts)
+        ? parsed.quizAttempts
+            .filter((attempt) => attempt && knownQuestionIds.has(attempt.questionId))
+            .map((attempt) => ({ ...attempt, at: typeof attempt.at === 'string' ? attempt.at : nowIso() }))
+        : [],
+      labActivity: Array.isArray(parsed.labActivity)
+        ? parsed.labActivity.filter((entry) => entry && typeof entry.labId === 'string')
+        : [],
+      difficultyOverrides: normaliseDifficultyOverrides(parsed.difficultyOverrides),
+      objectiveChecks: Array.isArray(parsed.objectiveChecks)
+        ? parsed.objectiveChecks.filter((key) => typeof key === 'string')
+        : [],
+      lastLessonSlug: typeof parsed.lastLessonSlug === 'string' ? parsed.lastLessonSlug : null,
+      updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : null,
+    }
+  } catch {
+    return initialProgress
+  }
+}
+
+export function serializeProgress(state: ProgressState): string {
+  return JSON.stringify({ ...state, exportedAt: nowIso() }, null, 2)
+}
+
+export interface ProgressApi {
+  state: ProgressState
+  /** Slug of the most recently visited lesson, if any. */
+  lastLessonSlug: string | null
+  completedCount: number
+  totalLessons: number
+  completionRatio: number
+  quizAccuracy: number
+  answeredQuestionIds: string[]
+  correctQuestionIds: string[]
+  isCompleted: (slug: string) => boolean
+  isBookmarked: (slug: string) => boolean
+  difficultyFor: (slug: string, fallback: LessonDifficulty) => LessonDifficulty
+  /** True when the student has marked this learning objective as understood. */
+  isObjectiveChecked: (lessonSlug: string, index: number) => boolean
+  /** How many objectives of a lesson are marked as understood. */
+  objectivesChecked: (lessonSlug: string) => number
+  completeLesson: (slug: string) => void
+  uncompleteLesson: (slug: string) => void
+  toggleBookmark: (slug: string) => void
+  recordAttempt: (attempt: Omit<QuizAttempt, 'at'>) => void
+  recordLab: (labId: string, metric: string) => void
+  setDifficulty: (slug: string, difficulty: LessonDifficulty) => void
+  toggleObjective: (lessonSlug: string, index: number) => void
+  visitLesson: (slug: string) => void

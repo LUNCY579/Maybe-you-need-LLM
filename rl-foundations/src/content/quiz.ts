@@ -1,0 +1,163 @@
+/**
+ * The assessment bank.
+ */
+
+import type { QuizQuestion } from '@llm-materials/course-core'
+
+export type { QuizQuestion }
+
+const SUTTON = { label: 'Sutton & Barto (2018)' }
+const SPINNINGUP = { label: 'OpenAI, Spinning Up in Deep RL' }
+const GAE = { label: 'Williams & Burges (1990)' }
+const COURSE = { label: 'This course' }
+
+export const QUIZ: QuizQuestion[] = [
+  {
+    id: 'q-mdp-1',
+    kind: 'multiple-choice',
+    prompt: 'What does the Markov property say?',
+    topic: 'States and returns',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'The next state depends only on the present state', feedback: 'Correct.' },
+      { id: 'b', label: 'The states arrive in a random order', feedback: 'No.' },
+      { id: 'c', label: 'The reward depends only on the state', feedback: 'That is a different condition, and it is not implied.' },
+      { id: 'd', label: 'The process never revisits a state', feedback: 'No.' },
+    ],
+    correctOptionId: 'a',
+    explanation: 'The whole history is irrelevant to the future. That is what makes the value function a function of the state alone, and the problem finite.',
+    citation: SUTTON,
+    lessonId: 'states-and-returns',
+  },
+  {
+    id: 'q-mdp-2',
+    kind: 'numeric',
+    prompt: 'A trajectory collects rewards 2, 1, 1 with a discount of 0.5. What is the return from the first step?',
+    topic: 'States and returns',
+    difficulty: 'core',
+    answer: 2.75,
+    tolerance: 0.001,
+    explanation: '2 + 0.5×1 + 0.25×1 = 2.75. Each reward is weighted by a power of the discount.',
+    citation: COURSE,
+    lessonId: 'states-and-returns',
+  },
+  {
+    id: 'q-value-1',
+    kind: 'multiple-choice',
+    prompt: 'What does the Bellman equation say?',
+    topic: 'The value function',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'The value of a state is the reward plus the discounted value of the next state', feedback: 'Correct.' },
+      { id: 'b', label: 'The value of a state is the average reward from it', feedback: 'That is a special case, with no discounting and no movement.' },
+      { id: 'c', label: 'The value of a state is the value of the best action', feedback: 'That is the optimality equation, not the Bellman equation for a policy.' },
+      { id: 'd', label: 'The value of a state is the reward of the best action', feedback: 'No.' },
+    ],
+    correctOptionId: 'a',
+    explanation: 'It is a fixed point: the value function is the one that satisfies it, and iterating it converges to that function.',
+    citation: SUTTON,
+    lessonId: 'the-value-function',
+  },
+  {
+    id: 'q-value-2',
+    kind: 'boolean',
+    prompt: 'Value iteration finds the optimal policy without ever evaluating a policy.',
+    topic: 'The optimal policy',
+    difficulty: 'core',
+    truth: true,
+    explanation: 'Yes. One sweep of the optimality operator gives the greedy policy with respect to the current values, and repeating the sweep converges to the optimal pair. A policy evaluation is not needed anywhere in it.',
+    citation: SUTTON,
+    lessonId: 'the-optimal-policy',
+  },
+  {
+    id: 'q-gradient-1',
+    kind: 'multiple-choice',
+    prompt: 'What does the likelihood-ratio trick do?',
+    topic: 'The likelihood-ratio trick',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'It turns an expectation under one distribution into one under another', feedback: 'Correct.' },
+      { id: 'b', label: 'It makes the estimator unbiased', feedback: 'The estimator is unbiased for other reasons.' },
+      { id: 'c', label: 'It reduces the variance of the estimate', feedback: 'That is the baseline’s job.' },
+      { id: 'd', label: 'It removes the discount', feedback: 'No.' },
+    ],
+    correctOptionId: 'a',
+    explanation: 'Multiplying by the ratio of the two densities does it, and the ratio does not depend on the parameters being differentiated — which is what lets the terms that do not depend on them drop out.',
+    citation: SPINNINGUP,
+    lessonId: 'the-likelihood-ratio-trick',
+  },
+  {
+    id: 'q-gradient-2',
+    kind: 'numeric',
+    prompt: 'A policy gives an action probability of 0.25 in a state. What is the gradient of its log-probability with respect to a logit that only that action has?',
+    topic: 'The likelihood-ratio trick',
+    difficulty: 'hard',
+    answer: 0.75,
+    tolerance: 0.001,
+    explanation: 'The derivative of log p with respect to its own logit is 1 − p, so it is 1 − 0.25 = 0.75.',
+    citation: COURSE,
+    lessonId: 'the-likelihood-ratio-trick',
+  },
+  {
+    id: 'q-actor-1',
+    kind: 'multiple-choice',
+    prompt: 'Why does subtracting a baseline leave the expected gradient unchanged?',
+    topic: 'The baseline',
+    difficulty: 'hard',
+    options: [
+      { id: 'a', label: 'The baseline does not depend on the action, so its expectation is zero', feedback: 'Correct.' },
+      { id: 'b', label: 'The baseline is a constant', feedback: 'It may vary with the state; what matters is that it does not vary with the action.' },
+      { id: 'c', label: 'The gradient of the baseline is zero', feedback: 'Its gradient is not zero; its expectation over the action is.' },
+      { id: 'd', label: 'The baseline is unbiased', feedback: 'Irrelevant to the expectation.' },
+    ],
+    correctOptionId: 'a',
+    explanation: 'The term is the score function times the baseline, and the score function has mean zero over the action distribution. So the baseline drops out of the expectation.',
+    citation: SUTTON,
+    lessonId: 'the-baseline',
+  },
+  {
+    id: 'q-actor-2',
+    kind: 'multiple-choice',
+    prompt: 'Which end of the n-step range is biased?',
+    topic: 'The n-step return',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'Both, in opposite ways: the one-step return is biased and the Monte Carlo return is noisy', feedback: 'Correct.' },
+      { id: 'b', label: 'Neither', feedback: 'They are the two ends of the trade.' },
+      { id: 'c', label: 'Only the one-step return', feedback: 'The Monte Carlo return is unbiased, and it is the noisy one.' },
+      { id: 'd', label: 'Only the Monte Carlo return', feedback: 'The opposite.' },
+    ],
+    correctOptionId: 'a',
+    explanation: 'The bootstrap is what biases an estimate, and the Monte Carlo return has no bootstrap. The sample is what makes an estimate noisy, and the one-step return has almost no sample in it.',
+    citation: GAE,
+    lessonId: 'the-n-step-return',
+  },
+  {
+    id: 'q-actor-3',
+    kind: 'boolean',
+    prompt: 'The best λ for an advantage estimate depends on how long the episodes are.',
+    topic: 'The λ-return',
+    difficulty: 'hard',
+    truth: true,
+    explanation: 'Yes. The bias comes from the truncation of the episode, so a short horizon wants a small λ and a long one can afford a large λ. The right λ is a function of the horizon you actually have.',
+    citation: GAE,
+    lessonId: 'the-lambda-return',
+  },
+  {
+    id: 'q-actor-4',
+    kind: 'multiple-choice',
+    prompt: 'What does the critic contribute to the actor–critic loop?',
+    topic: 'The actor–critic loop',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'An estimate of the value, and through it the advantage the actor follows', feedback: 'Correct.' },
+      { id: 'b', label: 'The parameters the actor starts from', feedback: 'No.' },
+      { id: 'c', label: 'The reward function', feedback: 'No.' },
+      { id: 'd', label: 'The discount', feedback: 'No.' },
+    ],
+    correctOptionId: 'a',
+    explanation: 'The critic turns the return into the advantage, which is a smaller and less noisy signal, and the actor follows the advantage rather than the return.',
+    citation: SPINNINGUP,
+    lessonId: 'the-actor-critic-loop',
+  },
+]

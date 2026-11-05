@@ -1,0 +1,29 @@
+{
+  "name": "@llm-materials/hub",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The front door of the collection: every course, every source, the learning path and the concept index.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "lint": "oxlint"
+  },
+  "dependencies": {
+    "@llm-materials/course-catalogue": "*",
+    "@llm-materials/course-core": "*",
+    "@playwright/test": "^1.64.1",
+    "@axe-core/playwright": "^4.14.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~6.0.2",
+    "vite": "^7.0.0",
+    "vitest": "^5.0.5"
+  }
+}

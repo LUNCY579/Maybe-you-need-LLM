@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Deep Learning Theory Explorer">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5aa9ff" />
+      <stop offset="0.55" stop-color="#b48cff" />
+      <stop offset="1" stop-color="#48d597" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0b0e13" />
+  <rect x="1.5" y="1.5" width="61" height="61" rx="12.5" fill="none" stroke="url(#g)" stroke-width="1.6" opacity="0.85" />
+  <g stroke="url(#g)" stroke-width="2.1" fill="none" stroke-linecap="round">
+    <path d="M12 40 L24 24 L36 44 L48 20" />
+  </g>
+  <g fill="#ff9f45">
+    <circle cx="24" cy="24" r="2.6" />
+    <circle cx="36" cy="44" r="2.6" />
+  </g>
+  <g fill="#8b98a9" font-family="ui-monospace, monospace" font-size="7" opacity="0.85">
+    <text x="10" y="56">K^(l+1)</text>
+  </g>
+</svg>

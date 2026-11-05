@@ -1,0 +1,19 @@
+{
+  "name": "Data Lab - LLM Materials",
+  "short_name": "Data Lab",
+  "description": "An interactive course from the LLM Materials collection, built on muennighoff-2023-datacomp.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e1014",
+  "theme_color": "#0e1014",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

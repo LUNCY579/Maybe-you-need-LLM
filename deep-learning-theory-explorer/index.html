@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Deep Learning Theory Explorer</title>
+    <meta
+      name="description"
+      content="Interactive mathematical laboratory for the principles of deep learning theory: signal propagation, criticality, the kernel recursion, finite-width fluctuations, the neural tangent kernel and representation learning — all computed in the browser."
+    />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0b0e13" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <style>
+      /* Paint the correct background before the bundle arrives, so there is no flash. */
+      html[data-theme='dark'] {
+        background: #0b0e13;
+      }
+      html[data-theme='light'] {
+        background: #f6f7f9;
+      }
+      html {
+        color-scheme: dark light;
+      }
+    </style>
+    <script>
+      // Apply the stored theme before React mounts, so the first paint is correct.
+      (function () {
+        try {
+          var stored = localStorage.getItem('dlte.theme.v1');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark';
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="max-width: 40rem; margin: 4rem auto; padding: 0 1.5rem; font-family: system-ui, sans-serif">
+        <h1 style="font-size: 1.25rem">Deep Learning Theory Explorer</h1>
+        <p style="line-height: 1.6; color: #8b98a9">
+          This laboratory computes every number it shows — Gaussian integrals by quadrature, network statistics by real
+          forward passes, gradients by exact backpropagation — in your browser. That requires JavaScript. Please enable
+          it and reload.
+        </p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Diffusion Lab - LLM Materials",
+  "short_name": "Diffusion Lab",
+  "description": "An interactive course from the LLM Materials collection, built on ho-2020.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e1014",
+  "theme_color": "#0e1014",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

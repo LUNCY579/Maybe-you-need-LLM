@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://llm-materials.example/mech-interp-lab/sitemap.xml
