@@ -88,6 +88,18 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 .card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
 .card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
 @media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+
+/* The printed book: the chrome is not part of the text. */
+@media print {
+  header.book, nav.toc, footer.pager { display: none; }
+  .layout { display: block; max-width: none; padding: 0; }
+  body { background: #fff; color: #000; font-size: 11pt; }
+  a { color: inherit; text-decoration: none; }
+  .math-display { overflow: visible; }
+  h1, h2, h3, h4 { break-after: avoid; }
+  pre, blockquote, table, figure { break-inside: avoid; }
+  section.volume { break-before: page; margin-top: 0; padding-top: 0; border-top: 0; }
+}
 </style>
 </head>
 <body>

@@ -399,6 +399,12 @@ export function AppShell() {
                 tone="teal"
               />
             </div>
+            <a
+              href="../textbooks/llm-foundations-lab.html"
+              className="rounded-lg border border-line px-3 py-1.5 text-sm text-fg no-underline hover:border-indigo/60"
+            >
+              Textbook
+            </a>
             <Button variant="ghost" size="sm" onClick={toggle} title="Toggle light and dark surfaces">
               <span aria-hidden>{theme === 'dark' ? '☾' : '☀'}</span>
               <span className="sr-only">Toggle colour scheme</span>

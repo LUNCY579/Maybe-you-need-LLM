@@ -185,6 +185,13 @@ export function AppShell({ children }: { children: ReactNode }) {
               <KeyboardIcon />
               <span className="hidden lg:inline">Shortcuts</span>
             </Button>
+            <a
+              href="../textbooks/agentic-ai-academy.html"
+              className="focus-ring inline-flex items-center rounded-lg px-3.5 py-2 text-sm no-underline"
+              style={{ border: '1px solid var(--border-soft)', color: 'var(--text-strong)' }}
+            >
+              Textbook
+            </a>
             <Button
               size="sm"
               variant="ghost"
