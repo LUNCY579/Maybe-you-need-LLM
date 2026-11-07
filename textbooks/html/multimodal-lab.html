@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multimodal Lab — textbook</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents"><a class="" href="#contents">Contents</a>
+<a class="" href="#1-contrastive-pretraining">1. Contrastive Pretraining</a>
+<a class="l2" href="#lesson-1-the-contrastive-objective">Lesson 1. The contrastive objective</a>
+<a class="l2" href="#lesson-2-the-data-and-the-batch">Lesson 2. The data and the batch</a>
+<a class="" href="#2-the-modality-gap">2. The Modality Gap</a>
+<a class="l2" href="#lesson-3-the-modality-gap">Lesson 3. The modality gap</a>
+<a class="l2" href="#lesson-4-zero-shot">Lesson 4. Zero-shot</a>
+<a class="" href="#3-instruction-tuning">3. Instruction Tuning</a>
+<a class="l2" href="#lesson-5-the-instruction-recipe">Lesson 5. The instruction recipe</a>
+<a class="l2" href="#lesson-6-the-alignment-tax">Lesson 6. The alignment tax</a>
+<a class="" href="#4-the-loss-and-the-bridge">4. The Loss and the Bridge</a>
+<a class="l2" href="#lesson-7-the-sigmoid-loss">Lesson 7. The sigmoid loss</a>
+<a class="l2" href="#lesson-8-the-frozen-bridge">Lesson 8. The frozen bridge</a>
+<a class="l2" href="#lesson-9-the-resampler">Lesson 9. The resampler</a>
+<a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
+<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+  <main class="book"><h1 id="multimodal-lab">Multimodal Lab</h1>
+<p><strong>Source:</strong> Learning Transferable Visual Models From Natural Language Supervision — Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, Ilya Sutskever (2021)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Nothing in the collection handles a second modality at all. <strong>Source:</strong> Flamingo: a Visual Language Model for Few-Shot Learning — Jean-Baptiste Alayrac, Jeff Donahue, Pauline Luc, Antoine Miech, Iain Barr, Yana Hasson, Karel Lenc, Arthur Mensch, Katie Millican, Malcolm Reynolds, Roman Ring, Eliza Rutherford, Serkan Cabi, Tengda Han, Zhitao Gong, Sina Samangooei, Marianne Monteiro, Jacob Menick, Sebastian Borgeaud, Andrew Brock, Aida Nematzadeh, Sahand Sharifzadeh, Mikolaj Binkowski, Ricardo Barreira, Oriol Vinyals, Andrew Zisserman, Karen Simonyan (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Few-shot learning with interleaved images and text, and the Perceiver resampler that makes it cheap. <strong>Source:</strong> Visual Instruction Tuning — Haotian Liu, Chunyuan Li, Qingyang Wu, Yong Jae Lee (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The recipe that turned a vision encoder plus a language model into a chat model, with almost no new parameters. <strong>Source:</strong> Sigmoid Loss for Language Image Pre-Training — Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, Lucas Beyer (2023)</p>
+<p><strong>Licence:</strong> CC BY 4.0 (as stated on the arXiv record).</p>
+<p><strong>Why this course exists:</strong> The contrastive loss normalised over the batch; the pairwise sigmoid loss is the later alternative, and the coupling experiment measures the difference. <strong>Source:</strong> BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models — Junnan Li, Dongxu Li, Silvio Savarese, Steven Hoi (2023)</p>
+<p><strong>Licence:</strong> CC BY 4.0 (as stated on the arXiv record).</p>
+<p><strong>Why this course exists:</strong> Nothing in the collection showed a frozen-encoder bridge, or priced what is trained against what is held still. <strong>Source:</strong> An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale — Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, Neil Houlsby (2020)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The patch embedding that turns an image into tokens was assumed, never shown.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#1-contrastive-pretraining">1. Contrastive Pretraining</a> - <a href="#lesson-1-the-contrastive-objective">Lesson 1. The contrastive objective</a> - <a href="#lesson-2-the-data-and-the-batch">Lesson 2. The data and the batch</a></li><li><a href="#2-the-modality-gap">2. The Modality Gap</a> - <a href="#lesson-3-the-modality-gap">Lesson 3. The modality gap</a> - <a href="#lesson-4-zero-shot">Lesson 4. Zero-shot</a></li><li><a href="#3-instruction-tuning">3. Instruction Tuning</a> - <a href="#lesson-5-the-instruction-recipe">Lesson 5. The instruction recipe</a> - <a href="#lesson-6-the-alignment-tax">Lesson 6. The alignment tax</a></li><li><a href="#4-the-loss-and-the-bridge">4. The Loss and the Bridge</a> - <a href="#lesson-7-the-sigmoid-loss">Lesson 7. The sigmoid loss</a> - <a href="#lesson-8-the-frozen-bridge">Lesson 8. The frozen bridge</a> - <a href="#lesson-9-the-resampler">Lesson 9. The resampler</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<h2 id="1-contrastive-pretraining">1. Contrastive Pretraining</h2>
+<p><em>Two encoders, one space, and no labels at all</em></p>
+<p>The loss that says a pair should be closer than the other pairs in the batch, the temperature that decides how sharp it is, and the data that pays for it.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>State the contrastive objective and say what the in-batch negatives are for</li><li>Explain what the temperature does, and why it is a decision rather than a constant</li><li>Measure how the retrieval improves with the batch size and with the data</li></ul>
+<h3 id="lesson-1-the-contrastive-objective">Lesson 1. The contrastive objective</h3>
+<p><em>What the loss says, and who provides the negatives</em></p>
+<p><em>Estimated study time:</em> 28 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the objective in words and write the loss</li><li>Explain where the negatives come from and what they cost</li><li>Say what the temperature does to the loss</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The loss asks for the paired image and caption to be closer than the other pairs in the batch.</li><li>The negatives are the other pairs in the batch, and they are free.</li><li>The temperature decides how sharp the distribution over the batch is.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the contrastive loss ask for? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The paired image and caption to score higher than every other pair in the batch</strong></li><li>- The image to be classified as the caption’s class</li><li>- The two encoders to be identical</li><li>- The batch to contain one pair of each class</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> It is a cross-entropy over the batch, with the true pairing on the diagonal. Nothing in it needs a label.</p></blockquote>
+<p>*<em>Q. The in-batch negatives are free: they are the other pairs the batch already contains. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Yes. A batch of B pairs gives B² pairs of which B are correct, and the rest cost nothing — which is why the method scales with the size of the batch.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The loss, the gradient, and the retrieval, with the temperature and the batch size exposed. Open <strong>Train the contrastive model</strong> in the multimodal-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§clip:2.1 The contrastive objective — The loss, the in-batch negatives, and the temperature.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The contrastive loss</strong> — The paired image and caption should be closer than the other pairs in the batch.</li><li><strong>The in-batch negatives</strong> — The other pairs in the batch, used as things not to match.</li><li><strong>The temperature</strong> — How sharp the distribution over the batch is.</li></ul>
+<h3 id="lesson-2-the-data-and-the-batch">Lesson 2. The data and the batch</h3>
+<p><em>What the scale of the pretraining buys</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what the number of pairs does to the retrieval</li><li>Explain why a larger batch gives more negatives and a better estimate</li><li>Describe the precomputation that makes the index affordable</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>More pairs is more supervision, and the retrieval improves with it.</li><li>A larger batch is more negatives for the same cost, and a better estimate.</li><li>The document vectors never change, so the index is a matrix and the search is a matrix product.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why can the document vectors be computed once and stored? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Because a document’s embedding does not depend on what is being retrieved</strong></li><li>- Because the encoder is small</li><li>- Because the training has finished</li><li>- Because the index is approximate</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> So the index is a matrix and the search is a matrix product — which is what makes a corpus of billions affordable.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The retrieval against the batch size and against the number of pairs. Open <strong>Scale the batch and the data</strong> in the multimodal-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§clip:3 Results — The zero-shot transfer, and the size of the pretraining dataset.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The in-batch negatives</strong> — The other pairs in the batch, used as things not to match.</li><li><strong>Retrieval</strong> — Finding the caption that belongs with an image, among all of them.</li></ul>
+<p><em>Read first:</em> The contrastive objective</p>
+<h2 id="2-the-modality-gap">2. The Modality Gap</h2>
+<p><em>Two spaces that are close, and not the same space</em></p>
+<p>The images and the captions end up in one space, and the space is not quite symmetric. The gap, and the zero-shot classifier that works anyway.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Define the modality gap and say how it is measured</li><li>Describe the zero-shot classifier, and the part the prompt plays in it</li><li>Explain why the classifier works at all, given the gap</li></ul>
+<h3 id="lesson-3-the-modality-gap">Lesson 3. The modality gap</h3>
+<p><em>One space, and a seam down the middle of it</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the gap and say how it is measured</li><li>Explain what it means for a retrieval that works</li><li>Say what closing it would cost</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The images and the captions end up in one space, but the two halves are further apart than either half is from itself.</li><li>A retrieval works anyway, because the <em>pairs</em> are close even though the <em>spaces</em> are not.</li><li>So the gap is a property of the representation, not a failure of the method.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is the modality gap? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The two modalities are further apart in the shared space than either is from itself</strong></li><li>- The two encoders have different numbers of parameters</li><li>- The training data has more images than captions</li><li>- The retrieval is inaccurate</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A retrieval works anyway, because the <em>pairs</em> are close even though the two <em>spaces</em> are not.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The within-modal and the between-modal similarities, and the gap between them. Open <strong>Measure the gap</strong> in the multimodal-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§clip:2 Method — The encoders, and the precomputation that makes the index affordable.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The modality gap</strong> — The two modalities are further apart than either is from itself.</li><li><strong>The embedding space</strong> — The space the encoders put things in.</li></ul>
+<p><em>Read first:</em> The contrastive objective</p>
+<h3 id="lesson-4-zero-shot">Lesson 4. Zero-shot</h3>
+<p><em>Classifying with the class names and nothing else</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the zero-shot classifier and why it works at all</li><li>Say what part the prompt plays, and measure what it is worth</li><li>Explain the connection to the retrieval the model was trained for</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The class names are embedded with the text encoder, and the image is assigned to the closest of them.</li><li>The model was never trained to classify; it was trained to match a caption, and the class names are captions.</li><li>The prompt is part of the method, and a different template gives a different score.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why does the zero-shot classifier work at all? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Because a class name is a caption, and the model was trained to match captions to images</strong></li><li>- Because the model was trained to classify</li><li>- Because the embeddings are normalised</li><li>- Because the batch contained the classes</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The classifier is a retrieval against a set of captions that happen to be the class names.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The zero-shot accuracy, and what each prompt template is worth. Open <strong>Classify with the names</strong> in the multimodal-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§clip:3 Results — The zero-shot transfer, and the prompts it is measured with.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Zero-shot</strong> — Doing the task with no examples of it.</li><li><strong>The prompt template</strong> — The sentence the class name is put into.</li></ul>
+<p><em>Read first:</em> The modality gap</p>
+<h2 id="3-instruction-tuning">3. Instruction Tuning</h2>
+<p><em>Getting better at instructions, and what it costs</em></p>
+<p>The recipe that turns a model into an assistant, and the tax it pays on everything it was good at before.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Describe the three stages of the recipe</li><li>Measure the alignment tax, and say what it is a tax on</li><li>Explain why the tax is a fact about training rather than a defect of the method</li></ul>
+<h3 id="lesson-5-the-instruction-recipe">Lesson 5. The instruction recipe</h3>
+<p><em>Three stages, and what each one is for</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the three stages of the recipe</li><li>Say what the visual instruction tuning adds to it</li><li>Explain why the stages are in that order</li><li>Say what the projection changes about a visual token, and what it costs</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The stages are: align the model to instructions, then teach it to read images, then tune it on visual instructions.</li><li>Each stage is a different kind of data, and the order is what makes the last one work.</li><li>The projection is a learned linear map from the vision width to the language width; it changes the width of a token, not its count.</li><li>The model that comes out is a different model from the one that went in.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does instruction tuning do? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Tunes the model on instructions and their answers, so that it follows instructions</strong></li><li>- Trains the model from scratch on instructions</li><li>- Changes the tokenizer</li><li>- Makes the model multimodal</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> And the model that comes out is a different model from the one that went in — which is the next lesson.</p></blockquote>
+<p>*<em>Q. A 1024-wide vision token is projected to 4096 dimensions by a linear layer with a bias. How many parameters does the layer have? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> 1024 × 4096 = 4,194,304 entries in the matrix, plus 4096 bias terms, is 4,198,400. The number of tokens does not appear: the same matrix projects 576 tokens or four.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The gain on the instructions and the tax on everything else, as the tuning is strengthened. Open <strong>Run the recipe</strong> in the multimodal-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§llava:2 The method — Instruction tuning on visual data, and the three stages of the recipe.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Instruction tuning</strong> — Tuning a model on instructions and the answers to them.</li><li><strong>The alignment tax</strong> — What the instruction tuning gives up on the tasks it was good at.</li></ul>
+<p><em>Read first:</em> Zero-shot</p>
+<h3 id="lesson-6-the-alignment-tax">Lesson 6. The alignment tax</h3>
+<p><em>What the tuning takes away</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the alignment tax and say what it is measured on</li><li>Measure the gain and the tax, and the ratio between them</li><li>Explain why the tax is a fact about training and not a defect of the method</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Tuning on instructions makes the model better at instructions and slightly worse at what it was good at.</li><li>The tax is a measurement on the original task, before and after — not a claim.</li><li>And it is a consequence of the training, which means it is something the training can be made to avoid.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is the alignment tax? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The accuracy the model gives up on its original task, measured before and after the tuning</strong></li><li>- The cost of running the tuning</li><li>- The size of the instruction dataset</li><li>- A failure of the method</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> It is a measurement on the original task, and the ratio between the gain and the tax is the number a practitioner is shopping for.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The gain, the tax, and the ratio between them. Open <strong>Pay the tax</strong> in the multimodal-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§llava:3 The results — The benchmarks, and the effect of the data mixtures on what the model keeps.</li><li>§flamingo:2 The method — The interleaved sequence, and the few-shot learning it buys.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The alignment tax</strong> — What the instruction tuning gives up on the tasks it was good at.</li><li><strong>Instruction tuning</strong> — Tuning a model on instructions and the answers to them.</li></ul>
+<p><em>Read first:</em> The instruction recipe</p>
+<h2 id="4-the-loss-and-the-bridge">4. The Loss and the Bridge</h2>
+<p><em>What the objective normalises, and what the method holds still</em></p>
+<p>Two later answers to the same recipe: a loss that decides each pair on its own, an architecture that freezes both towers and trains only the small part between them, and a resampler that bounds the visual token count.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Say what the softmax normalises, and show that the sigmoid loss does not normalise it</li><li>Measure the coupling between a pair and the rest of its batch</li><li>Say what is trained in a frozen-encoder bridge, and read its parameter bill</li><li>Explain how a fixed set of latents bounds the number of visual tokens</li></ul>
+<h3 id="lesson-7-the-sigmoid-loss">Lesson 7. The sigmoid loss</h3>
+<p><em>One decision per pair, and no denominator</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what the softmax normalises and what that couples together</li><li>Read the same row of a batch under both losses</li><li>Explain what the bias balances, and why its value depends on the batch</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The softmax turns each row of the batch into a distribution, so one pair’s loss depends on every other pair.</li><li>The sigmoid loss is a sum of independent pair decisions, and a pair’s loss is a function of that pair alone.</li><li>The bias is the count of negatives, written as a probability; it is learned, but its starting point is a fact about the batch.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the sigmoid loss remove from the contrastive objective? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The normalisation over the batch</strong></li><li>- The image encoder</li><li>- The negatives</li><li>- The temperature</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Each pair is a logistic decision of its own, so the loss of one pair no longer contains a term from every other pair in the batch.</p></blockquote>
+<p>*<em>Q. Appending an unrelated pair to the batch leaves the sigmoid loss of an existing pair exactly unchanged. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Yes. The pair’s loss is a function of its own similarity, its label and the two learned constants. The softmax loss of its row, by contrast, changes, because the denominator has grown.</p></blockquote>
+<p>*<em>Q. With a scale of 10, a bias of 0 and a similarity of 0, what is the sigmoid loss of one pair? (Three decimal places.) — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> The logit is 0, and −log σ(0) = log 2 ≈ 0.693. The label does not matter at zero: a positive and a negative pair are equally undecided.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Append unrelated pairs to the batch and watch one loss move while the other does not. Open <strong>Break the coupling</strong> in the multimodal-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§siglip:3.1 The sigmoid loss — The pairwise logistic loss, and the removal of the normalisation over the batch.</li><li>§siglip:4.8 The negative-to-positive ratio — What the loss does as the unmatched pairs come to outnumber the matched ones.</li><li>§siglip:4.9 The bias term — The learned bias, and the initialisation that matches it to the size of the batch.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2303.15343">Zhai et al., “Sigmoid Loss for Language Image Pre-Training”</a> — the paper this lesson is built on; the loss and the batch experiments are in §3 and §4.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The sigmoid loss</strong> — Every pair is a yes-or-no question, decided on its own.</li><li><strong>Coupling</strong> — The dependence of one pair’s loss on the rest of the batch.</li><li><strong>The bias of the loss</strong> — The learned offset b that decides how likely a match is at zero similarity.</li></ul>
+<p><em>Read first:</em> The contrastive objective</p>
+<h3 id="lesson-8-the-frozen-bridge">Lesson 8. The frozen bridge</h3>
+<p><em>Patches, queries, and the towers that do not move</em></p>
+<p><em>Estimated study time:</em> 28 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what the image encoder, the queries and the language model each do</li><li>Explain why the patch tokens exist, and what a learned query reads from them</li><li>Read the parameter bill of the bridge, and the share of it that is trained</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A vision transformer cuts the image into patches and treats each patch as a token, which is what lets an image encoder be a transformer at all.</li><li>BLIP-2 keeps both towers frozen and trains a small set of queries to read the patch tokens and present them to the language model.</li><li>Freezing means the towers contribute most of the parameters and none of the gradient; the trainable share is the number the method is selling.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. In BLIP-2, which parts of the system are trained? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The learned queries and the bridge around them</strong></li><li>- The image encoder</li><li>- The language model</li><li>- All of it, end to end</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Both towers are frozen, and only the Q-Former and the projection are trained — which is what makes the bridge cheap next to the towers.</p></blockquote>
+<p>*<em>Q. Widening the bridge leaves the number of frozen parameters unchanged. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> Yes. The frozen towers are what they are; the bridge’s width changes only the trainable side, which is the whole point of the accounting in the laboratory.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>A learned query over the patch tokens, and the parameter bill of the bridge that carries it. Open <strong>Read the patches</strong> in the multimodal-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§blip2:3.1 The model architecture — The frozen encoder, the Q-Former’s learned queries, and the frozen language model.</li><li>§blip2:3.2 Learning with the frozen image encoder — The queries are trained to read the encoder’s tokens, and the encoder is not trained at all.</li><li>§vit:3.1 The vision transformer — The image is cut into patches, and the patches are the tokens.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2301.12597">Li et al., “BLIP-2”</a> — the Q-Former, the two pre-training stages, and the frozen towers.</li><li><a href="https://arxiv.org/abs/2010.11929">Dosovitskiy et al., “An Image is Worth 16x16 Words”</a> — the patch embedding that every vision transformer in this course is built on.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>A patch token</strong> — A small square of the image, embedded like a word.</li><li><strong>A frozen encoder</strong> — A network whose weights are held fixed while everything else trains.</li><li><strong>The Q-Former</strong> — The small learned bridge that reads the image tokens with its own queries.</li></ul>
+<p><em>Read first:</em> The contrastive objective</p>
+<h3 id="lesson-9-the-resampler">Lesson 9. The resampler</h3>
+<p><em>A fixed number of vectors for a variable number of tokens</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what the resampler’s latents read, and what the output length is</li><li>Explain why the output length is bounded by the latents and not by the image</li><li>Compare the cost of cross-attention on the latents with attention over every token</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A resampler is a fixed set of learned latents attending to a variable number of visual tokens; one vector comes out per latent.</li><li>The output length is therefore the number of latents, whatever the resolution or the number of images: the bound is structural, not a truncation.</li><li>The cross-attention costs latents × tokens work, where attention over the raw tokens would cost tokens squared.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. After a resampler, what sets the number of visual tokens the language model reads? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The number of latents in the resampler</strong></li><li>- The resolution of the image</li><li>- The patch size of the vision encoder</li><li>- The number of images in the interleaved sequence</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The resampler has one output vector per latent, so the output length is fixed by the latents and does not grow with the image or with the number of images.</p></blockquote>
+<p>*<em>Q. How many visual tokens does a 448-pixel square image produce with 14-pixel patches? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> The grid is 448 / 14 = 32 patches per side, and 32 squared is 1,024 tokens going into the resampler — of which a fixed number will come out.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The visual token count at four resolutions, and the fixed number of vectors that come out. Open <strong>Bound the tokens</strong> in the multimodal-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§flamingo:2 The method — The visual encoder, the Perceiver Resampler, and the fixed number of latents it presents to the language model.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2204.14198">Alayrac et al., “Flamingo”</a> — the resampler, the interleaved sequence, and the few-shot learning it buys.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The resampler</strong> — A fixed set of latents that reads any number of visual tokens.</li><li><strong>A patch token</strong> — A small square of the image, embedded like a word.</li><li><strong>A frozen encoder</strong> — A network whose weights are held fixed while everything else trains.</li></ul>
+<p><em>Read first:</em> The frozen bridge</p>
+<h2 id="appendix-a-glossary">Appendix A — Glossary</h2>
+<p><strong>The contrastive loss</strong> — The paired image and caption should be closer than the other pairs in the batch.</p>
+<p>The loss is a cross-entropy over the batch: for each image, the caption it was paired with should score higher than every other caption in the batch. Nothing in it needs a label, which is what makes the scale possible.</p>
+<p><strong>The in-batch negatives</strong> — The other pairs in the batch, used as things not to match.</p>
+<p>A batch of B pairs gives B² question–answer pairs, of which B are correct. The other B²−B are negatives, and they cost nothing to obtain, which is the reason the method scales the way it does.</p>
+<p><strong>The temperature</strong> — How sharp the distribution over the batch is.</p>
+<p>The similarities are divided by the temperature before the softmax. A small temperature makes the loss care about the single best match; a large one makes it care about the whole distribution. It is a decision, and the laboratory measures what it is worth.</p>
+<p><strong>Retrieval</strong> — Finding the caption that belongs with an image, among all of them.</p>
+<p>The score of the pretraining is a retrieval score: given the image, is the right caption the closest one? It is the task the method is trained on, and it is the task the downstream use depends on.</p>
+<p><strong>The embedding space</strong> — The space the encoders put things in.</p>
+<p>One space, shared by the two modalities, and the place where "close" means "about the same thing". Its geometry is learned, and the geometry is what the rest of the method exploits.</p>
+<p><strong>The modality gap</strong> — The two modalities are further apart than either is from itself.</p>
+<p>Images and captions occupy two distinguishable regions of the shared space. The gap is a fact about the representation, and it is measured rather than assumed.</p>
+<p><strong>Zero-shot</strong> — Doing the task with no examples of it.</p>
+<p>The classifier writes the class names out, embeds them, and assigns each image to the closest name. The model was never trained to classify; it was trained to match a caption, and a class name is a caption.</p>
+<p><strong>The prompt template</strong> — The sentence the class name is put into.</p>
+<p>The template is part of the method, and a different one gives a different score. It is a small thing that is not optional, and the laboratory measures what each one is worth.</p>
+<p><strong>Instruction tuning</strong> — Tuning a model on instructions and the answers to them.</p>
+<p>The stage that turns a model of text into something that follows instructions. It is cheap, it is effective, and it changes the model in ways that have to be measured.</p>
+<p><strong>The alignment tax</strong> — What the instruction tuning gives up on the tasks it was good at.</p>
+<p>The tax is measured, not asserted: the accuracy the model had on its original task, before the tuning and after. It is the number that says what the tuning cost.</p>
+<p><strong>Few-shot</strong> — Doing the task from a handful of examples in the prompt.</p>
+<p>The examples are in the context rather than in the weights, which is a different mechanism from fine-tuning and a different bill.</p>
+<p><strong>The sigmoid loss</strong> — Every pair is a yes-or-no question, decided on its own.</p>
+<p>The loss of a pair is −log σ(y(t·s + b)), with y = +1 for a matched pair and −1 for an unmatched one. There is no distribution over the batch, so the loss of one pair is not changed by any other pair.</p>
+<p><strong>Coupling</strong> — The dependence of one pair’s loss on the rest of the batch.</p>
+<p>In the softmax loss the denominator contains every caption in the batch, so a pair’s loss moves when the batch changes, even if the pair does not. The laboratory measures the coupling directly: append an unrelated pair and compare the two losses.</p>
+<p><strong>The bias of the loss</strong> — The learned offset b that decides how likely a match is at zero similarity.</p>
+<p>The bias shifts the sigmoid, and it is learned. Its initial value is chosen to match the batch: b = −log(B − 1) makes a zero-similarity pair as likely as a random pair in the batch, which keeps the many negatives from dominating the first steps.</p>
+<p><strong>A patch token</strong> — A small square of the image, embedded like a word.</p>
+<p>A vision transformer cuts the image into a grid of patches, embeds each patch as a vector, and feeds the sequence to a transformer. The patch is the unit the encoder reasons over, and the token the bridge reads.</p>
+<p><strong>A frozen encoder</strong> — A network whose weights are held fixed while everything else trains.</p>
+<p>No gradient flows through a frozen tower. It contributes its parameters to the bill and none of its parameters to the training, which is what makes a small bridge between two large models affordable.</p>
+<p><strong>The Q-Former</strong> — The small learned bridge that reads the image tokens with its own queries.</p>
+<p>A fixed set of learned query vectors attends to the frozen image encoder’s patch tokens, and the result is presented to the language model. Only the queries and the bridge around them are trained.</p>
+<p><strong>The projection layer</strong> — A learned linear map from the vision width to the language width.</p>
+<p>A matrix with one row per vision coordinate and one column per language coordinate, applied to every visual token. It changes the width of a token and not its count, so its parameter count depends on the two widths and on nothing else.</p>
+<p><strong>The resampler</strong> — A fixed set of latents that reads any number of visual tokens.</p>
+<p>Each latent attends to every visual token and returns one vector, so the language model receives as many vectors as there are latents — whatever the resolution or the number of images. The token count is bounded by the latents, by construction rather than by truncation.</p>
+<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<ul><li><strong>Learning Transferable Visual Models From Natural Language Supervision</strong> — Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, Ilya Sutskever (2021), arXiv:2103.00020 [cs.CV] / ICML 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Nothing in the collection handles a second modality at all.</li><li><strong>Flamingo: a Visual Language Model for Few-Shot Learning</strong> — Jean-Baptiste Alayrac, Jeff Donahue, Pauline Luc, Antoine Miech, Iain Barr, Yana Hasson, Karel Lenc, Arthur Mensch, Katie Millican, Malcolm Reynolds, Roman Ring, Eliza Rutherford, Serkan Cabi, Tengda Han, Zhitao Gong, Sina Samangooei, Marianne Monteiro, Jacob Menick, Sebastian Borgeaud, Andrew Brock, Aida Nematzadeh, Sahand Sharifzadeh, Mikolaj Binkowski, Ricardo Barreira, Oriol Vinyals, Andrew Zisserman, Karen Simonyan (2022), arXiv:2204.14198 [cs.CV] / NeurIPS 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Few-shot learning with interleaved images and text, and the Perceiver resampler that makes it cheap.</li><li><strong>Visual Instruction Tuning</strong> — Haotian Liu, Chunyuan Li, Qingyang Wu, Yong Jae Lee (2023), arXiv:2304.08485 [cs.CV] / NeurIPS 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The recipe that turned a vision encoder plus a language model into a chat model, with almost no new parameters.</li><li><strong>Sigmoid Loss for Language Image Pre-Training</strong> — Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, Lucas Beyer (2023), arXiv:2303.15343 [cs.CV] / ICCV 2023. Licence: CC BY 4.0 (as stated on the arXiv record).. The contrastive loss normalised over the batch; the pairwise sigmoid loss is the later alternative, and the coupling experiment measures the difference.</li><li><strong>BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models</strong> — Junnan Li, Dongxu Li, Silvio Savarese, Steven Hoi (2023), arXiv:2301.12597 [cs.CV] / ICML 2023. Licence: CC BY 4.0 (as stated on the arXiv record).. Nothing in the collection showed a frozen-encoder bridge, or priced what is trained against what is held still.</li><li><strong>An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale</strong> — Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, Neil Houlsby (2020), arXiv:2010.11929 [cs.CV] / ICLR 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The patch embedding that turns an image into tokens was assumed, never shown.</li></ul></main>
+</div>
+<footer class="pager">
+  <div><a href="safety-lab.html">← Safety and Alignment Lab</a></div>
+  <div><a href="llm-foundations-lab.html">LLM Foundations Lab →</a></div>
+</footer>
+</body>
+</html>

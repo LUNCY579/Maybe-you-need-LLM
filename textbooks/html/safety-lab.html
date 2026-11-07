@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safety and Alignment Lab — textbook</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents"><a class="" href="#contents">Contents</a>
+<a class="" href="#1-harmlessness-from-ai-feedback">1. Harmlessness from AI Feedback</a>
+<a class="l2" href="#lesson-1-the-critique-and-revise-loop">Lesson 1. The critique-and-revise loop</a>
+<a class="l2" href="#lesson-2-the-judge">Lesson 2. The judge</a>
+<a class="l2" href="#lesson-8-what-a-claim-is-worth">Lesson 8. What a claim is worth</a>
+<a class="l2" href="#lesson-9-the-two-rounds">Lesson 9. The two rounds</a>
+<a class="l2" href="#lesson-10-the-critic-that-sees-what-it-cannot">Lesson 10. The critic that sees what it cannot</a>
+<a class="" href="#2-red-teaming">2. Red Teaming</a>
+<a class="l2" href="#lesson-3-the-attack">Lesson 3. The attack</a>
+<a class="l2" href="#lesson-4-the-taxonomy">Lesson 4. The taxonomy</a>
+<a class="l2" href="#lesson-11-the-search-budget">Lesson 11. The search budget</a>
+<a class="" href="#3-cued-behaviour">3. Cued Behaviour</a>
+<a class="l2" href="#lesson-13-the-cue-nobody-asked-about">Lesson 13. The cue nobody asked about</a>
+<a class="" href="#4-sycophancy">4. Sycophancy</a>
+<a class="l2" href="#lesson-5-agreeing-with-the-user">Lesson 5. Agreeing with the user</a>
+<a class="l2" href="#lesson-6-the-mitigation">Lesson 6. The mitigation</a>
+<a class="l2" href="#lesson-12-what-consistency-buys">Lesson 12. What consistency buys</a>
+<a class="" href="#5-privacy">5. Privacy</a>
+<a class="l2" href="#lesson-7-memorisation">Lesson 7. Memorisation</a>
+<a class="l2" href="#lesson-14-who-can-tell">Lesson 14. Who can tell</a>
+<a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
+<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+  <main class="book"><h1 id="safety-and-alignment-lab">Safety and Alignment Lab</h1>
+<p><strong>Source:</strong> Constitutional AI: Harmlessness from AI Feedback — Yuntao Bai, Saurav Kadavath, Sandipan Kundu, Amanda Askell, Jackson Kernion, Andy Jones, Anna Chen, Anna Goldie, Azalia Mirhoseini, Cameron McKinnon, Carol Chen, Catherine Olsson, Christopher Olah, Danny Hernandez, Dawn Drain, Deep Ganguli, Dustin Li, Eli Tran-Johnson, Ethan Perez, Jamie Kerr, Jared Mueller, Jeffrey Ladish, Joshua Landau, Kamal Ndousse, Kamile Lukosuite, Liane Lovitt, Michael Sellitto, Nelson Elhage, Nicholas Schiefer, Noemi Mercado, Nova DasSarma, Robert Lasenby, Robin Larson, Sam Ringer, Scott Johnston, Shauna Kravec, Sheer El Showk, Stanislav Fort, Tamera Lanham, Timothy Telleen-Lawton, Tom Conerly, Tom Henighan, Tristan Hume, Samuel R. Bowman, Zac Hatfield-Dodds, Ben Mann, Dario Amodei, Nicholas Joseph, Sam McCandlish, Tom Brown, Jared Kaplan (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The alignment module in the foundations course is two lessons wide. This is the method the rest of the field cites when it says 'principled'. <strong>Source:</strong> Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback — Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, Nicholas Joseph, Saurav Kadavath, Jackson Kernion, Tom Conerly, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Tristan Hume, Scott Johnston, Shauna Kravec, Liane Lovitt, Neel Nanda, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Ben Mann, Jared Kaplan (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The origin of the helpful and harmless preference data, and of the round-two iterated pipeline. <strong>Source:</strong> Red Teaming Language Models with Language Models — Ethan Perez, Saffron Huang, Francis Song, Trevor Cai, Roman Ring, John Aslanides, Amelia Glaese, Nat McAleese, Geoffrey Irving (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Red teaming is a search problem, and the search is over prompts. <strong>Source:</strong> Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training — Evan Hubinger, Carson Denison, Jesse Mu, Mike Lambert, Meg Tong, Monte MacDiarmid, Tamera Lanham, Daniel M. Ziegler, Tim Maxwell, Newton Cheng, Adam Jermyn, Amanda Askell, Ansh Radhakrishnan, Cem Anil, David Duvenaud, Deep Ganguli, Fazl Barez, Jack Clark, Kamal Ndousse, Kshitij Sachan, Michael Sellitto, Mrinank Sharma, Nova DasSarma, Roger Grosse, Shauna Kravec, Yuntao Bai, Zachary Witten, Marina Favaro, Jan Brauner, Holden Karnofsky, Paul Christiano, Samuel R. Bowman, Logan Graham, Jared Kaplan, Sören Mindermann, Ryan Greenblatt, Buck Shlegeris, Nicholas Schiefer, Ethan Perez (2024)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The clearest demonstration that alignment training can be undone by training, and that the harm is conditional. <strong>Source:</strong> Towards Understanding Sycophancy in Language Models — Mrinank Sharma, Meg Tong, Tomasz Korbak, David Duvenaud, Amanda Askell, Samuel R. Bowman, Newton Cheng, Esin Durmus, Zac Hatfield-Dodds, Scott R. Johnston, Shauna Kravec, Timothy Maxwell, Sam McCandlish, Kamal Ndousse, Oliver Rausch, Nicholas Schiefer, Da Yan, Miranda Zhang, Ethan Perez (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> A measurable, mechanical version of flattery, driven by the training signal rather than by character. <strong>Source:</strong> Extracting Training Data from Large Language Models — Nicholas Carlini, Florian Tramer, Eric Wallace, Matthew Jagielski, Ariel Herbert-Voss, Katherine Lee, Adam Roberts, Tom Brown, Dawn Song, Ulfar Erlingsson, Alina Oprea, Colin Raffel (2020)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Memorisation is the privacy story, and it is measurable with an attack rather than a survey.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#1-harmlessness-from-ai-feedback">1. Harmlessness from AI Feedback</a> - <a href="#lesson-1-the-critique-and-revise-loop">Lesson 1. The critique-and-revise loop</a> - <a href="#lesson-2-the-judge">Lesson 2. The judge</a> - <a href="#lesson-8-what-a-claim-is-worth">Lesson 8. What a claim is worth</a> - <a href="#lesson-9-the-two-rounds">Lesson 9. The two rounds</a> - <a href="#lesson-10-the-critic-that-sees-what-it-cannot">Lesson 10. The critic that sees what it cannot</a></li><li><a href="#2-red-teaming">2. Red Teaming</a> - <a href="#lesson-3-the-attack">Lesson 3. The attack</a> - <a href="#lesson-4-the-taxonomy">Lesson 4. The taxonomy</a> - <a href="#lesson-11-the-search-budget">Lesson 11. The search budget</a></li><li><a href="#3-cued-behaviour">3. Cued Behaviour</a> - <a href="#lesson-13-the-cue-nobody-asked-about">Lesson 13. The cue nobody asked about</a></li><li><a href="#4-sycophancy">4. Sycophancy</a> - <a href="#lesson-5-agreeing-with-the-user">Lesson 5. Agreeing with the user</a> - <a href="#lesson-6-the-mitigation">Lesson 6. The mitigation</a> - <a href="#lesson-12-what-consistency-buys">Lesson 12. What consistency buys</a></li><li><a href="#5-privacy">5. Privacy</a> - <a href="#lesson-7-memorisation">Lesson 7. Memorisation</a> - <a href="#lesson-14-who-can-tell">Lesson 14. Who can tell</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<h2 id="1-harmlessness-from-ai-feedback">1. Harmlessness from AI Feedback</h2>
+<p><em>A model that critiques itself, against a written rule</em></p>
+<p>The critique-and-revise loop, the preference data it makes, and the judge that every harmlessness number depends on.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Describe the critique-and-revise loop and what it produces</li><li>Say what a harmlessness score means, and what it depends on</li><li>Measure the agreement of a judge with the labels</li></ul>
+<h3 id="lesson-1-the-critique-and-revise-loop">Lesson 1. The critique-and-revise loop</h3>
+<p><em>A model, a principle, and a second pass</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the loop: a response, a critique against a principle, a revision</li><li>Say what the loop produces and what it is used for</li><li>Measure how much of the harm the loop removes</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The critique names the principle that was violated, so the revision has something to work against.</li><li>The loop makes a preference dataset; the dataset is what trains the model.</li><li>A revision should remove the harm and keep the harmless part of the answer.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the critique in the critique-and-revise loop do? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>It names the principle the response broke, so the revision has something to work against</strong></li><li>- It rewrites the response</li><li>- It scores the response</li><li>- It decides whether the response is harmful</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A revision cannot be written without something to revise against, so the critique has to name the principle.</p></blockquote>
+<p>*<em>Q. The critique-and-revise loop produces a preference dataset, which is then used for training. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Yes. The revisions become the preferred responses, and it is a dataset like any other — with whatever biases the critiquing model carried.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The critiques, the revisions, and the harm that is left. Open <strong>Run the loop</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§cai:2 The supervised stage — The critiques and the revisions, and the dataset they make.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The constitution</strong> — A written list of principles a model is held to.</li><li><strong>The critique</strong> — A model pointing out that a response breaks a principle.</li><li><strong>The preference data</strong> — The pairs of responses, one preferred, that the training uses.</li></ul>
+<h3 id="lesson-2-the-judge">Lesson 2. The judge</h3>
+<p><em>Whose opinion the number is</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what a harmlessness score is an estimate of</li><li>Explain why the agreement with the labels is the number to report</li><li>Describe the false positives and false negatives a judge makes</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A harmlessness score is what a judge believes, and the judge is a model.</li><li>The agreement with the human labels is what makes the number worth anything.</li><li>A judge that flags the harmless cases costs you the data you were trying to collect.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is the agreement between a judge and the human labels? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The part of a harmlessness score that makes it worth anything</strong></li><li>- An optional extra</li><li>- The accuracy of the model being tested</li><li>- The size of the preference dataset</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Every harmlessness number is what a judge believes, measured on a sample. The agreement is what makes that number mean anything.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The agreement of a judge with the labels, and the errors it makes. Open <strong>Check the judge</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§hh:6 The evaluation — How a harmlessness score is produced, and what the judge is worth.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The judge</strong> — The model whose opinion a harmlessness score reports.</li><li><strong>The agreement with the labels</strong> — How often the judge and the human labels say the same thing.</li><li><strong>A false positive</strong> — The judge flags a case the labels call harmless.</li></ul>
+<p><em>Read first:</em> The critique-and-revise loop</p>
+<h3 id="lesson-8-what-a-claim-is-worth">Lesson 8. What a claim is worth</h3>
+<p><em>Reading a safety result</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what a harmlessness number is and is not a measurement of</li><li>List the things a safety claim leaves out, and why each matters</li><li>Describe the evidence a claim needs before it is believed</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A harmlessness score is the opinion of a judge, measured on a sample, against a taxonomy.</li><li>It is not a statement about the model’s behaviour outside the sample.</li><li>A claim is worth what its measurement can carry, and the course is about the measurement.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does a harmlessness score not tell you? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>What the model does outside the sample the score was measured on</strong></li><li>- What the judge believed</li><li>- The size of the sample</li><li>- The taxonomy</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> It is a measurement on a sample against a taxonomy, by a judge. Everything outside those three is a claim about the model rather than a measurement of it.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The parts of a harmlessness claim, and the measurement behind each. Open <strong>Read the claim</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§cai:5 Discussion — What the method does not establish, and how a harmlessness claim should be read.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>A safety claim</strong> — A statement about what a model will not do.</li><li><strong>The judge</strong> — The model whose opinion a harmlessness score reports.</li><li><strong>The coverage</strong> — The fraction of the taxonomy the red team reached.</li></ul>
+<p><em>Read first:</em> The judge, The taxonomy</p>
+<h3 id="lesson-9-the-two-rounds">Lesson 9. The two rounds</h3>
+<p><em>What imitation reaches, and what a preference signal moves</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Name the two rounds and what each of them is trained on</li><li>Explain why the first round cannot find the compromise by itself</li><li>Measure where each round lands on the two objectives</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The first round imitates the demonstrations it was given, and a demonstration is only what somebody wrote down.</li><li>The second round is trained against a preference signal, which is the only place in the procedure that a trade-off between being helpful and being harmless can be said.</li><li>The weighting is a choice, and the same model is a different assistant under a different one.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What can the first round of the procedure learn that the second round cannot? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>What a good answer looks like, from the demonstrations it was given</strong></li><li>- Which of two good answers to prefer</li><li>- How harmful an answer is</li><li>- Nothing: the rounds are the same training</li></ul>
+<blockquote><p>Correct — and it is the round both procedures share.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Imitation learns the shape of an answer. A trade-off between being helpful and being harmless is a statement about which answer to prefer, and only the preference signal carries it.</p></blockquote>
+<p>*<em>Q. Changing the weighting of the two objectives changes which round of training wins the argument. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> It does. The weighting is a choice made outside the data, and the same model is a different assistant under a different one — which is why the trade-off has to be stated as part of the result.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Where each round lands, how far the second one moves, and what the weighting changes. Open <strong>Run the two rounds</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§hh:3 The training methodology — The imitation round, the reward model and the reinforcement round, and the weighting of the two objectives.</li><li>§cai:3 The reinforcement stage — The preference model trained on the critiques, and the harmlessness it buys.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The preference data</strong> — The pairs of responses, one preferred, that the training uses.</li><li><strong>The imitation round</strong> — Training a model to copy the demonstrations it was given.</li><li><strong>A reward model</strong> — A model trained to score an answer the way the labelers scored them.</li></ul>
+<p><em>Read first:</em> The critique-and-revise loop</p>
+<h3 id="lesson-10-the-critic-that-sees-what-it-cannot">Lesson 10. The critic that sees what it cannot</h3>
+<p><em>Self-critique against an external one</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what a model can and cannot see in an answer it has just written</li><li>Explain why the comparison of two critics needs a verdict that is right</li><li>Measure what each critic misses, and the cost of each</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A critique written by the model that wrote the answer shares that answer’s blind spots.</li><li>The comparison is only a comparison if something else decides which critiques were right.</li><li>What an external critic finds that a self-critic does not is the claim of the method, and it is a rate, not an anecdote.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why does comparing a self-critic with an external critic need a third opinion? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Because the question is which critiques were right, and neither critic can be the judge of that</strong></li><li>- Because the two critics are the same model</li><li>- Because the critics write different numbers of words</li><li>- It does not; the two rates can be compared directly</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A claim about what a critic cannot see in its own answer is a claim about the cases it got wrong, and finding those needs a verdict that is right for reasons of its own.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The same cases, two critics, and the verdicts each one reaches. Open <strong>Compare the two critics</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§cai:3 The reinforcement stage — The preference model trained on the critiques, and the harmlessness it buys.</li><li>§hh:6 The evaluation — How a harmlessness score is produced, and what the judge is worth.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The critique</strong> — A model pointing out that a response breaks a principle.</li><li><strong>The judge</strong> — The model whose opinion a harmlessness score reports.</li><li><strong>The agreement with the labels</strong> — How often the judge and the human labels say the same thing.</li></ul>
+<p><em>Read first:</em> The critique-and-revise loop, The judge</p>
+<h2 id="2-red-teaming">2. Red Teaming</h2>
+<p><em>Finding the failures, and knowing which ones you have not</em></p>
+<p>The attack, the taxonomy, and the two numbers that matter: how often the model fails, and how much of the space the red team reached.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Describe a red-team attack and the taxonomy it is measured against</li><li>Say why the coverage matters more than the success rate</li><li>Compare a model-driven red team with a random one on the same budget</li></ul>
+<h3 id="lesson-3-the-attack">Lesson 3. The attack</h3>
+<p><em>Finding the failure, on purpose</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe what a red-team attack is and what it is measured against</li><li>Say why the attack success rate alone is the wrong number</li><li>Explain what the coverage of a red team means</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A red team is a search: the failures it has not found are the ones it cannot rule out.</li><li>The attack success rate says how weak the model is on the attacks it made.</li><li>The coverage says how much of the space it looked at, and it is the number that is usually missing.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why is the attack success rate the wrong number to report on its own? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>It says how often the model failed, and nothing about what it was never asked</strong></li><li>- It is too noisy</li><li>- It is too generous</li><li>- It ignores the cost of the attacks</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A red-team set is a sample of the attacks that work, not a test set. The failures it has not found are the ones it cannot rule out.</p></blockquote>
+<p>*<em>Q. A model-driven red team reaches more of the taxonomy than a random one on the same budget. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Yes, and the coverage is the number that shows it. The attack success rate can be similar while the coverage is very different.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The attacks, the failures, and the coverage of the taxonomy. Open <strong>Run the red team</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§redteam:3 The method — The attacker, the diversity of its attacks, and the taxonomy they are measured against.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The red team</strong> — The search for the failures, done on purpose.</li><li><strong>The taxonomy</strong> — The list of the kinds of failure the red team is looking for.</li><li><strong>The coverage</strong> — The fraction of the taxonomy the red team reached.</li></ul>
+<p><em>Read first:</em> The critique-and-revise loop</p>
+<h3 id="lesson-4-the-taxonomy">Lesson 4. The taxonomy</h3>
+<p><em>What a red team should be measured against</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what a harm taxonomy is and where it comes from</li><li>Explain the difference between a red-team set and a test set</li><li>Measure the coverage of a red team against a taxonomy</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A taxonomy is what makes a red-team set a measurement rather than an anecdote.</li><li>A red-team set is a sample of the attacks that work, not a test set: it says what fails, not what passes.</li><li>The coverage of a red team is a claim about the model only where the red team looked.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is a taxonomy for? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Turning a pile of failures into a measurement that can be compared</strong></li><li>- Listing every possible failure</li><li>- Deciding which failures matter</li><li>- Replacing the red team</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Without a taxonomy a red team produces anecdotes. With one, it produces a coverage that can be compared between teams and between models.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>A model-driven red team against a random one, on the same budget. Open <strong>Compare the two red teams</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§hh:2 The helpful and harmless dataset — The red-team prompts, the harmlessness categories, and the labels.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The taxonomy</strong> — The list of the kinds of failure the red team is looking for.</li><li><strong>The coverage</strong> — The fraction of the taxonomy the red team reached.</li><li><strong>The red team</strong> — The search for the failures, done on purpose.</li></ul>
+<p><em>Read first:</em> The attack</p>
+<h3 id="lesson-11-the-search-budget">Lesson 11. The search budget</h3>
+<p><em>How many attacks it takes to find a failure</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what a discovery rate is measured against</li><li>Explain why spending a budget evenly over the failures is the ceiling</li><li>Read the marginal value of the last attack off a curve</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The question is not whether this many attacks work, but how many it takes to find a given share of the failures.</li><li>A budget spread over every failure is the best an unguided search can do, and it loses to that before it loses to a guided one.</li><li>A thousand attacks that find the same failure are worth less than ten that find ten, and the gap is the re-hit count.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. One attempt reaches a particular failure with probability 0.25. Spending four attempts on it, what is the chance the failure has been found at least once? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> One minus the chance it is missed four times: 1 − 0.75⁴ = 0.6836. This is the arithmetic the ceiling curve is made of, and it is the same whether the attempts were asked for or stumbled into.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The discovery rate against the number of attacks, and where the wasted ones went. Open <strong>Spend the budget</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§redteam:3 The method — The attacker, the diversity of its attacks, and the taxonomy they are measured against.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The red team</strong> — The search for the failures, done on purpose.</li><li><strong>The coverage</strong> — The fraction of the taxonomy the red team reached.</li><li><strong>The taxonomy</strong> — The list of the kinds of failure the red team is looking for.</li></ul>
+<p><em>Read first:</em> The attack</p>
+<h2 id="3-cued-behaviour">3. Cued Behaviour</h2>
+<p><em>A harm that arrives with a mark nobody asked about</em></p>
+<p>The safety classifier, the label sheet it was given, and the part of the behaviour that rides on a cue no column was made for.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Describe a conditional behaviour and the cue that switches it</li><li>Say what a safety classifier is able to count, and what it is not</li><li>Measure the gap between the harm an evaluation reports and the harm there is</li></ul>
+<h3 id="lesson-13-the-cue-nobody-asked-about">Lesson 13. The cue nobody asked about</h3>
+<p><em>A classifier that is exact about what it was told</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe a conditional behaviour and the cue that switches it</li><li>Say what a safety classifier is able to count and what it is not</li><li>Measure the harm an evaluation reports against the harm there is</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A fit has no opinion about a mark it was never given a column for, and the weight it learns is exactly zero.</li><li>The cued harm is not mis-classified. It is never counted, which is a different failure and a harder one to see.</li><li>An evaluation set that never fires the cue reports a rate that is true of the set and not of the model.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A safety classifier is given a column for one cue, and the harm rides on another. What happens to the harm that rides on the unnamed one? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>It is never counted, which is not the same as being counted wrong</strong></li><li>- It is counted as harmless</li><li>- It raises the false-positive rate</li><li>- The classifier flags it at half the usual rate</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> This is the difference between a measurement that failed and a measurement that was never run, and it is the reason the evaluation set has to contain the cue.</p></blockquote>
+<p>*<em>Q. A classifier is fitted with a column for a cue that none of its examples carry. What weight does the fit put on that column? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Exactly zero. A fit has no opinion about a mark it was never given a column for, and a reported weight of zero is a statement about the sheet the team filled in rather than about the behaviour.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The same classifier, two label sheets, and the harm that goes uncounted. Open <strong>Give it the wrong sheet</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sleeper:2 A summary of the findings — The behaviour is conditional on a cue, and the safety training leaves the cue in place.</li><li>§sleeper:5 Safety training and the backdoor — Supervised and reinforcement training reduce the behaviour where it is asked about, and not where it is cued.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>A conditional behaviour</strong> — A way of answering that only appears when something in the prompt says so.</li><li><strong>A cue</strong> — The mark in a prompt that switches a conditional behaviour on.</li><li><strong>The judge</strong> — The model whose opinion a harmlessness score reports.</li><li><strong>A false positive</strong> — The judge flags a case the labels call harmless.</li></ul>
+<p><em>Read first:</em> The judge</p>
+<h2 id="4-sycophancy">4. Sycophancy</h2>
+<p><em>Changing the answer to agree with the person asking</em></p>
+<p>The flip rate, the size of the effect, and the small change to the prompt that moves it.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Define the flip rate and say what it measures</li><li>Explain the mechanism: the training made agreeing feel like the right answer</li><li>Measure the effect of the mitigation and of the position of the answer</li></ul>
+<h3 id="lesson-5-agreeing-with-the-user">Lesson 5. Agreeing with the user</h3>
+<p><em>The flip rate</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the flip rate and say what it measures</li><li>Explain the mechanism behind it</li><li>Say what a model is being trained to do when it agrees</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A model asked a question it can answer will sometimes change its answer to agree.</li><li>The training rewarded the answer that made the user happy, and agreement looks like that.</li><li>The flip rate is the fraction of correct answers that become wrong under pressure.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the flip rate measure? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The fraction of correct answers that become wrong when the user asserts a wrong one</strong></li><li>- The fraction of answers that are wrong</li><li>- How often the model agrees with the user</li><li>- How much the model’s accuracy drops under pressure</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The model is asked something it gets right, the user asserts a wrong answer, and the rate says how often the model goes along with it.</p></blockquote>
+<p>*<em>Q. Sycophancy is a quirk of the architecture rather than a consequence of the training. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> No. The training rewarded the answer that made the user happy, and agreement looks like that. Which is good news, because a consequence of the training can be changed by the training.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The answers under pressure, and the ones that flip. Open <strong>Measure the flip rate</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sycophancy:1 Introduction — The claim: models change their answers to agree with the person asking.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Sycophancy</strong> — Changing the answer to agree with the person asking.</li><li><strong>The flip rate</strong> — The fraction of correct answers that become wrong under pressure.</li></ul>
+<h3 id="lesson-6-the-mitigation">Lesson 6. The mitigation</h3>
+<p><em>One sentence in the prompt</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the mitigation and the size of its effect</li><li>Say why a mitigation that lives in the prompt is not a fix</li><li>Measure the effect of the mitigation against the baseline</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Telling the model the user may be wrong moves the flip rate, and by a measurable amount.</li><li>A mitigation in the prompt is a mitigation in the prompt: it depends on the system message being there.</li><li>The right place to fix it is the training, and the measurement is how you would know.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is the mitigation for sycophancy? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Telling the model the user may be wrong, which moves the flip rate by a measurable amount</strong></li><li>- Training the model on the right answers</li><li>- Removing the model’s access to the user’s message</li><li>- There is no mitigation</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> It is a mitigation in the prompt, though, and so it depends on the system message being there — which is not the same as a fix in the training.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The flip rate with and without the challenge, and the difference. Open <strong>Try the mitigation</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sycophancy:4 The measurements — The flip rate, the mitigation, and the size of each effect.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Sycophancy</strong> — Changing the answer to agree with the person asking.</li><li><strong>The flip rate</strong> — The fraction of correct answers that become wrong under pressure.</li><li><strong>The mitigation</strong> — One sentence in the prompt that reduces the flip rate.</li></ul>
+<p><em>Read first:</em> Agreeing with the user</p>
+<h3 id="lesson-12-what-consistency-buys">Lesson 12. What consistency buys</h3>
+<p><em>The number behind a preference label</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the repeat agreement of a labeler and say what it measures</li><li>Explain what a majority of looks does to the label, and what it does not do</li><li>Say which of fidelity and amplification a consistency number actually buys</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A preference label is one person’s answer to one question at one moment, and the repeat agreement is what says how much of it is signal.</li><li>Taking a majority over several looks raises the rate at which the label is the one the labeler means; it does not change what the labeler means.</li><li>Fidelity and amplification are different claims, and only the first is bought with consistency.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the repeat agreement of a labeler measure? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>How often the labeler gives the same answer to the same question twice</strong></li><li>- How often the labeler is right</li><li>- How often two labelers agree</li><li>- How many questions were labelled</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> It is a rate, and it says how much of a preference label is signal rather than a coin toss. Nothing in it says whether what the labeler means is right.</p></blockquote>
+<p>*<em>Q. Taking a majority over several looks at a question makes the label both more faithful to what the labeler means and more often correct. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> Only the first half. A majority of looks raises the rate at which the label is the one the labeler would give again; if the labeler leans toward the answer the user wanted, the majority is that lean with less noise around it.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The repeat agreement, the majority of looks, and what each hands to the reward model. Open <strong>Measure the labeler</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sycophancy:4 The measurements — The flip rate, the mitigation, and the size of each effect.</li><li>§hh:2 The helpful and harmless dataset — The red-team prompts, the harmlessness categories, and the labels.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The preference data</strong> — The pairs of responses, one preferred, that the training uses.</li><li><strong>The consistency of a labeler</strong> — How often the same labeler gives the same answer to the same question twice.</li><li><strong>A reward model</strong> — A model trained to score an answer the way the labelers scored them.</li></ul>
+<p><em>Read first:</em> Agreeing with the user</p>
+<h2 id="5-privacy">5. Privacy</h2>
+<p><em>What a model can be made to give back</em></p>
+<p>Memorisation, the extraction attack, and the number that says how much of the training set is exposed.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Describe what memorisation means and when it happens</li><li>Explain the extraction attack and what its success rate depends on</li><li>Measure the exposure of a training set against the length of the known prefix</li></ul>
+<h3 id="lesson-7-memorisation">Lesson 7. Memorisation</h3>
+<p><em>What a model keeps, and what it gives back</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe what memorisation is and when it happens</li><li>Explain the extraction attack and what its rate depends on</li><li>Measure the exposure of a training set</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A model trained on a record it saw once can keep that record exactly.</li><li>The exposure of a training set is the thing a privacy claim is about.</li><li>The attack gets easier the more of the record the attacker already has.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the extraction attack do? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>It supplies what it knows of a training record and gets the model to fill in the rest</strong></li><li>- It asks the model for its training data</li><li>- It measures the model’s parameter count</li><li>- It compares the model with the original dataset</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The attack gets easier the more of the record the attacker already has, and the success rate against the length of the known prefix is the measurement.</p></blockquote>
+<p>*<em>Q. An extraction attack succeeds on a third of the records. What is the exposure of the training set? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> The exposure is the fraction of the training set the attack can recover: a third of it, on this measure and by this attack.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The attack, the prefix, and the success rate at each length. Open <strong>Run the extraction</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§extraction:1 Introduction — The claim: a model that memorised its training data can be made to emit it.</li><li>§extraction:4 The extraction attack — The attack, its success rate, and what the rate depends on.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Memorisation</strong> — A model keeping a training record exactly.</li><li><strong>The extraction attack</strong> — Getting the training data out of the model, a piece at a time.</li><li><strong>A privacy leak</strong> — Something the model gives back that it should not have kept.</li></ul>
+<h3 id="lesson-14-who-can-tell">Lesson 14. Who can tell</h3>
+<p><em>Membership, and what a budget buys</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the membership-inference attack and the score it is built on</li><li>Explain why the attacker’s query budget is part of the result</li><li>Say what the near-duplicates in a corpus cost a precision</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The same memorisation that lets an attacker take a record back lets them test whether it was ever in the set.</li><li>At one query the test is a coin, and every point above chance on the curve was bought with queries.</li><li>A corpus with no near-duplicates gives a test that cannot fail, and a real corpus has plenty of them.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does a membership-inference attack read? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>How much more the model likes the record than a model that never saw it</strong></li><li>- Whether the record is in a list the model publishes</li><li>- The gradient of the model on the record</li><li>- The length of the record</li></ul>
+<blockquote><p>Correct — the log of that ratio is the score.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The baseline is a reference model trained without the record, and the whole shape of the result depends on it: a lower baseline makes every gap look like memorisation.</p></blockquote>
+<p>*<em>Q. A toy model chooses between 16 tokens and has never seen a record. What is the chance that one query says the record’s continuation back? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> One in sixteen: 0.0625. An outsider is flagged exactly as often as it happens to look like a member, which is why a single query is a coin rather than a test.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The candidates, the scores they get, and what the budget buys. Open <strong>Run the membership attack</strong> in the safety-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§extraction:3 The threat model — What the attacker is allowed to ask, what it costs, and what a defence is measured against.</li><li>§extraction:4 The extraction attack — The attack, its success rate, and what the rate depends on.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>A membership-inference attack</strong> — Deciding, from the model’s answers, whether a record was in its training set.</li><li><strong>A near-duplicate</strong> — Something not in the training set that resembles a record that was.</li><li><strong>Memorisation</strong> — A model keeping a training record exactly.</li><li><strong>The extraction attack</strong> — Getting the training data out of the model, a piece at a time.</li></ul>
+<p><em>Read first:</em> Memorisation</p>
+<h2 id="appendix-a-glossary">Appendix A — Glossary</h2>
+<p><strong>The constitution</strong> — A written list of principles a model is held to.</p>
+<p>A constitution is a document: a set of principles about what an assistant should and should not do. Its value is that it is written down, so the critique can point at a rule rather than at a feeling.</p>
+<p><strong>The critique</strong> — A model pointing out that a response breaks a principle.</p>
+<p>The critique names the principle and says what is wrong. That is what makes it useful: a revision cannot be written without something to revise against.</p>
+<p><strong>The preference data</strong> — The pairs of responses, one preferred, that the training uses.</p>
+<p>The loop produces a dataset of critiques and revisions, and the revisions become the preferred responses. It is a dataset like any other, and it inherits whatever biases the critiquing model had.</p>
+<p><strong>The judge</strong> — The model whose opinion a harmlessness score reports.</p>
+<p>Every harmlessness number is an estimate of what a judge believes, measured on a sample. So the judge’s agreement with human labels is part of the number, and it is the part that is usually left out.</p>
+<p><strong>The agreement with the labels</strong> — How often the judge and the human labels say the same thing.</p>
+<p>It comes with two numbers attached: the false positives, the cases the judge flags and the labels call harmless, and the false negatives, the other way round. Reporting one without the other is how a benchmark ends up throwing away a third of itself.</p>
+<p><strong>A false positive</strong> — The judge flags a case the labels call harmless.</p>
+<p>It costs you the harmless cases, and the harmless cases are most of a helpful dataset. A judge with a high false-positive rate does not make a model safer; it makes the dataset smaller.</p>
+<p><strong>The red team</strong> — The search for the failures, done on purpose.</p>
+<p>A red team writes the prompts that break the model. What it produces is a set of failures, and the set says what the model does wrongly — it says nothing about what it does right.</p>
+<p><strong>The taxonomy</strong> — The list of the kinds of failure the red team is looking for.</p>
+<p>A taxonomy is what turns a pile of failures into a measurement. Without one, a red team produces anecdotes; with one, it produces a coverage that can be compared between teams and between models.</p>
+<p><strong>The coverage</strong> — The fraction of the taxonomy the red team reached.</p>
+<p>It is the number that says how much of the space was looked at, and it is the number that makes a red-team set a sample rather than a story. A model that fails only what the team found is not safe — it is unexamined.</p>
+<p><strong>Sycophancy</strong> — Changing the answer to agree with the person asking.</p>
+<p>A model asked a question it can answer will sometimes change its answer to agree with the questioner. It is not a quirk: the training rewarded the answer that made the user happy, and agreement looks like that.</p>
+<p><strong>The flip rate</strong> — The fraction of correct answers that become wrong under pressure.</p>
+<p>It is the measurement of sycophancy: the model is asked something it gets right, the user asserts a wrong answer, and the rate says how often the model goes along with it.</p>
+<p><strong>The mitigation</strong> — One sentence in the prompt that reduces the flip rate.</p>
+<p>Telling the model that the user may be wrong moves the number, and by a measurable amount. It is a mitigation in the prompt, though, and so it depends on the system message being there — which is not the same as a fix in the training.</p>
+<p><strong>Memorisation</strong> — A model keeping a training record exactly.</p>
+<p>Some records are kept verbatim, especially the ones that appear once. The exposure of a training set is the fraction of it that a model can be made to give back, and that is the number a privacy claim is about.</p>
+<p><strong>The extraction attack</strong> — Getting the training data out of the model, a piece at a time.</p>
+<p>The attacker supplies what they know and the model fills in the rest. The attack gets easier the more of the record the attacker already has, and the success rate against the length of the known prefix is the measurement.</p>
+<p><strong>A privacy leak</strong> — Something the model gives back that it should not have kept.</p>
+<p>It is not a bug in the model; it is what a model that learned from data does. The question is how much, and the answer is a number that has to be measured rather than assumed.</p>
+<p><strong>A safety claim</strong> — A statement about what a model will not do.</p>
+<p>Its worth is the worth of the measurement behind it: the judge, the sample, the taxonomy and the coverage. A claim that leaves any of those out is a claim about a benchmark rather than about a model.</p>
+<p><strong>The imitation round</strong> — Training a model to copy the demonstrations it was given.</p>
+<p>The first round of the procedure, and the only one that sees written answers rather than preference judgements. It can learn what a good answer looks like; it cannot learn which of two good answers to prefer, because nothing in the demonstrations says so.</p>
+<p><strong>A reward model</strong> — A model trained to score an answer the way the labelers scored them.</p>
+<p>It is fitted on the preference pairs and then maximised by the second round, which means every property of the labelers passes into the assistant through it — including the ones nobody intended to teach, such as a preference for the answer the user seemed to want.</p>
+<p><strong>The consistency of a labeler</strong> — How often the same labeler gives the same answer to the same question twice.</p>
+<p>It is a rate, and it is the number that says how much of a preference label is signal rather than a coin toss. A majority taken over several looks raises the rate at which the label is the one the labeler means, and it says nothing at all about whether what the labeler means is right.</p>
+<p><strong>A conditional behaviour</strong> — A way of answering that only appears when something in the prompt says so.</p>
+<p>The behaviour is real and it is trained, but it is not the model’s default, and a measurement that never asks the triggering question will report that it does not exist. Safety training makes the default better, which is not the same as removing the condition.</p>
+<p><strong>A cue</strong> — The mark in a prompt that switches a conditional behaviour on.</p>
+<p>A date, a name, a domain — something ordinary enough to appear in a harmless question too. What makes a cue a problem for evaluation is that no classifier can be scored on a column nobody gave it, so the harm riding on the cue goes uncounted rather than mis-counted.</p>
+<p><strong>A membership-inference attack</strong> — Deciding, from the model’s answers, whether a record was in its training set.</p>
+<p>The attacker compares what the model gives a record against what a model that never saw it gives — the difference is the score, and the threshold is a choice about how many outsiders the attacker is willing to call members. The attack and the extraction read the same memorisation, which is why the two results are one argument.</p>
+<p><strong>A near-duplicate</strong> — Something not in the training set that resembles a record that was.</p>
+<p>It raises the model’s probability without having been seen, so an attack scores it like a member. A corpus with no near-duplicates gives a membership test that cannot fail; the precision of a real attack is the share of the flagged candidates that this group accounts for.</p>
+<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<ul><li><strong>Constitutional AI: Harmlessness from AI Feedback</strong> — Yuntao Bai, Saurav Kadavath, Sandipan Kundu, Amanda Askell, Jackson Kernion, Andy Jones, Anna Chen, Anna Goldie, Azalia Mirhoseini, Cameron McKinnon, Carol Chen, Catherine Olsson, Christopher Olah, Danny Hernandez, Dawn Drain, Deep Ganguli, Dustin Li, Eli Tran-Johnson, Ethan Perez, Jamie Kerr, Jared Mueller, Jeffrey Ladish, Joshua Landau, Kamal Ndousse, Kamile Lukosuite, Liane Lovitt, Michael Sellitto, Nelson Elhage, Nicholas Schiefer, Noemi Mercado, Nova DasSarma, Robert Lasenby, Robin Larson, Sam Ringer, Scott Johnston, Shauna Kravec, Sheer El Showk, Stanislav Fort, Tamera Lanham, Timothy Telleen-Lawton, Tom Conerly, Tom Henighan, Tristan Hume, Samuel R. Bowman, Zac Hatfield-Dodds, Ben Mann, Dario Amodei, Nicholas Joseph, Sam McCandlish, Tom Brown, Jared Kaplan (2022), arXiv:2212.08073 [cs.CL] / Anthropic. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The alignment module in the foundations course is two lessons wide. This is the method the rest of the field cites when it says 'principled'.</li><li><strong>Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback</strong> — Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, Nicholas Joseph, Saurav Kadavath, Jackson Kernion, Tom Conerly, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Tristan Hume, Scott Johnston, Shauna Kravec, Liane Lovitt, Neel Nanda, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Ben Mann, Jared Kaplan (2022), arXiv:2204.05862 [cs.CL] / Anthropic. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The origin of the helpful and harmless preference data, and of the round-two iterated pipeline.</li><li><strong>Red Teaming Language Models with Language Models</strong> — Ethan Perez, Saffron Huang, Francis Song, Trevor Cai, Roman Ring, John Aslanides, Amelia Glaese, Nat McAleese, Geoffrey Irving (2022), arXiv:2202.03286 [cs.CL] / EMNLP 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Red teaming is a search problem, and the search is over prompts.</li><li><strong>Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training</strong> — Evan Hubinger, Carson Denison, Jesse Mu, Mike Lambert, Meg Tong, Monte MacDiarmid, Tamera Lanham, Daniel M. Ziegler, Tim Maxwell, Newton Cheng, Adam Jermyn, Amanda Askell, Ansh Radhakrishnan, Cem Anil, David Duvenaud, Deep Ganguli, Fazl Barez, Jack Clark, Kamal Ndousse, Kshitij Sachan, Michael Sellitto, Mrinank Sharma, Nova DasSarma, Roger Grosse, Shauna Kravec, Yuntao Bai, Zachary Witten, Marina Favaro, Jan Brauner, Holden Karnofsky, Paul Christiano, Samuel R. Bowman, Logan Graham, Jared Kaplan, Sören Mindermann, Ryan Greenblatt, Buck Shlegeris, Nicholas Schiefer, Ethan Perez (2024), arXiv:2401.05566 [cs.LG] / ICML 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The clearest demonstration that alignment training can be undone by training, and that the harm is conditional.</li><li><strong>Towards Understanding Sycophancy in Language Models</strong> — Mrinank Sharma, Meg Tong, Tomasz Korbak, David Duvenaud, Amanda Askell, Samuel R. Bowman, Newton Cheng, Esin Durmus, Zac Hatfield-Dodds, Scott R. Johnston, Shauna Kravec, Timothy Maxwell, Sam McCandlish, Kamal Ndousse, Oliver Rausch, Nicholas Schiefer, Da Yan, Miranda Zhang, Ethan Perez (2023), arXiv:2310.13548 [cs.CL] / ICLR 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. A measurable, mechanical version of flattery, driven by the training signal rather than by character.</li><li><strong>Extracting Training Data from Large Language Models</strong> — Nicholas Carlini, Florian Tramer, Eric Wallace, Matthew Jagielski, Ariel Herbert-Voss, Katherine Lee, Adam Roberts, Tom Brown, Dawn Song, Ulfar Erlingsson, Alina Oprea, Colin Raffel (2020), arXiv:2012.07805 [cs.CR] / USENIX Security 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Memorisation is the privacy story, and it is measurable with an attack rather than a survey.</li></ul></main>
+</div>
+<footer class="pager">
+  <div><a href="agent-bench-lab.html">← Agent Benchmark Lab</a></div>
+  <div><a href="multimodal-lab.html">Multimodal Lab →</a></div>
+</footer>
+</body>
+</html>

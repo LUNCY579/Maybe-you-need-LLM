@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Language Model from Scratch — textbook</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents"><a class="" href="#contents">Contents</a>
+<a class="" href="#1-tokenisation">1. Tokenisation</a>
+<a class="l2" href="#lesson-1-the-tokeniser">Lesson 1. The tokeniser</a>
+<a class="l2" href="#lesson-2-the-vocabulary-economy">Lesson 2. The vocabulary economy</a>
+<a class="" href="#2-the-architecture">2. The Architecture</a>
+<a class="l2" href="#lesson-3-the-decoder-block">Lesson 3. The decoder block</a>
+<a class="l2" href="#lesson-4-the-parameter-budget">Lesson 4. The parameter budget</a>
+<a class="" href="#3-resource-accounting">3. Resource Accounting</a>
+<a class="l2" href="#lesson-5-the-flops">Lesson 5. The FLOPs</a>
+<a class="l2" href="#lesson-6-the-memory-hierarchy">Lesson 6. The memory hierarchy</a>
+<a class="" href="#4-systems-and-parallelism">4. Systems and Parallelism</a>
+<a class="l2" href="#lesson-7-parallelism">Lesson 7. Parallelism</a>
+<a class="" href="#5-data">5. Data</a>
+<a class="l2" href="#lesson-8-the-data-pipeline">Lesson 8. The data pipeline</a>
+<a class="" href="#6-training-and-evaluation">6. Training and Evaluation</a>
+<a class="l2" href="#lesson-9-the-training-loop">Lesson 9. The training loop</a>
+<a class="l2" href="#lesson-10-the-perplexity-and-the-number-behind-it">Lesson 10. The perplexity, and the number behind it</a>
+<a class="l2" href="#lesson-11-projecting-the-next-run">Lesson 11. Projecting the next run</a>
+<a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
+<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+  <main class="book"><h1 id="language-model-from-scratch">Language Model from Scratch</h1>
+<p><strong>Source:</strong> CS336: Language Modeling from Scratch — Stanford CS336 staff (2026)</p>
+<p><strong>Licence:</strong> Course materials are published for study. The lecture repository (stanford-cs336/spring2025-lectures) and the assignment repository (stanford-cs336/assignment1-basics) are both MIT licensed. Course slides and assignment handouts are cited, not redistributed.</p>
+<p><strong>Why this course exists:</strong> No course in the collection trains a real model, touches a real corpus, or accounts for real hardware cost. Every number in the collection comes from a toy-scale model. <strong>Source:</strong> nanoGPT — Andrej Karpathy (2023)</p>
+<p><strong>Licence:</strong> MIT (verified via the GitHub API, 2026-10-19)</p>
+<p><strong>Why this course exists:</strong> The smallest honest implementation of a modern decoder-only language model. <strong>Source:</strong> CS336 spring 2025 lecture materials — Stanford CS336 staff (2025)</p>
+<p><strong>Licence:</strong> MIT (verified via the GitHub API, 2026-10-19)</p>
+<p><strong>Why this course exists:</strong> The lecture sequence itself: tokenisation, PyTorch and resource accounting, architectures, mixture of experts, GPUs, kernels, parallelism, scaling laws, inference, evaluation, data, and post-training. <strong>Source:</strong> CS336 assignment handouts and code — Stanford CS336 staff (2025)</p>
+<p><strong>Licence:</strong> MIT (verified via the GitHub API, 2026-10-19)</p>
+<p><strong>Why this course exists:</strong> The five assignments map one-to-one onto the planned modules. <strong>Source:</strong> Neural Networks: Zero to Hero — Andrej Karpathy (2023)</p>
+<p><strong>Licence:</strong> MIT (verified via the GitHub API, 2026-10-19)</p>
+<p><strong>Why this course exists:</strong> The build-up from a single neuron to a GPT, which is the pedagogical spine the other courses assume. <strong>Source:</strong> Hugging Face LLM Course — Hugging Face (2025)</p>
+<p><strong>Licence:</strong> Published under CC BY-NC 4.0. Cited and linked; not redistributed.</p>
+<p><strong>Why this course exists:</strong> The practical library layer: tokenisers, datasets, generation, and the huggingface pipeline API. <strong>Source:</strong> Transformers — Hugging Face (2025)</p>
+<p><strong>Licence:</strong> Apache-2.0 (verified via the GitHub API, 2026-10-19)</p>
+<p><strong>Why this course exists:</strong> The library every applied course in this field assumes.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#1-tokenisation">1. Tokenisation</a> - <a href="#lesson-1-the-tokeniser">Lesson 1. The tokeniser</a> - <a href="#lesson-2-the-vocabulary-economy">Lesson 2. The vocabulary economy</a></li><li><a href="#2-the-architecture">2. The Architecture</a> - <a href="#lesson-3-the-decoder-block">Lesson 3. The decoder block</a> - <a href="#lesson-4-the-parameter-budget">Lesson 4. The parameter budget</a></li><li><a href="#3-resource-accounting">3. Resource Accounting</a> - <a href="#lesson-5-the-flops">Lesson 5. The FLOPs</a> - <a href="#lesson-6-the-memory-hierarchy">Lesson 6. The memory hierarchy</a></li><li><a href="#4-systems-and-parallelism">4. Systems and Parallelism</a> - <a href="#lesson-7-parallelism">Lesson 7. Parallelism</a></li><li><a href="#5-data">5. Data</a> - <a href="#lesson-8-the-data-pipeline">Lesson 8. The data pipeline</a></li><li><a href="#6-training-and-evaluation">6. Training and Evaluation</a> - <a href="#lesson-9-the-training-loop">Lesson 9. The training loop</a> - <a href="#lesson-10-the-perplexity-and-the-number-behind-it">Lesson 10. The perplexity, and the number behind it</a> - <a href="#lesson-11-projecting-the-next-run">Lesson 11. Projecting the next run</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<h2 id="1-tokenisation">1. Tokenisation</h2>
+<p><em>The first decision, and the one everything else is priced against</em></p>
+<p>A tokeniser decides what a token is, and therefore how long your corpus is, how big your embedding table is, and how many tokens of compute your training run costs. This module builds a byte-pair encoding from scratch and measures the trade-off it sets up.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Train a byte-pair encoding and explain the merge rule</li><li>Compute the bytes-per-token ratio and say what it decides</li><li>Explain why the vocabulary size and the sequence length trade against each other</li></ul>
+<h3 id="lesson-1-the-tokeniser">Lesson 1. The tokeniser</h3>
+<p><em>Learning to merge bytes into words</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the byte-pair encoding rule and run it by hand on a short example</li><li>Explain why the encoding starts from bytes rather than characters</li><li>Compute the bytes-per-token ratio of a corpus</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The tokeniser is trained, not designed: the merges are whatever the corpus supports.</li><li>Starting from bytes means the vocabulary can represent any text, at the price of a long sequence.</li><li>The bytes-per-token ratio is the number that decides your training bill.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does a byte-pair encoding start from? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The 256 bytes of the text</strong></li><li>- A fixed list of words</li><li>- The most frequent words in the corpus</li><li>- Unicode code points</li></ul>
+<blockquote><p>Correct, which is why it can represent any text.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Starting from the bytes means the tokeniser can represent any text at all, and the merges it learns are whatever the corpus supports.</p></blockquote>
+<p>*<em>Q. A corpus is 8,000,000 bytes of text and the tokeniser produces 2,000,000 tokens. How many bytes per token is that? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Exactly 4 bytes per token. The ratio is the number that decides the training bill: a corpus of B bytes becomes B ÷ 4 tokens, and the compute follows the token count.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Train a byte-pair encoding on a generated corpus and watch the merges accumulate. Open <strong>Watch the merges happen</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§1 Overview and tokenization · p. 1 — The tokenisation approach the assignment builds on, and the reason the vocabulary size and the sequence length trade against each other.</li><li>§assignment1 Assignment 1 — Basics · p. 1 — The tokeniser, the model and the optimiser the assignment asks you to build.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Tokeniser</strong> — The program that turns text into a sequence of integers.</li><li><strong>Byte-pair encoding</strong> — A tokeniser learned by repeatedly merging the most frequent adjacent pair.</li><li><strong>Vocabulary</strong> — The set of tokens the tokeniser can produce.</li><li><strong>Bytes per token</strong> — How many characters of text one token stands for.</li></ul>
+<h3 id="lesson-2-the-vocabulary-economy">Lesson 2. The vocabulary economy</h3>
+<p><em>Every token you save is a parameter you do not have</em></p>
+<p><em>Estimated study time:</em> 18 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Explain the trade between the vocabulary size and the sequence length</li><li>Compute the embedding parameters a vocabulary implies</li><li>Argue for a particular vocabulary size on cost grounds</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A larger vocabulary means a longer sequence for the same text, and more parameters in the embedding.</li><li>The cost of a vocabulary is paid twice: in parameters, and in tokens.</li><li>The optimum depends on the model width, which is why the two cannot be chosen separately.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why does a larger vocabulary not simply make training cheaper? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>Because the embedding and output matrices get larger</strong></li><li>- Because the sequences get longer, so the attention cost grows</li><li>- Because the optimiser has more states to carry</li><li>- It does make training cheaper</li></ul>
+<blockquote><p>Correct — that is half of it.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A larger vocabulary shortens the sequence but enlarges the two vocabulary-sized matrices. The two effects pull in opposite directions, which is why the vocabulary and the width have to be chosen together.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Watch the embedding parameters and the corpus length move against each other. Open <strong>The cost of a vocabulary</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§1 Overview and tokenization · p. 1 — The argument that the vocabulary size and the model dimensions have to be chosen together.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Vocabulary</strong> — The set of tokens the tokeniser can produce.</li><li><strong>Embedding</strong> — The matrix that maps a token id to a vector.</li><li><strong>Context length</strong> — The maximum number of tokens the model attends over at once.</li></ul>
+<p><em>Read first:</em> The tokeniser</p>
+<h2 id="2-the-architecture">2. The Architecture</h2>
+<p><em>A stack of matrices, and the shapes that go with them</em></p>
+<p>The decoder-only transformer is a small number of matrices. This module writes them down, counts their parameters, and shows which of them dominate the bill.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Write the decoder block: the attention, the feed-forward, and the residual connections</li><li>Count the parameters of a model and say which part dominates</li><li>Explain what tying the output projection to the embedding does</li></ul>
+<h3 id="lesson-3-the-decoder-block">Lesson 3. The decoder block</h3>
+<p><em>Attention, a feed-forward layer, and two residual connections</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the decoder block and name every tensor in it</li><li>Explain the pre-norm ordering and what it buys</li><li>Explain why the feed-forward block is usually wider than the residual stream</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A block is a residual connection around an attention, and another around a feed-forward.</li><li>The feed-forward block is where most of the parameters live.</li><li>The pre-norm ordering keeps the residual stream clean, which is what makes deep stacks trainable.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Which part of a decoder block usually holds the most parameters? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The feed-forward block</strong></li><li>- The attention projections</li><li>- The layer norms</li><li>- The residual connections</li></ul>
+<blockquote><p>Correct: two matrices of width × dFf each.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The feed-forward block has a width × dFf matrix and a dFf × width matrix, and with dFf usually several times the width it dominates the block.</p></blockquote>
+<p>*<em>Q. A pre-norm block normalises its input before the sub-layer rather than after it. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Yes. Normalising first keeps the residual stream unscaled, which is what makes a deep stack of blocks trainable without careful initialisation.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Count every parameter of a model and see which part of it dominates. Open <strong>Count the parameters</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§3 Architectures and hyperparameters · p. 1 — The architecture the assignment builds, and the hyperparameter choices it makes.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Transformer</strong> — The stack of attention and feed-forward blocks that makes a language model.</li><li><strong>Attention</strong> — The part of the block that lets each position look at the others.</li><li><strong>Feed-forward block</strong> — A two-layer network applied to each position independently.</li><li><strong>Residual connection</strong> — Adding a block’s input to its output.</li><li><strong>RMSNorm</strong> — Normalising a vector by its root-mean-square, then scaling it.</li></ul>
+<p><em>Read first:</em> The vocabulary economy</p>
+<h3 id="lesson-4-the-parameter-budget">Lesson 4. The parameter budget</h3>
+<p><em>Which matrices are large, and why</em></p>
+<p><em>Estimated study time:</em> 18 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Break a model’s parameters into their components</li><li>Explain when the embedding dominates the parameter count</li><li>Explain what tying the output projection does</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The embedding and the output projection are the only vocabulary-sized matrices.</li><li>Tying them halves the largest single block of parameters, at the cost of some capability.</li><li>Everything else scales with the width and the depth, not the vocabulary.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A model has a vocabulary of 32,000, a width of 768 and 12 layers, and it ties its output projection to the embedding. How many parameters does the embedding account for, in millions? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> 32,000 × 768 = 24,576,000, which is 24.576 million. With the output tied, the vocabulary-sized parameters are paid for once instead of twice.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The parameter breakdown as the width, the depth and the vocabulary move. Open <strong>The budget</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§3 Architectures and hyperparameters · p. 1 — The model dimensions and how they are chosen.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Parameter count</strong> — How many numbers the model has.</li><li><strong>Weight tying</strong> — Using the token embedding as the output projection.</li></ul>
+<p><em>Read first:</em> The decoder block</p>
+<h2 id="3-resource-accounting">3. Resource Accounting</h2>
+<p><em>How much arithmetic, and how much memory, and which one binds</em></p>
+<p>Before you train anything, you can work out what it will cost. This module counts the floating-point operations of a training step, the memory it needs, and the arithmetic intensity that decides whether the arithmetic units or the memory bandwidth is the bottleneck.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Count the FLOPs of a forward pass and of a training step</li><li>Compute the memory a training step needs, in all four of its components</li><li>Compute the arithmetic intensity and place it against the machine’s balance point</li><li>Explain why the attention kernel is memory bound even when the step is not</li></ul>
+<h3 id="lesson-5-the-flops">Lesson 5. The FLOPs</h3>
+<p><em>What a training step costs before you run it</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Count the FLOPs of a forward pass from the matrix shapes alone</li><li>Explain why a training step is about three forward passes</li><li>Predict how the cost changes with the width, the depth and the sequence length</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A matrix–matrix multiply of an m × k by a k × n costs 2mnk floating-point operations.</li><li>The backward pass costs about twice the forward pass, so a step is about three forwards.</li><li>The cost of a run is the cost of a step times the number of steps, and nothing is a surprise.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A matrix–matrix multiply of an m × k by a k × n matrix costs how many floating-point operations? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Exactly 2mnk. There are mn outputs, each needing k multiplications and k additions, and the additions are counted as a second operation.</p></blockquote>
+<p>*<em>Q. Why is a training step about three forward passes? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The backward pass costs about twice the forward pass</strong></li><li>- The optimiser needs a second pass to check the update</li><li>- The activations are recomputed</li><li>- The data is loaded twice</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The backward pass computes the gradient with respect to the inputs and the gradient with respect to the weights, and the second of those costs about as much as the forward pass itself.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Break a training step into its terms and watch them move with the shape. Open <strong>Count the arithmetic</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§2 PyTorch and resource accounting · p. 1 — The FLOP accounting, and the rule that a matrix–matrix multiply costs 2mnk.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>FLOPs</strong> — Floating-point operations.</li><li><strong>Training step</strong> — One batch, one forward pass, one backward pass, one update.</li><li><strong>Arithmetic intensity</strong> — Floating-point operations per byte of memory traffic.</li></ul>
+<p><em>Read first:</em> The decoder block</p>
+<h3 id="lesson-6-the-memory-hierarchy">Lesson 6. The memory hierarchy</h3>
+<p><em>The wall your arithmetic runs into</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compute the memory a training step needs, in all four of its components</li><li>Compute the arithmetic intensity and compare it with the machine’s balance point</li><li>Explain why the attention kernel is memory bound even when the whole step is not</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Four things have to fit: the parameters, the gradients, the optimiser state and the activations.</li><li>Arithmetic intensity is the number of operations per byte, and it decides what the bottleneck is.</li><li>The attention kernel’s intensity is fixed by the head dimension, which is why it has to be tiled.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is the arithmetic intensity of a kernel? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Floating-point operations per byte of memory traffic</strong></li><li>- Bytes of memory per floating-point operation</li><li>- The fraction of the peak rate the kernel reaches</li><li>- The number of arithmetic units the kernel uses</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Intensity is operations per byte. Compare it with the machine’s balance point — the intensity at which the two ceilings meet — and you know which of them binds.</p></blockquote>
+<p>*<em>Q. Why is the attention kernel memory bound even when the whole training step is not? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>Its intensity is fixed by the head dimension, which is small</strong></li><li>- It runs on a slower processor</li><li>- It reads more data than the other kernels</li><li>- It uses more arithmetic units</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The attention kernel does about dModel of arithmetic per byte it moves, which is below the balance point of a modern accelerator. That is why it has to be tiled, and why FlashAttention is a memory-layout problem as much as an arithmetic one.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Place the workload on the roofline and see which constraint binds. Open <strong>The roofline</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§2 PyTorch and resource accounting · p. 2 — The memory hierarchy, the arithmetic intensity, and the roofline.</li><li>§5 GPUs, TPUs and the memory hierarchy · p. 1 — The hardware the arithmetic has to fit into, and the balance point of a real accelerator.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Arithmetic intensity</strong> — Floating-point operations per byte of memory traffic.</li><li><strong>Roofline</strong> — The ceiling on a kernel’s attainable rate.</li><li><strong>Balance point</strong> — The intensity at which a machine’s two ceilings meet.</li><li><strong>Activation memory</strong> — The intermediate values kept so the backward pass can use them.</li></ul>
+<p><em>Read first:</em> The FLOPs</p>
+<h2 id="4-systems-and-parallelism">4. Systems and Parallelism</h2>
+<p><em>What it costs to spread a model across machines</em></p>
+<p>A model that does not fit on one device has to be split. This module covers the three kinds of parallelism and, for each of them, the communication that has to happen and the arithmetic it buys.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Name the three kinds of parallelism and what each one splits</li><li>Compute the communication a data-parallel step needs</li><li>Compute the ratio of communication to computation, and say when it stops paying</li></ul>
+<h3 id="lesson-7-parallelism">Lesson 7. Parallelism</h3>
+<p><em>Three ways to split a model, and what each one costs</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Name data, tensor and pipeline parallelism and what each splits</li><li>Compute the communication a data-parallel step needs</li><li>Compute the ratio of communication to computation, and say when it stops paying</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Data parallelism splits the batch and adds a gradient all-reduce per step.</li><li>Tensor parallelism splits a single matrix and adds an all-reduce per layer.</li><li>Pipeline parallelism splits the layers and adds a point-to-point send per stage.</li><li>The split is worth it when the communication is smaller than the arithmetic it saves.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does data parallelism split? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The batch</strong></li><li>- The layers</li><li>- The individual matrices</li><li>- The vocabulary</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Data parallelism gives every device the same model and a different slice of the batch, then all-reduces the gradients before the update.</p></blockquote>
+<p>*<em>Q. Data parallelism is worth it when the gradient all-reduce costs less than the arithmetic it saves. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> Yes. The all-reduce touches every parameter, and the saving from a larger batch is the difference in the number of steps. Past some size the communication wins.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The communication a data-parallel step needs, against the arithmetic it buys. Open <strong>What the split costs</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§7 Parallelism · p. 1 — The three kinds of parallelism, and the communication each one requires.</li><li>§assignment2 Assignment 2 — Systems · p. 1 — The systems assignment: profiling, a memory-efficient kernel, and a distributed run.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Data parallelism</strong> — Splitting the batch across devices and averaging the gradients.</li><li><strong>Tensor parallelism</strong> — Splitting a single matrix across devices.</li><li><strong>Pipeline parallelism</strong> — Splitting the layers across devices and moving the activations along.</li><li><strong>All-reduce</strong> — Summing a tensor across every device and giving the result to all of them.</li></ul>
+<p><em>Read first:</em> The memory hierarchy</p>
+<h2 id="5-data">5. Data</h2>
+<p><em>The part of the pipeline that decides what the model knows</em></p>
+<p>The tokens are the training set, and how they are chosen is a research decision in its own right. This module covers the sources, the filtering, the deduplication, and what each stage is for.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Say what each stage of a data pipeline is for</li><li>Explain why deduplication changes the token count</li><li>Argue for the mixture being a decision rather than a default</li></ul>
+<h3 id="lesson-8-the-data-pipeline">Lesson 8. The data pipeline</h3>
+<p><em>From a crawl to a training set</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Name the stages of a language-modeling data pipeline and what each is for</li><li>Explain why deduplication changes the token count</li><li>Argue that the mixture is a decision rather than a default</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Every filtering stage removes tokens, and the stages are not independent.</li><li>Deduplication is not a tidy-up; it changes what the model learns.</li><li>The mixture over sources is a research decision, and it should be argued for.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is the mixture in a data pipeline? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The proportions in which the sources are combined</strong></li><li>- The list of filters applied to the corpus</li><li>- The order the documents are shuffled in</li><li>- The tokeniser’s merge list</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The mixture is a decision about what the model should know, and it deserves the same argument as any other hyperparameter.</p></blockquote>
+<p>*<em>Q. Deduplication only tidies the corpus up; it does not change what the model learns. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> No. Repeated text is a signal — the model learns differently when a document appears ten times — and removing it changes both the token count and the distribution.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Run a corpus through the stages and watch the token count fall. Open <strong>The pipeline</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§13 Data — sources and datasets · p. 1 — The sources, and the question of what a token is worth.</li><li>§14 Data — filtering, deduplication and mixing · p. 1 — The filtering, the deduplication and the mixing.</li><li>§assignment4 Assignment 4 — Data · p. 1 — The data assignment: build the pipeline and measure what the filtering did.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Corpus</strong> — The pile of text a model is trained on.</li><li><strong>Deduplication</strong> — Removing text that appears more than once.</li><li><strong>Filtering</strong> — Removing the documents a pipeline decides are not worth training on.</li><li><strong>Mixture</strong> — The proportions in which the sources of a corpus are combined.</li></ul>
+<p><em>Read first:</em> The vocabulary economy</p>
+<h2 id="6-training-and-evaluation">6. Training and Evaluation</h2>
+<p><em>The loop, the loss, and what the number means</em></p>
+<p>A training run is a loop over batches, and a language model is trained to predict the next token. This module runs a real one, in the browser, and reports what the loss and the perplexity actually measure.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Run a training loop and read the loss curve</li><li>Explain what the cross-entropy loss is measuring, token by token</li><li>Convert a loss into a perplexity and say what the conversion assumes</li><li>Say why a validation loss is a different measurement from a training loss</li></ul>
+<h3 id="lesson-9-the-training-loop">Lesson 9. The training loop</h3>
+<p><em>Batches, gradients, and the loss that falls</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the training loop and say what each step does</li><li>Explain the cross-entropy loss as a sum over tokens</li><li>Explain what the loss curve does and does not tell you</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A step is a batch, a forward pass, a backward pass and an update.</li><li>The loss is the average negative log-probability of the tokens that came next.</li><li>A falling loss is evidence the model is fitting; it is not evidence it generalises.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the cross-entropy loss measure for a language model? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The negative log-probability the model assigned to the token that actually came next</strong></li><li>- The error in the predicted token</li><li>- The distance between the prediction and the label</li><li>- The perplexity</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Averaged over the tokens, the cross-entropy is the negative log-likelihood of the corpus under the model, which is exactly what the model is trying to minimise.</p></blockquote>
+<p>*<em>Q. A model reaches a cross-entropy of 2.3026. What is its perplexity? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> e^2.3026 = 10, so exactly 10. A perplexity of 10 means the model was as uncertain about each token as a ten-way choice.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Train a real transformer in the browser and watch the loss fall. Open <strong>Run a training loop</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§assignment1 Assignment 1 — Basics · p. 1 — The training loop, the optimiser, and a run that has to converge.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Cross-entropy</strong> — The average negative log-probability of the tokens that actually came next.</li><li><strong>Batch</strong> — The set of sequences one step processes.</li><li><strong>Gradient accumulation</strong> — Splitting a large batch into several small ones and adding the gradients.</li><li><strong>Perplexity</strong> — The loss, exponentiated.</li></ul>
+<p><em>Read first:</em> The decoder block, The FLOPs</p>
+<h3 id="lesson-10-the-perplexity-and-the-number-behind-it">Lesson 10. The perplexity, and the number behind it</h3>
+<p><em>What the loss means when you exponentiate it</em></p>
+<p><em>Estimated study time:</em> 18 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Convert a cross-entropy loss into a perplexity</li><li>State what the perplexity assumes about the distribution</li><li>Explain why the validation loss is a different measurement</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The perplexity is the loss, exponentiated: it is a number of effective choices.</li><li>It assumes the model is being scored against one fixed distribution.</li><li>A validation loss is a measurement; a training loss is a diagnostic.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why is the validation loss a different measurement from the training loss? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>It is computed on data the model never trained on</strong></li><li>- It is computed with a different tokeniser</li><li>- It is the training loss, averaged</li><li>- It uses a different loss function</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The training loss is a diagnostic of the optimiser; the validation loss is a measurement of the model. The gap between them is the overfitting.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Read the perplexity alongside the loss and the validation number. Open <strong>The number and what is behind it</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§10 Evaluation · p. 1 — What a benchmark measures, and the protocol that has to be reported with it.</li><li>§12 Evaluation, continued · p. 1 — The evaluation harness and the reproducibility of a number.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Perplexity</strong> — The loss, exponentiated.</li><li><strong>Validation loss</strong> — The loss on data the model never trained on.</li><li><strong>Overfitting</strong> — The model learning the training data instead of the process behind it.</li></ul>
+<p><em>Read first:</em> The training loop</p>
+<h3 id="lesson-11-projecting-the-next-run">Lesson 11. Projecting the next run</h3>
+<p><em>What a power law lets you say before you spend the money</em></p>
+<p><em>Estimated study time:</em> 20 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the shape of the scaling laws and what they predict</li><li>Explain the compute-optimal allocation and the rule of thumb it gives</li><li>Say what a scaling law cannot tell you</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The loss falls as a power law in the compute, the data and the parameters.</li><li>For a fixed compute, there is an optimal size, and Chinchilla found where.</li><li>A scaling law is an extrapolation, and its uncertainty grows with the distance.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the IsoFLOP method find? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>The model size that minimises the loss for a fixed compute budget</strong></li><li>- The largest model the hardware can hold</li><li>- The number of epochs before overfitting</li><li>- The learning rate schedule</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> For each model size, find the data that uses the same compute, and read the best point off the curve. Chinchilla used it to find the compute-optimal allocation.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Trace the compute-optimal frontier and read the optimal allocation off it. Open <strong>The IsoFLOP picture</strong> in the lm-from-scratch application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§8 Scaling laws · p. 1 — The power laws and the IsoFLOP methodology.</li><li>§11 Scaling laws, continued · p. 1 — Fitting the laws to your own runs and projecting from them.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2203.15556">Hoffmann et al., arXiv:2203.15556</a> — The compute-optimal allocation and the rule of thumb it gives.</li><li><a href="https://arxiv.org/abs/2001.08361">Kaplan et al., arXiv:2001.08361</a> — The power laws themselves.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Scaling law</strong> — A power law relating the loss to a resource.</li><li><strong>IsoFLOP</strong> — Holding the compute fixed and sweeping the model size.</li><li><strong>Compute-optimal</strong> — The allocation of parameters and data that minimises the loss for a fixed compute.</li></ul>
+<p><em>Read first:</em> The FLOPs</p>
+<h2 id="appendix-a-glossary">Appendix A — Glossary</h2>
+<p><strong>Tokeniser</strong> — The program that turns text into a sequence of integers.</p>
+<p>It defines what a token is. Everything downstream — the sequence length, the embedding size, the compute — is priced against it.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Byte-pair encoding</strong> — A tokeniser learned by repeatedly merging the most frequent adjacent pair.</p>
+<p>It starts from the 256 bytes, so it can represent any text, and it learns its merges from the corpus. The merges are the model, not a design decision.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Vocabulary</strong> — The set of tokens the tokeniser can produce.</p>
+<p>Its size sets the width of the embedding matrix and of the output projection, and it trades against how long the sequences become.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Bytes per token</strong> — How many characters of text one token stands for.</p>
+<p>The ratio that decides your bill: a corpus of B bytes becomes B ÷ (bytes per token) tokens, and the training cost follows the token count.</p>
+<p><em>Example:</em> A corpus of 10 GB with 4 bytes per token — how many tokens? → About 2.5 billion tokens.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Embedding</strong> — The matrix that maps a token id to a vector.</p>
+<p>Its shape is vocabulary × width, which makes it one of the two largest matrices in the model.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Context length</strong> — The maximum number of tokens the model attends over at once.</p>
+<p>It sets the size of the positional embedding and, quadratically, the cost of the attention scores.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Transformer</strong> — The stack of attention and feed-forward blocks that makes a language model.</p>
+<p>A decoder-only transformer is a residual stream with an attention block and a feed-forward block wrapped around each step.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Attention</strong> — The part of the block that lets each position look at the others.</p>
+<p>Each position forms a query, compares it with every key, and mixes the values in proportion to the resulting scores.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Feed-forward block</strong> — A two-layer network applied to each position independently.</p>
+<p>It holds most of the model’s parameters, which is why widening it is the usual way to add capacity.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Residual connection</strong> — Adding a block’s input to its output.</p>
+<p>It gives the gradient a direct path, which is what makes a deep stack of blocks trainable at all.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>RMSNorm</strong> — Normalising a vector by its root-mean-square, then scaling it.</p>
+<p>A simplification of LayerNorm with no mean subtraction and no bias. The gradient has a term from the mean that is easy to forget.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Parameter count</strong> — How many numbers the model has.</p>
+<p>It decides the memory for the parameters, the gradients and the optimiser state — four bytes per parameter for the last two and two for the first.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Weight tying</strong> — Using the token embedding as the output projection.</p>
+<p>It removes one vocabulary-sized matrix, which is often a large fraction of the parameters, at the cost of some expressiveness.</p>
+<p><em>Course term</em></p>
+<p><strong>FLOPs</strong> — Floating-point operations.</p>
+<p>A matrix–matrix multiply of an m × k by a k × n matrix costs 2mnk of them. That single rule is enough to cost a whole training run.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Training step</strong> — One batch, one forward pass, one backward pass, one update.</p>
+<p>The backward pass costs about twice the forward, so a step is about three forwards.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Arithmetic intensity</strong> — Floating-point operations per byte of memory traffic.</p>
+<p>It decides whether a kernel is limited by the arithmetic units or by the memory bandwidth, and it is the number the roofline is built on.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Balance point</strong> — The intensity at which a machine’s two ceilings meet.</p>
+<p>A kernel above it is limited by memory; below it, by arithmetic. On a modern accelerator it is of order a hundred.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Roofline</strong> — The ceiling on a kernel’s attainable rate.</p>
+<p>The smaller of the machine’s peak arithmetic rate and its bandwidth divided by the intensity. A kernel cannot beat the roof, and knowing which arm it is under tells you what to optimise.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Activation memory</strong> — The intermediate values kept so the backward pass can use them.</p>
+<p>It scales with the sequence length and with the width, and it is usually the largest single term in the memory of a training step.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Data parallelism</strong> — Splitting the batch across devices and averaging the gradients.</p>
+<p>Each device computes the same model on a different slice of the data, and the gradients are all-reduced before the update.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Tensor parallelism</strong> — Splitting a single matrix across devices.</p>
+<p>It needs an all-reduce inside every layer, which is why it is usually confined to the fast interconnect inside a node.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Pipeline parallelism</strong> — Splitting the layers across devices and moving the activations along.</p>
+<p>It needs a point-to-point send per stage, and it leaves the devices idle at the boundaries unless there are enough microbatches to fill the pipe.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>All-reduce</strong> — Summing a tensor across every device and giving the result to all of them.</p>
+<p>Its cost is what decides whether data parallelism is worth it, and it is why the parameters have to be kept in a form the reduction can be applied to efficiently.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Corpus</strong> — The pile of text a model is trained on.</p>
+<p>Its size in tokens is the training budget, and which text is in it is a research decision.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Deduplication</strong> — Removing text that appears more than once.</p>
+<p>It is not a tidy-up. Repeated text is a signal, and removing it changes both the token count and what the model learns.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Filtering</strong> — Removing the documents a pipeline decides are not worth training on.</p>
+<p>Each stage removes tokens, and the stages are not independent, so the order and the thresholds are decisions with consequences.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Mixture</strong> — The proportions in which the sources of a corpus are combined.</p>
+<p>It is a decision about what the model should know, and it deserves the same argument as any other hyperparameter.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Cross-entropy</strong> — The average negative log-probability of the tokens that actually came next.</p>
+<p>It is the objective of almost every language model, and it is the negative log-likelihood the model is trying to minimise.</p>
+<p><em>Course term</em></p>
+<p><strong>Batch</strong> — The set of sequences one step processes.</p>
+<p>It trades memory against the quality of the gradient: a bigger batch is a better estimate of the gradient and a larger activation footprint.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Gradient accumulation</strong> — Splitting a large batch into several small ones and adding the gradients.</p>
+<p>It gives you the gradient of the large batch at the memory cost of the small one, at the cost of the activations of the small ones being alive at once.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Perplexity</strong> — The loss, exponentiated.</p>
+<p>It is a number of effective choices: a perplexity of 10 means the model is as uncertain as a ten-way choice. It is only meaningful against a fixed tokenisation.</p>
+<p><em>Example:</em> A cross-entropy of 2.3 — what is the perplexity? → e^2.3 ≈ 10, so about ten effective choices per token.</p>
+<p><em>Course term</em></p>
+<p><strong>Validation loss</strong> — The loss on data the model never trained on.</p>
+<p>It is a measurement; the training loss is a diagnostic. The gap between them is the overfitting.</p>
+<p><em>CS336: Language Modeling from Scratch</em></p>
+<p><strong>Overfitting</strong> — The model learning the training data instead of the process behind it.</p>
+<p>It shows up as a training loss that keeps falling while the validation loss does not.</p>
+<p><em>Course term</em></p>
+<p><strong>Scaling law</strong> — A power law relating the loss to a resource.</p>
+<p>The loss falls as a power law in the compute, the data and the parameters, with the exponent slowly improving.</p>
+<p><em>Kaplan et al. (2020)</em></p>
+<p><strong>IsoFLOP</strong> — Holding the compute fixed and sweeping the model size.</p>
+<p>The method that finds the compute-optimal allocation: for each model size, find the data that uses the same compute, and read the best point off the curve.</p>
+<p><em>Hoffmann et al. (2022)</em></p>
+<p><strong>Compute-optimal</strong> — The allocation of parameters and data that minimises the loss for a fixed compute.</p>
+<p>Chinchilla found that the parameters and the tokens should grow together, roughly twenty tokens per parameter — a rule of thumb, not a law.</p>
+<p><em>Hoffmann et al. (2022)</em></p>
+<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<ul><li><strong>CS336: Language Modeling from Scratch</strong> — Stanford CS336 staff (2026), stanford-cs336.github.io — Spring 2025 and Spring 2026 offerings. Licence: Course materials are published for study. The lecture repository (stanford-cs336/spring2025-lectures) and the assignment repository (stanford-cs336/assignment1-basics) are both MIT licensed. Course slides and assignment handouts are cited, not redistributed.. No course in the collection trains a real model, touches a real corpus, or accounts for real hardware cost. Every number in the collection comes from a toy-scale model.</li><li><strong>nanoGPT</strong> — Andrej Karpathy (2023), GitHub repository. Licence: MIT (verified via the GitHub API, 2026-10-19). The smallest honest implementation of a modern decoder-only language model.</li><li><strong>CS336 spring 2025 lecture materials</strong> — Stanford CS336 staff (2025), GitHub repository. Licence: MIT (verified via the GitHub API, 2026-10-19). The lecture sequence itself: tokenisation, PyTorch and resource accounting, architectures, mixture of experts, GPUs, kernels, parallelism, scaling laws, inference, evaluation, data, and post-training.</li><li><strong>CS336 assignment handouts and code</strong> — Stanford CS336 staff (2025), GitHub repository. Licence: MIT (verified via the GitHub API, 2026-10-19). The five assignments map one-to-one onto the planned modules.</li><li><strong>Neural Networks: Zero to Hero</strong> — Andrej Karpathy (2023), Video series and companion notes. Licence: MIT (verified via the GitHub API, 2026-10-19). The build-up from a single neuron to a GPT, which is the pedagogical spine the other courses assume.</li><li><strong>Hugging Face LLM Course</strong> — Hugging Face (2025), Online course. Licence: Published under CC BY-NC 4.0. Cited and linked; not redistributed.. The practical library layer: tokenisers, datasets, generation, and the huggingface pipeline API.</li><li><strong>Transformers</strong> — Hugging Face (2025), GitHub repository and Python package. Licence: Apache-2.0 (verified via the GitHub API, 2026-10-19). The library every applied course in this field assumes.</li></ul></main>
+</div>
+<footer class="pager">
+  <div><a href="rlhf-lab.html">← RLHF Lab</a></div>
+  <div><a href="mech-interp-lab.html">Mechanistic Interpretability Lab →</a></div>
+</footer>
+</body>
+</html>

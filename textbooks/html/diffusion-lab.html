@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diffusion Lab — textbook</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents"><a class="" href="#contents">Contents</a>
+<a class="" href="#1-the-forward-process">1. The Forward Process</a>
+<a class="l2" href="#lesson-1-what-a-diffusion-model-is">Lesson 1. What a diffusion model is</a>
+<a class="l2" href="#lesson-2-the-closed-form">Lesson 2. The closed form</a>
+<a class="l2" href="#lesson-3-the-posterior">Lesson 3. The posterior</a>
+<a class="" href="#2-the-reverse-process">2. The Reverse Process</a>
+<a class="l2" href="#lesson-4-the-training-objective">Lesson 4. The training objective</a>
+<a class="l2" href="#lesson-5-three-parameterisations">Lesson 5. Three parameterisations</a>
+<a class="l2" href="#lesson-6-sampling">Lesson 6. Sampling</a>
+<a class="" href="#3-noise-schedules">3. Noise Schedules</a>
+<a class="l2" href="#lesson-7-choosing-a-schedule">Lesson 7. Choosing a schedule</a>
+<a class="l2" href="#lesson-8-the-weighting">Lesson 8. The weighting</a>
+<a class="" href="#4-latent-diffusion">4. Latent Diffusion</a>
+<a class="l2" href="#lesson-9-the-latent-space">Lesson 9. The latent space</a>
+<a class="" href="#5-guidance">5. Guidance</a>
+<a class="l2" href="#lesson-10-classifier-free-guidance">Lesson 10. Classifier-free guidance</a>
+<a class="l2" href="#lesson-11-the-price-of-guidance">Lesson 11. The price of guidance</a>
+<a class="" href="#6-the-design-space">6. The Design Space</a>
+<a class="l2" href="#lesson-12-the-design-space">Lesson 12. The design space</a>
+<a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
+<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+  <main class="book"><h1 id="diffusion-lab">Diffusion Lab</h1>
+<p><strong>Source:</strong> Denoising Diffusion Probabilistic Models — Jonathan Ho, Ajay Jain, Pieter Abbeel (2020)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. No Creative Commons licence is shown on the record; re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> There is no generative or multimodal application anywhere in the collection. <strong>Source:</strong> High-Resolution Image Synthesis with Latent Diffusion Models — Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Diffusion is what made high-resolution generation practical; the latent step is the missing half of the story. <strong>Source:</strong> Elucidating the Design Space of Diffusion-Based Generative Models — Tero Karras, Miika Aittala, Timo Aila, Samuli Laine (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The pre-conditioning and σ parametrisation that later samplers use; without it, the schedule choice looks arbitrary. <strong>Source:</strong> Classifier-Free Diffusion Guidance — Jonathan Ho, Tim Salimans (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Guidance is how a text-conditioned model is steered, and it is a single interpolation in the score. <strong>Source:</strong> Diffusion Models Beat GANs on Image Synthesis — Prafulla Dhariwal, Alex Nichol (2021)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The classifier-guidance recipe that made diffusion competitive, for comparison with classifier-free guidance. <strong>Source:</strong> Denoising Diffusion Implicit Models — Jiaming Song, Chenlin Meng, Stefano Ermon (2020)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The deterministic sampler, and therefore the reason a diffusion model can be sampled in a few dozen steps instead of a thousand. <strong>Source:</strong> Improved Denoising Diffusion Probabilistic Models — Alex Nichol, Prafulla Dhariwal (2021)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The cosine schedule and the learned variances, which is what the schedules module compares against the original linear schedule.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#1-the-forward-process">1. The Forward Process</a> - <a href="#lesson-1-what-a-diffusion-model-is">Lesson 1. What a diffusion model is</a> - <a href="#lesson-2-the-closed-form">Lesson 2. The closed form</a> - <a href="#lesson-3-the-posterior">Lesson 3. The posterior</a></li><li><a href="#2-the-reverse-process">2. The Reverse Process</a> - <a href="#lesson-4-the-training-objective">Lesson 4. The training objective</a> - <a href="#lesson-5-three-parameterisations">Lesson 5. Three parameterisations</a> - <a href="#lesson-6-sampling">Lesson 6. Sampling</a></li><li><a href="#3-noise-schedules">3. Noise Schedules</a> - <a href="#lesson-7-choosing-a-schedule">Lesson 7. Choosing a schedule</a> - <a href="#lesson-8-the-weighting">Lesson 8. The weighting</a></li><li><a href="#4-latent-diffusion">4. Latent Diffusion</a> - <a href="#lesson-9-the-latent-space">Lesson 9. The latent space</a></li><li><a href="#5-guidance">5. Guidance</a> - <a href="#lesson-10-classifier-free-guidance">Lesson 10. Classifier-free guidance</a> - <a href="#lesson-11-the-price-of-guidance">Lesson 11. The price of guidance</a></li><li><a href="#6-the-design-space">6. The Design Space</a> - <a href="#lesson-12-the-design-space">Lesson 12. The design space</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<h2 id="1-the-forward-process">1. The Forward Process</h2>
+<p><em>How a fixed chain turns data into noise</em></p>
+<p>A diffusion model corrupts its data with a fixed Markov chain and then learns to undo the corruption. This module builds the chain: the one-step transition, the closed form that makes training cheap, the posterior the reverse process is matched against, and the signal-to-noise ratio that measures how far the corruption has gone.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Write the forward transition and the closed form for q(x_t | x_0)</li><li>Derive the posterior q(x_{t−1} | x_t, x_0) and explain why it is tractable</li><li>Compute the signal-to-noise ratio at any step and say what it means</li><li>Explain why the closed form and the Markov chain agree</li></ul>
+<h3 id="lesson-1-what-a-diffusion-model-is">Lesson 1. What a diffusion model is</h3>
+<p><em>A fixed corruption, and a learned undoing of it</em></p>
+<p><em>Estimated study time:</em> 18 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the two processes that make up a diffusion model</li><li>Say what the "diffusion" is named after</li><li>Explain why the forward process has no learnable parameters</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A diffusion model is a latent variable model whose approximate posterior is fixed.</li><li>The forward process adds Gaussian noise on a schedule; the reverse process learns to undo it.</li><li>The prior at the end of the chain is the standard normal, so sampling starts from noise.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Which part of a diffusion model has learnable parameters? — multiple-choice </em>(warmup)***</p>
+<ul><li>- The forward process</li><li>✓ <strong>The reverse process</strong></li><li>- The variance schedule</li><li>- The prior</li></ul>
+<blockquote><p>Correct — the reverse process mean is produced by the network.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The forward process and the schedule are fixed by hand. Everything the model learns lives in the reverse process, whose mean is a function of the noisy state and the timestep.</p></blockquote>
+<p>*<em>Q. The forward process gradually destroys the information in the data. — boolean </em>(warmup)***</p>
+<blockquote><p><strong>Why:</strong> Yes. The signal-to-noise ratio falls monotonically, and by the last step the state is essentially the prior, carrying almost no information about the data.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Step a data point through the forward chain and watch the signal disappear. Open <strong>Watch the chain run</strong> in the diffusion-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§2 Background · p. 3 — The reverse process of equation 1, the forward process of equation 2, and the variational bound of equation 3.</li><li>§1 Introduction · p. 1 — The description of the model as a parameterised Markov chain trained with variational inference.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2006.11239">Ho, Jain &amp; Abbeel, arXiv:2006.11239</a> — The primary source.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Diffusion model</strong> — A generative model that learns to reverse a fixed noise-addition process.</li><li><strong>Forward process</strong> — The fixed chain that adds noise to the data.</li><li><strong>Reverse process</strong> — The learned chain that removes noise.</li><li><strong>Variance schedule</strong> — The sequence β_1 … β_T that sets how much noise each step adds.</li></ul>
+<h3 id="lesson-2-the-closed-form">Lesson 2. The closed form</h3>
+<p><em>Sampling any timestep in one step</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State q(x_t | x_0) and derive it from the one-step transition</li><li>Explain why the closed form is what makes diffusion training affordable</li><li>Verify that the closed form and the Markov chain describe the same distribution</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>x_t = √ᾱ_t · x_0 + √(1 − ᾱ_t) · ε, with ε ~ N(0, I).</li><li>The state is a scaled copy of the data plus a scaled copy of a noise vector.</li><li>Training never unrolls the chain: one timestep, one noise draw, one network evaluation.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. The closed form q(x_t | x_0) has the form x_t = √ᾱ_t · x_0 + √(1 − ᾱ_t) · ε. What is ε? — multiple-choice </em>(warmup)***</p>
+<ul><li>✓ <strong>A standard normal vector</strong></li><li>- The previous state x_{t−1}</li><li>- A learnable parameter</li><li>- The posterior mean</li></ul>
+<blockquote><p>Correct: ε ~ N(0, I), drawn fresh at every training step.</p></blockquote>
+<blockquote><p><strong>Why:</strong> ε is a standard normal draw, and it is the same vector that the network is trained to predict. That is the whole trick: the target of the training objective is a random vector the model never has to see.</p></blockquote>
+<p>*<em>Q. With the paper’s linear schedule, β goes from 10⁻⁴ to 0.02 over 1000 steps. What is β at the first step? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> β_1 = 10⁻⁴ exactly. The schedule is linear in the step index, so the first and last values are the endpoints of the range.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Compare the two ways of reaching the same timestep. Open <strong>Check the closed form against the chain</strong> in the diffusion-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§2 Background · p. 4 — Equation 4, the closed form q(x_t | x_0), and the statement that efficient training follows from it.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>ᾱ (alpha bar)</strong> — The cumulative product of the α_t, so ᾱ_t = ∏ α_s.</li><li><strong>Signal-to-noise ratio</strong> — ᾱ_t divided by 1 − ᾱ_t: how much signal survives against how much noise.</li><li><strong>Marginal</strong> — The distribution of one timestep, with the intermediate steps summed out.</li></ul>
+<p><em>Read first:</em> What a diffusion model is</p>
+<h3 id="lesson-3-the-posterior">Lesson 3. The posterior</h3>
+<p><em>The one quantity that has to be tractable</em></p>
+<p><em>Estimated study time:</em> 20 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the posterior q(x_{t−1} | x_t, x_0)</li><li>Explain why a tractable posterior is what makes the variational bound usable</li><li>Compute the posterior mean and variance for a given step</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>q(x_{t−1} | x_t, x_0) is Gaussian, and so is the reverse process it is compared against.</li><li>Every KL term in the bound therefore has a closed form instead of a Monte Carlo estimate.</li><li>The posterior leans on x_0 at small t and on x_t at large t.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why does the paper need q(x_{t−1} | x_t, x_0) to have a closed form? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>So every KL term in the bound can be computed between two Gaussians</strong></li><li>- So the sampling can be done in one step</li><li>- So the model does not need a network</li><li>- So the data can be scaled to [−1, 1]</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The variational bound is a sum of KL divergences between the true posterior and the model’s reverse transition. If both are Gaussian, each term has a closed form instead of a high-variance Monte Carlo estimate.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>See the posterior shift its weight from x_0 to x_t as the noise grows. Open <strong>Move the posterior weight</strong> in the diffusion-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§2 Background · p. 4 — Equations 6 and 7: the posterior mean and the posterior variance β̃_t.</li><li>§2 Background · p. 3 — Equation 5: the decomposition of the bound into per-step KL terms.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Posterior</strong> — q(x_{t−1} | x_t, x_0): where the chain would have been, given the data.</li><li><strong>Variational bound</strong> — An upper bound on the negative log likelihood, decomposed into per-step KL terms.</li><li><strong>KL divergence</strong> — A measure of how far one distribution is from another.</li></ul>
+<p><em>Read first:</em> The closed form</p>
+<h2 id="2-the-reverse-process">2. The Reverse Process</h2>
+<p><em>Learning to walk the corruption backwards</em></p>
+<p>The reverse process is a Markov chain of learned Gaussians. This module derives the ε-prediction parameterisation, the two other standard parameterisations, the ancestral sampler, and the deterministic sampler that makes diffusion models fast.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Derive the ε-prediction parameterisation from the variational bound</li><li>Convert between ε-prediction, x₀-prediction and v-prediction</li><li>Run the ancestral sampler and the deterministic sampler</li><li>State what the training objective actually optimises, and what it gives up</li></ul>
+<h3 id="lesson-4-the-training-objective">Lesson 4. The training objective</h3>
+<p><em>Why predicting the noise is the same as predicting the score</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Derive the ε-prediction parameterisation from the bound</li><li>State the simplified objective and what it gives up</li><li>Explain the connection to denoising score matching</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The reverse mean can be written in terms of a network that predicts ε.</li><li>With that parameterisation the bound becomes a weighted squared error on ε.</li><li>Dropping the weight gives the objective the paper actually uses.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. With the ε-prediction parameterisation, the network is trained to predict… — multiple-choice </em>(core)***</p>
+<ul><li>- the clean sample x_0</li><li>✓ <strong>the noise ε that was added</strong></li><li>- the posterior mean μ̃_t</li><li>- the reverse variance σ_t</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Predicting ε makes the bound resemble denoising score matching and makes the sampler resemble Langevin dynamics. Both facts are the paper’s stated reasons for preferring it.</p></blockquote>
+<p>*<em>Q. In the simplified objective the weight on the loss is exactly what value at every timestep? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Exactly 1. The true bound weights the loss by β_t² / (2 σ_t² α_t (1 − ᾱ_t)); the simplified objective replaces that whole factor with 1, which is why it down-weights small t so dramatically.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Compare the weight of the true bound with the flat weight of the simplified objective. Open <strong>See the weight the simplification drops</strong> in the diffusion-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§3.2 Reverse process and L_{1:T−1} · p. 7 — Equations 8 to 12: from the KL term to the ε-prediction parameterisation of equation 11 and the weighted loss of equation 12.</li><li>§3.4 Simplified training objective · p. 10 — Equation 14, the simplified objective, and the reason the small-t terms are down-weighted.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>ε-prediction</strong> — Parameterising the reverse mean through a network that predicts the added noise.</li><li><strong>Score</strong> — The gradient of the log density with respect to the input.</li><li><strong>Denoising score matching</strong> — Training a score network by asking it to predict the noise that was added.</li><li><strong>Simplified objective</strong> — The unweighted squared error on ε that the paper actually trains with.</li></ul>
+<p><em>Read first:</em> The posterior</p>
+<h3 id="lesson-5-three-parameterisations">Lesson 5. Three parameterisations</h3>
+<p><em>ε, x₀, and v</em></p>
+<p><em>Estimated study time:</em> 18 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Convert a prediction in one parameterisation into another</li><li>State which parameterisation the paper found best and why</li><li>Predict what changes when the network predicts x₀ instead of ε</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The three parameterisations describe the same reverse process; only the network target changes.</li><li>Predicting x₀ is unstable at large t, where the estimate of x₀ is dominated by noise.</li><li>The v-prediction is the reparameterisation that interpolates between them.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Which statement about the three parameterisations is true? — multiple-choice </em>(core)***</p>
+<ul><li>- They define three different reverse processes</li><li>✓ <strong>They describe the same reverse process but train the network on different targets</strong></li><li>- Only ε-prediction is mathematically valid</li><li>- x₀-prediction is always better</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The three parameterisations are algebraically equivalent views of p_θ(x_{t−1}|x_t). What changes is the regression target, and therefore how stable training is and how the loss is weighted.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Take one network output and read it as ε, as x₀, and as v. Open <strong>Convert a prediction</strong> in the diffusion-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§3.2 Reverse process and L_{1:T−1} · p. 8 — The remark that predicting x_0 led to worse sample quality early on, and the summary of the two parameterisations.</li><li>§4.2 Reverse process parameterization and training objective ablation · p. 12 — Table 2: the measured comparison of the two parameterisations under both objectives.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>v-prediction</strong> — Predicting the velocity √ᾱ_t ε − √(1−ᾱ_t) x_0.</li><li><strong>x₀-prediction</strong> — Parameterising the reverse mean through a network that predicts the clean sample.</li></ul>
+<p><em>Read first:</em> The training objective</p>
+<h3 id="lesson-6-sampling">Lesson 6. Sampling</h3>
+<p><em>From noise to a sample, and back again</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Run the ancestral sampler and account for the noise it adds</li><li>Explain what a deterministic sampler does differently</li><li>Describe the cost of sampling in network evaluations</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The ancestral sampler adds σ_t · z at every step.</li><li>A deterministic sampler reuses the same noise and can be run in fewer steps.</li><li>Sampling is the expensive half: T network evaluations per sample.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Sampling with T = 1000 steps needs one network evaluation per step. How many network evaluations does a single sample cost? — numeric </em>(warmup)***</p>
+<blockquote><p><strong>Why:</strong> Exactly 1000. This is the cost the paper notes it shares with earlier work, and it is the reason every later improvement in this area is about taking fewer steps.</p></blockquote>
+<p>*<em>Q. What does a deterministic sampler change? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>It removes the fresh noise, so the same start gives the same sample</strong></li><li>- It removes the network from the loop</li><li>- It replaces the variance schedule with a learned one</li><li>- It trains the model with a different objective</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> DDIM removes the fresh noise at each step, turning the reverse chain into a probability-flow ODE. The same latent then always gives the same sample, which is what allows the number of steps to be cut without collapsing diversity.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Sample from a trained model and watch the trajectory back to the data. Open <strong>Run the reverse chain</strong> in the diffusion-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§3.2 Reverse process and L_{1:T−1} · p. 8 — Algorithm 2, the sampling procedure, and the remark that it resembles Langevin dynamics.</li><li>§3.4 Simplified training objective · p. 10 — Algorithm 1, the training procedure.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2010.02502">Song, Meng &amp; Ermon, arXiv:2010.02502</a> — DDIM: the deterministic sampler.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Ancestral sampling</strong> — The sampler that adds fresh noise at every reverse step.</li><li><strong>DDIM</strong> — A deterministic sampler for the same trained model.</li><li><strong>Deterministic sampler</strong> — A sampler that adds no fresh noise, so the same starting point gives the same sample.</li></ul>
+<p><em>Read first:</em> Three parameterisations</p>
+<h2 id="3-noise-schedules">3. Noise Schedules</h2>
+<p><em>Choosing how fast the signal disappears</em></p>
+<p>The schedule is the one set of choices in the model that is not learned. This module compares the linear schedule of the original paper with the cosine schedule that followed, and shows what the schedule does to the training signal.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Compare the linear and cosine schedules on the same number of steps</li><li>Explain the effect of a schedule on the terminal KL divergence</li><li>Compute the weight the true variational bound puts on each timestep</li><li>Argue for a schedule choice from the signal-to-noise ratio alone</li></ul>
+<h3 id="lesson-7-choosing-a-schedule">Lesson 7. Choosing a schedule</h3>
+<p><em>Linear, cosine, and what they do to the signal</em></p>
+<p><em>Estimated study time:</em> 20 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the linear schedule of the original paper</li><li>Explain what the schedule controls</li><li>Compute the terminal KL divergence for a given schedule</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The paper fixes β to grow linearly from 1e-4 to 0.02 over T = 1000 steps.</li><li>The schedule is the only part of the model that is not learned.</li><li>A good schedule spends its steps where the denoising task is informative.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the variance schedule control? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>How much noise each step adds, and therefore the whole signal-to-noise trajectory</strong></li><li>- The size of the network</li><li>- The learning rate</li><li>- The resolution of the images</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The schedule determines ᾱ_t at every step, and therefore the signal-to-noise ratio, the terminal KL divergence, and the weighting of the training objective.</p></blockquote>
+<p>*<em>Q. The paper quotes a terminal KL divergence of about 10⁻⁵ bits per dimension for its linear schedule. Roughly how many bits per dimension is that, in scientific notation? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> 10⁻⁵ bits per dimension. The point of the number is that x_T is, for every practical purpose, indistinguishable from the prior — which is what lets the sampler start from pure noise.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Put the linear and cosine schedules side by side and read the signal-to-noise ratio off each. Open <strong>Compare two schedules</strong> in the diffusion-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§4 Experiments · p. 11 — T = 1000, β linear from 1e-4 to 0.02, and the quoted terminal KL of roughly 1e-5 bits per dimension.</li><li>§3.1 Forward process and L_T · p. 6 — The reason the forward variances are fixed rather than learned: the terminal term is then a constant.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2102.09672">Nichol &amp; Dhariwal, arXiv:2102.09672</a> — The cosine schedule and learned variances.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Variance schedule</strong> — The sequence β_1 … β_T that sets how much noise each step adds.</li><li><strong>Terminal KL</strong> — How far the final noisy state is from the standard normal prior.</li></ul>
+<p><em>Read first:</em> The closed form</p>
+<h3 id="lesson-8-the-weighting">Lesson 8. The weighting</h3>
+<p><em>Why the simplified objective is not the same objective</em></p>
+<p><em>Estimated study time:</em> 18 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the weight of the true variational bound at each timestep</li><li>Explain the consequence of dropping the weight</li><li>Say what the paper gives up when it uses the simplified objective</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The true bound weights the loss by β_t² / (2 σ_t² α_t (1 − ᾱ_t)).</li><li>That weight is enormous at small t and tiny at large t.</li><li>The simplified objective flattens it, so small t is effectively ignored.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Dropping the weight from the true variational bound has which effect? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>Small t are effectively ignored, because the true weight there is enormous</strong></li><li>- Large t are ignored</li><li>- The objective becomes a different likelihood bound</li><li>- Nothing changes, because the weight is constant</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The true weight β_t²/(2σ_t²α_t(1−ᾱ_t)) is very large at small t and very small at large t. Flattening it to 1 therefore removes most of the gradient signal from the easy, small-t end of the chain — which the paper reports improves sample quality.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Break the bound into its per-step KL terms and see where the cost sits. Open <strong>Decompose the bound</strong> in the diffusion-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§3.4 Simplified training objective · p. 10 — The statement that the simplified objective down-weights the loss terms corresponding to small t.</li><li>§4.1 Sample quality · p. 11 — Table 1: the true bound gives better codelengths, the simplified objective gives better samples.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Variational bound</strong> — An upper bound on the negative log likelihood, decomposed into per-step KL terms.</li><li><strong>Simplified objective</strong> — The unweighted squared error on ε that the paper actually trains with.</li></ul>
+<p><em>Read first:</em> The training objective, Choosing a schedule</p>
+<h2 id="4-latent-diffusion">4. Latent Diffusion</h2>
+<p><em>Why the diffusion happens in someone else’s space</em></p>
+<p>Rombach et al. did not improve the diffusion model; they moved it into an autoencoder’s latent space. This module measures the compression, the reconstruction error it costs, and the scaling factor that makes the latents behave like the data the schedule assumes.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Compute the saving a latent diffusion model buys, in elements and in attention</li><li>Measure the reconstruction error a compression buys</li><li>Explain why the latents have to be rescaled</li><li>Trace what happens to the signal-to-noise ratio in the latent space</li></ul>
+<h3 id="lesson-9-the-latent-space">Lesson 9. The latent space</h3>
+<p><em>Moving the diffusion into an autoencoder</em></p>
+<p><em>Estimated study time:</em> 20 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compute the reduction in elements and in attention a compression buys</li><li>Measure the reconstruction error a compression costs</li><li>Explain the role of the scaling factor</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A diffusion model in pixel space wastes most of its capacity on high frequencies.</li><li>An autoencoder moves the problem into a lower dimensional space, and the saving is roughly quadratic.</li><li>The latents have to be rescaled, because the schedule assumes unit-variance data.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why does latent diffusion use an autoencoder at all? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The diffusion runs on far fewer elements, so it is much cheaper</strong></li><li>- The autoencoder makes the images sharper</li><li>- It removes the need for a variance schedule</li><li>- It allows the model to be trained on text</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Compressing by a factor f reduces the number of elements by roughly 1/f² and the attention cost by roughly 1/f⁴, because attention is quadratic in the number of tokens.</p></blockquote>
+<p>*<em>Q. An autoencoder compresses a 256×256 image with 3 channels by a factor of 8, to 4 latent channels. By what factor is the number of elements the diffusion model works on reduced? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> The image has 256×256×3 = 196,608 elements; the latent has 32×32×4 = 4,096. The reduction factor is 48. The attention saving is larger still, because it is quadratic in the token count.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Train a real autoencoder and watch the reconstruction error against the compression ratio. Open <strong>Measure the compression</strong> in the diffusion-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§2 Background · p. 3 — The argument that the top-level latent x_T has nearly zero mutual information with the data.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2112.10752">Rombach et al., arXiv:2112.10752</a> — Latent diffusion, and the scaling factor of 0.18215.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Latent diffusion</strong> — Running the diffusion in an autoencoder’s latent space instead of in pixel space.</li><li><strong>Autoencoder</strong> — A learned encoder and decoder pair that compresses data and reconstructs it.</li><li><strong>Scaling factor</strong> — The constant that rescales the latents so they have roughly unit variance.</li></ul>
+<p><em>Read first:</em> The closed form</p>
+<h2 id="5-guidance">5. Guidance</h2>
+<p><em>Steering a generative model with a condition</em></p>
+<p>Guidance is how a diffusion model is made to obey a prompt. This module derives classifier-free guidance from the score, and measures the trade-off it buys: sharper samples, less diversity, and a model that is no longer sampling the distribution it was trained on.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Write the guided score and explain each term</li><li>Predict what a guidance weight does to fidelity and to diversity</li><li>Derive the classifier-guided update and compare it with the classifier-free one</li><li>Say precisely what a guided model is sampling</li></ul>
+<h3 id="lesson-10-classifier-free-guidance">Lesson 10. Classifier-free guidance</h3>
+<p><em>Guiding without a classifier</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the guided score</li><li>Derive it from the conditional and unconditional scores</li><li>Explain why the guided model is not sampling the training distribution</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>s_guided = s_uncond + w · (s_cond − s_uncond).</li><li>The guided distribution is the training distribution tilted by p(c | x)^w.</li><li>Raising w sharpens the samples and reduces their diversity.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. The classifier-free guided score is s_uncond + w · (s_cond − s_uncond). What does w = 0 give? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The unconditional score</strong></li><li>- The conditional score</li><li>- A score of zero</li><li>- The posterior mean</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> At w = 0 the guidance term vanishes and the sampler is unconditional. At w = 1 the guided score is exactly the conditional score.</p></blockquote>
+<p>*<em>Q. What does a large guidance weight do to the samples? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>They cluster more tightly on the mode that matches the condition</strong></li><li>- They spread out to cover the tail of the distribution</li><li>- They become noisier</li><li>- They become independent of the condition</li></ul>
+<blockquote><p>Correct: sharper, but less diverse.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Guidance tilts the distribution by p(c|x)^w, which sharpens the conditional but suppresses everything else. The result is better prompt adherence and worse coverage — the classic fidelity–diversity trade-off.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Measure fidelity and diversity against the guidance weight, with an exact score. Open <strong>Sweep the guidance weight</strong> in the diffusion-lab application.</p>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2207.12598">Ho &amp; Salimans, arXiv:2207.12598</a> — The classifier-free guidance derivation.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Guidance</strong> — Steering a generative model towards a condition by interpolating its scores.</li><li><strong>Classifier-free guidance</strong> — Guidance that needs no classifier, because the condition is dropped out during training.</li><li><strong>Score</strong> — The gradient of the log density with respect to the input.</li><li><strong>Mode collapse</strong> — A generator that produces only a subset of the data distribution.</li></ul>
+<p><em>Read first:</em> The training objective</p>
+<h3 id="lesson-11-the-price-of-guidance">Lesson 11. The price of guidance</h3>
+<p><em>What the extra fidelity costs</em></p>
+<p><em>Estimated study time:</em> 18 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Quantify the trade-off between fidelity and diversity</li><li>Explain the relationship between guidance weight and the effective temperature</li><li>Predict what a very large guidance weight does</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Guidance narrows the distribution: the samples move to the mode and stop spreading.</li><li>A large guidance weight behaves like a low temperature, but not exactly.</li><li>The guided model has higher likelihood on some inputs and much lower on others.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A guided model samples from a distribution proportional to p(x) · p(c | x)^w. For what value of w is this distribution exactly p(x | c)? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> w = 1. Since p(x)·p(c|x) = p(x|c)·p(c), and p(c) is a constant, the tilted distribution is proportional to the true conditional. Any w above 1 over-shoots it.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Put fidelity against diversity and mark where the sweet spot is. Open <strong>Plot the trade-off</strong> in the diffusion-lab application.</p>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Mode collapse</strong> — A generator that produces only a subset of the data distribution.</li><li><strong>Guidance</strong> — Steering a generative model towards a condition by interpolating its scores.</li></ul>
+<p><em>Read first:</em> Classifier-free guidance</p>
+<h2 id="6-the-design-space">6. The Design Space</h2>
+<p><em>The choices that survived</em></p>
+<p>The original paper fixed a dozen choices for convenience. Later work showed which of them mattered. This module covers the σ parametrisation, the preconditioning functions, the deterministic samplers, and the arithmetic of how many network evaluations a sample costs.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Compare the timestep and σ parametrisations</li><li>Explain what a preconditioning function is for</li><li>Count the network evaluations a given number of steps costs</li><li>Describe the difference between a stochastic and a deterministic sampler</li></ul>
+<h3 id="lesson-12-the-design-space">Lesson 12. The design space</h3>
+<p><em>The choices that turned out to matter</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compare the timestep parametrisation with the σ parametrisation</li><li>Explain what a preconditioning function does</li><li>Count the network evaluations a sampler costs</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The original paper fixed many choices for convenience; later work separated the ones that matter.</li><li>Preconditioning decides how the loss at one noise level is weighted against the others.</li><li>The number of steps is the only number that matters for sampling cost.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is preconditioning for? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>Deciding how the loss at one noise level counts against the others</strong></li><li>- Choosing the number of sampling steps</li><li>- Rescaling the data to [−1, 1]</li><li>- Making the network smaller</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Different noise levels have different intrinsic difficulty and different signal-to-noise ratios, so a single unweighted loss trains them badly. Preconditioning is the per-level weight that fixes this.</p></blockquote>
+<p>*<em>Q. A sampler takes 50 steps out of a chain of length 1000. How many network evaluations does one sample cost? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Exactly 50. The number of steps is the only thing that matters for sampling cost, which is why deterministic samplers that can be run in few steps matter so much.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Add up what a sample costs, in network evaluations and in memory. Open <strong>Count the cost</strong> in the diffusion-lab application.</p>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2206.00364">Karras et al., arXiv:2206.00364</a> — The σ parametrisation, the preconditioning functions and the design-space analysis.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Preconditioning</strong> — A weighting that decides how the loss at one noise level counts against the others.</li><li><strong>σ parametrisation</strong> — Indexing the noise levels by the standard deviation of the data noise.</li></ul>
+<p><em>Read first:</em> Sampling, Choosing a schedule</p>
+<h2 id="appendix-a-glossary">Appendix A — Glossary</h2>
+<p><strong>Diffusion model</strong> — A generative model that learns to reverse a fixed noise-addition process.</p>
+<p>A diffusion model is a latent variable model with two parts: a forward process that gradually adds Gaussian noise to the data, and a reverse process, learned, that removes it. Because the forward process is fixed, the model has few enough degrees of freedom to train well and the resulting samples are competitive with GANs.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Forward process</strong> — The fixed chain that adds noise to the data.</p>
+<p>Also called the diffusion process. It is a Markov chain q(x_1:T | x_0) = ∏ q(x_t | x_{t−1}) in which each step multiplies the state by √α_t and adds Gaussian noise of scale √β_t. It has no learnable parameters at all.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Reverse process</strong> — The learned chain that removes noise.</p>
+<p>A Markov chain p_θ(x_{0:T}) = p(x_T) ∏ p_θ(x_{t−1} | x_t) whose transitions are Gaussians with learned means and fixed variances. The means are produced by a network that takes the noisy state and the timestep.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Variance schedule</strong> — The sequence β_1 … β_T that sets how much noise each step adds.</p>
+<p>The only unlearned choice in the model. The original paper fixes it to grow linearly from 1e-4 to 0.02 over 1000 steps. Later work found a cosine schedule to be better, and even allows the schedule itself to be learned.</p>
+<p><em>Example:</em> What are β_1 and β_T in the paper’s setup? → 10⁻⁴ and 0.02 respectively, with T = 1000 steps.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>ᾱ (alpha bar)</strong> — The cumulative product of the α_t, so ᾱ_t = ∏ α_s.</p>
+<p>ᾱ_t is the fraction of the original signal still present in x_t. It is the single most useful number in the whole model: it appears in the closed form for x_t, in the posterior, and in the weighting of the training objective.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Marginal</strong> — The distribution of one timestep, with the intermediate steps summed out.</p>
+<p>q(x_t | x_0) is the marginal of the forward chain at step t, with x_1 … x_{t−1} integrated out. Because the chain is Gaussian, that marginal is itself Gaussian, and it has a closed form.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Signal-to-noise ratio</strong> — ᾱ_t divided by 1 − ᾱ_t: how much signal survives against how much noise.</p>
+<p>The SNR of the forward process at step t. It is one above 1 while the data is still mostly intact and falls below 1 as the state becomes mostly noise. The schedule determines the whole trajectory of the SNR, and therefore which steps are worth training on.</p>
+<p><em>Example:</em> At what step does the SNR cross one? → Where ᾱ_t = 0.5. For the paper’s linear schedule over 1000 steps that is around t = 500.</p>
+<p><em>Course term</em></p>
+<p><strong>Posterior</strong> — q(x_{t−1} | x_t, x_0): where the chain would have been, given the data.</p>
+<p>The approximate posterior of the latent variable model. It is Gaussian, with a mean that is a fixed linear combination of x_0 and x_t, and a variance β̃_t. It is the target the reverse process is compared against, and its tractability is what makes the variational bound computable.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Variational bound</strong> — An upper bound on the negative log likelihood, decomposed into per-step KL terms.</p>
+<p>L = D_KL(q(x_T|x_0) ‖ p(x_T)) + Σ D_KL(q(x_{t−1}|x_t,x_0) ‖ p_θ(x_{t−1}|x_t)) − log p_θ(x_0|x_1). Every term compares two Gaussians, so every term has a closed form rather than needing a Monte Carlo estimate.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>KL divergence</strong> — A measure of how far one distribution is from another.</p>
+<p>D_KL(P ‖ Q) = ∫ P log(P/Q). Between two univariate Gaussians it has a closed form, which is why the diffusion bound is cheap to compute.</p>
+<p><em>Course term</em></p>
+<p><strong>ε-prediction</strong> — Parameterising the reverse mean through a network that predicts the added noise.</p>
+<p>μ_θ(x_t, t) = (1/√α_t)(x_t − (β_t/√(1−ᾱ_t)) ε_θ(x_t, t)). The paper argues for this parameterisation because it makes the bound look like denoising score matching and makes sampling look like Langevin dynamics.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>x₀-prediction</strong> — Parameterising the reverse mean through a network that predicts the clean sample.</p>
+<p>An alternative target for the same reverse process. The paper reports that it works only with the full variational bound, and that it leads to worse sample quality early in training.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>v-prediction</strong> — Predicting the velocity √ᾱ_t ε − √(1−ᾱ_t) x_0.</p>
+<p>A reparameterisation that interpolates between ε-prediction and x₀-prediction. It is numerically better behaved at high noise levels, and is used in several later systems.</p>
+<p><em>Course term</em></p>
+<p><strong>Score</strong> — The gradient of the log density with respect to the input.</p>
+<p>∇_x log p(x). A network that predicts the score of the noisy distribution at every noise level is a denoising score model, and sampling from it is annealed Langevin dynamics.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Denoising score matching</strong> — Training a score network by asking it to predict the noise that was added.</p>
+<p>The equivalence the paper leans on: optimising a weighted variational bound on a diffusion model is equivalent to training a score-based model with denoising score matching over multiple noise levels.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Simplified objective</strong> — The unweighted squared error on ε that the paper actually trains with.</p>
+<p>L_simple = E ‖ε − ε_θ(√ᾱ_t x_0 + √(1−ᾱ_t) ε, t)‖². It drops the weight of the true bound, which down-weights small t. The paper reports better codelengths from the true bound and better samples from the simplified one.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Ancestral sampling</strong> — The sampler that adds fresh noise at every reverse step.</p>
+<p>Algorithm 2 of the paper: x_{t−1} = (1/√α_t)(x_t − (β_t/√(1−ᾱ_t)) ε_θ) + σ_t z, with z ~ N(0, I) and z = 0 at the last step.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>DDIM</strong> — A deterministic sampler for the same trained model.</p>
+<p>Denoising diffusion implicit models rewrite the reverse chain so that the marginals are deterministic given x_0, turning sampling into an ODE that can be jumped over. η = 0 gives a fully deterministic sampler; η = 1 recovers the ancestral one.</p>
+<p><em>Song, Meng &amp; Ermon (2021)</em></p>
+<p><strong>Deterministic sampler</strong> — A sampler that adds no fresh noise, so the same starting point gives the same sample.</p>
+<p>The same latent always produces the same output, which makes the samplers comparable and lets the number of steps be reduced without the loss of diversity that stochasticity would cause.</p>
+<p><em>Song, Meng &amp; Ermon (2021)</em></p>
+<p><strong>Terminal KL</strong> — How far the final noisy state is from the standard normal prior.</p>
+<p>D_KL(q(x_T|x_0) ‖ N(0, I)). The paper quotes roughly 10⁻⁵ bits per dimension for its linear schedule, which is the statement that x_T carries essentially no information about the data.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Latent diffusion</strong> — Running the diffusion in an autoencoder’s latent space instead of in pixel space.</p>
+<p>The technique behind Stable Diffusion. The saving is roughly quadratic in the compression factor, because both the number of spatial positions and the number of channels shrink.</p>
+<p><em>Rombach et al. (2022)</em></p>
+<p><strong>Autoencoder</strong> — A learned encoder and decoder pair that compresses data and reconstructs it.</p>
+<p>In latent diffusion the autoencoder is usually a convolutional one trained separately. Its reconstruction error is the price paid for the compression.</p>
+<p><em>Rombach et al. (2022)</em></p>
+<p><strong>Scaling factor</strong> — The constant that rescales the latents so they have roughly unit variance.</p>
+<p>The forward process assumes data with unit-ish variance. Rombach et al. multiply their latents by 0.18215 to achieve that, and the choice matters: without it the schedule is mismatched to the data.</p>
+<p><em>Rombach et al. (2022)</em></p>
+<p><strong>Guidance</strong> — Steering a generative model towards a condition by interpolating its scores.</p>
+<p>The guided score is a linear combination of the unconditional and the conditional score, with a weight that decides how far to go. Guidance is what makes a text-to-image model obey its prompt.</p>
+<p><em>Ho &amp; Salimans (2022)</em></p>
+<p><strong>Classifier-free guidance</strong> — Guidance that needs no classifier, because the condition is dropped out during training.</p>
+<p>s_guided = s_uncond + w(s_cond − s_uncond). The model is trained both with and without the condition, so the two scores come from the same network. It is simpler than classifier guidance and works better in practice.</p>
+<p><em>Ho &amp; Salimans (2022)</em></p>
+<p><strong>Mode collapse</strong> — A generator that produces only a subset of the data distribution.</p>
+<p>Guidance causes a specific kind of it: the samples concentrate on the mode that matches the condition and stop covering the rest of the distribution.</p>
+<p><em>Course term</em></p>
+<p><strong>Preconditioning</strong> — A weighting that decides how the loss at one noise level counts against the others.</p>
+<p>Different noise levels have different intrinsic difficulty, so the loss has to be scaled per level for the network to be trained well. The design-space paper treats this as a function of σ and t rather than of the raw loss.</p>
+<p><em>Karras et al. (2022)</em></p>
+<p><strong>σ parametrisation</strong> — Indexing the noise levels by the standard deviation of the data noise.</p>
+<p>An alternative to indexing by timestep, in which the model is written in terms of σ, the noise level itself. It makes the design space easier to reason about and is the basis of several later samplers.</p>
+<p><em>Karras et al. (2022)</em></p>
+<p><strong>Rate–distortion</strong> — A view of the generative model as a lossy compressor.</p>
+<p>The bound’s KL terms are the rate; the reconstruction error is the distortion. The paper reports that more than half of a diffusion model’s lossless codelength describes imperceptible detail.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Progressive generation</strong> — Large-scale structure appears first and fine detail last.</p>
+<p>Predicting x̂_0 from a noisy x_t at each step of the reverse chain gives a sequence of ever sharper estimates. Large features are decided early, details late.</p>
+<p><em>Ho, Jain &amp; Abbeel (2020)</em></p>
+<p><strong>Noise swap</strong> — Replacing the noise in a noisy sample to see what the model kept.</p>
+<p>Taking x_t from one data point and rebuilding it with the noise from another isolates structure from texture, with no model involved at all.</p>
+<p><em>Course term</em></p>
+<p><strong>Signal</strong> — The part of x_t that comes from the data rather than from the noise.</p>
+<p>In x_t = √ᾱ_t x_0 + √(1−ᾱ_t) ε, the first term is the signal and the second is the noise. Their ratio is the signal-to-noise ratio, and it is the single number that describes how corrupted the state is.</p>
+<p><em>Course term</em></p>
+<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<ul><li><strong>Denoising Diffusion Probabilistic Models</strong> — Jonathan Ho, Ajay Jain, Pieter Abbeel (2020), arXiv:2006.11239 [cs.LG] / NeurIPS 2020. Licence: arXiv perpetual, non-exclusive distribution licence. No Creative Commons licence is shown on the record; re-check per version before redistributing.. There is no generative or multimodal application anywhere in the collection.</li><li><strong>High-Resolution Image Synthesis with Latent Diffusion Models</strong> — Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer (2022), arXiv:2112.10752 [cs.CV] / CVPR 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Diffusion is what made high-resolution generation practical; the latent step is the missing half of the story.</li><li><strong>Elucidating the Design Space of Diffusion-Based Generative Models</strong> — Tero Karras, Miika Aittala, Timo Aila, Samuli Laine (2022), arXiv:2206.00364 [cs.CV] / NeurIPS 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The pre-conditioning and σ parametrisation that later samplers use; without it, the schedule choice looks arbitrary.</li><li><strong>Classifier-Free Diffusion Guidance</strong> — Jonathan Ho, Tim Salimans (2022), arXiv:2207.12598 [cs.LG]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Guidance is how a text-conditioned model is steered, and it is a single interpolation in the score.</li><li><strong>Diffusion Models Beat GANs on Image Synthesis</strong> — Prafulla Dhariwal, Alex Nichol (2021), arXiv:2105.05233 [cs.CV] / NeurIPS 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The classifier-guidance recipe that made diffusion competitive, for comparison with classifier-free guidance.</li><li><strong>Denoising Diffusion Implicit Models</strong> — Jiaming Song, Chenlin Meng, Stefano Ermon (2020), arXiv:2010.02502 [cs.LG] / ICLR 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The deterministic sampler, and therefore the reason a diffusion model can be sampled in a few dozen steps instead of a thousand.</li><li><strong>Improved Denoising Diffusion Probabilistic Models</strong> — Alex Nichol, Prafulla Dhariwal (2021), arXiv:2102.09672 [cs.LG] / ICML 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The cosine schedule and the learned variances, which is what the schedules module compares against the original linear schedule.</li></ul></main>
+</div>
+<footer class="pager">
+  <div></div>
+  <div><a href="evaluation-lab.html">Evaluation Lab →</a></div>
+</footer>
+</body>
+</html>

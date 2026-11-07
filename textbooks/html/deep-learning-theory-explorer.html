@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning Theory Explorer — textbook</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents"><a class="" href="#contents">Contents</a>
+<a class="l2" href="#lesson-1-gaussians-wick-contraction-and-why-the-gaussian-world-is-not-enough">Lesson 1. Gaussians, Wick contraction and why the Gaussian world is not enough</a>
+<a class="l2" href="#lesson-2-neural-networks-as-random-functions-activation-functions-and-ensembles">Lesson 2. Neural networks as random functions: activation functions and ensembles</a>
+<a class="l2" href="#lesson-3-deep-linear-networks-exact-criticality-and-the-explodingvanishing-problem">Lesson 3. Deep linear networks: exact criticality and the exploding/vanishing problem</a>
+<a class="l2" href="#lesson-4-finite-width-fluctuations-and-the-depth-to-width-ratio">Lesson 4. Finite width: fluctuations and the depth-to-width ratio</a>
+<a class="l2" href="#lesson-5-representation-group-flow-how-the-preactivation-distribution-evolves">Lesson 5. Representation group flow: how the preactivation distribution evolves</a>
+<a class="l2" href="#lesson-6-criticality-for-general-activations-two-conditions-and-the-kaiming-initialization">Lesson 6. Criticality for general activations: two conditions and the Kaiming initialization</a>
+<a class="l2" href="#lesson-7-universality-classes-tanh-sin-sigmoid-and-friends">Lesson 7. Universality classes: tanh, sin, sigmoid and friends</a>
+<a class="l2" href="#lesson-8-bayesian-learning-what-infinite-width-can-and-cannot-do">Lesson 8. Bayesian learning: what infinite width can and cannot do</a>
+<a class="l2" href="#lesson-9-gradient-descent-and-the-neural-tangent-kernel">Lesson 9. Gradient descent and the neural tangent kernel</a>
+<a class="l2" href="#lesson-10-representation-learning-at-finite-width">Lesson 10. Representation learning at finite width</a>
+<a class="" href="#appendix-a-equation-reference">Appendix A — Equation reference</a>
+<a class="" href="#appendix-b-notation">Appendix B — Notation</a></nav>
+  <main class="book"><h1 id="deep-learning-theory-explorer">Deep Learning Theory Explorer</h1>
+<p><strong>Source:</strong> The Principles of Deep Learning Theory — Daniel A. Roberts, Sho Yaida, Boris Hanin (2022)</p>
+<p><strong>Licence:</strong> Copyrighted by the authors and Cambridge University Press. Cited by reference; the text and figures are not redistributed.</p>
+<p><strong>Why this course exists:</strong> The mathematical layer: initialisation and criticality, signal propagation, the kernel recursion, finite-width fluctuations, the NTK, and representation learning. <strong>Source:</strong> Mathematics for Machine Learning — Marc Peter Deisenroth, A. Aldo Faisal, Cheng Soon Ong (2020)</p>
+<p><strong>Licence:</strong> Freely available to read online. The machine-check could not be completed from this environment (the GitHub repository name was not resolvable through the API); verify the licence terms on the site before redistributing.</p>
+<p><strong>Why this course exists:</strong> The prerequisite mathematics for the theory course, which currently ships a self-check instead of a reference.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#lesson-1-gaussians-wick-contraction-and-why-the-gaussian-world-is-not-enough">Lesson 1. Gaussians, Wick contraction and why the Gaussian world is not enough</a> <em>(foundation, Chapters 0-1)</em></li><li><a href="#lesson-2-neural-networks-as-random-functions-activation-functions-and-ensembles">Lesson 2. Neural networks as random functions: activation functions and ensembles</a> <em>(foundation, Chapter 2)</em></li><li><a href="#lesson-3-deep-linear-networks-exact-criticality-and-the-explodingvanishing-problem">Lesson 3. Deep linear networks: exact criticality and the exploding/vanishing problem</a> <em>(core, Chapter 3)</em></li><li><a href="#lesson-4-finite-width-fluctuations-and-the-depth-to-width-ratio">Lesson 4. Finite width: fluctuations and the depth-to-width ratio</a> <em>(core, Chapter 3.3, 5.4)</em></li><li><a href="#lesson-5-representation-group-flow-how-the-preactivation-distribution-evolves">Lesson 5. Representation group flow: how the preactivation distribution evolves</a> <em>(advanced, Chapter 4)</em></li><li><a href="#lesson-6-criticality-for-general-activations-two-conditions-and-the-kaiming-initialization">Lesson 6. Criticality for general activations: two conditions and the Kaiming initialization</a> <em>(core, Chapter 5.1-5.2)</em></li><li><a href="#lesson-7-universality-classes-tanh-sin-sigmoid-and-friends">Lesson 7. Universality classes: tanh, sin, sigmoid and friends</a> <em>(advanced, Chapter 5.3, 5.5)</em></li><li><a href="#lesson-8-bayesian-learning-what-infinite-width-can-and-cannot-do">Lesson 8. Bayesian learning: what infinite width can and cannot do</a> <em>(advanced, Chapter 6)</em></li><li><a href="#lesson-9-gradient-descent-and-the-neural-tangent-kernel">Lesson 9. Gradient descent and the neural tangent kernel</a> <em>(advanced, Chapters 7-9)</em></li><li><a href="#lesson-10-representation-learning-at-finite-width">Lesson 10. Representation learning at finite width</a> <em>(advanced, Chapters 10-11)</em></li><li><a href="#appendix-a-equation-reference">Appendix A — Equation reference</a></li><li><a href="#appendix-b-notation">Appendix B — Notation</a></li></ul>
+<h3 id="lesson-1-gaussians-wick-contraction-and-why-the-gaussian-world-is-not-enough">Lesson 1. Gaussians, Wick contraction and why the Gaussian world is not enough</h3>
+<p><em>Deep learning theory starts with Gaussian integrals because a wide network behaves like a Gaussian process. The interesting physics lives in the deviations from Gaussianity, and those deviations are measured by connected correlators.</em></p>
+<p><em>Estimated study time:</em> 40 minutes · tier: foundation · built on: Chapters 0-1</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Evaluate Gaussian expectations with Wick contraction</li><li>Distinguish a nearly-Gaussian distribution from an exactly Gaussian one</li><li>Explain why the connected four-point correlator measures interactions between neurons</li></ul>
+<h4 id="why-gaussian-integrals-first">Why Gaussian integrals first</h4>
+<p>A neural network at initialization is an ensemble of functions: draw the weights from a probability distribution and you get a random function. When the hidden layers are very wide, that ensemble becomes a Gaussian process, whose entire behaviour is fixed by one object — the two-point correlation, or [[kernel]]. Gaussian integrals are therefore the native language of the theory.</p>
+<p><span class="math-display">$\int_{-\infty}^{\infty} \frac{dz}{\sqrt{2\pi K}}\, e^{-\frac{z^2}{2K}} = 1 , \qquad \mathbb{E}[z^2] = K$</span> <em>The normal density and its second moment; K is the variance and plays the role of the kernel.</em></p>
+<p>For a centred Gaussian vector, every higher moment factorises into products of second moments. The pattern of the factorisation is called Wick contraction: pair up the fields in all possible ways and multiply the corresponding covariances.</p>
+<p><span class="math-display">$\mathbb{E}[z_1 z_2 z_3 z_4] = \mathbb{E}[z_1z_2]\,\mathbb{E}[z_3z_4] + \mathbb{E}[z_1z_3]\,\mathbb{E}[z_2z_4] + \mathbb{E}[z_1z_4]\,\mathbb{E}[z_2z_3]$</span> <em>Wick contraction: three ways to pair four fields.</em></p>
+<h4 id="nearly-gaussian-distributions">Nearly-Gaussian distributions</h4>
+<p>Real networks have finite width, so the preactivation distribution is only approximately Gaussian. The clean way to quantify the deviation is a cumulant: subtract from the four-point function all of the Wick pairings, and what remains is a genuine measurement of interaction.</p>
+<blockquote><p><strong>Figure:</strong> non-gaussianity</p></blockquote>
+<p><span class="math-display">$G^{(4)} - \big(G^{(2)}\big)^2 = 2\,(\ell-1)\frac{\big(G^{(2)}\big)^2}{n} + O\!\left(\frac{1}{n^2}\right)$</span> <em>For a deep linear network with zero bias, the leading non-Gaussianity grows linearly with depth ℓ and falls off as 1/n: the depth-to-width ratio is the small parameter of the whole theory.</em></p>
+<blockquote><p><strong>The single most repeated theme</strong> (insight)</p>
+<p>Finite-width corrections at criticality grow like [[aspect-ratio]]. A short, fat network is nearly Gaussian and nearly infinite-width; a tall, skinny network is dominated by interactions. Every fluctuation panel in this app is a measurement of that statement.</p></blockquote>
+<h4 id="experiment">Experiment</h4>
+<p>Use Laboratory C to measure the seed-to-seed variance of the layer-wise kernel as you change depth and width. The measured variance should grow roughly linearly in depth and fall off as 1/width, while the mean profile stays flat at criticality.</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. For <span class="math-inline">$z \sim \mathcal{N}(0, K)$</span>, what is <span class="math-inline">$\mathbb{E}[z^4]$</span>? </em>(warmup)***</p>
+<ul><li>- <span class="math-inline">$K^2$</span></li><li>✓ <strong><span class="math-inline">$3K^2$</span></strong></li><li>- <span class="math-inline">$K^4$</span></li><li>- <span class="math-inline">$\sqrt{3}K$</span></li></ul>
+<blockquote><p><strong>Why:</strong> Wick contraction gives three pairings, each contributing K², so E[z⁴] = 3K².</p></blockquote>
+<p>*<em>Q. A deep linear network has depth ℓ = 21 and width n = 100. Using the leading finite-width result, what is <span class="math-inline">$G^{(4)} - (G^{(2)})^2$</span> in units of <span class="math-inline">$(G^{(2)})^2$</span>? </em>(core)***</p>
+<ul><li>- 0.2</li><li>✓ <strong>0.4</strong></li><li>- 0.02</li><li>- 2.0</li></ul>
+<blockquote><p><strong>Why:</strong> 2(ℓ−1)/n = 2·20/100 = 0.4. The depth-to-width ratio sets the size of the deviation from Gaussianity.</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>For z ~ N(0, 2), compute E[z⁴] using Wick contraction.</strong> <em>(numerical)</em></p>
+<p><em>Hint:</em> There are three ways to pair four fields.</p>
+<blockquote><p><strong>Answer:</strong> E[z⁴] = 3K² = 3·4 = 12. (Three pairings, each contributing K² = 4.)</p></blockquote>
+<p><strong>Why does the connected four-point correlator vanish for a Gaussian distribution?</strong> <em>(conceptual)</em></p>
+<blockquote><p><strong>Answer:</strong> For a Gaussian, every moment factorises into Wick pairings, so the connected part (the cumulant) is identically zero. A nonzero connected four-point function therefore certifies non-Gaussianity, which is the signature of neuron-neuron interactions.</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Measure the L/n growth of finite-width fluctuations. (route: <code>/labs/width-depth</code>)</p></blockquote>
+<blockquote><p>Also: Watch the signal propagate through a wide network, and see how far from Gaussian the preactivations are. (route: <code>/labs/physics</code>)</p></blockquote>
+<blockquote><p>Also: Have the Wick contractions and quadrature arithmetic of this lesson graded against the app’s own computation. (route: <code>/labs/drills</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>§1.1 — Gaussian integrals and Wick contraction</li><li>§1.3 — nearly-Gaussian distributions and connected correlators</li><li>eq. (3.28) — leading non-Gaussianity of a deep linear network</li></ul>
+<h3 id="lesson-2-neural-networks-as-random-functions-activation-functions-and-ensembles">Lesson 2. Neural networks as random functions: activation functions and ensembles</h3>
+<p><em>Choosing an initialization distribution is choosing a probability distribution over functions. The activation function decides which function class you can represent, and the ensemble decides how the training data interacts with it.</em></p>
+<p><em>Estimated study time:</em> 45 minutes · tier: foundation · built on: Chapter 2</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the initialization distribution used throughout the book</li><li>Explain why a deterministic zero initialization is a bad idea</li><li>Classify activations by smoothness and scale invariance</li></ul>
+<p><em>Read first:</em> Gaussians, Wick contraction and why the Gaussian world is not enough</p>
+<h4 id="the-ensemble-of-functions">The ensemble of functions</h4>
+<p>The route from architecture to a distribution over functions runs through the preactivation recursion. Drop the biases and both endpoints are linear maps composed layer by layer.</p>
+<p><span class="math-display">$z^{(\ell)} = W^{(\ell)} h^{(\ell-1)} + b^{(\ell)} , \qquad h^{(\ell)} = \sigma\!\left(z^{(\ell)}\right)$</span> <em>The layer recursion. Everything in the first half of the book is a statistical statement about this iteration.</em></p>
+<p><span class="math-display">$W^{(\ell)}_{ij} \sim \mathcal{N}\!\left(0, \frac{C_W}{n_{\ell-1}}\right) , \qquad b^{(\ell)}_i \sim \mathcal{N}(0, C_b)$</span> <em>The 1/n rescaling of the weight variance is exactly what makes the infinite-width limit non-trivial: without it every observable collapses.</em></p>
+<blockquote><p><strong>Why not initialize at zero?</strong> (warning)</p>
+<p>A zero initialization keeps every neuron in a layer identical forever: no symmetry breaking. More formally, both susceptibilities are proportional to [[cw]], so C_W = 0 can never satisfy the criticality conditions and the kernel decays exponentially to a trivial fixed point.</p></blockquote>
+<blockquote><p><strong>Figure:</strong> helper-function</p></blockquote>
+<h4 id="activation-classes-that-matter-later">Activation classes that matter later</h4>
+<ul><li>Scale-invariant: σ(λz) = λσ(z), i.e. σ(z) = a₊z (z ≥ 0), a₋z (z &lt; 0). Includes the linear activation and the ReLU.</li><li>Smooth with σ(0) = 0 and σ′(0) ≠ 0: the K = 0 universality class, containing tanh and sin.</li><li>Smooth but σ(0) ≠ 0: sigmoid and softplus. Their criticality conditions clash with the physical requirement C_b ≥ 0.</li><li>Nonlinear monomials z^p, p ≥ 2: the criticality ratio is p/(2p−1), which equals one only for p = 1.</li><li>Half-stable: SWISH-like and GELU-like activations whose nontrivial fixed point is repulsive from one side.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Which initialization variance makes a deep linear network preserve its covariance exactly? </em>(warmup)***</p>
+<ul><li>- <span class="math-inline">$C_W = 0$</span></li><li>✓ <strong><span class="math-inline">$C_W = 1$</span></strong></li><li>- <span class="math-inline">$C_W = 2$</span></li><li>- <span class="math-inline">$C_W = 1/2$</span></li></ul>
+<blockquote><p><strong>Why:</strong> For σ(z) = z, g(K) = K, so the recursion is G^(ℓ+1) = C_W G^(ℓ) and only C_W = 1 has a nontrivial fixed point.</p></blockquote>
+<p>*<em>Q. What is the critical rescaled weight variance for the ReLU activation? </em>(core)***</p>
+<ul><li>- <span class="math-inline">$1$</span></li><li>- <span class="math-inline">$\sqrt{2}$</span></li><li>✓ <strong><span class="math-inline">$2$</span></strong></li><li>- <span class="math-inline">$4$</span></li></ul>
+<blockquote><p><strong>Why:</strong> A² = (a₊² + a₋²)/2 = (1 + 0)/2 = 1/2, hence C_W^crit = 1/A² = 2 (Kaiming/He initialization).</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>For a scale-invariant activation with a₊ = 1, a₋ = 0.1, compute A² and the critical weight variance.</strong> <em>(numerical)</em></p>
+<p><em>Hint:</em> A² = (a₊² + a₋²)/2 and C_W = 1/A².</p>
+<blockquote><p><strong>Answer:</strong> A² = (1² + 0.1²)/2 = 0.505, so C_W^crit = 1/A² ≈ 1.980.</p></blockquote>
+<p><strong>Why does the weight variance carry a factor 1/n_{ℓ−1}?</strong> <em>(conceptual)</em></p>
+<blockquote><p><strong>Answer:</strong> The preactivation is a sum of n_{ℓ−1} terms. Without the 1/n rescaling the variance of the sum would grow with width, and any infinite-width limit (as well as the "correlation functions are O(1)" property the theory relies on) would be lost.</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Compare activations at and away from criticality. (route: <code>/labs/initialization</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>§2.2 — activation functions</li><li>§2.3 — ensembles, permutation symmetry</li><li>eq. (4.2) — initialization distribution</li></ul>
+<h3 id="lesson-3-deep-linear-networks-exact-criticality-and-the-explodingvanishing-problem">Lesson 3. Deep linear networks: exact criticality and the exploding/vanishing problem</h3>
+<p><em>With a linear activation the whole theory becomes exact. The covariance is multiplied by C_W at every layer, so C_W = 1 is the unique nontrivial fixed point and every other choice either explodes or decays exponentially.</em></p>
+<p><em>Estimated study time:</em> 45 minutes · tier: core · built on: Chapter 3</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Derive the covariance recursion of a deep linear network</li><li>Identify trivial versus nontrivial fixed points</li><li>Explain why C_W = 1 is required for signal preservation</li></ul>
+<p><em>Read first:</em> Neural networks as random functions: activation functions and ensembles</p>
+<h4 id="from-layer-to-layer">From layer to layer</h4>
+<p>Define the covariance of preactivations for two inputs x₁, x₂ as the width-averaged inner product. For a linear network the recursion is multiplication by a constant, which is why this is the only case with a closed-form solution.</p>
+<blockquote><p><strong>Figure:</strong> linear-profile</p></blockquote>
+<p><span class="math-display">$G^{(\ell+1)}_{12} = C_W\, G^{(\ell)}_{12} \quad\Longrightarrow\quad G^{(\ell)}_{12} = C_W^{\ell} G^{(0)}_{12}$</span> <em>The exact solution. The factor of n in the weight variance cancels, confirming the choice of rescaling.</em></p>
+<blockquote><p><strong>Three regimes</strong> (insight)</p>
+<p>[[cw]] &gt; 1: all structure is pushed to a trivial fixed point at infinity (numerical blow-up). [[cw]] &lt; 1: correlations decay to zero and the data dependence is erased. C_W = 1: the covariance is preserved exactly — the first example of criticality.</p></blockquote>
+<p><span class="math-display">$\chi_\parallel = C_W \, \frac{d g}{dK} = C_W , \qquad K^{(\ell)} \xrightarrow{C_W = 1} K^{(1)}$</span> <em>For the linear activation g(K) = K, so the parallel susceptibility equals C_W and the critical value is C_W = 1.</em></p>
+<h4 id="experiment-verify-the-recursion-yourself">Experiment: verify the recursion yourself</h4>
+<p>Laboratory A lets you set C_W = 1, C_W = 0.8 and C_W = 1.2 on a deep linear network and watch the measured kernel trajectory. The displayed theoretical curve is the exact solution above; the scatter is the finite-width measurement, and the spread across seeds is a preview of the fluctuation analysis.</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A deep linear network has <span class="math-inline">$C_W = 0.95$</span> and depth 100. Roughly what happens to the kernel? </em>(core)***</p>
+<ul><li>- It stays constant</li><li>✓ <strong>It decays roughly as <span class="math-inline">$0.95^{\ell}$</span> — exponential death of the signal</strong></li><li>- It grows linearly with depth</li><li>- It oscillates</li></ul>
+<blockquote><p><strong>Why:</strong> Below C_W = 1 the covariance is multiplied by C_W each layer, so after 100 layers it has fallen by 0.95⁹⁹ ≈ 0.006. This is the vanishing-signal problem in its simplest form.</p></blockquote>
+<p>*<em>Q. Why does the 1/n factor in the weight variance cancel in the linear-network covariance recursion? </em>(warmup)***</p>
+<ul><li>- Because the activation is odd</li><li>✓ <strong>Because the sum over the n input neurons exactly compensates the 1/n in each variance</strong></li><li>- Because the biases vanish</li><li>- It does not cancel; the covariance scales with n</li></ul>
+<blockquote><p><strong>Why:</strong> Each of the n terms contributes (C_W/n)·G, so the sum is n·(C_W/n)G = C_W G. This is the whole reason the rescaling is the right one.</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>A linear network with C_W = 0.9 and G⁽¹⁾ = 1.5 is 40 layers deep. What is G⁽⁴⁰⁾?</strong> <em>(numerical)</em></p>
+<blockquote><p><strong>Answer:</strong> G⁽⁴⁰⁾ = 0.9³⁹ · 1.5 ≈ 0.0246. The factor 39 counts the layers after the first: G⁽ℓ⁾ = C_W^(ℓ−1) G⁽¹⁾.</p></blockquote>
+<p><strong>Run the linear network at C_W = 1 with 6 seeds and check that the mean of (1/n)Σz² matches ‖x‖²/n₀ at every layer.</strong> <em>(code)</em></p>
+<blockquote><p><strong>Answer:</strong> The ensemble mean matches to a few per cent at width 32; the per-seed curve scatters by O(1/√n) because each seed is one draw of the weight matrices.</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Linear network at and off criticality. (route: <code>/labs/initialization</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>§3.2 — criticality of deep linear networks</li><li>eqs. (3.14)-(3.15) — the covariance recursion and its solution</li></ul>
+<h3 id="lesson-4-finite-width-fluctuations-and-the-depth-to-width-ratio">Lesson 4. Finite width: fluctuations and the depth-to-width ratio</h3>
+<p><em>At criticality the mean of the kernel is preserved exactly, but individual networks still differ from the mean. The variance of that difference grows linearly with depth and shrinks with width, making L/n the emergent scale of the theory.</em></p>
+<p><em>Estimated study time:</em> 40 minutes · tier: core · built on: Chapter 3.3, 5.4</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the leading finite-width correction to the four-point correlator</li><li>Predict how the variance of the layer kernel scales with depth and width</li><li>Explain why L/n is the cutoff of the effective theory</li></ul>
+<p><em>Read first:</em> Deep linear networks: exact criticality and the exploding/vanishing problem</p>
+<h4 id="fluctuating-observables">Fluctuating observables</h4>
+<p>Define the observable O^(ℓ) = (1/n)Σ_j z_j^(ℓ) z_j^(ℓ), the layer-wise mean square preactivation measured on a single network. Its expectation over the ensemble is the [[kernel]]; its variance over the ensemble measures how strongly a single network deviates from the Gaussian, infinite-width picture.</p>
+<blockquote><p><strong>Figure:</strong> fluctuation</p></blockquote>
+<p><span class="math-display">$\mathrm{Var}\Big[\tfrac{1}{n}\textstyle\sum_j (z_j^{(\ell)})^2\Big] = \frac{2\ell\,(G^{(2)})^2}{n} + O\!\left(\frac{1}{n^2}\right)$</span> <em>For a deep linear network at criticality with a single input. The variance is suppressed by 1/n yet grows linearly with depth ℓ: the combination ℓ/n is what matters.</em></p>
+<blockquote><p><strong>What this does and does not say</strong> (limitation)</p>
+<p>This is a statement about the ensemble variance of a simple observable in a deep linear network, verified numerically in the app at the stated precision. It is not a claim that these simulations reproduce the book's complete effective theory, which involves a full effective action with all-order couplings.</p></blockquote>
+<h4 id="why-deep-networks-are-useful-anyway">Why deep networks are useful anyway</h4>
+<p>Depth brings two opposing effects: deeper networks can develop nontrivial correlations and features, but their observables fluctuate more from instantiation to instantiation. Since practical networks have L ≳ 2, some finite-width effect is always present — which is exactly the regime where the perturbative expansion in 1/n is trustworthy.</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Depth 50, width 512, critical linear network with <span class="math-inline">$G^{(2)} = 1$</span>. Estimate the standard deviation of the layer observable <span class="math-inline">$O^{(50)}$</span> across seeds. </em>(hard)***</p>
+<ul><li>- ≈ 0.014</li><li>- ≈ 0.14</li><li>✓ <strong>≈ 0.44</strong></li><li>- ≈ 1.0</li></ul>
+<blockquote><p><strong>Why:</strong> Var = 2ℓ/n = 2·50/512 ≈ 0.195, so the standard deviation is √0.195 ≈ 0.44. A 44% deviation from the mean of the layer observable is not unusual for L/n ≈ 0.1.</p></blockquote>
+<p>*<em>Q. What makes the perturbative effective theory accurate? </em>(core)***</p>
+<ul><li>- Large depth</li><li>✓ <strong>Small depth-to-width ratio <span class="math-inline">$L/n$</span></strong></li><li>- Zero bias variance</li><li>- A linear activation</li></ul>
+<blockquote><p><strong>Why:</strong> All leading finite-width corrections scale with L/n, so the expansion is controlled when the network is short and fat.</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>Depth 20, width 256, critical linear network with G⁽²⁾ = 1. Predict the standard deviation of O⁽²⁰⁾ across instantiations.</strong> <em>(numerical)</em></p>
+<blockquote><p><strong>Answer:</strong> Var = 2·20/256 = 0.15625, so sd ≈ 0.395 — a 40% deviation from the mean of 1. This is why skinny, deep networks show wildly different behaviour across seeds.</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Measure the L/n growth directly. (route: <code>/labs/width-depth</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>eq. (3.28) — leading four-point correction</li><li>eq. (3.33) — variance of the layer observable</li><li>§5.4 — fluctuations for general activations, with grading by L/n</li></ul>
+<h3 id="lesson-5-representation-group-flow-how-the-preactivation-distribution-evolves">Lesson 5. Representation group flow: how the preactivation distribution evolves</h3>
+<p><em>Marginalizing one layer at a time turns the network into a flow of distributions. At infinite width the flow is Gaussian and described by the kernel recursion; away from infinite width, non-Gaussianities accumulate layer by layer.</em></p>
+<p><em>Estimated study time:</em> 50 minutes · tier: advanced · built on: Chapter 4</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Explain the marginalization step that defines the flow</li><li>Write the kernel recursion for a general activation</li><li>Interpret non-Gaussian couplings as running with depth</li></ul>
+<p><em>Read first:</em> Finite width: fluctuations and the depth-to-width ratio</p>
+<h4 id="the-intuition-coarse-graining-a-network">The intuition: coarse-graining a network</h4>
+<p>A network is a stack of random linear maps. If you ask "what is the distribution of the output when the weights are random?", the honest answer is an integral over every weight in the network — hopeless. The trick is to integrate one layer at a time, from the outside in.</p>
+<p>Integrating out the last layer leaves a distribution over the penultimate layer's activations. Integrating out the layer before that leaves a distribution over the layer before it. Each integration step therefore produces a <em>new</em> distribution — a flow of distributions, one per layer. The question the theory answers is: what does this flow do as the layer index increases?</p>
+<blockquote><p><strong>Why this is a flow and not a recursion</strong> (insight)</p>
+<p>The map from one layer's distribution to the next is the same at every step. That is the renormalization-group structure: the same operation applied repeatedly. In the physics analogy of the book, this is the same coarse-graining that turns microscopic dynamics into macroscopic thermodynamics.</p></blockquote>
+<h4 id="marginalize-the-last-layer-first">Marginalize the last layer first</h4>
+<p>The output distribution is an integral over all weights. Grouping the weights layer by layer, each step replaces a layer of neurons by a Gaussian with the kernel computed from the previous layer — as long as the layer is wide enough that correlations between neurons can be neglected.</p>
+<p><span class="math-display">$K^{(\ell+1)}_{12} = C_b + C_W \, \mathbb{E}_{(u,v)\sim\mathcal{N}(0,\,K^{(\ell)})}\big[\sigma(u)\,\sigma(v)\big]$</span> <em>The kernel recursion (mixing two inputs). For a single input both copies coincide and the expectation reduces to E[σ(z)²] = g(K).</em></p>
+<p>Non-Gaussianities enter through a quartic coupling V^(ℓ), whose flow is fed by the difference G⁽⁴⁾ − (G⁽²⁾)². The coupling grows with depth, so the layer at which you look matters: the distribution runs, which is why the book calls this representation group flow.</p>
+<blockquote><p><strong>Scope of the app</strong> (limitation)</p>
+<p>The laboratories in this app compute the Gaussian part of the flow exactly (via quadrature) and measure the leading non-Gaussianity empirically. The full effective action with its quartic and higher couplings is described here in prose and citations, not simulated.</p></blockquote>
+<h4 id="experiment">Experiment</h4>
+<p>Open Laboratory A and switch the activation between the scale-invariant class (ReLU) and the K = 0 class (tanh). The measured kernel profile is the flow of the kernel under the recursion; the theory curve is the same recursion evaluated by Gauss-Hermite quadrature. Where the two agree, the Gaussian part of the flow is doing the work. Where they separate at large depth, you are seeing the leading finite-width correction the Gaussian flow does not capture.</p>
+<p>Then open Laboratory C and look at the depth-to-width ratio panel: it is the quantity that decides whether the Gaussian description of the flow is still accurate at the depth you are running.</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. For <span class="math-inline">$\sigma(z) = z^2$</span>, which relationship does the two-input kernel recursion satisfy? </em>(core)***</p>
+<ul><li>- <span class="math-inline">$K^{(\ell+1)}_{12} = C_b + C_W K^{(\ell)}_{12}$</span></li><li>✓ <strong><span class="math-inline">$K^{(\ell+1)}_{12} = C_b + C_W (K_{11}K_{22} + 2K_{12}^2)$</span></strong></li><li>- <span class="math-inline">$K^{(\ell+1)}_{12} = C_b + C_W (K_{11} + K_{22})$</span></li><li>- The recursion closes on the diagonal only</li></ul>
+<blockquote><p><strong>Why:</strong> E[z²z′²] = E[z²]E[z′²] + 2E[zz′]² for jointly Gaussian variables, which mixes diagonal and off-diagonal kernel entries. Nonlinear activations always do this; the linear one does not.</p></blockquote>
+<p>*<em>Q. What is the "representation group flow"? </em>(warmup)***</p>
+<ul><li>- Backpropagation through time</li><li>✓ <strong>The layer-by-layer evolution of the preactivation distribution as the network is coarsened</strong></li><li>- A group-theoretic symmetry of the loss</li><li>- The flow of gradients between layers</li></ul>
+<blockquote><p><strong>Why:</strong> Marginalizing one layer at a time defines a flow of distributions (and of their couplings) along depth — a renormalization-group flow for the representations.</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>For a quadratic activation σ(z) = z², use Wick contraction to write K⁽ℓ⁺¹⁾ in terms of the kernel matrix entries, and evaluate the bracket for K₁₁ = 2, K₂₂ = 3, K₁₂ = 0.5.</strong> <em>(numerical)</em></p>
+<p><em>Hint:</em> E[z²z′²] = E[z²]E[z′²] + 2E[zz′]² for jointly Gaussian (z, z′).</p>
+<blockquote><p><strong>Answer:</strong> K⁽ℓ⁺¹⁾₁₂ = C_b + C_W (K₁₁K₂₂ + 2K₁₂²) = C_b + C_W (6 + 0.5) = C_b + 6.5·C_W. This is why nonlinear activations mix diagonal and off-diagonal entries, whereas the linear case does not.</p></blockquote>
+<p><strong>Why does the flow become exactly Gaussian in the infinite-width limit, and what breaks that at finite width?</strong> <em>(conceptual)</em></p>
+<blockquote><p><strong>Answer:</strong> At infinite width the correlations between neurons in a layer vanish (the principle of sparsity: the input of any one neuron is a sum of so many weakly correlated signals that the law of large numbers applies), so the marginalization is exact and the layer distribution is Gaussian. At finite width those intra-layer correlations are non-zero, and they are exactly what the connected four-point correlator G⁽⁴⁾ − (G⁽²⁾)² measures. The correction grows like L/n, so it is negligible for short, fat networks and dominant for tall, skinny ones.</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Compare the measured kernel profile with the recursion. (route: <code>/labs/initialization</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>§4.1-4.3 — layer-by-layer marginalization</li><li>§4.5 — subleading corrections</li><li>eqs. (5.1), (5.44) — the two-input kernel recursion</li></ul>
+<h3 id="lesson-6-criticality-for-general-activations-two-conditions-and-the-kaiming-initialization">Lesson 6. Criticality for general activations: two conditions and the Kaiming initialization</h3>
+<p><em>Criticality requires two susceptibilities to equal one: one controls magnitude perturbations, the other controls angular ones. For scale-invariant activations both conditions are solved exactly and reproduce He/Kaiming initialization.</em></p>
+<p><em>Estimated study time:</em> 55 minutes · tier: core · built on: Chapter 5.1-5.2</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the parallel and perpendicular susceptibilities</li><li>Apply the criticality conditions to the linear and ReLU activations</li><li>Explain the line-of-fixed-points and semi-critical cases</li></ul>
+<p><em>Read first:</em> Representation group flow: how the preactivation distribution evolves</p>
+<h4 id="two-ways-to-perturb-a-kernel">Two ways to perturb a kernel</h4>
+<p>Perturbing around a fixed point of the kernel recursion, there are two independent ways to move: change the magnitude of an input ([[chi-parallel]]) or change its direction at fixed magnitude ([[chi-perp]])perpendicular). Each perturbation is multiplied by its own susceptibility per layer.</p>
+<p><span class="math-display">$\chi_\parallel(K) = C_W\, g'(K), \qquad \chi_\perp(K) = C_W \, \mathbb{E}_{z\sim\mathcal{N}(0,K)}\big[\sigma'(z)^2\big]$</span> <em>The two susceptibilities. Criticality is the statement χ∥(K</em>) = 1 and χ⊥(K<em>) = 1 at the fixed point K</em> = C_b + C_W g(K<em>).</em></p>
+<p>Beware a common trap: [[chi-perp]] is not the variance of the activation derivative. It is the expectation of the square of σ′. Both coincidences that make the analysis easy for scale-invariant activations fail for the K = 0 class.</p>
+<h4 id="scale-invariant-activations">Scale-invariant activations</h4>
+<p>For σ(z) = a₊z on the positive half-line and a₋z on the negative half-line, g(K) = A²K exactly with [[a2]] = (a₊² + a₋²)/2, so both susceptibilities are the kernel-independent constant A²C_W.</p>
+<blockquote><p><strong>Figure:</strong> criticality</p></blockquote>
+<p><span class="math-display">$(C_b, C_W)^{\text{critical}} = \left(0,\; \frac{1}{A^2}\right), \qquad A^2 = \frac{a_+^2 + a_-^2}{2}$</span> <em>The critical hyperparameters. For the ReLU A² = 1/2 and C_W = 2: Kaiming/He initialization is a criticality condition, not a heuristic.</em></p>
+<ul><li>C_W &gt; 1/A²: everything explodes exponentially towards the trivial fixed point at infinity.</li><li>C_W &lt; 1/A²: the kernel collapses to K* = C_b/(1 − A²C_W) and perturbations vanish exponentially.</li><li>C_W = 1/A², C_b = 0: every K is a fixed point — a line of nontrivial fixed points, exactly as in a scale-invariant field theory.</li><li>C_W = 1/A², C_b &gt; 0: semi-critical. Perturbations stay constant at linear order while the kernel grows linearly with depth; still no exponential behaviour.</li></ul>
+<blockquote><p><strong>Order-one numbers from a principle</strong> (insight)</p>
+<p>The theory predicts C_W = 1, 2, 1.98 for linear, ReLU and leaky-ReLU(0.1). None of these numbers was fitted: they follow from demanding that the depth direction neither blows up nor dies out.</p></blockquote>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the perpendicular susceptibility <span class="math-inline">$\chi_\perp$</span> control? </em>(core)***</p>
+<ul><li>- The growth of the input magnitude</li><li>✓ <strong>The growth of angular perturbations — differences between inputs at equal magnitude</strong></li><li>- The effective learning rate</li><li>- The bias variance</li></ul>
+<blockquote><p><strong>Why:</strong> Perpendicular perturbations are same-norm differences between two inputs, measured by D^(ℓ). If χ⊥ ≠ 1, the network either loses its ability to distinguish inputs or amplifies noise without bound.</p></blockquote>
+<p>*<em>Q. Which activation has <span class="math-inline">$\chi_\parallel = \chi_\perp$</span> for all <span class="math-inline">$K$</span>? </em>(hard)***</p>
+<ul><li>- tanh</li><li>- sigmoid</li><li>✓ <strong>A scale-invariant activation</strong></li><li>- GELU</li></ul>
+<blockquote><p><strong>Why:</strong> Scale-invariant activations have g(K) = A²K, giving both susceptibilities equal to the K-independent constant A²C_W. For the K = 0 class equality holds only at K* = 0.</p></blockquote>
+<p>*<em>Q. A leaky ReLU has negative slope 0.25. What is its critical weight variance? </em>(core)***</p>
+<ul><li>✓ <strong><span class="math-inline">$1.88$</span></strong></li><li>- <span class="math-inline">$2.00$</span></li><li>- <span class="math-inline">$1.60$</span></li><li>- <span class="math-inline">$2.13$</span></li></ul>
+<blockquote><p><strong>Why:</strong> A² = (1 + 0.25²)/2 = (1 + 0.0625)/2 = 0.53125, so C_W^crit = 1/0.53125 ≈ 1.882.</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>Compute the critical C_W for a scale-invariant activation with a₊ = 1, a₋ = 0 (ReLU) and for a₋ = a₊ = 1 (linear).</strong> <em>(numerical)</em></p>
+<p><em>Hint:</em> C_W^crit = 1/A² with A² = (a₊² + a₋²)/2 (book eq. (5.67)).</p>
+<blockquote><p><strong>Answer:</strong> ReLU: A² = (1 + 0)/2 = 0.5, C_W = 2. Linear: A² = (1 + 1)/2 = 1, C_W = 1.</p></blockquote>
+<p><strong>Why does the sigmoid fail the criticality test even though its activation is perfectly smooth? Compute the unphysical C_b it would need.</strong> <em>(conceptual)</em></p>
+<blockquote><p><strong>Answer:</strong> The condition χ⊥/χ∥ = 1 is met only at K* = 0, where the fixed-point relation forces C_b = −σ(0)²/σ′(0)² = −(1/2)²/(1/4) = −4 &lt; 0. A negative bias variance is unphysical, so no critical initialization exists. Shifting the activation so that σ(0) = 0 turns the sigmoid into a scaled tanh, which is critical.</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Compare measured signal propagation with the C_W = 1/A² prediction. (route: <code>/labs/initialization</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>§5.1 — criticality analysis of the kernel</li><li>§5.2 — scale-invariant activations, eq. (5.67)</li><li>§5.3.2 — activations without criticality</li></ul>
+<h3 id="lesson-7-universality-classes-tanh-sin-sigmoid-and-friends">Lesson 7. Universality classes: tanh, sin, sigmoid and friends</h3>
+<p><em>Numerically solving the second criticality condition sorts activations into classes with distinct deep behaviour: exact preservation, power-law decay, exponential failure, or a repulsive fixed point.</em></p>
+<p><em>Estimated study time:</em> 55 minutes · tier: advanced · built on: Chapter 5.3, 5.5</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Implement the criticality scan of §5.3.1 conceptually</li><li>Distinguish the K = 0 class from the no-criticality and half-stable cases</li><li>State the universal exponent and its coefficient for the K = 0 class</li></ul>
+<p><em>Read first:</em> Criticality for general activations: two conditions and the Kaiming initialization</p>
+<h4 id="the-numerical-criticality-algorithm">The numerical criticality algorithm</h4>
+<p>For a candidate fixed-point value [[kstar]], set C_W = 1/g′(K<em>) and C_b = K</em> − C_W g(K*). That satisfies the fixed-point equation and [[chi-parallel]] = 1 identically. The remaining condition [[chi-perp]] = 1 becomes a single dimensionless equation</p>
+<p><span class="math-display">$\frac{2 K_*^2 \, \mathbb{E}[\sigma'(z)^2]_{K_*}}{\mathbb{E}[\sigma(z)^2 (z^2 - K_*)]_{K_*}} = 1$</span> <em>Condition (5.73). Scan K</em> ≥ 0 for a root, then read off (C_b, C_W) and check that C_b ≥ 0.*</p>
+<p>This is exactly what the app computes in the criticality scanner: the ratio above is evaluated with Gauss-Hermite quadrature for any activation in the registry, including GELU and SWISH, and every root is reported together with its physicality and stability.</p>
+<blockquote><p><strong>Figure:</strong> susceptibility</p></blockquote>
+<h4 id="the-k-0-universality-class">The K = 0 universality class</h4>
+<p>If σ(0) = 0 and σ′(0) ≠ 0, the fixed point sits at [[kstar]] = 0 and the approach to it is a power law rather than an exponential, governed by [[a1]]. The exponent is universal, the coefficient is not.</p>
+<blockquote><p><strong>Figure:</strong> power-law</p></blockquote>
+<p><span class="math-display">$K^{(\ell)} = \frac{1}{(-a_1)\,\ell} + \cdots , \qquad a_1 = \gamma_1\gamma_3 + \tfrac{3}{4}\gamma_2^2$</span> <em>Power-law decay of the kernel at criticality. For tanh a₁ = −2 and for sin a₁ = −1, so both decay as 1/ℓ with different coefficients, exactly as the app measures.</em></p>
+<blockquote><p><strong>Why this is good news</strong> (insight)</p>
+<p>tanh at C_W = 1 keeps a slowly decaying but non-vanishing signal: [[kernel]] ~ 1/ℓ over hundreds of layers. Exponential decay would leave nothing to train on; a power law leaves order-one signal for any finite depth.</p></blockquote>
+<h4 id="the-other-classes">The other classes</h4>
+<ul><li>No criticality: sigmoid (unphysical C_b), softplus (no root at all), nonlinear monomials (the ratio p/(2p−1) equals one only for p = 1).</li><li>Half-stable: GELU and SWISH satisfy the conditions at a nonzero K<em>, but the K</em> = 0 fixed point is repulsive because a₁ &gt; 0.</li><li>Non-smooth activations such as the ReLU need the finite-angle analysis of §5.5, where the perpendicular mode develops a slow power-law decay rather than staying exactly constant.</li></ul>
+<blockquote><p><strong>A caveat stated in the source itself</strong> (warning)</p>
+<p>For nonlinear scale-invariant activations the constancy of the perpendicular component holds only at the level of infinitesimal perturbations. A finite-angle analysis shows a crossover to a slow power-law decay, which is benign compared to exponential behaviour but is not exact constancy.</p></blockquote>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. At criticality, how does the kernel of a tanh network behave with depth? </em>(hard)***</p>
+<ul><li>- It is exactly constant</li><li>- It decays exponentially</li><li>✓ <strong>It decays as a power law, <span class="math-inline">$K^{(\ell)} \sim 1/((-a_1)\ell)$</span> with <span class="math-inline">$a_1 = -2$</span></strong></li><li>- It grows logarithmically</li></ul>
+<blockquote><p><strong>Why:</strong> tanh belongs to the K = 0 class with a₁ = −2, so the kernel follows a benign 1/ℓ power law. The exponent 1 is universal; the coefficient depends on the activation.</p></blockquote>
+<p>*<em>Q. Why does the softplus activation fail to be critical? </em>(core)***</p>
+<ul><li>- Its derivative vanishes at the origin</li><li>✓ *<em>The criticality ratio never reaches one for K</em> ≥ 0**</li><li>- It is not differentiable</li><li>- Its C_W would be zero</li></ul>
+<blockquote><p><strong>Why:</strong> The ratio 2K<em>²E[σ′²]/E[σ²(z²−K</em>)] stays below one for all K* ≥ 0, so there is no nontrivial fixed point at all.</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>tanh at criticality with K⁽¹⁾ = 1: use the power law to estimate K at layer 200, then compare with the exact recursion from the app.</strong> <em>(numerical)</em></p>
+<blockquote><p><strong>Answer:</strong> Power law: K ≈ 1/(2·200) = 0.0025. The continuous version of the recursion, 1/((−a₁)(ℓ−1) + 1/K⁽¹⁾), gives 0.002506, and the exact quadrature recursion gives 0.002534 — the exact curve is larger because the asymptotic form drops the O(K³) terms. The app shows both curves and their difference.</p></blockquote>
+<p><strong>Why can the softplus not be rescued by subtracting log 2 so that σ(0) = 0?</strong> <em>(conceptual)</em></p>
+<blockquote><p><strong>Answer:</strong> With that shift the coefficient a₁ changes sign, so the K* = 0 fixed point becomes repulsive; away from K = 0 the parallel susceptibility exceeds one, and the kernel diverges exponentially. The fix must remove the offset while keeping a₁ negative.</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Run tanh, sin, sigmoid and GELU and classify them by measured behaviour. (route: <code>/labs/initialization</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>§5.3.1 — the criticality algorithm</li><li>§5.3.3 — K = 0 universality class, power law</li><li>§5.3.4 — half-stable classes</li><li>§5.5 — finite-angle analysis for non-smooth activations</li></ul>
+<h3 id="lesson-8-bayesian-learning-what-infinite-width-can-and-cannot-do">Lesson 8. Bayesian learning: what infinite width can and cannot do</h3>
+<p><em>Treated Bayesianly, an infinite-width network is exactly a Gaussian process whose predictions depend on the data only through the kernel. Its posterior cannot move the kernel, which is a precise statement of the absence of representation learning at infinite width.</em></p>
+<p><em>Estimated study time:</em> 50 minutes · tier: advanced · built on: Chapter 6</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the Gaussian-process description of an infinite-width network</li><li>Explain why the evidence prefers criticality</li><li>Explain why feature learning is impossible at infinite width but appears at finite width</li></ul>
+<p><em>Read first:</em> Universality classes: tanh, sin, sigmoid and friends</p>
+<h4 id="predictions-from-a-gaussian-process">Predictions from a Gaussian process</h4>
+<p>Bayesian model fitting starts from a prior over functions and conditions on the data. For an infinite-width network the prior is Gaussian with covariance K, so the posterior is Gaussian too and the mean prediction is a kernel regression formula.</p>
+<blockquote><p><strong>Figure:</strong> gp-posterior</p></blockquote>
+<blockquote><p><strong>What this figure is, and is not</strong> (limitation)</p>
+<p>This is the posterior of the <em>infinite-width</em> Gaussian process, computed in closed form by inverting the kernel matrix. It is not a finite-width Bayesian posterior: the finite-width corrections of Chapter 6, which generate the Hebbian wiring and the moving kernel, are not implemented here. The figure makes the limit concrete; Laboratory E measures what a finite-width network does instead.</p></blockquote>
+<p><span class="math-display">$\mu_*(x) = K_*(x)^T \left(K + \sigma_\epsilon^2 I\right)^{-1} y$</span> <em>Gaussian-process posterior mean: linear in the training labels, with no dependence on anything but the kernel.</em></p>
+<blockquote><p><strong>The evidence argument for criticality</strong> (insight)</p>
+<p>The marginal likelihood (evidence) rewards priors that can fit data without being too flexible. Evaluating the evidence for a Gaussian-process network shows a preference for order-one, critical hyperparameters — a second, independent route to the same tuning that the signal-propagation analysis produced.</p></blockquote>
+<h4 id="no-wiring-no-representation-learning">No wiring, no representation learning</h4>
+<p>Two structural facts follow. Correlation functions are delta-correlated across neurons at infinite width, so the network does not "wire together" features inside a layer. And the posterior depends on the data only through the kernel, which is fixed by the architecture and initialization: the representation cannot change. Introducing 1/n corrections generates both effects — Hebbian-style wiring and a moving kernel.</p>
+<blockquote><p><strong>Where the app stands</strong> (limitation)</p>
+<p>Laboratory E measures the finite-width drift of hidden features and of the empirical kernel; it does not implement Bayesian inference. The Bayesian results above are stated with citations, not simulated, and the app says so where they appear.</p></blockquote>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. In the infinite-width Bayesian picture, why can the network not learn a new representation? </em>(core)***</p>
+<ul><li>- The learning rate is too small</li><li>✓ <strong>The posterior depends on the data only through a kernel fixed at initialization</strong></li><li>- The loss is convex</li><li>- The biases are frozen</li></ul>
+<blockquote><p><strong>Why:</strong> The Gaussian-process posterior is a kernel regression: the covariance does not change with the data. Feature learning is a 1/n effect.</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>Why is "the kernel is frozen" equivalent to "no representation learning"?</strong> <em>(conceptual)</em></p>
+<blockquote><p><strong>Answer:</strong> The kernel is the collection of gradient inner products that controls how the network changes when trained. If it is fixed by initialization, training only changes the read-out in an already-fixed feature space; no hidden-layer feature can be re-shaped, so the representation is static.</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Measure feature drift as a function of width. (route: <code>/labs/representation</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>§6.2 — Bayesian model fitting and comparison</li><li>§6.3 — infinite-width Bayesian inference, evidence for criticality</li><li>§6.4 — finite-width Bayesian inference, Hebbian learning</li></ul>
+<h3 id="lesson-9-gradient-descent-and-the-neural-tangent-kernel">Lesson 9. Gradient descent and the neural tangent kernel</h3>
+<p><em>Gradient descent changes any observable through the NTK. At infinite width the NTK is deterministic and frozen, which turns training into kernel learning with closed-form dynamics; at finite width it fluctuates and defrosts.</em></p>
+<p><em>Estimated study time:</em> 60 minutes · tier: advanced · built on: Chapters 7-9</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the NTK and derive the update equation for an observable</li><li>State the frozen-NTK recursion for a deep network</li><li>Explain why the learning-rate tensor is scaled by 1/n per layer</li></ul>
+<p><em>Read first:</em> Bayesian learning: what infinite width can and cannot do</p>
+<h4 id="the-ntk-controls-learning">The NTK controls learning</h4>
+<p>A gradient step changes the parameters; the induced change of any observable is a sum over parameter gradients weighted by the loss gradient. All of the model-dependent information is collected in one kernel.</p>
+<blockquote><p><strong>Figure:</strong> ntk-closed-form</p></blockquote>
+<p><span class="math-display">$\Theta_{i_1 i_2; 1 2} = \sum_{\theta} \frac{\partial z_{i_1}(x_1)}{\partial \theta} \frac{\partial z_{i_2}(x_2)}{\partial \theta} , \qquad \Delta z_i(x) = -\eta \sum_{j, \tilde x} \Theta_{ij; x \tilde x}\, \epsilon_{j;\tilde x}$</span> <em>The NTK and the resulting change of the network output. The off-diagonal entries in the sample index are exactly the mechanism by which learning one example affects another.</em></p>
+<p><span class="math-display">$\Theta^{(\ell+1)} = K^{(\ell+1)} + \chi_\perp^{(\ell+1)}\,\Theta^{(\ell)} , \qquad \Theta^{(1)} = K^{(1)}$</span> <em>The frozen-NTK recursion of the effective theory (9.5)-(9.7). Because χ⊥ is the same susceptibility that appears in the criticality analysis, criticality of the kernel and criticality of the NTK are one story.</em></p>
+<h4 id="parameterization-matters">Parameterization matters</h4>
+<p>The raw sum over parameters in the NTK definition grows with the fan-in of each layer: a hidden layer contributes θ(1) to [[theta]] and the read-out another θ(1), so the total is θ(width). The book absorbs this by scaling the learning rate of a weight by 1/n_{ℓ−1}, so that the weight contribution to the effective kernel is O(1) and the large-width expansion is meaningful.</p>
+<p><span class="math-display">$\upsilon^{(W)}_{\ell} = \frac{\eta\, \lambda^{(W)}_{\ell}}{n_{\ell-1}} , \qquad \upsilon^{(b)}_{\ell} = \eta\, \lambda^{(b)}_{\ell}$</span> <em>The learning-rate tensor of eqs. (8.6). Laboratory D measures the width-linear growth of the raw NTK that motivates this scaling.</em></p>
+<blockquote><p><strong>What the app computes</strong> (insight)</p>
+<p>Laboratory D assembles the raw empirical NTK from exact Jacobians, checks symmetry and positive semidefiniteness, compares it against a closed-form two-layer ensemble prediction that the test suite validates, and measures its width scaling. The frozen recursion is displayed alongside, with the normalization convention stated explicitly.</p></blockquote>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. The NTK is <span class="math-inline">$\Theta(x,x') = \sum_\theta \partial f(x)/\partial\theta \cdot \partial f(x')/\partial\theta$</span>. For a single-layer linear network <span class="math-inline">$f = w\cdot x + b$</span>, what is <span class="math-inline">$\Theta(x,x')$</span>? </em>(core)***</p>
+<ul><li>- <span class="math-inline">$x\cdot x'$</span></li><li>✓ <strong><span class="math-inline">$x\cdot x' + 1$</span></strong></li><li>- <span class="math-inline">$3$</span></li><li>- <span class="math-inline">$\|x\|\|x'\|$</span></li></ul>
+<blockquote><p><strong>Why:</strong> The weight gradients give Σ_k x_k x′_k and the bias gradient contributes 1·1. The bias contribution is easy to forget and shows up in the app's test suite.</p></blockquote>
+<p>*<em>Q. How does the raw empirical NTK of a two-layer network scale with hidden width <span class="math-inline">$n_1$</span>? </em>(hard)***</p>
+<ul><li>- independent of <span class="math-inline">$n_1$</span></li><li>✓ <strong>linearly</strong></li><li>- as <span class="math-inline">$1/n_1$</span></li><li>- as <span class="math-inline">$\sqrt{n_1}$</span></li></ul>
+<blockquote><p><strong>Why:</strong> The read-out term accumulates n₁ independent contributions of O(1), so the trace grows linearly with width. This is why the book scales weight learning rates by 1/n per layer (eqs. (8.6)-(8.7)).</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>A two-layer tanh network, widths (4, 128, 1), C_W = 1, C_b = 0. Predict by what factor the empirical NTK trace changes when you quadruple the hidden width to 512.</strong> <em>(numerical)</em></p>
+<blockquote><p><strong>Answer:</strong> The read-out term n₁·g(K⁽¹⁾) dominates and grows linearly with n₁, so the trace grows by close to a factor of four — the closed form gives 3.82, not exactly four, because the first-layer term C_W·K̇·(x·x′ + 1) is width-independent and the read-out bias contributes a constant. Laboratory D reports the measured ratio and the closed-form prediction side by side.</p></blockquote>
+<p><strong>Why is the NTK called frozen at infinite width, and what thaws it?</strong> <em>(conceptual)</em></p>
+<blockquote><p><strong>Answer:</strong> At infinite width the parameter gradients are determined by the initialization and do not change as training proceeds, so Θ is constant in time. At finite width the 1/n corrections make the gradient directions drift as the weights move, which the book quantifies with the differential of the NTK (dNTK).</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Assemble the NTK from Jacobians and watch it defrost during training. (route: <code>/labs/ntk</code>)</p></blockquote>
+<blockquote><p>Also: Go down the loss itself: a read-out slice that is exactly quadratic, a hidden slice that is not, and the stability threshold read off the curvature. (route: <code>/labs/landscape</code>)</p></blockquote>
+<blockquote><p>Also: The eigenvalue, kernel and Gaussian-process arithmetic this lesson assumes, as graded drills. (route: <code>/labs/drills</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>§7.2 — gradient descent and function approximation</li><li>§8.0 — learning-rate tensor and the forward equation for the NTK</li><li>§9.1-9.3 — effective theory of the frozen NTK at initialization</li><li>§10.2 — kernel learning dynamics</li></ul>
+<h3 id="lesson-10-representation-learning-at-finite-width">Lesson 10. Representation learning at finite width</h3>
+<p><em>The difference between a kernel method and a neural network is the movement of the kernel. Measuring that movement — feature drift, kernel drift, class separation — shows it is a finite-width effect whose size shrinks as the network widens.</em></p>
+<p><em>Estimated study time:</em> 55 minutes · tier: advanced · built on: Chapters 10-11</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the differential of the NTK and interpret it</li><li>Measure feature drift and class separation in a trained network</li><li>Explain the kernel/large-width limit as a controlled approximation</li></ul>
+<p><em>Read first:</em> Gradient descent and the neural tangent kernel</p>
+<h4 id="the-kernel-moves">The kernel moves</h4>
+<p>Take the derivative of the NTK with respect to training time. What you get, the differential of the NTK (dNTK), is nonzero only because the parameter gradients themselves depend on the parameters — a purely finite-width phenomenon. Its flow is governed by the same four-point vertices that control non-Gaussianities.</p>
+<p><span class="math-display">$\frac{d\Theta}{dt} = \frac{\partial \Theta}{\partial \theta}\cdot \dot\theta \;\sim\; \frac{1}{n}\,\big(\text{four-point vertices}\big)$</span> <em>Sketch of the dNTK flow: the book’s statement is that it is nonzero at finite width and vanishes as 1/n. The application measures that the kernel moves, and it measures the movement; the 1/n scaling is the leading order of the flow, which a single training step does not by itself establish.</em></p>
+<p>The practical question is empirical: how much does the representation actually move in a small network trained on a real task? Laboratory E trains a two-dimensional classifier, snapshots hidden activations, and reports feature drift, kernel drift and a Fisher separation ratio, all computed from real forward passes, with the PCA limitation stated next to the projection.</p>
+<blockquote><p><strong>Figure:</strong> feature-drift</p></blockquote>
+<h4 id="kernel-methods-nonlinear-models-and-the-interpolation-between-them">Kernel methods, nonlinear models and the interpolation between them</h4>
+<p>A kernel method has no representation learning; a network has it. The infinite-width limit is therefore the boundary case that makes the network analytically tractable, and the 1/n expansion describes the departure from it. Generalization analyses that inherit the kernel picture should be read in that light.</p>
+<blockquote><p><strong>Honest scope note</strong> (limitation)</p>
+<p>This app measures the width dependence of feature drift in a small MLP on synthetic data. That is evidence for the qualitative finite-width picture, not a reproduction of the book's quantitative scaling laws for the dNTK.</p></blockquote>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. The differential of the NTK (dNTK) is </em>(core)***</p>
+<ul><li>- always zero, since the NTK is frozen in time</li><li>✓ <strong>nonzero in general and proportional to finite-width corrections</strong></li><li>- a second-order derivative of the loss</li><li>- the Hessian of the network output</li></ul>
+<blockquote><p><strong>Why:</strong> The dNTK measures how the NTK changes under training. It vanishes at infinite width, and its size tracks 1/n corrections — the quantitative signature of representation learning.</p></blockquote>
+<p>*<em>Q. You train the same network at widths 8, 64 and 512 for a fixed number of steps. What should happen to the measured feature drift? </em>(hard)***</p>
+<ul><li>- It increases with width</li><li>- It stays the same</li><li>✓ <strong>It decreases with width, approaching the frozen-kernel limit</strong></li><li>- It is random and unrelated to width</li></ul>
+<blockquote><p><strong>Why:</strong> Feature drift is a 1/n effect: wider networks behave more like kernel machines on the same training budget, so the representation moves less.</p></blockquote>
+<h4 id="exercises">Exercises</h4>
+<p><strong>Train the same two-moons network at widths 8, 32 and 128 for the same number of steps and compare the feature drift.</strong> <em>(code)</em></p>
+<blockquote><p><strong>Answer:</strong> Drift decreases with width in the app's measurement — 0.24, 0.10 and 0.04 at widths 8, 32 and 128 at the small step size the figure uses — and the class separation is best in the middle rather than at either end (Fisher 0.61, 0.67, 0.64), so moving further is not the same as separating better. The trend is a property of the regime, not of the width alone: raise the learning rate and the wide network overshoots, moving further than the narrow one, and the ordering reverses. The app reports the numbers rather than a fitted law.</p></blockquote>
+<blockquote><p><strong>Laboratory:</strong> Train, snapshot, measure drift and separation. (route: <code>/labs/representation</code>)</p></blockquote>
+<p><strong>Citations</strong></p>
+<ul><li>§10.4 — linear models, kernel methods and infinite-width networks</li><li>§11.1-11.3 — dNTK and representation learning</li></ul>
+<h2 id="appendix-a-equation-reference">Appendix A — Equation reference</h2>
+<p><strong>Gaussian second and fourth moments</strong> (warmup-gaussian)</p>
+<p><span class="math-display">$\mathbb{E}[z^2] = K, \qquad \mathbb{E}[z^4] = 3K^2, \qquad z \sim \mathcal{N}(0, K)$</span></p>
+<p><em>The two moments that make every first-layer calculation possible.</em> — from §1.1</p>
+<p>Symbols:</p>
+<ul><li><code>z</code> — a centred Gaussian random variable (a preactivation, typically)</li><li><code>K</code> — its variance — in network language, the kernel value K = q or K₁₁</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>z is exactly Gaussian</li><li>z is centred; a nonzero mean shifts the odd moments</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Start from the Gaussian integral ∫ dz e^{−z²/(2K)} = √(2πK).</li><li>Differentiate once with respect to K: ∫ dz z² e^{−z²/(2K)} = K·√(2πK) after normalization gives E[z²] = K.</li><li>Differentiate again: E[z⁴] = 3K², the value used in every Wick contraction of four fields.</li></ol>
+<p><strong>Worked example.</strong> K = 2, E[z²] = K = 2, E[z⁴] = 3K² = 12 → <strong>12</strong></p>
+<p><strong>MLP forward recursion</strong> (forward-recursion)</p>
+<p><span class="math-display">$z^{(\ell)} = W^{(\ell)} h^{(\ell-1)} + b^{(\ell)}, \qquad h^{(\ell)} = \sigma\!\left(z^{(\ell)}\right)$</span></p>
+<p><em>The object whose statistics the theory computes.</em> — from eq. (4.1)</p>
+<p>Symbols:</p>
+<ul><li><code>W^{(\ell)}</code> — weight matrix of layer ℓ, shape n_ℓ × n_{ℓ−1}</li><li><code>b^{(\ell)}</code> — bias vector of layer ℓ</li><li><code>\sigma</code> — elementwise activation function</li><li><code>n_\ell</code> — width of layer ℓ; n₀ is the input dimension</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>the activation acts elementwise</li><li>the read-out is linear unless stated otherwise</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Apply the affine map W^(ℓ)h^(ℓ−1) + b^(ℓ).</li><li>Insert the result into σ elementwise to obtain h^(ℓ).</li><li>Iterate from h^(0) = x to the output layer.</li></ol>
+<p><strong>Worked example.</strong> x = [0.5, −1.25], W^(1) = 2×2 matrix, entries ~ N(0, 1/n₀), σ = tanh → <strong>z^(1) = W^(1)x + b^(1), h^(1) = tanh(z^(1)) — evaluated exactly in Laboratory A</strong></p>
+<p><strong>Critical-scaled initialization</strong> (init-variance)</p>
+<p><span class="math-display">$W^{(\ell)}_{ij} \sim \mathcal{N}\!\left(0, \frac{C_W}{n_{\ell-1}}\right), \qquad b^{(\ell)}_i \sim \mathcal{N}(0, C_b)$</span></p>
+<p><em>The distribution that makes the infinite-width limit well defined.</em> — from eq. (4.2)</p>
+<p>Symbols:</p>
+<ul><li><code>C_W</code> — rescaled weight variance (dimensionless, O(1))</li><li><code>C_b</code> — bias variance</li><li><code>n_{\ell-1}</code> — fan-in of layer ℓ</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>weights are independent across layers and neurons</li><li>C_W and C_b are layer independent in the analysis</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>A preactivation is a sum of n_{ℓ−1} terms each of size W·h.</li><li>For the sum to have O(1) variance regardless of width, each weight variance must be O(1/n_{ℓ−1}).</li><li>Criticality then fixes the O(1) constant C_W.</li></ol>
+<p><strong>Worked example.</strong> n_{ℓ−1} = 64, C_W = 2 (ReLU critical), Var(W) = 2/64 = 0.03125 → <strong>sd(W) ≈ 0.177</strong> (Verified empirically in the test suite by measuring the sample variance of the initialized weights.)</p>
+<p><strong>Deep linear covariance</strong> (linear-covariance)</p>
+<p><span class="math-display">$G^{(\ell)}_{12} = C_W^{\ell} G^{(0)}_{12}$</span></p>
+<p><em>The exactly solvable case, and the origin of the word criticality.</em> — from eqs. (3.14)-(3.15)</p>
+<p>Symbols:</p>
+<ul><li><code>G^{(\ell)}_{12}</code> — width-averaged preactivation inner product for inputs x₁, x₂</li><li><code>G^{(0)}_{12}</code> — input inner product x₁·x₂</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>linear activation</li><li>zero bias</li><li>weights drawn as in eq. (4.2)</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Write z^(ℓ+1) = W^(ℓ+1)z^(ℓ) and take the expectation of the inner product of two copies.</li><li>The weights are independent of the preactivations, so Wick-contract them: E[W_iℓ W_jℓ] = (C_W/n_ℓ)δ_ij.</li><li>The sum over the n_ℓ neurons cancels the 1/n_ℓ, leaving G^(ℓ+1) = C_W G^(ℓ), hence G^(ℓ) = C_W^ℓ G^(0).</li></ol>
+<p><strong>Worked example.</strong> C_W = 1, G^(0) = ‖x‖²/n₀ = 1.5, ℓ = 40 → <strong>G^(40) = 1.5 — exactly preserved, layer after layer</strong> (At C_W = 0.9 the same quantity would be 1.5·0.9³⁹ ≈ 0.025.)</p>
+<p><strong>Parallel susceptibility</strong> (chi-parallel)</p>
+<p><span class="math-display">$\chi_\parallel(K) = C_W\, g'(K) = \frac{C_W}{2K^2}\,\mathbb{E}\big[\sigma(z)^2(z^2 - K)\big]_K$</span></p>
+<p><em>Per-layer growth factor of a perturbation that changes the magnitude of an input.</em> — from eq. (5.50)</p>
+<p>Symbols:</p>
+<ul><li><code>g(K)</code> — E[σ(z)²] for z ~ N(0,K)</li><li><code>\chi_\parallel</code> — growth factor of the parallel mode; equals one at criticality</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>infinite width (the kernel recursion is exact only in that limit)</li><li>Gaussian preactivations at each layer</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The single-input recursion is K^(ℓ+1) = C_b + C_W g(K^(ℓ)).</li><li>Linearize around a fixed point K<em>: K^(ℓ) = K</em> + δ^(ℓ) gives δ^(ℓ+1) = C_W g′(K*) δ^(ℓ) + O(δ²).</li><li>The stated integral form of g′(K) follows from differentiating under the Gaussian integral (identity (5.53)).</li></ol>
+<p><strong>Worked example.</strong> Activation = tanh, C_W = 1, K* = 0 → <strong>χ∥ = C_W·g′(0) = 1·(γ₁² + γ₀γ₂) = 1 — criticality</strong> (γ₁ = 1 and γ₀ = 0 for tanh, so the value is exactly 1.)</p>
+<p><strong>Perpendicular susceptibility</strong> (chi-perp)</p>
+<p><span class="math-display">$\chi_\perp(K) = C_W\, \mathbb{E}_{z\sim\mathcal{N}(0,K)}\big[\sigma'(z)^2\big]$</span></p>
+<p><em>Per-layer growth factor of a perturbation that changes the direction of an input at fixed magnitude.</em> — from eq. (5.51)</p>
+<p>Symbols:</p>
+<ul><li><code>\sigma'</code> — derivative of the activation</li><li><code>\chi_\perp</code> — growth factor of the angular mode</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>same as χ∥: infinite width, Gaussian preactivations</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Rotate the two-input kernel into the basis K^{[0]}, K^{[1]}, K^{[2]} of eq. (5.15).</li><li>The [2] component measures D = E[(z₊ − z₋)²], the squared difference of two same-magnitude inputs.</li><li>Its linearized recursion is K^{<a href="ℓ+1">2</a>} = χ⊥(K<em>)K^{<a href="ℓ">2</a>} + h(K</em>)K^{<a href="ℓ">1</a>}, so χ⊥ governs the angular mode.</li></ol>
+<p><strong>Worked example.</strong> Activation = ReLU, C_W = 2, K = any → <strong>χ⊥ = 2·E[σ′(z)²] = 2·(1/2) = 1 for every K — scale invariance makes criticality exact</strong></p>
+<p><strong>The two criticality conditions</strong> (criticality-conditions)</p>
+<p><span class="math-display">$\chi_\parallel(K_*) = 1, \qquad \chi_\perp(K_*) = 1, \qquad K_* = C_b + C_W g(K_*)$</span></p>
+<p><em>The definition of a well-behaved deep initialization.</em> — from eqs. (5.55)-(5.56)</p>
+<p>Symbols:</p>
+<ul><li><code>K_*</code> — the nontrivial fixed point of the kernel recursion</li><li><code>C_b, C_W</code> — the two initialization hyperparameters to be determined</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>the fixed point exists and is nontrivial</li><li>C_b ≥ 0 is required physically</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Require that perturbations of both kinds neither explode nor vanish: both susceptibilities equal one.</li><li>Together with the fixed-point equation this gives three conditions for three unknowns (C_b, C_W, K*).</li><li>For scale-invariant activations the susceptibilities are K independent, so the equations decouple and (C_b,C_W) = (0, 1/A²).</li></ol>
+<p><strong>Worked example.</strong> Activation = tanh, Solution = K* = 0, C_b = 0, C_W = 1/γ₁² = 1 → <strong>(C_b, C_W) = (0, 1) — the canonical K = 0 class point</strong></p>
+<p><strong>Scale-invariant criticality and Kaiming initialization</strong> (scale-invariant-critical)</p>
+<p><span class="math-display">$(C_b, C_W)^{\text{crit}} = \left(0, \frac{1}{A^2}\right), \qquad A^2 = \frac{a_+^2 + a_-^2}{2}$</span></p>
+<p><em>He/Kaiming initialization derived from a principle rather than tuned empirically.</em> — from eqs. (5.60)-(5.67)</p>
+<p>Symbols:</p>
+<ul><li><code>a_+</code> — slope for positive preactivations</li><li><code>a_-</code> — slope for negative preactivations</li><li><code>A^2</code> — the resulting constant, (a₊² + a₋²)/2</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>the activation is exactly scale invariant</li><li>C_b = 0 for a line of nontrivial fixed points</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>For σ(z) = a_±z, compute g(K) = A²K by two Gaussian integrals on half-lines.</li><li>Both susceptibilities collapse to the constant A²C_W.</li><li>Setting them equal to one gives C_W = 1/A²; the ReLU (A² = 1/2) reproduces the familiar factor of two.</li></ol>
+<p><strong>Worked example.</strong> ReLU = a₊ = 1, a₋ = 0 → A² = 0.5, Leaky ReLU(0.25) = a₋ = 0.25 → A² = 0.53125 → <strong>C_W = 2.000 and C_W = 1.882 respectively</strong> (Both values are reproduced by the app's criticality scanner using numerical quadrature.)</p>
+<p><strong>The numerical criticality condition</strong> (second-condition)</p>
+<p><span class="math-display">$\frac{2K_*^2\,\mathbb{E}[\sigma'(z)^2]_{K_*}}{\mathbb{E}[\sigma(z)^2(z^2 - K_*)]_{K_*}} = 1$</span></p>
+<p><em>A single dimensionless equation to scan for the fixed-point value K</em>.* — from eq. (5.73)</p>
+<p>Symbols:</p>
+<ul><li><code>K_*</code> — candidate fixed-point kernel value</li><li><code>\mathbb{E}[\cdot]_{K_*}</code> — expectation under z ~ N(0, K*)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>C_W and C_b are then fixed by eqs. (5.71)-(5.72) and must satisfy C_b ≥ 0</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Fix a candidate K<em>. Set C_W = 1/g′(K</em>) so that χ∥ = 1 automatically.</li><li>Set C_b = K<em> − C_W g(K</em>) so that K* is a fixed point.</li><li>The remaining condition χ⊥ = 1 becomes the ratio above, independent of the hyperparameters.</li></ol>
+<p><strong>Worked example.</strong> sigmoid at K* → 0 = ratio → γ₁²/(γ₁² + γ₀γ₂) = 1, implied C_b = −σ(0)²/σ′(0)² = −4 &lt; 0 → unphysical → <strong>no critical initialization for the sigmoid</strong> (The app's scanner plots this ratio for every activation in the registry.)</p>
+<p><strong>K = 0 class: power-law kernel decay</strong> (kzero-power-law)</p>
+<p><span class="math-display">$K^{(\ell)} = \frac{1}{(-a_1)\,\ell} + \cdots, \qquad a_1 = \gamma_1\gamma_3 + \tfrac{3}{4}\gamma_2^2$</span></p>
+<p><em>Why tanh and sin survive at criticality while decaying gently.</em> — from eqs. (5.90)-(5.92)</p>
+<p>Symbols:</p>
+<ul><li><code>\gamma_p</code> — Taylor coefficients of σ: σ(z) = Σ γ_p z^p/p!</li><li><code>a_1</code> — coefficient of K² in g(K); negative for tanh and sin</li><li><code>\ell</code> — layer index</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>σ(0) = 0 and σ′(0) ≠ 0</li><li>C_W = 1/γ₁², C_b = 0</li><li>large ℓ (asymptotic statement)</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Expand g(K) = γ₁²K + a₁K² + … using the Taylor expansion of σ and Gaussian moments.</li><li>The recursion becomes K^(ℓ+1) = K^(ℓ) + a₁(K^(ℓ))², i.e. dK/dℓ = a₁K² in the continuum.</li><li>Integrating gives K^(ℓ) ≈ 1/((−a₁)ℓ): a universal exponent 1 with an activation-dependent coefficient.</li></ol>
+<p><strong>Worked example.</strong> tanh = γ₁ = 1, γ₃ = −2 → a₁ = −2, sin = γ₁ = 1, γ₃ = −1 → a₁ = −1, ℓ = 200 → <strong>K^(200) ≈ 0.0025 (tanh) versus ≈ 0.005 (sin)</strong> (The exact recursion (quadrature) gives slightly larger values due to the O(1) offset and K³ corrections; the app displays both.)</p>
+<p><strong>Finite-width fluctuation law</strong> (fluctuation-law)</p>
+<p><span class="math-display">$\mathrm{Var}\Big[\tfrac{1}{n}\textstyle\sum_j (z_j^{(\ell)})^2\Big] = \frac{2\ell\,(G^{(2)})^2}{n} + O\!\left(\frac{1}{n^2}\right)$</span></p>
+<p><em>How strongly one instantiation deviates from the ensemble average, and how that grows with depth.</em> — from eqs. (3.28), (3.33)</p>
+<p>Symbols:</p>
+<ul><li><code>G^{(2)}</code> — the kernel K^(ℓ), constant in ℓ at criticality</li><li><code>n</code> — hidden width</li><li><code>\ell</code> — layer index</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>deep linear network</li><li>critical initialization C_W = 1</li><li>single input</li><li>leading order in 1/n</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Compute the connected four-point correlator of a deep linear network: G⁽⁴⁾ − (G⁽²⁾)² = 2(ℓ−1)(G⁽²⁾)²/n.</li><li>The variance of the layer observable picks up this connected piece plus a 2G⁽⁴⁾/n term.</li><li>Combining them gives Var = 2ℓ(G⁽²⁾)²/n to leading order — linear in depth, suppressed by width.</li></ol>
+<p><strong>Worked example.</strong> ℓ = 10, n = 64, G^(2) = 1 → <strong>Var ≈ 20/64 = 0.3125, sd ≈ 0.56 — verified in the app against 400 seeded networks</strong></p>
+<p><strong>Neural tangent kernel</strong> (ntk-definition)</p>
+<p><span class="math-display">$\Theta_{i_1i_2;12} = \sum_\theta \frac{\partial z_{i_1}(x_1)}{\partial \theta}\cdot\frac{\partial z_{i_2}(x_2)}{\partial \theta}$</span></p>
+<p><em>The kernel that governs how outputs change under gradient descent.</em> — from eq. (7.17)</p>
+<p>Symbols:</p>
+<ul><li><code>\theta</code> — all trainable parameters, weights and biases</li><li><code>z_{i}(x)</code> — output component i of the network on input x</li><li><code>\Theta</code> — the NTK; a Gram matrix of parameter gradients</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>differentiable model</li><li>independent of the loss function used for training</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>A gradient step changes parameters by Δθ = −η g.</li><li>Expand an observable to first order in Δθ and collect the parameter gradients.</li><li>The term multiplying the loss gradient is the NTK; its off-diagonal sample entries transfer learning between examples.</li></ol>
+<p><strong>Worked example.</strong> Model = f(x) = w·x + b (single linear layer), Gradient pieces = ∂f/∂w_k = x_k, ∂f/∂b = 1 → <strong>Θ(x,x′) = x·x′ + 1 — checked exactly in the test suite</strong></p>
+<p><strong>Frozen NTK recursion</strong> (ntk-recursion)</p>
+<p><span class="math-display">$\Theta^{(\ell+1)} = K^{(\ell+1)} + \chi_\perp^{(\ell+1)}\,\Theta^{(\ell)}, \qquad \Theta^{(1)} = K^{(1)}$</span></p>
+<p><em>How the kernel of the frozen NTK builds up with depth.</em> — from eqs. (9.5)-(9.7)</p>
+<p>Symbols:</p>
+<ul><li><code>\Theta^{(\ell)}</code> — the ℓ-th-layer NTK, in the normalization of eqs. (8.6)-(8.7)</li><li><code>\chi_\perp</code> — the same perpendicular susceptibility as in the criticality analysis</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>infinite width (the mean NTK)</li><li>weight learning rates rescaled by 1/n_{ℓ−1}, as in eq. (8.6)</li><li>single-input (diagonal) evaluation of χ⊥</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Split the parameter sum of the (ℓ+1)-th-layer NTK into its own layer plus all earlier layers.</li><li>The own-layer piece is the kernel K^(ℓ+1); the earlier layers propagate through the derivative kernel E[σ′σ′] = χ⊥/C_W.</li><li>Iterating gives Θ^(ℓ+1) = K^(ℓ+1) + χ⊥Θ^(ℓ) with the first-layer initial condition Θ^(1) = K^(1).</li></ol>
+<p><strong>Worked example.</strong> Linear net, C_W = 1, C_b = 0 = K^(ℓ) = K^(1), χ⊥ = 1, Depth = L → <strong>Θ^(L) = L·K^(1) — each layer contributes the input kernel once</strong> (For the raw (un-normalized) NTK the read-out term instead grows linearly with the hidden width; the app measures both.)</p>
+<p><strong>Kernel-learning dynamics</strong> (kernel-learning)</p>
+<p><span class="math-display">$z(x; t+1) - z(x; t) = -\eta \sum_{\tilde x \in \mathcal{A}} \Theta_{x\tilde x}\, \frac{\partial L_{\mathcal{A}}}{\partial z(\tilde x)}$</span></p>
+<p><em>Training as linear evolution in function space when the NTK is frozen.</em> — from eqs. (7.19)-(7.20)</p>
+<p>Symbols:</p>
+<ul><li><code>\mathcal{A}</code> — the training set</li><li><code>\eta</code> — learning rate</li><li><code>L_{\mathcal{A}}</code> — training loss</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>small learning rate (first-order expansion)</li><li>frozen NTK — exact only at infinite width</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Take the first-order Taylor expansion of an observable in the parameter change.</li><li>Substitute the gradient-descent update Δθ = −η∂L/∂θ.</li><li>Identify the NTK as the coefficient of the loss gradient; for MSE the loss gradient is the prediction error.</li></ol>
+<p><strong>Worked example.</strong> Training set = one example, Loss = MSE, Θ = constant in time → <strong>error decays geometrically: ε(t) = (1 − ηΘ)^t ε(0) — the loss curve of the app's optimization lab in the linear regime</strong></p>
+<p><strong>Gradient-descent stability for a quadratic loss</strong> (gradient-descent-stability)</p>
+<p><span class="math-display">$\theta_{t+1} = \theta_t - \eta\, H\, \theta_t \quad\text{converges} \iff \eta &lt; \frac{2}{\lambda_{\max}(H)}$</span></p>
+<p><em>Why too large a learning rate makes the loss explode, and where the threshold sits.</em> — from §7.2, §10.2</p>
+<p>Symbols:</p>
+<ul><li><code>H</code> — Hessian of the loss; for a linear read-out H = (2/M)ΦᵀΦ</li><li><code>\lambda_{\max}</code> — largest eigenvalue of H — the curvature of the stiffest direction</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>quadratic (linear-model) loss</li><li>full-batch gradient descent</li><li>fixed learning rate</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Diagonalize H; in the eigenbasis each mode evolves independently as (1 − ηλ_i)^t.</li><li>A mode converges iff |1 − ηλ_i| &lt; 1, i.e. η &lt; 2/λ_i.</li><li>The binding constraint is the largest eigenvalue, giving the stated threshold.</li></ol>
+<p><strong>Worked example.</strong> Read-out features = computed from the frozen hidden layer, λ_max(H) = measured from the feature Gram matrix → <strong>the app displays λ_max, the predicted threshold 2/λ_max and the measured loss curves on both sides of it</strong></p>
+<p><strong>Differential of the NTK</strong> (dntk)</p>
+<p><span class="math-display">$\frac{d\Theta}{dt} = \left(\frac{\partial \Theta}{\partial \theta}\right)\cdot\dot\theta \;\propto\; \frac{1}{n}$</span></p>
+<p><em>The quantitative measure of representation learning.</em> — from §11.1-11.2</p>
+<p>Symbols:</p>
+<ul><li><code>d\Theta/dt</code> — time derivative of the NTK along the training trajectory</li><li><code>n</code> — hidden width</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>finite width, since the object vanishes identically at infinite width</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Differentiate the NTK definition with respect to training time.</li><li>The derivative is nonzero only because the parameter gradients depend on the parameters themselves.</li><li>That dependence is mediated by four-point (interaction) vertices, whose size is suppressed by 1/n.</li></ol>
+<p><strong>Worked example.</strong> Measured quantity = ‖Θ(t) − Θ(0)‖_F / ‖Θ(0)‖_F in Laboratory E → <strong>decreases with width in the app's measurements; the exact rate depends on the task and hyperparameters</strong></p>
+<h2 id="appendix-b-notation">Appendix B — Notation</h2>
+<table><thead><tr><th>Symbol</th><th>Name</th><th>Meaning</th></tr></thead><tbody><tr><td>n_l</td><td>layer width</td><td>number of neurons in layer l (n₀ is the input dimension)</td></tr><tr><td>L</td><td>depth</td><td>number of layers, including the output layer</td></tr><tr><td>C_W</td><td>rescaled weight variance</td><td>Var(W_ij^(l)) = C_W / n_{l-1}</td></tr><tr><td>C_b</td><td>bias variance</td><td>Var(b_i^(l)) = C_b</td></tr><tr><td>z^(l)</td><td>preactivation</td><td>the vector before the activation in layer l</td></tr><tr><td>K^(l)</td><td>kernel</td><td>infinite-width mean of the preactivation inner product; the two-point correlator G^(l)</td></tr><tr><td>g(K)</td><td>single-input expectation</td><td>E[σ(z)²] for z ~ N(0,K)</td></tr><tr><td>χ∥</td><td>parallel susceptibility</td><td>C_W g′(K): growth of magnitude perturbations</td></tr><tr><td>χ⊥</td><td>perpendicular susceptibility</td><td>C_W E[σ′(z)²]_K: growth of angular perturbations</td></tr><tr><td>a₁</td><td>quartic coupling</td><td>O(K²) coefficient of g(K); controls the K = 0 fixed-point stability</td></tr><tr><td>Θ</td><td>neural tangent kernel</td><td>sum of parameter-gradient inner products, governing GD dynamics</td></tr><tr><td>η</td><td>learning rate</td><td>step size of the gradient update</td></tr><tr><td>ℓ</td><td>layer index</td><td>used interchangeably with l for the layer position</td></tr></tbody></table></main>
+</div>
+<footer class="pager">
+  <div><a href="agentic-ai-academy.html">← Agentic AI Academy</a></div>
+  <div></div>
+</footer>
+</body>
+</html>

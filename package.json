@@ -21,6 +21,7 @@
     "verify:standalone": "node scripts/verify-standalone.mjs",
     "test:e2e": "node scripts/run-e2e.mjs",
     "collect:lessons": "node scripts/collect-lessons.mjs",
+    "textbooks": "node scripts/compile-textbooks.mjs && node scripts/render-textbook-html.mjs",
     "sync:catalogue": "node scripts/sync-catalogue.mjs",
     "sync:authors": "node scripts/sync-authors.mjs",
     "sync:citations": "node scripts/sync-course-citations.mjs",
