@@ -18,7 +18,9 @@
  * file.
  *
  * The file holds no components, so that a test running outside the browser
- * — the end-to-end suite — can read it.
+ * — the end-to-end suite — can read it. Nothing is imported here either: the
+ * laboratory count below is checked against the registry by
+ * `src/content/labs.test.ts`, rather than pulled in from it.
  */
 
 /** A page of the course. */

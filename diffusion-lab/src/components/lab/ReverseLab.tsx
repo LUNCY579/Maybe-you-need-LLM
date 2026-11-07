@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react'
 import { createRng, fmt, l2Distance } from '@llm-materials/course-core'
 import { buildSchedule } from '../../core/schedules'
 import { qSample } from '../../core/forward'
-import { ancestralStep, ddimStep, reverseMean, sample, toEpsilon, toX0 } from '../../core/reverse'
+import { networkEvaluations, reverseMean, sample, toEpsilon, toX0 } from '../../core/reverse'
 import type { Parameterisation, ReverseConfig } from '../../core/reverse'
-import { ringMixture, trainDenoiser } from '../../core/denoiser'
+import { ringMixture, trainDenoiser, TOY_MODEL } from '../../core/denoiser'
 import type { TrainingResult } from '../../core/denoiser'
 import { Button, Callout, Figure, Panel, SegmentedControl, Slider, Stat } from '@llm-materials/course-ui'
 import { DataTable, PointChart, TrendChart } from '@llm-materials/course-ui'
@@ -13,6 +13,8 @@ type View = 'sampling' | 'parameterisations'
 
 const SCHEDULE = buildSchedule('linear', 200)
 const DIMENSION = 2
+const HIDDEN_SIZES = [32, 32]
+const TRAJECTORY_MARKS_EVERY = 10
 
 export function ReverseLab() {
   const [view, setView] = useState<View>('sampling')
@@ -22,7 +24,7 @@ export function ReverseLab() {
   const [sampler, setSampler] = useState<'ancestral' | 'ddim'>('ancestral')
   const [parameterisation, setParameterisation] = useState<Parameterisation>('epsilon')
 
-  const data = useMemo(() => ringMixture(createRng(seed), 400, 8), [seed])
+  const data = useMemo(() => ringMixture(createRng(seed), TOY_MODEL.dataPoints, TOY_MODEL.modes), [seed])
 
   const train = () => {
     setIsTraining(true)
@@ -32,12 +34,15 @@ export function ReverseLab() {
       const result = trainDenoiser(
         {
           dimension: DIMENSION,
-          hiddenSizes: [32, 32],
+          hiddenSizes: HIDDEN_SIZES,
           timeEmbeddingDimension: 8,
           schedule: SCHEDULE,
           seed,
         },
-        { steps: 900, batchSize: 64, recordEvery: 50 },
+        // The screen plots `data` as the training data, so it has to be the array the network is
+        // actually trained on; TOY_MODEL is the budget the prose on this screen and the landing
+        // page both quote.
+        { steps: TOY_MODEL.steps, batchSize: TOY_MODEL.batchSize, recordEvery: TOY_MODEL.recordEvery, data },
       )
       setModel(result)
       setIsTraining(false)
@@ -49,31 +54,40 @@ export function ReverseLab() {
     [parameterisation],
   )
 
-  const trace = useMemo(() => {
-    if (!model) return null
-    return sample((x, t) => model.denoiser.predict(x, t), config, seed, {
-      ddim: sampler === 'ddim',
-    })
+  // Four complete chains. Striding by ten and applying a one-step formula across the gap is a
+  // different process from the one the table below reports, so the plot shows real states.
+  const chains = useMemo(() => {
+    if (!model) return []
+    return Array.from({ length: 4 }, (_, sampleIndex) =>
+      sample((x, t) => model.denoiser.predict(x, t), config, seed + sampleIndex * 977, {
+        ddim: sampler === 'ddim',
+      }),
+    )
   }, [model, config, seed, sampler])
 
-  const trajectories = useMemo(() => {
-    if (!model) return []
-    const rng = createRng(seed + 31)
-    return Array.from({ length: 4 }, (_, sampleIndex) => {
-      let current = [rng() * 2 - 1, rng() * 2 - 1]
-      const points = [{ x: current[0], y: current[1] }]
-      for (let t = SCHEDULE.steps - 1; t >= 0; t -= 10) {
-        const prediction = model.denoiser.predict(current, t)
-        const result =
-          sampler === 'ddim'
-            ? ddimStep(current, t, prediction, config, rng, 0)
-            : ancestralStep(current, t, prediction, config, rng, true)
-        current = result.xPrevious
-        points.push({ x: current[0], y: current[1] })
-      }
-      return { sampleIndex, points }
-    })
-  }, [model, config, seed, sampler])
+  const trace = chains[0] ?? null
+
+  const trajectories = useMemo(
+    () =>
+      chains.map((chain, sampleIndex) => ({
+        sampleIndex,
+        points: chain.states
+          .filter((_, index) => index % TRAJECTORY_MARKS_EVERY === 0)
+          .map(([x, y]) => ({ x, y })),
+      })),
+    [chains],
+  )
+
+  const endDistances = useMemo(
+    () =>
+      chains.map((chain) => {
+        const final = chain.states[chain.states.length - 1]!
+        let nearest = Number.POSITIVE_INFINITY
+        for (const point of data) nearest = Math.min(nearest, l2Distance(final, point))
+        return nearest
+      }),
+    [chains, data],
+  )
 
   const parameterisationRows = useMemo(() => {
     const x0 = [1.1, -0.6]
@@ -103,14 +117,10 @@ export function ReverseLab() {
   )
 
   const sampleQuality = useMemo(() => {
-    if (!model || !trace) return null
-    const final = trace.states[trace.states.length - 1]
-    let nearest = Number.POSITIVE_INFINITY
-    for (const point of data) {
-      nearest = Math.min(nearest, l2Distance(final, point))
-    }
-    return { radius: Math.hypot(final[0], final[1]), nearest }
-  }, [model, trace, data])
+    if (!trace || endDistances.length === 0) return null
+    const final = trace.states[trace.states.length - 1]!
+    return { radius: Math.hypot(final[0], final[1]), nearest: endDistances[0]! }
+  }, [trace, endDistances])
 
   return (
     <div className="lab">
@@ -168,9 +178,17 @@ export function ReverseLab() {
             ) : (
               <>
                 <div className="stat-row">
-                  <Stat label="Final loss" value={fmt(model.finalLoss, 4)} hint="mean squared error on ε" />
+                  <Stat
+                    label="Final loss"
+                    value={fmt(model.finalLoss, 4)}
+                    hint="the last batch's squared error on ε, summed over both coordinates"
+                  />
                   <Stat label="Training steps" value={String(model.losses.length)} hint="recorded points" />
-                  <Stat label="Network evaluations" value={String(SCHEDULE.steps)} hint="one per sampling step" />
+                  <Stat
+                    label="Network evaluations"
+                    value={String(networkEvaluations(SCHEDULE, SCHEDULE.steps))}
+                    hint="one per sampling step, at the schedule's full length"
+                  />
                   {sampleQuality ? (
                     <Stat
                       label="Sample radius"
@@ -183,8 +201,8 @@ export function ReverseLab() {
 
                 <Figure
                   title="The training loss"
-                  description="The simplified objective during training: the mean squared error between the true noise and the network's prediction of it, over the training steps."
-                  caption="The loss on the simplified objective. It falls as the network learns to predict the noise at each noise level."
+                  description={`The simplified objective during training: the squared error between the true noise and the network's prediction of it, recorded every ${TOY_MODEL.recordEvery} steps.`}
+                  caption="The loss on the simplified objective. Each point is a single batch's estimate, summed over both coordinates, so the curve is noisy; the claim is only that the batches late in training are smaller than the batches early in it."
                 >
                   <TrendChart
                     data={lossCurve}
@@ -197,8 +215,8 @@ export function ReverseLab() {
 
                 <Figure
                   title="The reverse process, from noise to data"
-                  description="Four sampled trajectories through the reverse chain, plotted at intervals, with the training data shown behind them."
-                  caption="Four samples drawn from the trained model, with their intermediate states. The chain starts as pure noise and ends on the ring of modes."
+                  description="Four complete sampling chains from the trained model, drawn at every tenth state they visit, with the training data shown behind them."
+                  caption={`Four samples drawn from the trained model, with their intermediate states. The chain starts as pure noise and ends on the ring of modes: the furthest of these four endpoints from any training point is ${fmt(Math.max(...endDistances), 2)} away, while the ring itself has radius 2.`}
                 >
                   <PointChart
                     points={[
@@ -223,24 +241,32 @@ export function ReverseLab() {
 
                 <DataTable
                   caption="The chain, step by step, for one sample"
-                  headers={['Step', 'State', 'Radius']}
+                  headers={['Step', 'State after the step', 'Radius']}
                   rows={
                     trace
                       ? trace.steps
-                          .filter((_, index) => index % 20 === 0)
                           .map((step, index) => {
-                            const state = trace.states[index + 1]
-                            return [step, `(${fmt(state[0], 3)}, ${fmt(state[1], 3)})`, fmt(Math.hypot(state[0], state[1]), 3)]
+                            // states[0] is the noise the chain started from, so the state after
+                            // steps[index] is states[index + 1] — the pairing has to be made before
+                            // the rows are thinned out, or the two arrays drift apart.
+                            const state = trace.states[index + 1]!
+                            return [
+                              step,
+                              `(${fmt(state[0], 3)}, ${fmt(state[1], 3)})`,
+                              fmt(Math.hypot(state[0], state[1]), 3),
+                            ] as (string | number)[]
                           })
+                          .filter((_, index) => index % 20 === 0)
                       : []
                   }
                 />
 
                 <Callout tone="warning" title="This is a toy model, trained on toy data">
-                  The network is a two-layer perceptron with 32 hidden units, trained for 900 steps on 400 points drawn
-                  from a generated ring of eight Gaussian modes. It is a real diffusion model, trained with a real
-                  gradient, on a distribution that is easy enough to fit in a second — and it is not a model of images,
-                  and it is not a model of anything a paper has published a number for.
+                  The network is a two-layer perceptron with {HIDDEN_SIZES[0]} hidden units per layer, trained for{' '}
+                  {TOY_MODEL.steps} steps on the {data.length} points plotted above, drawn from a generated ring of{' '}
+                  {TOY_MODEL.modes} Gaussian modes. It is a real diffusion model, trained with a real gradient, on a
+                  distribution small enough to fit in this tab in seconds — and it is not a model of images, and it is
+                  not a model of anything a paper has published a number for.
                 </Callout>
               </>
             )}

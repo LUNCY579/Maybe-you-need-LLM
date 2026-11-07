@@ -19,10 +19,12 @@ import {
   lessonNeighbours,
 } from './curriculum'
 import { QUIZ_BANK, questionsForLesson, quizStats } from './quiz'
+import { LABS, PLAYGROUND_LAB_IDS } from './labs'
 import { FORMULAS, GLOSSARY, formulasForLesson, glossaryForLesson } from './glossary'
 import { LESSON_LOADERS } from './lessons/registry'
 import { EXPLANATIONS, EXPLANATION_BY_LESSON } from './explanations'
 import { ProgressProvider } from '../state/ProgressContext'
+import { LandingPage } from '../pages/Landing'
 import { KnowledgeCheck } from '../components/lesson/LessonChrome'
 
 const MODULE_IDS = MODULES.map((m) => m.id)
@@ -124,9 +126,8 @@ describe('curriculum structure', () => {
   })
 
   it('every lesson declares a known interactive lab', () => {
-    const known = ['transformer', 'tokenizer', 'sampling', 'learning', 'alignment', 'inference', 'prompt']
     for (const lesson of LESSONS) {
-      expect(known).toContain(lesson.interactive.lab)
+      expect(PLAYGROUND_LAB_IDS).toContain(lesson.interactive.lab)
       expect(lesson.interactive.title.length).toBeGreaterThan(3)
       expect(lesson.minutes).toBeGreaterThan(0)
     }
@@ -364,5 +365,18 @@ describe('lesson rendering', () => {
       expect(visibleText(html)).toContain(questionsForLesson(lesson.id)[0].prompt.replace(/\s+/g, ' '))
       expect(visibleText(html)).toContain('Knowledge check')
     }
+  })
+})
+
+describe('the course home', () => {
+  it('lists every arm of the playground the registry declares', () => {
+    // The list is built from `src/content/labs.ts`, so an arm added to the
+    // registry appears here without anyone remembering to update a paragraph.
+    const text = visibleText(renderInApp(<LandingPage />))
+    for (const lab of LABS) {
+      expect(text, `the course home omits ${lab.title}`).toContain(lab.title)
+      expect(text, `${lab.title} is listed with no description`).toContain(lab.blurb)
+    }
+    expect(text).toContain(`${LABS.length} laboratories`)
   })
 })

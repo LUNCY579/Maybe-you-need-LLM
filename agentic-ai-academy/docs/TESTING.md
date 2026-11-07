@@ -22,7 +22,7 @@ npm run e2e         # playwright test (against the production build)
 | Content validation | `npm run check:content` | **pass** — 0 errors, 0 warnings; 12 lessons, 73 sections, 94 questions, 120 glossary terms, 9 registered laboratories, 23/23 chapters covered |
 | Type check | `npm run typecheck` | **pass** — 0 errors (strict TypeScript, `noUnusedLocals`, `noUnusedParameters`) |
 | Lint | `npm run lint` | **pass** — 0 errors, 3 warnings (see §6) |
-| Unit + component tests | `npm test` | **pass** — 42 files, **484 tests**, 0 failures |
+| Unit + component tests | `npm test` | **pass** — 47 files, **542 tests**, 0 failures |
 | Production build | `npm run build` | **pass** — `dist/` produced, no bundler errors |
 | Browser tests (Chromium) | `npm run e2e` | **pass** — **95 tests**, 0 failures — in the run recorded in §3, which predates the four newest laboratories |
 | Browser tests (all engines) | `npx playwright test` | **pass** — **235 passed**, 50 skipped (the audit runs on Chromium only), 0 failures — same run, same caveat |
@@ -44,9 +44,9 @@ and WebKit 27.2.
 
 ---
 
-## 2. Unit and component tests (484)
+## 2. Unit and component tests (542)
 
-Forty-two files, 484 tests, all green in one `vitest run`. Every file in the suite is listed here, and
+47 files, 542 tests, all green in one `vitest run`. Every file in the suite is listed here, and
 every count below is the number of tests that run reported for that file, so the section is a
 statement about the suite rather than a sample of it.
 
@@ -132,7 +132,7 @@ options is a genuine parse error — `\frac{1}{` raises `ParseError: Unexpected 
 argument, expected '}'` — and that is the defect an author can actually introduce, the one the reader
 would otherwise hide as an error box. All 19 authored blocks parse.
 
-### `src/content/docsClaims.test.ts` — the documentation that counts things (6)
+### `src/content/docsClaims.test.ts` — the documentation that counts things (9)
 
 Three files quote the size of the browser suites, and every one of those numbers was typed by hand.
 Typed numbers rot silently: `docs/TESTING.md` had said "forty-six journeys" for an audit that held
@@ -148,6 +148,18 @@ compares it with a count taken from the files that define the suite.
 - Every route in the laboratory registry is audited by axe-core, and every laboratory with its own
   route is visited by the smoke suite — the registry cannot gain a screen the browser suites never
   open.
+- Every section heading in this file that counts the assertions in a test file counts at least as
+  many as that file writes. A bracketed figure above the literal count is allowed only where the file
+  generates assertions from more than it writes, so `src/App.test.tsx` — one `it.each` over the
+  laboratory routes, one loop over the lessons — is legitimate and a padded number is not. Two of the
+  forty-two figures had drifted by the time the check was written, and both were in the files the
+  learned compressor touched.
+- The size of the unit suite — the README, the §1 results table and the §6 appendix — names the file
+  count read off the tree, and a test total that is below the assertions those files write fails. An
+  honest figure here has to rise when the suite does, which is the direction these numbers rot in.
+- That listing is checked in both directions: a documented file has to be in the repository, and a
+  test file added under `src/` has to be listed before the suite goes green — which is how the four
+  deep-dive screens were briefly in the run and not in the document.
 
 It proves that the documents describe the repository. It cannot prove that the browser suites pass,
 because the Playwright browsers are not downloaded here, and §3 says so.
@@ -247,7 +259,7 @@ that *is* retrieved can still fail, by landing in the middle of the window. Sele
 can crowd the decisive passage out. The window never holds more than was asked for, the engine is
 deterministic, and the answer is never right without the decisive passage.
 
-### `src/engine/demos/contextWindow.test.ts` — the context window (16)
+### `src/engine/demos/contextWindow.test.ts` — the context window (28)
 
 Everything fits when the window is large enough; the prompt never exceeds the budget under any
 policy at any size; the instruction and the task are protected from truncation; a window too small
@@ -256,6 +268,33 @@ fact; retrieval keeps it; compression keeps the item but loses the detail inside
 moves the overflow to a store rather than destroying it, and can recall the wrong item; the
 policies disagree, so there is something for the student to discover; and the engine is
 deterministic.
+
+Twelve of those assertions are about the fifth policy, which is fitted rather than written. It is
+trained on the other windows and never shown this one's answer key; flipping which item is decisive
+in the held-out window leaves every score byte-identical, which is the check that `critical` sits on
+the right-hand side of the fit and nowhere on its left. The recorded loss curve starts at the cost of
+guessing every item at fifty-fifty, never rises, and ends well below where it opened; the same
+settings give the same weights, and a shorter run gives worse ones. Every score lies in the range the
+panel prints, and the ranking agreement is counted pair by pair — reported exactly, including the
+window where it is not perfect. Then the three results the policy exists to show: it keeps the
+delivery date in full where the hand-written summary dropped it, it reproduces the paper's own caveat
+on the report window by ranking the headline figure third and shortening it, and it learns the
+opposite of the truncation rule — a negative weight on recency, in all three fits.
+
+### `src/ui/demos/ContextWindowDemo.test.tsx` — the context-window screen (7)
+
+The fifth screen test, and the same method as the four deep-dive laboratories below: nothing is
+stored as an expected string. The panel's numbers are recomputed from the engine the panel renders —
+the training-set counts, the first and last loss, every feature label, note and signed weight, the
+intercept, each decision row and its score to three decimals, the pairs ordered correctly and the
+resulting ranking figure. Two of the seven are the story rather than the arithmetic: the report
+window at its own budget shows the wrong answer beside the explanation that the compressor kept the
+document and lost the detail, and the same window widened to the tokens that item asks for shows the
+right answer with the figure no longer compressed — the caveat is the room it was given, not the
+ranking. The learned policy is offered as a radio button with the honest accessible name
+*trained on the other windows*, the last two buttons and the panel's scope note are on the page, and
+the protected rows carry no score badge, because a scorer that never sees them has no business
+ranking them.
 
 ### `src/ui/builder/JsonObjectEditor.test.tsx` — the JSON argument field (6)
 
@@ -426,13 +465,19 @@ the same pure engine the screen calls, with the same configuration, and asserts 
 the page *is* the figure computed — so a screen cannot keep displaying a number its engine stopped
 producing.
 
-### `src/content/declaredLabs.test.ts` — the registry against the collection manifest (7)
+### `src/content/declaredLabs.test.ts` — the registry against the collection manifest (17)
 
-Every item `LABS[].delivers` promises is an item the collection manifest declared for this course,
-quoted byte for byte; every declared item is attributed to a manifest source that lists it and is
-owned by exactly one laboratory; a laboratory that declares anything names a source. The remaining
-assertions walk the declared items one at a time, so an item that stops being delivered fails by
-name rather than as a count.
+Every item the registry promises is an item the collection manifest declared for this course, quoted
+byte for byte; every declared item is attributed to a manifest source that lists it and is owned by
+exactly one entry; an entry that declares anything names a source and a component that exists. The
+registry is read as one list — `LABS[].delivers` for the laboratory routes and `DEMO_DELIVERIES[]` for
+the demonstrations that live inside a lesson — because the audit reads it that way, and a promise
+pointed at a demonstration is no less a promise. The remaining assertions walk the declared items one
+at a time, so an item that stops being delivered fails by name rather than as a count. One of those
+named tests is the Gist item, and it fails if the compressor stops being trained on the other windows,
+if its recorded loss curve stops descending from chance, or if the report window stops showing the
+caveat. The last assertion in the file is the collection's own bottom line: no manifest idea for this
+course is left without an entry claiming it.
 
 ### `src/content/collection.test.ts` — the course's place in the collection (12)
 
@@ -515,6 +560,53 @@ sweep, family by family.
 Turns the rewrite budget off and shows the rescued answers become abstentions; moves the hop margin
 and shows the hop coverage move with it; renders the three Chapter 12 items each under its own tab;
 and is deterministic — the same settings give the same figures on a second render.
+
+### `src/pages/labs/PlanningLabPage.test.tsx` — the Lab A screen (6)
+
+The four laboratories that came before the deep dives now hold the same line as the ones that
+followed them. Lab A: opens on the greedy failure with the budget, failure and replan counts quoted
+from the run; the detailed-results table equals `runAllStrategies` row for row; switching to the
+search planner moves the outcome sentence and the step-trace tab label with it; turning slip up makes
+the table differ from the deterministic table it replaced, and it still equals the engine; the
+reflective trace has exactly as many rows as the run has steps, and the rows flagged failed are as
+many as the failure count; a new seed changes the run, step by step, in the deterministic world too.
+
+### `src/pages/labs/MemoryLabPage.test.tsx` — the Lab B screen (7)
+
+Prints the four tiles from `runMemoryLab` at the recommended settings, including the
+kept-critical fraction and the retrieved-critical hint; carries the declared §9.3.2.3 item as the
+write-and-read bookkeeping — the store size moves by one arrival and one eviction per tick, the read
+side scores exactly the surviving store, and retrieved plus omitted is the store again; shrinks the
+store to two with recency retrieval and shows the critical facts lost and the decision turn wrong;
+re-ranks retrieval when the relevance weight moves and prints every new score to three decimals;
+rolls the scratchpad and prints how many events fell out of it at both ends of the budget, including
+the honest fact that the widest budget offered still cannot hold the whole stream; tabulates the four
+comparison configurations; and restores the recommended settings from the controls.
+
+### `src/pages/labs/WorldModelLabPage.test.tsx` — the Lab C screen (6)
+
+Prints both agents' measured reward, success, steps and mean divergence, and the reward sentence from
+the configured object; carries the declared model-free-versus-model-based item as the mechanism each
+arm produced — a curve as long as the episode count against a plan as long as the sweep count, and two
+greedy policies whose arrows are the engine's, cell for cell, and are not the same arrows; carries the
+declared world-model item as the divergence panel, whose rows are the worst-diverging visited states
+in descending order, whose predicted branches normalise to one, and whose tile is the mean of exactly
+the rows listed; shows that with slip at zero the model has no error at all and both agents arrive;
+turns the accuracy down and shows the divergence rise while the reward tile does not move, which is
+the reason the lab prints model error as its own number; re-plots the curve when the episode count
+moves, including the down-sampling rule that stops applying at forty episodes.
+
+### `src/pages/labs/MultiAgentLabPage.test.tsx` — the Lab D screen (7)
+
+Prints the score, the lost-message count, the defects caught and the defects that reach the answer
+from the same run the panel renders; carries the declared multi-agent item as the per-role bookkeeping
+— five roles listed, each with the engine's sent, received, introduced and caught counts, the messages
+summing to the log and the one receive-only role reporting no dropped send; tabulates the handoff
+summary and the message log against that trace, with the grouped counts adding back to the log;
+lists how each subtask ended; turns the verifier off and shows the defects arriving with a summary
+that now says no verification step was in the loop; applies each preset and shows the measured line
+printed under it rather than the promised one; and moves the channel reliability down to show the
+score paying for the messages the tile counts.
 
 ---
 
@@ -782,7 +874,7 @@ Nine sources of flakiness were found and removed rather than papered over:
   setup line was deleted rather than reworded, because the method is always
   replaced in jsdom anyway.
 
-The numbers in §1 are from the runs recorded here: 42 unit files and 484 unit tests, all green in
+The numbers in §1 are from the runs recorded here: 47 unit files and 542 unit tests, all green in
 one `vitest run`; 95 browser tests per engine, 235 passing across Chromium, Firefox and WebKit, with
 the accessibility checks running on Chromium only. The browser suite has since grown by one smoke
 test and eight audit pages for the four deep-dive laboratories, the interaction audit has grown by a

@@ -34,6 +34,10 @@ export function SchedulesLab() {
   )
 
   const terminalBits = terminalKLDivergence(schedule) / Math.log(2)
+  // effectiveDiffusionLength counts steps and so runs one ahead of the zero-based timestep every
+  // other figure on this screen uses. The hint names that timestep, otherwise the two read as a
+  // mismatch.
+  const halfLife = schedule.alphaBars.findIndex((value) => value < 0.5)
 
   return (
     <div className="lab">
@@ -76,13 +80,17 @@ export function SchedulesLab() {
           <Stat
             label="Effective length"
             value={String(effectiveDiffusionLength(schedule))}
-            hint="the step where ᾱ falls below 0.5"
+            hint={
+              halfLife < 0
+                ? 'ᾱ never falls below 0.5 on this schedule'
+                : `the first timestep whose ᾱ is below 0.5 is t = ${halfLife}`
+            }
           />
         </div>
 
         <Figure
           title="The cumulative signal ᾱ_t"
-          description="For both schedules, the fraction of the original signal still present at each timestep, on a logarithmic scale."
+          description="For both schedules, the fraction of the original signal still present at each timestep."
           caption="ᾱ_t against t. The paper's linear schedule spends its early steps with almost all the signal intact; the cosine schedule destroys the signal faster at the start and keeps it longer through the middle."
         >
           <TrendChart
@@ -92,15 +100,15 @@ export function SchedulesLab() {
               { key: 'cosine', name: 'Cosine', colour: 'var(--accent-rose)' },
             ]}
             xLabel="timestep t"
-            yLabel="ᾱ_t (log scale)"
+            yLabel="ᾱ_t"
             height={280}
           />
         </Figure>
 
         <Figure
           title="The signal-to-noise ratio"
-          description="For both schedules, the signal-to-noise ratio at each timestep, on a logarithmic scale, with a reference line at one."
-          caption="SNR(t) on a log scale. The point where it crosses one is where the state stops being mostly signal."
+          description="For both schedules, the signal-to-noise ratio at each timestep, with a reference line at one."
+          caption="SNR(t) on a linear axis, so the early decades of the fall are compressed against the top of the plot. The point where it crosses one is where the state stops being mostly signal."
         >
           <TrendChart
             data={snrCurve}
@@ -109,7 +117,7 @@ export function SchedulesLab() {
               { key: 'cosine', name: 'Cosine', colour: 'var(--accent-rose)' },
             ]}
             xLabel="timestep t"
-            yLabel="SNR (log scale)"
+            yLabel="SNR"
             height={280}
             referenceLines={[{ y: 1, label: 'SNR = 1' }]}
           />

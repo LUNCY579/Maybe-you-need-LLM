@@ -123,6 +123,21 @@ export interface TrainingResult {
 }
 
 /**
+ * The budget of the toy model the laboratory trains in the browser.
+ *
+ * The interface quotes these numbers — in the laboratory and on the landing page — so they live
+ * beside the function that consumes them rather than in a component. `steps` is the budget at
+ * which the samples land on the ring, which is the property the figures test asserts.
+ */
+export const TOY_MODEL = {
+  steps: 3000,
+  batchSize: 64,
+  recordEvery: 100,
+  dataPoints: 400,
+  modes: 8,
+} as const
+
+/**
  * Train a denoiser with the simplified objective.
  *
  * L_simple(θ) = E_{t, x_0, ε} [ ‖ε − ε_θ(√ᾱ_t x_0 + √(1−ᾱ_t) ε, t)‖² ]

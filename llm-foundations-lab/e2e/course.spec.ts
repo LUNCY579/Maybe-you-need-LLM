@@ -515,8 +515,11 @@ test('the speculative decoding view computes the acceptance, not a stored table'
   const noise = page.getByRole('slider', { name: /^Draft noise/ })
   await temp.fill('1')
   await noise.fill('0')
-  await expect(page.getByText('1.0000').first()).toBeVisible()
-  await expect(page.getByText('5.000', { exact: true })).toBeVisible()
+  // The two figures belong to the stats they are named under: α is the acceptance, and the
+  // expected tokens per pass is k + 1. The draft-length table below prints the same numbers once
+  // the draft is perfect, so each assertion is read from its own stat.
+  await expect(page.getByText('Acceptance α').locator('+ p')).toHaveText('1.0000')
+  await expect(page.getByText('Expected tokens / pass').locator('+ p')).toHaveText('5.000')
 
   // Hand the draft some noise again and the output is no longer degenerate.
   await noise.fill('0.9')

@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { LABS } from './labs'
 
@@ -88,6 +88,105 @@ describe('the documentation that counts the suites', () => {
     expect(Number(heading![2])).toBe(AUDIT_PAGES)
     // Declared may exceed run: the run predates the pages added since.
     expect(Number(heading![1])).toBeLessThanOrEqual(AUDIT_PAGES)
+  })
+
+  it('counts every file it counts, counted from the file', () => {
+    // The figure in brackets on a section heading is how many assertions that file makes. It
+    // drifts the same way the journey count did, and two of the forty-two had already drifted
+    // when this check was written. A literal `it(` is a floor rather than an exact count: a
+    // file may expand one call into many, which is why `src/App.test.tsx` claims more than it
+    // writes — and the surplus is only allowed where the file really does generate, so a padded
+    // figure still fails.
+    const sections = [...TESTING.matchAll(/^### `([^`]+)`[^\n]*?\((\d+)\)/gm)]
+    expect(sections.length).toBeGreaterThan(30)
+    for (const [, file, claimedText] of sections) {
+      const claimed = Number(claimedText)
+      const path = resolve(process.cwd(), file)
+      expect(existsSync(path), `${file} is documented but is not in the repository`).toBe(true)
+      const source = readFileSync(path, 'utf8')
+      const written = (source.match(/^\s*(?:it|test)(?:\.\w+)?\(/gm) ?? []).length
+      expect(claimed, `${file} writes ${written} assertions; the document claims ${claimed}`).toBeGreaterThanOrEqual(written)
+      if (claimed > written) {
+        const generates = /for \(|\.(map|forEach|each)\(/.test(source)
+        expect(generates, `${file} claims ${claimed} assertions from ${written} places and generates none`).toBe(true)
+      }
+    }
+  })
+
+  it('quotes the size of the unit suite from the files that make it up', () => {
+    // Three places state how big the unit suite is: the results table and §2 of this
+    // document, and the README's testing section. The file count is read off the tree, so it
+    // is exact; the test count is the assertions every file writes, which is a floor rather
+    // than a total because a generated test is invisible to a static read. A figure that has
+    // fallen behind the suite it describes therefore fails, and one ahead of it is allowed
+    // only where some file genuinely generates.
+    const files: string[] = []
+    const walk = (directory: string) => {
+      for (const entry of readdirSync(directory, { withFileTypes: true })) {
+        const path = join(directory, entry.name)
+        if (entry.isDirectory()) walk(path)
+        else if (/\.test\.tsx?$/.test(entry.name)) files.push(path)
+      }
+    }
+    walk(resolve(process.cwd(), 'src'))
+    const written = files.reduce(
+      (sum, file) => sum + (readFileSync(file, 'utf8').match(/^\s*(?:it|test)(?:\.\w+)?\(/gm) ?? []).length,
+      0,
+    )
+    const generates = files.some((file) => /for \(|\.(map|forEach|each)\(/.test(readFileSync(file, 'utf8')))
+
+    const claims: { where: string; total: number; files: number | null }[] = []
+    const readme = /# (\d+) unit and component tests across (\d+) files/.exec(README)
+    expect(readme, 'README.md no longer states the size of the unit suite').not.toBeNull()
+    claims.push({ where: 'README.md', total: Number(readme![1]), files: Number(readme![2]) })
+
+    const results = /— (\d+) files, \*\*(\d+) tests\*\*/.exec(TESTING)
+    expect(results, 'docs/TESTING.md §1 no longer states the size of the unit suite').not.toBeNull()
+    claims.push({ where: 'docs/TESTING.md §1', total: Number(results![2]), files: Number(results![1]) })
+
+    const section = /## 2\. Unit and component tests \((\d+)\)/.exec(TESTING)
+    expect(section, 'docs/TESTING.md §2 no longer states the size of the unit suite').not.toBeNull()
+    claims.push({ where: 'docs/TESTING.md §2', total: Number(section![1]), files: null })
+
+    const appendix = /(\d+) unit files and (\d+) unit tests/.exec(TESTING)
+    expect(appendix, 'docs/TESTING.md no longer states the size of the unit suite in its appendix').not.toBeNull()
+    claims.push({ where: 'docs/TESTING.md §6', total: Number(appendix![2]), files: Number(appendix![1]) })
+
+    for (const claim of claims) {
+      if (claim.files !== null) {
+        expect(claim.files, `${claim.where} names ${claim.files} files; the tree holds ${files.length}`).toBe(files.length)
+      }
+      expect(claim.total, `${claim.where} claims ${claim.total} tests; the files write ${written}`).toBeGreaterThanOrEqual(
+        written,
+      )
+      if (claim.total > written) {
+        expect(generates, `${claim.where} is ahead of the written count and no file generates tests`).toBe(true)
+      }
+    }
+  })
+
+  it('lists every file that makes up the unit suite', () => {
+    // §2 states that every file in the suite is listed there, and the check above proves only
+    // the other direction — that a listed file exists. A new test could therefore join the
+    // suite and stay undocumented, which is what happened to the four deep-dive screens.
+    const files: string[] = []
+    const walk = (directory: string, prefix: string) => {
+      for (const entry of readdirSync(directory, { withFileTypes: true })) {
+        const path = join(directory, entry.name)
+        const shown = `${prefix}/${entry.name}`
+        if (entry.isDirectory()) walk(path, shown)
+        else if (/\.test\.tsx?$/.test(entry.name)) files.push(shown)
+      }
+    }
+    walk(resolve(process.cwd(), 'src'), 'src')
+
+    const listed = new Set(
+      [...TESTING.matchAll(/^### `([^`]+)`/gm)].map((match) => match[1].replace(/\\/g, '/')),
+    )
+    for (const file of files) {
+      expect(listed.has(file), `${file} is in the suite but not listed in docs/TESTING.md §2`).toBe(true)
+    }
+    expect(listed.size, 'docs/TESTING.md §2 lists a file the suite does not have').toBe(files.length)
   })
 })
 

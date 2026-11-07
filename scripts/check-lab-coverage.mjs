@@ -27,6 +27,14 @@
  * declares its own mappings (see `src/content/labs.ts` in mech-interp-lab), and the missing
  * word printed beside every `gap` row, which `--find` expands into every tier.
  *
+ * A declaration and a pairing are not the same thing, and the report keeps them in separate
+ * columns. `declares` counts the items an application’s registry claims; `paired` counts the
+ * ones whose screen the audit could actually find — either the file named by the entry’s
+ * `screen:` field, or the one whose name is the entry’s `id` without its `Lab` suffix. An
+ * item that is declared but not paired is still carried by the word matcher, which is worth
+ * knowing before it is worth calling green, so `--gaps` prints those rows too and `--json`
+ * reports the resolved path under `unit`.
+ *
  * Matching is deliberately conservative: an item is only claimed by a file that says its
  * rarest word, plus half of its other discriminating words (`requirements` explains why
  * those are the right two halves). When the bar is missed the row stays a `gap` even if a
@@ -40,9 +48,9 @@
  *   node scripts/check-lab-coverage.mjs --json
  *
  * `--strict` is non-zero unless every declared item has a unit behind it, which is how a
- * course is closed. Without it the script reports and exits 0, so the collection-wide
- * number can stay in `verify` while the sixteen applications are still being worked
- * through.
+ * course is closed. All sixteen of them are closed, so `verify` prints the report and then
+ * asserts over the whole collection. Without `--strict` the script only reports and exits
+ * 0, which is what a run in the middle of building an arm needs to be.
  */
 
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
@@ -313,21 +321,61 @@ function testTitles(paths, appDirectory) {
  * saying that a particular unit answers a particular promise. Apps that have not adopted
  * the convention return an empty map and fall back to the text scan below, which is why
  * the tiers are reported separately rather than collapsed into one number.
+ *
+ * The strings are read whole, and reading them whole is the one place in this file that
+ * cannot be done with words. A literal is taken from its opening quote to the matching
+ * one, so an apostrophe inside a double-quoted item — `summaries of a user's
+ * interactions` — is text rather than a delimiter. Pairing quotes by scanning left to
+ * right is what this function used to do, and it cost two of the collection's 200
+ * declarations: the audit simply could not see an item that had been written down
+ * correctly, and reported it as a row the application had not claimed.
+ *
+ * An entry may name its screen explicitly with `screen: 'PlanningLabPage'`. Without it
+ * the screen is the file whose name is the entry's `id` with the `Lab` suffix dropped, and
+ * that convention does not reach an application whose pages are `…LabPage.tsx` and whose
+ * ids are kebab-case routes. The field exists so that such an application can still state
+ * the pairing instead of leaving it to a name rule.
  */
 function registryOf(files) {
   const map = new Map()
+  const LITERAL = /(['"`])((?:\\.|(?!\1)[^\\\n]){4,200})\1/g
   for (const entry of files) {
     for (const match of entry.source.matchAll(/\bdelivers\s*:\s*\[([\s\S]*?)\]/g)) {
-      const before = entry.source.slice(0, match.index)
-      const ids = [...before.matchAll(/\bid\s*:\s*(['"])([^'"\n]+)\1/g)].map((m) => m[2])
-      const lab = ids[ids.length - 1]
-      if (!lab) continue
-      for (const literal of match[1].matchAll(/(['"])([^'"\n]{4,200})\1/g)) {
-        map.set(normalise(literal[2]), { lab, file: entry.path })
+      const declaration = nearestDeclaration(entry.source.slice(0, match.index))
+      if (declaration === undefined) continue
+      for (const literal of match[1].matchAll(LITERAL)) {
+        map.set(normalise(unquote(literal[2])), { ...declaration, file: entry.path })
       }
     }
   }
   return map
+}
+
+/**
+ * The `id` and the optional `screen` that belong to a `delivers` block.
+ *
+ * Both are taken from the text above the block, and `screen` only counts when it sits
+ * between this `id` and the block: a registry that names its screens for two entries out
+ * of nine must not have the seventh one's items pair with the second one's page.
+ */
+function nearestDeclaration(before) {
+  const FIELD = /\b(id|screen)\s*:\s*(['"`])((?:\\.|(?!\2)[^\\\n])*)\2/g
+  let lab
+  let screen
+  for (const field of before.matchAll(FIELD)) {
+    if (field[1] === 'id') {
+      lab = unquote(field[3])
+      screen = undefined
+    } else if (lab !== undefined) {
+      screen = unquote(field[3])
+    }
+  }
+  return lab === undefined ? undefined : { lab, screen }
+}
+
+/** The text a source literal stands for: a backslash before a quote is punctuation. */
+function unquote(text) {
+  return text.replace(/\\(['"`\\])/g, '$1')
 }
 
 /** Two strings name the same idea when the only differences are spaces and punctuation. */
@@ -343,6 +391,13 @@ function scanApp(app) {
         .filter((path) => !path.includes('.test.'))
         .map((path) => ({ path: show(directory, path), ...fileText(path) })),
     ),
+    // Every component in the application, whatever directory its authors chose. This is
+    // not word evidence — it is the address book a `screen:` declaration is looked up in,
+    // so that an application whose surfaces live in `src/ui/demos` or `src/pages/builder`
+    // can still point a declaration at the file that computes the item.
+    surfaces: filesIn(directory, 'src', '.tsx')
+      .filter((path) => !path.includes('.test.'))
+      .map((path) => ({ path: show(directory, path), ...fileText(path) })),
     modules: MODULE_DIRS.flatMap((relativeDirectory) =>
       filesIn(directory, relativeDirectory, '.ts')
         .filter((path) => !path.includes('.test.'))
@@ -362,13 +417,14 @@ function scanApp(app) {
  * registry is worth — are testable against a fixture, and a fixture is a handful of
  * objects rather than a directory tree.
  */
-function makeScan({ screens = [], modules = [], tests = [], content = [] }) {
+function makeScan({ screens = [], surfaces = [], modules = [], tests = [], content = [] }) {
   const registry = registryOf([...content, ...modules])
   // A word's document frequency is measured over every file, so that a word's meaning does
   // not depend on which tier the evidence happens to sit in.
   const all = [...screens, ...modules, ...tests, ...content]
   return {
     screens,
+    surfaces,
     modules,
     tests,
     content,
@@ -385,6 +441,17 @@ function makeScan({ screens = [], modules = [], tests = [], content = [] }) {
   }
 }
 
+/** The screen a registry entry points at, by name if it gave one and by convention if not. */
+function findScreen(scan, mapping) {
+  if (mapping.screen !== undefined) {
+    return (
+      scan.screens.find((entry) => entry.name === mapping.screen) ??
+      (scan.surfaces ?? []).find((entry) => entry.name === mapping.screen)
+    )
+  }
+  return scan.screens.find((entry) => entry.name.replace(/lab$/i, '').toLowerCase() === mapping.lab.toLowerCase())
+}
+
 /** The strongest kind of evidence a declared item has, and where it came from. */
 function judge(item, scan) {
   const needed = requirements(item, scan.df, scan.fileCount)
@@ -396,9 +463,12 @@ function judge(item, scan) {
 
   const mapping = scan.registry.get(normalise(item))
   const declared = mapping !== undefined
-  const screen = declared
-    ? scan.screens.find((entry) => entry.name.replace(/lab$/i, '').toLowerCase() === mapping.lab.toLowerCase())
-    : undefined
+  // The registry says which screen computes the item, either by naming the file outright
+  // with `screen:` or by the convention that the entry’s `id` is that file’s name without
+  // its `Lab` suffix. Which of the two worked is reported, because a declaration whose
+  // screen cannot be found is a claim the audit is still carrying on the word matcher’s
+  // behalf.
+  const screen = declared ? findScreen(scan, mapping) : undefined
   // A screen is checked either by a test that names it, or by a test that renders the
   // registry the item was declared in — `for (const lab of LABS) render(LAB_SCREENS[lab.id])`
   // exercises every screen, including ones no test mentions by name.
@@ -435,6 +505,7 @@ function judge(item, scan) {
     status,
     evidence,
     lab: mapping?.lab,
+    unit: declared && screen ? screen.path : declared ? 'unpaired' : undefined,
     where: declared && screen ? [mapping.file, screen.path] : [...screenHits, ...moduleHits].slice(0, 2).map((entry) => entry.path),
     tests: (declared && checked ? [screen] : testHits.slice(0, 1)).map((entry) => entry.path),
     taughtIn: taughtHits.slice(0, 2).map((entry) => entry.path),
@@ -497,8 +568,8 @@ function main() {
         'usage: node scripts/check-lab-coverage.mjs [--app <id>] [--gaps] [--json] [--strict]',
         '',
         '  --app     restrict the audit to one application (repeatable)',
-        '  --gaps    list the items with no unit behind them, and the items whose unit is',
-        '            not named by a test',
+        '  --gaps    list the items with no unit behind them, the items whose unit is',
+        '            not named by a test, and the registry declarations that name no screen',
         '  --find    for items whose text contains this, show the nearest file and the',
         '            word that stopped it — how a gap row is checked by hand',
         '  --json    the whole audit as one document',
@@ -573,6 +644,7 @@ function main() {
     built: tally('built'),
     taught: tally('taught'),
     gap: tally('gap'),
+    paired: rows.reduce((sum, row) => sum + pairedCount(row), 0),
   }
 
   if (options.json) {
@@ -582,13 +654,13 @@ function main() {
   } else {
     console.log(`Declared laboratory ideas: ${totals.declared} across ${rows.length} applications (manifest ${manifest.version}, verified ${manifest.lastVerified}).`)
     console.log('')
-    const header = ['application', 'declared', 'tested', 'mapped', 'built', 'taught', 'gap', 'screens', 'modules', 'declares', 'checks']
+    const header = ['application', 'declared', 'tested', 'mapped', 'built', 'taught', 'gap', 'screens', 'modules', 'declares', 'paired', 'checks']
     const widths = header.map((name) => Math.max(name.length, ...rows.map((row) => String(cell(row, name)).length)))
     const line = (cells) => cells.map((value, index) => String(value).padEnd(widths[index])).join('  ')
     console.log(line(header))
     for (const row of rows) {
       if (row.missing) {
-        console.log(line([row.app, row.declared, 'no', 'such', 'directory', '', '', '', '', '', '', '']))
+        console.log(line([row.app, row.declared, 'no', 'such', 'directory', '', '', '', '', '', '', '', '']))
         continue
       }
       console.log(
@@ -603,23 +675,28 @@ function main() {
           row.counts.screens,
           row.counts.modules,
           row.counts.registry,
+          cell(row, 'paired'),
           row.counts.testCases,
         ]),
       )
     }
-    console.log(line(['total', totals.declared, totals.tested, totals.mapped, totals.built, totals.taught, totals.gap, '', '', '', '']))
+    console.log(line(['total', totals.declared, totals.tested, totals.mapped, totals.built, totals.taught, totals.gap, '', '', '', totals.paired, '']))
     console.log('')
     console.log('tested  a unit is the item and something checks it · mapped  a registry names the unit, no test found')
     console.log('built   a unit’s own words are the item · taught  only the course text names it · gap  nothing does')
+    console.log('declares  items the application’s registry claims · paired  of those, the ones whose screen was found')
 
     if (options.gaps) {
       for (const row of rows) {
         const results = row.results ?? []
         const unbacked = results.filter((result) => result.status === 'gap' || result.status === 'taught')
         const unchecked = results.filter((result) => result.status === 'built' || result.status === 'mapped')
-        if (unbacked.length === 0 && unchecked.length === 0) continue
+        const unpaired = results.filter((result) => result.unit === 'unpaired')
+        if (unbacked.length === 0 && unchecked.length === 0 && unpaired.length === 0) continue
         console.log('')
-        console.log(`${row.app} — ${unbacked.length} with no unit behind them, ${unchecked.length} reaching a unit but not checked`)
+        console.log(
+          `${row.app} — ${unbacked.length} with no unit behind them, ${unchecked.length} reaching a unit but not checked, ${unpaired.length} declared by a registry that names no screen`,
+        )
         for (const result of unbacked) {
           let evidence
           if (result.status === 'taught') {
@@ -638,6 +715,12 @@ function main() {
         for (const result of unchecked) {
           console.log(`  [${result.status.padEnd(6)}] ${result.item}  (${result.source}) — ${result.where.join(', ')}`)
         }
+        for (const result of unpaired) {
+          // A declaration that names a screen no file answers to is the registry pointing
+          // at nothing. The item still counts as tested if a test happens to share its
+          // words, which is exactly why the pairing is printed rather than folded in.
+          console.log(`  [unpaired] ${result.item}  (${result.source}) — registry entry “${result.lab}” has no screen; add screen: '…' or rename the file`)
+        }
       }
     }
   }
@@ -651,9 +734,15 @@ function count(row, status) {
   return (row.results ?? []).filter((result) => result.status === status).length
 }
 
+/** How many of an application’s declared items name a screen the audit could find. */
+function pairedCount(row) {
+  return (row.results ?? []).filter((result) => result.unit && result.unit !== 'unpaired').length
+}
+
 function cell(row, name) {
   if (name === 'application') return row.app
   if (name === 'declared') return row.declared
+  if (name === 'paired') return pairedCount(row)
   if (name === 'screens') return row.counts?.screens ?? 0
   if (name === 'modules') return row.counts?.modules ?? 0
   if (name === 'declares') return row.counts?.registry ?? 0

@@ -14,6 +14,7 @@ import { Callout, Figure, Panel, Slider, Stat } from '@llm-materials/course-ui'
 import { DataTable, PointChart } from '@llm-materials/course-ui'
 
 const SCHEDULE = buildSchedule('linear', 200)
+const IMAGE = { size: 256, channels: 3, factor: 8, latentChannels: 4 }
 
 export function LatentLab() {
   const [latentDimension, setLatentDimension] = useState(1)
@@ -58,22 +59,29 @@ export function LatentLab() {
   )
 
   const saving = useMemo(
-    () => compressionSaving(256, 256, 3, 8, 4),
+    () => compressionSaving(IMAGE.size, IMAGE.size, IMAGE.channels, IMAGE.factor, IMAGE.latentChannels),
     [],
   )
 
   const snrComparison = useMemo(() => {
-    const rows: { x: number; pixel: number; latent: number }[] = []
+    const rows: { x: number; pixel: number; plain: number; latent: number }[] = []
     const latentVariance = mean(variances)
     for (let t = 0; t < SCHEDULE.steps; t += 10) {
       const alphaBar = SCHEDULE.alphaBars[t]
       const signal = alphaBar
       const noise = 1 - alphaBar
-      // In the latent space the same schedule is applied to data whose
-      // variance is not one, so the effective SNR changes.
-      const latentSignal = (alphaBar * latentVariance) / scale ** 2
+      // The latents are multiplied by the scale before the chain is run on them, so the signal
+      // that survives at t is ᾱ_t times the variance they then have — which is one, by
+      // construction of the scale. That is the whole point of rescaling, and the table shows it:
+      // the rescaled column agrees with the pixel column at every step.
+      const latentSignal = alphaBar * latentVariance * scale ** 2
       const latentNoise = 1 - alphaBar
-      rows.push({ x: t, pixel: signal / noise, latent: latentSignal / latentNoise })
+      rows.push({
+        x: t,
+        pixel: signal / noise,
+        plain: (alphaBar * latentVariance) / latentNoise,
+        latent: latentSignal / latentNoise,
+      })
     }
     return rows
   }, [variances, scale])
@@ -112,7 +120,7 @@ export function LatentLab() {
           <Stat
             label="Element saving"
             value={`${fmt(1 / saving.elementRatio, 1)}×`}
-            hint="at a compression factor of 8"
+            hint={`at a compression factor of ${IMAGE.factor}`}
           />
         </div>
 
@@ -176,25 +184,26 @@ export function LatentLab() {
             caption="The saving from a factor-8 compression of a 256×256 image"
             headers={['Quantity', 'Value']}
             rows={[
-              ['pixel elements', fmt(256 * 256 * 3, 0)],
-              ['latent elements', fmt(32 * 32 * 4, 0)],
+              ['pixel elements', String(IMAGE.size * IMAGE.size * IMAGE.channels)],
+              ['latent elements', String((IMAGE.size / IMAGE.factor) ** 2 * IMAGE.latentChannels)],
               ['element ratio', fmt(saving.elementRatio, 6)],
-              ['attention cost ratio', fmt(saving.attentionRatio, 8)],
+              ['element saving', `${fmt(1 / saving.elementRatio, 1)}×`],
+              ['attention saving', `${fmt(1 / saving.attentionRatio, 0)}×`],
             ]}
           />
         </Figure>
 
         <Figure
           title="The signal-to-noise ratio, before and after the rescaling"
-          description="The signal-to-noise ratio along the chain, computed for the pixel data and for the latent data after the scaling factor is applied."
-          caption="The schedule assumes data with unit variance. A latent space with a different scale is mismatched to it, and the rescaling factor is what puts it back — which is why the factor of 0.18215 in the paper is not an arbitrary constant."
+          description="The signal-to-noise ratio along the chain, computed for unit-variance pixel data, for the latents as the autoencoder emits them, and for the latents after the scaling factor is applied."
+          caption="The schedule assumes data with unit variance. The latents do not have it, so the chain runs at the wrong noise level in the middle column; multiplying by the scale puts the ratio back where the pixel column has it, which is why the factor of 0.18215 in the paper is not an arbitrary constant. The latent columns use the mean variance across the latent coordinates."
         >
           <DataTable
             caption="The effective signal-to-noise ratio in pixel space and in latent space"
-            headers={['t', 'SNR (pixels)', 'SNR (latents, rescaled)']}
+            headers={['t', 'SNR (pixels)', 'SNR (latents, as they come out)', 'SNR (latents, rescaled)']}
             rows={snrComparison
               .filter((_, index) => index % 5 === 0)
-              .map((row) => [row.x, fmt(row.pixel, 4), fmt(row.latent, 4)])}
+              .map((row) => [row.x, fmt(row.pixel, 4), fmt(row.plain, 4), fmt(row.latent, 4)])}
           />
         </Figure>
 

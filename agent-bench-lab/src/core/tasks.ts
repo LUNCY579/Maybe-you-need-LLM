@@ -82,6 +82,22 @@ export function buildTaskSet(options: TaskSetOptions = {}): TaskSet {
   return { tasks, files }
 }
 
+/**
+ * How the tasks fall across the difficulty bands.
+ *
+ * The mix is the part of a benchmark that a headline score leaves out, so the screen that prints
+ * the score prints this too — and the histogram is a property of the task set, not of the drawing,
+ * which is what lets a test ask whether the panel shows the task set the controls hold.
+ */
+export function difficultyHistogram(tasks: Task[], bands = 5): { band: number; count: number }[] {
+  const counts = Array.from({ length: bands }, () => 0)
+  for (const task of tasks) {
+    const index = Math.min(bands - 1, Math.floor(task.difficulty * bands))
+    counts[index] = (counts[index] ?? 0) + 1
+  }
+  return counts.map((count, index) => ({ band: index + 1, count }))
+}
+
 /* -------------------------------------------------------------------------- */
 /* The statistics of a score                                                   */
 /* -------------------------------------------------------------------------- */

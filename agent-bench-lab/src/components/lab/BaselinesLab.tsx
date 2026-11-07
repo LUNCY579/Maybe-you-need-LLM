@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { fmt } from '@llm-materials/course-core'
 import { buildTaskSet, passAtK, passPowerK, pairedSignTest } from '../../core/tasks'
-import { agentSolver, costPerTask, retrievalBaseline } from '../../core/verifier'
+import { agentSolver, costPerTask, repeatedRuns, retrievalBaseline, runSpread } from '../../core/verifier'
 import { repeatedTrialCounts } from '../../core/landscape'
 import { Callout, Figure, Panel, SegmentedControl, Slider, Stat } from '@llm-materials/course-ui'
 import { DataTable, TrendChart, useViewParam } from '@llm-materials/course-ui'
@@ -23,27 +23,16 @@ export function BaselinesLab() {
 
   const taskSet = useMemo(() => buildTaskSet({ size, seed }), [size, seed])
 
-  const acrossRuns = useMemo(() => {
-    const rows: { x: number; score: number }[] = []
-    for (let run = 0; run < runs; run++) {
-      const baseline = retrievalBaseline(taskSet.tasks, seed + run * 13)
-      const agent = agentSolver(taskSet.tasks, { seed: seed + run * 13 })
-      rows.push({ x: run + 1, score: (baseline.solved / Math.max(1, size)) * 100 })
-      rows.push({ x: run + 1, score: (agent.solved / Math.max(1, size)) * 100 })
-    }
-    return rows
-  }, [taskSet, runs, seed, size])
+  const runRows = useMemo(() => repeatedRuns(taskSet.tasks, { runs, seed }), [taskSet, runs, seed])
+  const acrossRuns = useMemo(
+    () => runRows.flatMap((row) => [{ x: row.run, score: row.baseline }, { x: row.run, score: row.agent }]),
+    [runRows],
+  )
 
   const baseline = useMemo(() => retrievalBaseline(taskSet.tasks, seed), [taskSet, seed])
   const agent = useMemo(() => agentSolver(taskSet.tasks, { seed: seed + 1 }), [taskSet, seed])
 
-  const spread = useMemo(() => {
-    const scores = acrossRuns.map((row) => row.score)
-    const mean = scores.reduce((a, b) => a + b, 0) / Math.max(1, scores.length)
-    const variance =
-      scores.reduce((sum, value) => sum + (value - mean) ** 2, 0) / Math.max(1, scores.length - 1)
-    return { mean, deviation: Math.sqrt(variance) }
-  }, [acrossRuns])
+  const spread = useMemo(() => runSpread(runRows), [runRows])
 
   const passAt = useMemo(
     () => [
@@ -89,6 +78,7 @@ export function BaselinesLab() {
           <Stat
             label="The spread across the runs"
             value={`${fmt(spread.deviation, 2)} points`}
+            hint="the movement of one solver between its own runs"
             tone="warn"
           />
           <Stat

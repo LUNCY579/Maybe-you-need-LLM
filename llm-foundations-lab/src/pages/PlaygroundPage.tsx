@@ -9,55 +9,10 @@ import { InferenceLab } from '../components/lab/InferenceLab'
 import { PromptLab } from '../components/lab/PromptLab'
 import { useProgress } from '../state/hooks'
 import type { SavedPlaygroundConfig } from '../core/progress'
+import { LABS, labByTab } from '../content/labs'
 import { Badge, Button, Callout, Panel, Tabs } from '../components/ui/primitives'
 
 type LabId = SavedPlaygroundConfig['lab']
-
-const LABS: { id: LabId; label: string; title: string; description: string }[] = [
-  {
-    id: 'transformer',
-    label: 'Transformer',
-    title: 'Transformer Explorer',
-    description:
-      'The complete forward pass of a tiny decoder: tokens, embeddings, positions, Q/K/V, scores, mask, softmax, output, next-token distribution.',
-  },
-  {
-    id: 'tokenizer',
-    label: 'Tokenizer',
-    title: 'Tokenization and embeddings',
-    description: 'Word, character and greedy subword strategies against one explicit toy vocabulary, plus masking recipes.',
-  },
-  {
-    id: 'sampling',
-    label: 'Sampling',
-    title: 'Text generation and sampling',
-    description: 'Temperature, top-k, top-p and seeds applied to explicit logits, with a Monte-Carlo check of the sampler.',
-  },
-  {
-    id: 'learning',
-    label: 'Training',
-    title: 'Learning and optimisation',
-    description: 'Real gradient descent on a bigram language model, with gradient checking and a scaling-law calculator.',
-  },
-  {
-    id: 'alignment',
-    label: 'Alignment',
-    title: 'Alignment and preference learning',
-    description: 'SFT, reward modelling, DPO and process supervision in one transparent linear model.',
-  },
-  {
-    id: 'inference',
-    label: 'Inference',
-    title: 'Inference and reasoning',
-    description: 'Autoregressive decoding, KV-cache accounting, reasoning search and evaluation protocols.',
-  },
-  {
-    id: 'prompt',
-    label: 'Prompting',
-    title: 'Prompting, budgets and retrieval',
-    description: 'Assemble a prompt under a hard token budget and score passages with real cosine similarity.',
-  },
-]
 
 export function PlaygroundPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -77,14 +32,12 @@ export function PlaygroundPage() {
     [configParam, progress.playgroundConfigs],
   )
   const requestedLab = searchParams.get('lab')
-  const lab: LabId = LABS.some((item) => item.id === requestedLab)
-    ? (requestedLab as LabId)
-    : (savedConfig?.lab ?? 'transformer')
+  const lab: LabId = labByTab(requestedLab)?.tab ?? (savedConfig?.lab ?? 'transformer')
   const importedSettings = savedConfig?.settings ?? null
   /** Changes when a different configuration is loaded, so the laboratory remounts. */
   const configKey = configParam ?? 'default'
 
-  const active = useMemo(() => LABS.find((item) => item.id === lab)!, [lab])
+  const active = useMemo(() => labByTab(lab)!, [lab])
 
   const handleSave = (settings: Record<string, number | string | boolean>) => {
     const config: SavedPlaygroundConfig = {
@@ -103,8 +56,8 @@ export function PlaygroundPage() {
       <header className="space-y-2">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-fg">Interactive playground</h1>
         <p className="max-w-3xl text-sm text-muted">
-          Seven laboratories, each computing its results in this browser tab. Configurations you save are added to your
-          local progress file and can be reopened from the dashboard or exported as JSON.
+          {LABS.length} laboratories, each computing its results in this browser tab. Configurations you save are added
+          to your local progress file and can be reopened from the dashboard or exported as JSON.
         </p>
       </header>
 
@@ -114,7 +67,7 @@ export function PlaygroundPage() {
         onChange={(next) => {
           setSearchParams({ lab: next })
         }}
-        tabs={LABS.map((item) => ({ value: item.id, label: item.label }))}
+        tabs={LABS.map((item) => ({ value: item.tab, label: item.label }))}
       />
 
       {/* Each laboratory renders its own titled header, so this panel only carries

@@ -6,6 +6,7 @@ import {
   describeForwardMarginal,
   forwardChain,
   posteriorMean,
+  posteriorVariance,
   qSample,
   swapNoise,
 } from '../../core/forward'
@@ -23,6 +24,7 @@ const DATA_POINTS: [number, number][] = [
 ]
 
 const SCHEDULE: Schedule = buildSchedule('linear', 200)
+const CHAIN_MARKS_EVERY = 20
 
 export function ForwardLab() {
   const [view, setView] = useState<View>('chain')
@@ -32,6 +34,9 @@ export function ForwardLab() {
   const rng = useMemo(() => createRng(seed), [seed])
 
   const chain = useMemo(() => forwardChain(DATA_POINTS[0], SCHEDULE, rng), [rng])
+
+  // Every twentieth state of the chain is drawn on the plot, including the first and the last.
+  const chainMarks = useMemo(() => chain.filter((_, index) => index % CHAIN_MARKS_EVERY === 0), [chain])
 
   const marginal = useMemo(
     () => describeForwardMarginal(DATA_POINTS[0], t, SCHEDULE),
@@ -159,8 +164,8 @@ export function ForwardLab() {
           <>
             <Figure
               title="The chain, step by step"
-              description={`The state of one data point as noise is added, plotted at twelve steps of the chain. The signal moves towards the origin while the spread grows.`}
-              caption="The forward chain for a single data point, at twelve evenly spaced steps. The state is the data scaled by √ᾱ_t, plus noise of scale √(1−ᾱ_t)."
+              description={`The state of one data point as noise is added, plotted at ${chainMarks.length} steps of the chain. The signal moves towards the origin while the spread grows.`}
+              caption="The forward chain for a single data point, at every twentieth step of the chain. The state is the data scaled by √ᾱ_t, plus noise of scale √(1−ᾱ_t)."
             >
               <PointChart
                 points={DATA_POINTS.map((point) => ({ x: point[0], y: point[1], group: 'Data' }))}
@@ -175,9 +180,7 @@ export function ForwardLab() {
                   [-3, 3],
                   [-3, 3],
                 ]}
-                referencePoints={chain
-                  .filter((_, index) => index % 20 === 0)
-                  .map((point) => ({ x: point[0], y: point[1] }))}
+                referencePoints={chainMarks.map((point) => ({ x: point[0], y: point[1] }))}
               />
             </Figure>
 
@@ -254,7 +257,7 @@ export function ForwardLab() {
             <Figure
               title="Where the posterior puts its weight"
               description="The weight the posterior mean puts on x_0 and on x_t, as a function of the timestep. At small t the posterior is almost entirely determined by the data; at large t it is almost entirely determined by the current state."
-              caption="The posterior q(x_{t−1} | x_t, x_0) is a fixed convex combination of x_0 and x_t. The weight on x_0 falls as the noise grows."
+              caption="The posterior q(x_{t−1} | x_t, x_0) is a combination of x_0 and x_t whose coefficients the forward process decides — they sum to within half a percent of one along the whole chain. The weight on x_0 falls as the noise grows."
             >
               <TrendChart
                 data={posteriorWeights}
@@ -277,7 +280,7 @@ export function ForwardLab() {
                 ['weight on x₀', fmt(posteriorWeights[Math.min(posteriorWeights.length - 1, Math.floor(t / 4))]?.onX0 ?? 0, 4)],
                 ['x_t', `(${fmt(posteriorAtT.xT[0], 4)}, ${fmt(posteriorAtT.xT[1], 4)})`],
                 ['posterior mean', `(${fmt(posteriorAtT.mean[0], 4)}, ${fmt(posteriorAtT.mean[1], 4)})`],
-                ['posterior variance β̃_t', fmt(betaTilde(t), 6)],
+                ['posterior variance β̃_t', fmt(posteriorVariance(t, SCHEDULE), 6)],
               ]}
             />
 
@@ -291,14 +294,14 @@ export function ForwardLab() {
 
         <Figure
           title="The signal-to-noise ratio along the chain"
-          description="The signal-to-noise ratio of the forward process at every timestep, on a logarithmic scale. It falls from far above one to far below one."
-          caption="SNR(t) = ᾱ_t / (1 − ᾱ_t), on a log scale. Above 1 the state still contains more signal than noise."
+          description="The signal-to-noise ratio of the forward process at every timestep. It falls from far above one to far below one."
+          caption="SNR(t) = ᾱ_t / (1 − ᾱ_t). Above 1 the state still contains more signal than noise."
         >
           <TrendChart
             data={snrCurve}
             series={[{ key: 'snr', name: 'SNR', colour: 'var(--accent-amber)' }]}
             xLabel="timestep t"
-            yLabel="SNR (log scale)"
+            yLabel="SNR"
             height={220}
             referenceLines={[{ y: 1, label: 'SNR = 1' }]}
           />
@@ -337,9 +340,4 @@ export function ForwardLab() {
       </Panel>
     </div>
   )
-}
-
-function betaTilde(t: number): number {
-  const index = Math.min(SCHEDULE.steps - 1, Math.max(0, t))
-  return ((1 - SCHEDULE.previousAlphaBars[index]) / (1 - SCHEDULE.alphaBars[index])) * SCHEDULE.betas[index]
 }

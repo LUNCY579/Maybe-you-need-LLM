@@ -170,7 +170,7 @@ export const lessonInteractionStyles: LessonContent = {
           demo: 'context-window',
           title: 'The context window, and what it does to the answer',
           intro:
-            'Shrink the window until the material no longer fits, and then choose between the four policies the textbook names: truncate the history, retrieve what is relevant, compress the prompt, or page the overflow out to an external store. The interesting case is not the one where a fact is dropped — it is the one where the fact is still there, shortened, and the detail that decides the answer is not in the summary any more.',
+            'Shrink the window until the material no longer fits, and then choose between the four policies the textbook names — truncate the history, retrieve what is relevant, compress the prompt, page the overflow out to an external store — and a fifth that §9.3.2.2 points at without spelling out: let a compressor *learned* on the other windows decide what each piece of material is worth. The interesting case is not the one where a fact is dropped — it is the one where the fact is still there, shortened, and the detail that decides the answer is not in the summary any more.',
         },
         {
           kind: 'prose',
@@ -301,7 +301,7 @@ export const lessonInteractionStyles: LessonContent = {
     {
       referenceId: 'mu-2023-gist',
       note:
-        'Learned prompt compression — and the authors’ own admission that compression necessarily loses nuance, which is the trade the demonstration makes visible.',
+        'Learned prompt compression — and the authors’ own admission that compression necessarily loses nuance. The demonstration fits the compressor itself: a scorer trained on every window but the one it is shown, and the report window is the one where its abstract keeps the right document and drops the figure.',
     },
     {
       referenceId: 'zhong-2024-memorybank',

@@ -359,7 +359,7 @@ Other scripts:
 ```bash
 npm run build      # type-check, then produce a static bundle in dist/
 npm run preview    # serve the production build locally
-npm run test       # unit and component tests (Vitest)
+npm run test       # unit and component tests (Vitest: 551 tests across 35 files)
 npm run test:e2e   # end-to-end tests (Playwright: Chromium, Firefox and WebKit,
                    # plus the offline tests against a published build)
 npm run lint       # Oxlint

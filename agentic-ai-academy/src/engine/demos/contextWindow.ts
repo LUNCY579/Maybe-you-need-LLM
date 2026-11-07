@@ -14,9 +14,9 @@
  *    §9.3.2.3 adds explicit memory management, where read and write are
  *    operations the agent performs (MemGPT, MCP).
  *
- * The hard part is not knowing the four policies. It is seeing what each one
- * costs, because three of them can lose the *decisive* fact while looking
- * perfectly reasonable:
+ * The hard part is not knowing the policies. It is seeing what each one costs,
+ * because three of them can lose the *decisive* fact while looking perfectly
+ * reasonable:
  *
  *  - **Truncation** drops the oldest material. If the decisive fact arrived
  *    early, it is gone.
@@ -27,10 +27,16 @@
  *  - **Paging out** loses nothing — the material is still in an external
  *    store — but the agent can retrieve only one item per turn, and it may
  *    retrieve the wrong one.
+ *  - **Learned compression** replaces the hand-written rule with a scorer
+ *    trained on other windows (§9.3.2.2; Gist, Mu et al. 2023). It inherits
+ *    the caveat rather than escaping it: it is trained to predict which
+ *    material *looks* like it matters, and the summary it prefers can drop
+ *    the deciding detail just as neatly as the hand-written one.
  *
- * This engine makes those four outcomes computable rather than arguable. It
- * is entirely deterministic: no model is called, and the same inputs always
- * give the same answer.
+ * This engine makes those outcomes computable rather than arguable. It is
+ * entirely deterministic: no model is called, and the same inputs always give
+ * the same answer — including the training run, which is a fixed full-batch
+ * fit whose loss curve is recorded rather than asserted.
  */
 
 /** Where a piece of the prompt came from. */
@@ -69,8 +75,8 @@ export interface ContextItem {
   tags?: string[]
 }
 
-/** The four ways a harness can fit material into a finite window. */
-export type ContextPolicy = 'truncate' | 'relevance' | 'compress' | 'page'
+/** The five ways a harness can fit material into a finite window. */
+export type ContextPolicy = 'truncate' | 'relevance' | 'compress' | 'page' | 'gist'
 
 export const CONTEXT_POLICIES: { value: ContextPolicy; label: string; description: string }[] = [
   {
@@ -96,6 +102,12 @@ export const CONTEXT_POLICIES: { value: ContextPolicy; label: string; descriptio
     label: 'Page out and recall',
     description:
       'Move the overflow into an external store, then recall one item from it. Nothing is lost, but only one thing can be recalled per turn.',
+  },
+  {
+    value: 'gist',
+    label: 'Learned compression',
+    description:
+      'Score every item with a compressor trained on the other windows — and never shown which fact decides this one — then give each item the longest form its score can pay for.',
   },
 ]
 
@@ -140,6 +152,8 @@ export interface ContextOutcome {
   pagedOut: ContextItem[]
   /** The item recalled from the store, under the paging policy. */
   recalled: ContextItem | null
+  /** Under the learned policy, the scorer that decided and what it decided per item. */
+  gist: GistTrace | null
   /** The tokens the prompt uses. */
   used: number
   /** The size of the window. */
@@ -211,12 +225,300 @@ function shortened(item: ContextItem): KeptItem {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Learned compression                                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The signals a learned compressor can see.
+ *
+ * `critical` is not one of them. The label trains the scorer and is never handed to it as an
+ * input, which is the difference between a learner and a lookup: at the moment the harness
+ * has to decide, the compressor has only the surface of the material — how much of the
+ * goal's vocabulary an item carries, how much of the question's, how recent it is, what
+ * shortening it is worth, and whether a short form of it exists at all.
+ *
+ * The scope note matters: this is a scorer over five hand-built features, fitted by logistic
+ * regression, not gist tokens emitted by a language model. What it shares with Gist is the
+ * mechanism — a compressor whose behaviour is fitted rather than written — and what it gains
+ * is that every weight, every loss value and every decision below is checkable by hand.
+ */
+export interface GistFeatures {
+  /** the share of the goal's tags this item carries */
+  tagOverlap: number
+  /** the share of the question's terms that appear in this item */
+  questionOverlap: number
+  /** 1 for the newest unprotected item, 0 for the oldest */
+  recency: number
+  /** the item's share of the material — what compressing it buys */
+  cost: number
+  /** whether a shorter form of this item exists */
+  compressible: number
+}
+
+export type GistFeatureKey = keyof GistFeatures
+
+export const GIST_FEATURES: { key: GistFeatureKey; label: string; note: string }[] = [
+  { key: 'tagOverlap', label: 'Goal vocabulary', note: 'How much of the goal’s tag list the item carries.' },
+  { key: 'questionOverlap', label: 'Question terms', note: 'How many of the question’s own words appear in the item.' },
+  { key: 'recency', label: 'Recency', note: 'How late in the session the item arrived.' },
+  { key: 'cost', label: 'Token share', note: 'The item’s share of the material: shortening a large item saves more.' },
+  { key: 'compressible', label: 'Has a short form', note: 'Whether a summary of the item exists at all.' },
+]
+
+/** The canonical order the weight vector is kept in. */
+const FEATURE_KEYS: GistFeatureKey[] = ['tagOverlap', 'questionOverlap', 'recency', 'cost', 'compressible']
+
+/**
+ * How the scorer is fitted.
+ *
+ * Full-batch gradient descent on the log-loss, one fixed step size, a fixed number of
+ * epochs, no randomness anywhere — so the weights, the loss curve and every decision drawn
+ * from them are the same in this run as in the test that asserts them.
+ */
+export const GIST_TRAINING = { learningRate: 1, epochs: 300 }
+
+/** A fitted scorer and the curve that produced it. */
+export interface GistModel {
+  weights: Record<GistFeatureKey, number>
+  bias: number
+  /** the mean log-loss over the training material, one entry per epoch */
+  loss: number[]
+  epochs: number
+  examples: number
+  positives: number
+  /** the windows the weights were fitted on — never the one being assembled */
+  trainedOn: string[]
+}
+
+/** What the scorer made of one item, and what the harness then did with it. */
+export interface GistDecision {
+  item: ContextItem
+  features: GistFeatures
+  /** the probability the scorer gives that the answer depends on this item */
+  score: number
+  action: 'full' | 'gist' | 'drop'
+}
+
+/** How well the scores rank decisive material above the rest, on the held-out window. */
+export interface GistRanking {
+  /** decisive × non-decisive pairs */
+  pairs: number
+  /** pairs put in the right order, ties counted as half */
+  concordant: number
+  auc: number
+}
+
+/** The learned policy's evidence: the model, what it decided, and how it judged itself. */
+export interface GistTrace {
+  model: GistModel
+  /** the window this model never saw during training */
+  heldOut: string
+  decisions: GistDecision[]
+  ranking: GistRanking
+}
+
+/** Words too general to tell one piece of material from another. */
+const GIST_STOPWORDS = new Set([
+  'the', 'and', 'for', 'with', 'from', 'into', 'that', 'this', 'what', 'how', 'why', 'are', 'was',
+  'were', 'its', 'be', 'been', 'is', 'it', 'do', 'does', 'did', 'not', 'of', 'to', 'in', 'on', 'at',
+  'by', 'a', 'an', 'they', 'them', 'their', 'we', 'you', 'can', 'still', 'about', 'only', 'then',
+  'than', 'which', 'who', 'when', 'has', 'have', 'had', 'will', 'would', 'should',
+])
+
+function gistTerms(text: string): Set<string> {
+  const found = new Set<string>()
+  for (const word of text.toLowerCase().split(/[^a-z0-9]+/)) {
+    if (word.length === 0 || GIST_STOPWORDS.has(word)) continue
+    // A number is a term even though "it" and "is" are not: the facts that get lost from a
+    // summary are dates, amounts and counts.
+    if (word.length < 3 && !/\d/.test(word)) continue
+    found.add(word)
+  }
+  return found
+}
+
+/**
+ * The feature vector of every unprotected item in a window.
+ *
+ * Recency and token share are measured against the *unprotected* material, because that is
+ * the material a policy chooses between: the instruction and the task are never in the running.
+ */
+function gistFeaturesFor(scenario: ContextScenario): Map<string, GistFeatures> {
+  const free = scenario.items.filter((item) => !isProtected(item))
+  const materialTokens = free.reduce((sum, item) => sum + item.tokens, 0) || 1
+  const questionTerms = gistTerms(scenario.question)
+  const goalTags = scenario.relevantTags
+  const map = new Map<string, GistFeatures>()
+  free.forEach((item, index) => {
+    const terms = gistTerms(`${item.label} ${item.content}`)
+    let sharedTags = 0
+    for (const tag of goalTags) if (terms.has(tag)) sharedTags += 1
+    let sharedTerms = 0
+    for (const term of questionTerms) if (terms.has(term)) sharedTerms += 1
+    map.set(item.id, {
+      tagOverlap: goalTags.length === 0 ? 0 : sharedTags / goalTags.length,
+      questionOverlap: questionTerms.size === 0 ? 0 : sharedTerms / questionTerms.size,
+      recency: free.length > 1 ? index / (free.length - 1) : 1,
+      cost: item.tokens / materialTokens,
+      compressible: item.compressed ? 1 : 0,
+    })
+  })
+  return map
+}
+
+function sigmoid(z: number): number {
+  return 1 / (1 + Math.exp(-z))
+}
+
+/** Keeps the log finite at the ends of the sigmoid. */
+function clamp01(p: number): number {
+  return Math.min(1 - 1e-9, Math.max(1e-9, p))
+}
+
+/**
+ * Fit the compressor on a corpus of windows.
+ *
+ * The examples are items, not windows: an item is positive when the answer depends on it.
+ * Every item is described only by `GIST_FEATURES`, so a fitted weight says something a
+ * compressor could compute at run time — `critical` appears on the right-hand side of the
+ * fit and nowhere on its left.
+ */
+export function trainGistModel(
+  corpus: ContextScenario[] = CONTEXT_SCENARIOS,
+  options: { exclude?: string; epochs?: number; learningRate?: number } = {},
+): GistModel {
+  const epochs = options.epochs ?? GIST_TRAINING.epochs
+  const learningRate = options.learningRate ?? GIST_TRAINING.learningRate
+
+  const trainedOn: string[] = []
+  const vectors: number[][] = []
+  const labels: number[] = []
+  for (const scenario of corpus) {
+    if (scenario.id === options.exclude) continue
+    const free = scenario.items.filter((item) => !isProtected(item))
+    if (free.length === 0) continue
+    trainedOn.push(scenario.id)
+    const features = gistFeaturesFor(scenario)
+    for (const item of free) {
+      const entry = features.get(item.id)
+      if (!entry) continue
+      vectors.push(FEATURE_KEYS.map((key) => entry[key]))
+      labels.push(item.critical === true ? 1 : 0)
+    }
+  }
+
+  const vector = FEATURE_KEYS.map(() => 0)
+  let bias = 0
+  const loss: number[] = []
+  const count = Math.max(1, vectors.length)
+
+  for (let epoch = 0; epoch < epochs; epoch += 1) {
+    const gradient = FEATURE_KEYS.map(() => 0)
+    let biasGradient = 0
+    let total = 0
+    for (let row = 0; row < vectors.length; row += 1) {
+      const features = vectors[row]
+      const label = labels[row]
+      let z = bias
+      for (let key = 0; key < features.length; key += 1) z += vector[key] * features[key]
+      const p = sigmoid(z)
+      const clipped = clamp01(p)
+      total += -(label * Math.log(clipped) + (1 - label) * Math.log(1 - clipped))
+      const error = p - label
+      for (let key = 0; key < features.length; key += 1) gradient[key] += error * features[key]
+      biasGradient += error
+    }
+    loss.push(total / count)
+    for (let key = 0; key < vector.length; key += 1) vector[key] -= (learningRate * gradient[key]) / count
+    bias -= (learningRate * biasGradient) / count
+  }
+
+  const weights = {} as Record<GistFeatureKey, number>
+  FEATURE_KEYS.forEach((key, index) => {
+    weights[key] = vector[index]
+  })
+
+  return {
+    weights,
+    bias,
+    loss,
+    epochs,
+    examples: vectors.length,
+    positives: labels.reduce((sum, label) => sum + label, 0),
+    trainedOn,
+  }
+}
+
+const MODEL_CACHE = new Map<string, GistModel>()
+
+/**
+ * The scorer used to assemble one window: fitted on every *other* window in the corpus.
+ *
+ * This is the honest part of the demonstration. Handing the compressor the answer key of the
+ * window it is compressing would make the loss curve meaningless, so each window is judged
+ * out-of-sample — the same claim Gist makes for itself, tested the way a small one can be.
+ */
+export function gistModelFor(
+  scenario: ContextScenario,
+  corpus: ContextScenario[] = CONTEXT_SCENARIOS,
+): GistModel {
+  const trainedOn = corpus.filter((entry) => entry.id !== scenario.id).map((entry) => entry.id)
+  const key = `${scenario.id}|${trainedOn.join(',')}|${GIST_TRAINING.learningRate}|${GIST_TRAINING.epochs}`
+  const cached = MODEL_CACHE.get(key)
+  if (cached) return cached
+  const model = trainGistModel(corpus, { exclude: scenario.id })
+  MODEL_CACHE.set(key, model)
+  return model
+}
+
+/** The probability the scorer puts on "the answer depends on this item". */
+export function scoreGistItem(features: GistFeatures, model: GistModel): number {
+  let z = model.bias
+  for (const key of FEATURE_KEYS) z += model.weights[key] * features[key]
+  return sigmoid(z)
+}
+
+function rankAgreement(entries: { score: number; critical: boolean }[]): GistRanking {
+  let pairs = 0
+  let concordant = 0
+  for (const positive of entries) {
+    if (!positive.critical) continue
+    for (const negative of entries) {
+      if (negative.critical) continue
+      pairs += 1
+      if (positive.score > negative.score) concordant += 1
+      else if (positive.score === negative.score) concordant += 0.5
+    }
+  }
+  // A window with no decisive item has nothing to rank, and a compressor asked to find
+  // nothing cannot be said to have failed to find it.
+  return { pairs, concordant, auc: pairs === 0 ? 1 : concordant / pairs }
+}
+
+/**
+ * Score a window's material, most-likely-to-matter first.
+ *
+ * Ties are broken by the order the material arrived in, so the ranking is a total order and
+ * the allocation below is reproducible.
+ */
+function rankByGist(scenario: ContextScenario, model: GistModel): { item: ContextItem; features: GistFeatures; score: number }[] {
+  const features = gistFeaturesFor(scenario)
+  return scenario.items
+    .filter((item) => !isProtected(item))
+    .map((item, index) => ({ item, index, features: features.get(item.id) as GistFeatures }))
+    .map((entry) => ({ ...entry, score: scoreGistItem(entry.features, model) }))
+    .sort((a, b) => (b.score === a.score ? a.index - b.index : b.score - a.score))
+    .map((entry) => ({ item: entry.item, features: entry.features, score: entry.score }))
+}
+
 /**
  * Fit a scenario's material into a window.
  *
- * The four policies are the ones the textbook names, and each one is a
- * different answer to the same question: *what do you do when the material
- * does not fit?*
+ * The first four policies are the ones the textbook names, and each one is a different
+ * answer to the same question: *what do you do when the material does not fit?* The fifth is
+ * the answer §9.3.2.2 points at when it lists compression as the remedy: let a trained
+ * scorer decide what the material is worth.
  */
 export function assembleContext(
   scenario: ContextScenario,
@@ -233,6 +535,7 @@ export function assembleContext(
     totalTokens,
     pagedOut: [] as ContextItem[],
     recalled: null as ContextItem | null,
+    gist: null as GistTrace | null,
     overflow: false,
   }
 
@@ -257,6 +560,7 @@ export function assembleContext(
   let dropped: ContextItem[] = []
   let pagedOut: ContextItem[] = []
   let recalled: ContextItem | null = null
+  let gist: GistTrace | null = null
 
   const room = budget - protectedTokens
   const usedOf = (entries: KeptItem[]) => entries.reduce((sum, entry) => sum + entry.tokens, 0)
@@ -337,6 +641,41 @@ export function assembleContext(
     dropped = []
   }
 
+  if (policy === 'gist') {
+    // Score the material with a compressor trained on the other windows, then give each item
+    // the longest form its rank can pay for: the full text while there is room for it, the
+    // short form when only the short form fits, nothing at all after that.
+    const model = gistModelFor(scenario)
+    const decisions: GistDecision[] = []
+    const entries: KeptItem[] = []
+    let left = room
+    for (const ranked of rankByGist(scenario, model)) {
+      const { item, features, score } = ranked
+      const short = item.compressed
+      if (left >= item.tokens) {
+        decisions.push({ item, features, score, action: 'full' })
+        entries.push(full(item))
+        left -= item.tokens
+      } else if (short && left >= short.tokens) {
+        decisions.push({ item, features, score, action: 'gist' })
+        entries.push(shortened(item))
+        left -= short.tokens
+      } else {
+        decisions.push({ item, features, score, action: 'drop' })
+      }
+    }
+    kept = [...kept, ...entries]
+    dropped = free.filter((item) => !entries.some((entry) => entry.item.id === item.id))
+    gist = {
+      model,
+      heldOut: scenario.id,
+      decisions,
+      ranking: rankAgreement(
+        decisions.map((decision) => ({ score: decision.score, critical: decision.item.critical === true })),
+      ),
+    }
+  }
+
   const used = usedOf(kept)
   const survivingFacts = new Set(kept.filter((entry) => entry.retains).map((entry) => entry.item.id))
   const intact = scenario.items
@@ -366,6 +705,12 @@ export function assembleContext(
       : intact
         ? 'Compression shortened the material but kept the decisive detail.'
         : 'Compression dropped what it could not shorten, and the decisive fact went with it.'
+  } else if (policy === 'gist') {
+    explanation = compressedLost.length
+      ? `The compressor was trained on the other windows and never shown which fact decides this one. It scored “${compressedLost[0]?.label ?? 'a required item'}” high enough to keep and short enough to lose the detail — an abstract of the right document, with the number cut out of it.`
+      : intact
+        ? 'The compressor ranked the decisive material above the material it could stand in for, and the window held it in full.'
+        : `The compressor ranked “${lost[0]?.label ?? 'a required item'}” below the material it kept, and by the time its turn came there was no room for it in any form.`
   } else {
     explanation = recalled
       ? `The overflow was paged out, not lost, and the agent recalled “${recalled.label}”. ${intact ? 'That was the decisive item, so the answer survived.' : 'But it was the wrong item to recall, and the decisive fact stayed in the store.'}`
@@ -377,6 +722,7 @@ export function assembleContext(
     dropped,
     pagedOut,
     recalled,
+    gist,
     used,
     budget,
     totalTokens,

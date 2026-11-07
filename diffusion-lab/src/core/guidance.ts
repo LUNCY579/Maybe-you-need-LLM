@@ -119,12 +119,13 @@ export interface LangevinResult {
 }
 
 /**
- * Annealed Langevin dynamics under the guided score.
+ * Langevin dynamics under the guided score, at a fixed step size.
  *
  * This is the sampler a diffusion model uses when it is written as a
  * score-based model, and it is what makes the guidance laboratory honest: the
  * score is exact, and the sampler is the same kind of sampler a real diffusion
- * model uses.
+ * model uses. A real sampler anneals the step size across noise levels; this
+ * one runs at a single noise level, so the step size is constant.
  */
 export function guidedLangevin(
   start: Vector,

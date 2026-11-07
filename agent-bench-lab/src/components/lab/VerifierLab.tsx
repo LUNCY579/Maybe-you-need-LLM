@@ -103,16 +103,16 @@ export function VerifierLab() {
             >
               <DataTable
                 caption="The scores"
-                headers={['The solver', 'The tasks solved', 'The cheats', 'The clean score', 'The attempts']}
+                headers={['The solver', 'The tasks solved', 'The cheats', 'The score had the cheats counted', 'The attempts']}
                 rows={[
                   [
                     'the agentless baseline',
                     baseline.solved,
                     baseline.cheated,
-                    `${fmt(baseline.cleanScore * 100, 1)}%`,
+                    `${fmt(baseline.inflatedScore * 100, 1)}%`,
                     baseline.attempts,
                   ],
-                  ['the agent', agent.solved, agent.cheated, `${fmt(agent.cleanScore * 100, 1)}%`, agent.attempts],
+                  ['the agent', agent.solved, agent.cheated, `${fmt(agent.inflatedScore * 100, 1)}%`, agent.attempts],
                 ]}
               />
             </Figure>

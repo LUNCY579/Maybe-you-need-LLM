@@ -100,8 +100,13 @@ export interface SolveResult {
   attempts: number
   /** The number of tasks solved by a patch that touched a test. */
   cheated: number
-  /** The score, with the cheats removed. */
-  cleanScore: number
+  /**
+   * The score the solver would have been given had its cheats counted as solutions.
+   *
+   * The verifier never counts a cheat as solved, so this is the number the weak criterion would
+   * have reported — the gap between it and `solved / attempted` is what the criterion is worth.
+   */
+  inflatedScore: number
 }
 
 /**
@@ -134,7 +139,7 @@ export function retrievalBaseline(tasks: Task[], seed = 1): SolveResult {
     attempted: tasks.length,
     attempts: tasks.length,
     cheated,
-    cleanScore: tasks.length === 0 ? 0 : (solved - cheated) / tasks.length,
+    inflatedScore: tasks.length === 0 ? 0 : (solved + cheated) / tasks.length,
   }
 }
 
@@ -183,7 +188,7 @@ export function agentSolver(
     attempted: tasks.length,
     attempts,
     cheated,
-    cleanScore: tasks.length === 0 ? 0 : (solved - cheated) / tasks.length,
+    inflatedScore: tasks.length === 0 ? 0 : (solved + cheated) / tasks.length,
   }
 }
 
@@ -215,6 +220,62 @@ function wilson(successes: number, trials: number): { estimate: number; low: num
     low: Math.max(0, (centre - spread) / denominator),
     high: Math.min(1, (centre + spread) / denominator),
   }
+}
+
+/**
+ * The same tasks, solved again and again.
+ *
+ * A run is a sample of a stochastic solver, so the score the screen prints is one row of a
+ * distribution. Both solvers are run at seeds that step by thirteen, which is the convention the
+ * course uses for "the same tasks, a different day".
+ */
+export interface RunRow {
+  /** The run, counting from one. */
+  run: number
+  /** Each solver's score for that run, in per cent of the task set. */
+  baseline: number
+  agent: number
+}
+
+export function repeatedRuns(tasks: Task[], options: { runs?: number; seed?: number } = {}): RunRow[] {
+  const settings = { runs: 6, seed: 3, ...options }
+  const trials = Math.max(1, tasks.length)
+  return Array.from({ length: settings.runs }, (_, index) => {
+    const runSeed = settings.seed + index * 13
+    return {
+      run: index + 1,
+      baseline: (retrievalBaseline(tasks, runSeed).solved / trials) * 100,
+      agent: (agentSolver(tasks, { seed: runSeed }).solved / trials) * 100,
+    }
+  })
+}
+
+/**
+ * The run-to-run noise, measured inside each series.
+ *
+ * Pooling the two solvers' scores would give a deviation that is mostly the gap between their
+ * means: a solver does not move twenty points between runs, but the baseline and the agent are
+ * twenty points apart. The pooled *within-series* deviation is the number the panel's sentence
+ * describes — the movement one solver makes from one run to the next, and so what a single
+ * reported score leaves out.
+ */
+export function runSpread(rows: RunRow[]): { mean: number; deviation: number } {
+  const series = { baseline: rows.map((row) => row.baseline), agent: rows.map((row) => row.agent) }
+  const meanOf = (scores: number[]) => scores.reduce((a, b) => a + b, 0) / Math.max(1, scores.length)
+  const varianceOf = (scores: number[]) => {
+    if (scores.length < 2) return 0
+    const mean = meanOf(scores)
+    return scores.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (scores.length - 1)
+  }
+  const all = [...series.baseline, ...series.agent]
+  const degrees = all.length - 2
+  const pooled =
+    degrees < 1
+      ? 0
+      : (varianceOf(series.baseline) * (series.baseline.length - 1) +
+          varianceOf(series.agent) * (series.agent.length - 1)) /
+        degrees
+  return { mean: meanOf(all), deviation: Math.sqrt(Math.max(0, pooled)) }
 }
 
 /**

@@ -115,7 +115,7 @@ eviction, the laboratory shows it too.
 | What a filter throws away | 3 · The training pipeline | Sets the quality and de-duplication thresholds for a corpus, and watches the two ways curation fails: duplicates left in for the model to memorise, and legitimate writing removed because it looks unusual |
 | Why a greedy planner gets stuck | 5 · Multi-step reasoning | Steps through the greedy planner's failure on the grid, then switches to the search planner and compares |
 | What the agent remembers, and what it forgets | 7 · Interaction styles and memory | Shrinks the store until a fact is evicted, and changes the retrieval strategy |
-| The context window, and what it does to the answer | 7 · Interaction styles and memory | Shrinks the window until the material no longer fits, then compares the four policies the textbook names — truncation, retrieval, compression and paging out — and watches the decisive fact survive or not |
+| The context window, and what it does to the answer | 7 · Interaction styles and memory | Shrinks the window until the material no longer fits, then compares the four policies the textbook names — truncation, retrieval, compression and paging out — with a fifth that is trained rather than written: a compressor fitted on the other windows, whose weights, loss curve and ranking are printed, and which loses the headline number on the report window exactly as the paper says a compressor will |
 | When should an assistant act, and when should it ask? | 8 · Tools and context | Runs three escalation policies over the same requests in a shop, a clinic and a flight desk, and shows that the right policy depends on what a mistake costs |
 | Bad is stronger than good | 10 · Behaviour and strategy | Scores the same day of events under two memory architectures - the original, which is valence-blind, and the one that weighs a criticism more than a compliment - and watches the agent conclude different things about an identical day |
 | Where was the decision made? | 11 · Advanced architectures | Runs two prompts through the same model and compares three ways of looking inside: a probe that finds the concept everywhere, a logit lens that shows the decision forming, and a patch that says where the behaviour was actually caused |
@@ -320,7 +320,7 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design rationale.
 ## Testing
 
 ```bash
-npm test        # 484 unit and component tests across 42 files
+npm test        # 542 unit and component tests across 47 files
 npm run e2e     # Playwright browser tests across Chromium, Firefox and WebKit
 ```
 

@@ -1,5 +1,6 @@
 import { Link } from '../components/layout/CourseLink.tsx'
 import { LESSONS, MODULES } from '../content/curriculum'
+import { LABS } from '../content/labs'
 import { GLOSSARY, FORMULAS } from '../content/glossary'
 import { useProgress } from '../state/hooks'
 import { buildLearningPath } from '../core/path'
@@ -176,15 +177,13 @@ export function LandingPage() {
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Panel>
-          <h2 className="font-display text-lg font-semibold text-fg">Seven laboratories</h2>
+          <h2 className="font-display text-lg font-semibold text-fg">{LABS.length} laboratories</h2>
           <ul className="mt-2 space-y-1.5 text-sm text-muted">
-            <li>Transformer Explorer — the full forward pass, stage by stage</li>
-            <li>Tokenization and embeddings — three strategies, one toy vocabulary</li>
-            <li>Sampling and decoding — temperature, top-k, top-p, seeds</li>
-            <li>Learning and optimisation — real SGD on a bigram model</li>
-            <li>Alignment and preference learning — SFT, reward models, DPO</li>
-            <li>Inference and reasoning — decoding, cache accounting, search</li>
-            <li>Prompting — budget accounting and retrieval scoring</li>
+            {LABS.map((lab) => (
+              <li key={lab.tab}>
+                {lab.title} — {lab.blurb}
+              </li>
+            ))}
           </ul>
           <Link to="/playground" className="mt-3 inline-block no-underline">
             <Button size="sm">Open the playground</Button>

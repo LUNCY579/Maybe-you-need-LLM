@@ -303,6 +303,17 @@ concept with no simulation is a concept the student can only read about:
   demonstration can show a prompt that looks complete and answers wrongly because the number is not
   in the summary any more. That is the failure that is hardest to notice in production, and it
   cannot be noticed at all without a simulation.
+  The fifth policy is the one §9.3.2.2 gestures at when it names compression as the remedy: let a
+  trained scorer decide what the material is worth. That scorer is actually trained here — a
+  logistic regression over five signals a harness could compute at run time (goal vocabulary,
+  question terms, recency, token share, whether the item has a short form), fitted by full-batch
+  gradient descent on the *other* windows and then asked to rank the one it is shown, so the answer
+  key of the window being compressed never enters its weights. The weights, the recorded loss
+  curve and the ranking agreement are all printed, and the item that decides this window's answer is
+  not among the inputs. What the fit learns is "older material matters", which is the opposite of
+  the truncation rule; it earns the demo its result on the first two windows and loses the third —
+  the headline figure is ranked third, shortened, and the number goes out of the abstract. The
+  caveat the paper states for itself, reproduced by a learner rather than written into a script.
 - **Retrieval** (Ch. 12, §12.2–12.4) is the other half of the window's budget. The chapter measures
   Recall@k and MRR, which are computed over the *retrieved* set; the window then decides whether the
   model uses what was retrieved. The engine makes the two separable: a passage can be missed

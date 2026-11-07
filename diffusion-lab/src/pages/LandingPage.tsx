@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
-import { MODULES } from '../content/curriculum'
+import { LESSONS, MODULES } from '../content/curriculum'
+import { LABS } from '../content/labs'
+import { TOY_MODEL } from '../core/denoiser'
 import { Callout, Panel } from '@llm-materials/course-ui'
 import { CATALOGUE, CollectionLinks } from '@llm-materials/course-catalogue'
 
@@ -27,7 +29,10 @@ export function LandingPage() {
         </div>
       </section>
 
-      <Panel title="What the course covers" subtitle="Six modules, twelve lessons, six laboratories">
+      <Panel
+        title="What the course covers"
+        subtitle={`${MODULES.length} modules, ${LESSONS.length} lessons, ${LABS.length} laboratories`}
+      >
         <div className="module-grid">
           {MODULES.map((module) => (
             <Link key={module.id} className="module-card" to={`/modules/${module.id}`}>
@@ -63,10 +68,10 @@ export function LandingPage() {
 
         <Panel title="An honest note on scale" accent="amber">
           <Callout tone="warning" title="This is a toy model">
-            The denoiser in Laboratory B is a two-layer perceptron with 32 hidden units, trained for 900 steps on a
-            generated ring of eight Gaussian modes. It is a real diffusion model with a real gradient and a real
-            sampler — and it is not a model of images, and it produces none of the sample-quality numbers the paper
-            reports.
+            The denoiser in Laboratory B is a two-layer perceptron with 32 hidden units, trained for {TOY_MODEL.steps}{' '}
+            steps on a generated ring of {TOY_MODEL.modes} Gaussian modes. It is a real diffusion model with a real
+            gradient and a real sampler — and it is not a model of images, and it produces none of the sample-quality
+            numbers the paper reports.
           </Callout>
           <p className="body-text">
             The parts of the course that <em>are</em> exact are the parts that can be: the forward process, the closed
@@ -77,36 +82,14 @@ export function LandingPage() {
         </Panel>
       </div>
 
-      <Panel title="The seven laboratories" accent="emerald">
+      <Panel title={`The ${LABS.length} laboratories`} accent="emerald">
         <div className="lab-grid">
-          <Link className="lab-card" to="/labs/forward">
-            <span className="lab-card-name">A · The forward process</span>
-            <span className="lab-card-text">The chain, the closed form, and the posterior.</span>
-          </Link>
-          <Link className="lab-card" to="/labs/reverse">
-            <span className="lab-card-name">B · The reverse process</span>
-            <span className="lab-card-text">A real denoiser, trained in your browser.</span>
-          </Link>
-          <Link className="lab-card" to="/labs/schedules">
-            <span className="lab-card-name">C · Noise schedules</span>
-            <span className="lab-card-text">Linear against cosine, and what they do.</span>
-          </Link>
-          <Link className="lab-card" to="/labs/latent">
-            <span className="lab-card-name">D · Latent diffusion</span>
-            <span className="lab-card-text">The compression, measured.</span>
-          </Link>
-          <Link className="lab-card" to="/labs/guidance">
-            <span className="lab-card-name">E · Guidance</span>
-            <span className="lab-card-text">The fidelity–diversity trade-off, with an exact score.</span>
-          </Link>
-          <Link className="lab-card" to="/labs/variational">
-            <span className="lab-card-name">F · The variational bound</span>
-            <span className="lab-card-text">The weights, and the decomposition.</span>
-          </Link>
-          <Link className="lab-card" to="/labs/preconditioning">
-            <span className="lab-card-name">G · Preconditioning</span>
-            <span className="lab-card-text">The σ parametrisation, the coefficients, and a sampler.</span>
-          </Link>
+          {LABS.map((lab) => (
+            <Link key={lab.id} className="lab-card" to={`/labs/${lab.id}`}>
+              <span className="lab-card-name">{lab.name}</span>
+              <span className="lab-card-text">{lab.blurb}</span>
+            </Link>
+          ))}
         </div>
       </Panel>
 

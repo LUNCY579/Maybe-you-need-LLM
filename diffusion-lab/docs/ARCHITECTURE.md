@@ -182,12 +182,14 @@ Gaussian KL, the linear algebra — are checked.
 
 ## Testing
 
-Three layers, each proving something the others cannot.
+Four layers, each proving something the others cannot.
 
 | Layer | Tool | What it proves |
 | --- | --- | --- |
-| Core | Vitest, Node | The mathematics. 43 tests, including a finite-difference check of every gradient |
-| Content | Vitest, Node | The source mapping. 27 tests, enforcing every rule listed above |
+| Core | Vitest, Node | The mathematics in `src/core/`. 56 tests, including a finite-difference check of every gradient and the preconditioned sampler |
+| Content | Vitest, Node | The source mapping in `src/content/`. 28 tests, enforcing every rule listed above |
+| Screen and figures | Vitest, jsdom | The laboratory on screen, in `src/components/lab/labs.test.tsx`, and every number a laboratory prints, recomputed with the settings its controls hold, in `src/components/lab/labFigures.test.tsx`. 35 tests — and the caption claims the figures make are measured rather than trusted |
+| Landing | Vitest, jsdom | The counts and the training budget the front page states, against the registry and the curriculum, in `src/pages/LandingPage.test.tsx`. 3 tests |
 | Browser | Playwright, Chromium | The student journey, and an axe-core audit of fourteen pages in both themes |
 
 The browser suite runs against the **production build**, because that is what a learner

@@ -3,12 +3,15 @@ import { fmt } from '@llm-materials/course-core'
 import { buildSchedule } from '../../core/schedules'
 import { qSample } from '../../core/forward'
 import { posteriorMean } from '../../core/forward'
-import { simplifiedObjectiveRatio, weightCurves } from '../../core/variational'
+import { boundTerm, simplifiedObjectiveRatio, weightCurves } from '../../core/variational'
+import { networkEvaluations } from '../../core/reverse'
 import type { ReverseConfig } from '../../core/reverse'
 import { Callout, Figure, Panel, SegmentedControl, Stat } from '@llm-materials/course-ui'
 import { DataTable, TrendChart } from '@llm-materials/course-ui'
 
 const SCHEDULE = buildSchedule('linear', 200)
+// The cost table is about the paper's chain, not the 200-step one the other screens sample on.
+const PAPER = buildSchedule('linear', 1000)
 const CONFIG: ReverseConfig = {
   schedule: SCHEDULE,
   parameterisation: 'epsilon',
@@ -26,9 +29,8 @@ export function VariationalLab() {
       SCHEDULE.betas.map((_, t) => ({
         x: t,
         ratio: simplifiedObjectiveRatio(t, CONFIG),
-        normalised: curves.weighted[t],
       })),
-    [curves],
+    [],
   )
 
   const decomposition = useMemo(() => {
@@ -36,38 +38,21 @@ export function VariationalLab() {
     const noise = [0.3, 0.6]
     const xT = qSample(x0, 60, noise, SCHEDULE)
 
-    // The "model" here is the exact posterior, so every per-step term is
-    // zero; the lab shows what the terms would be for a model that is wrong
-    // by a fixed amount in each coordinate.
-    const truth = posteriorMean(xT, x0, 60, SCHEDULE)
-    const wrong = truth.map((value) => value + 0.05)
-
     const rows: { t: number; kl: number; weight: number }[] = []
     for (let t = 1; t < SCHEDULE.steps; t += 2) {
-      const alphaBarPrevious = SCHEDULE.previousAlphaBars[t]
-      const alphaBar = SCHEDULE.alphaBars[t]
-      const alpha = SCHEDULE.alphas[t]
-      const beta = SCHEDULE.betas[t]
-      const denominator = 1 - alphaBar
-      const c0 = (Math.sqrt(alphaBarPrevious) * beta) / denominator
-      const cT = (Math.sqrt(alpha) * (1 - alphaBarPrevious)) / denominator
-      const mean = x0.map((value, i) => c0 * value + cT * (xT[i] ?? 0))
-
-      const posteriorStd = Math.sqrt(((1 - alphaBarPrevious) / denominator) * beta)
-      const modelStd = Math.sqrt(beta)
-      const kl =
-        0.5 *
-        (mean.reduce((acc, value, i) => {
-          const d = value - (wrong[i] ?? 0)
-          return acc + Math.log(modelStd / posteriorStd) + (posteriorStd ** 2 + d * d) / (2 * modelStd ** 2) - 0.5
-        }, 0))
-
-      rows.push({ t, kl, weight: simplifiedObjectiveRatio(t, CONFIG) })
+      // A reverse process whose mean is off by 0.05 in both coordinates at every step, so the
+      // only thing that varies along the chain is the pair of variances. Both distributions are
+      // Gaussian, so the term is the closed form of equation 11 evaluated — no network, no
+      // Monte Carlo.
+      const wrong = posteriorMean(xT, x0, t, SCHEDULE).map((value) => value + 0.05)
+      rows.push({ t, kl: boundTerm(xT, x0, t, wrong, CONFIG), weight: simplifiedObjectiveRatio(t, CONFIG) })
     }
     return rows
   }, [])
 
   const total = decomposition.reduce((acc, row) => acc + row.kl, 0)
+  const firstRatio = ratioData[0].ratio
+  const lastRatio = ratioData[ratioData.length - 1].ratio
 
   return (
     <div className="lab">
@@ -100,16 +85,24 @@ export function VariationalLab() {
             value={fmt(ratioData[ratioData.length - 1].ratio, 6)}
             hint="effectively nothing"
           />
-          <Stat label="Simplified weight" value="1" hint="everywhere, by definition" />
-          <Stat label="Per-step KL, summed" value={fmt(total, 4)} hint="nats, for a model off by 0.05" />
+          <Stat
+            label="Simplified weight"
+            value={fmt(curves.simplified[0], 4)}
+            hint="flat across the chain, by definition"
+          />
+          <Stat
+            label="Per-step KL, summed"
+            value={fmt(total, 4)}
+            hint={`nats, over the ${decomposition.length} steps plotted`}
+          />
         </div>
 
         {view === 'weights' ? (
           <>
             <Figure
               title="The weight the true bound puts on each timestep"
-              description="The weight of the true variational bound at each timestep, on a logarithmic scale, together with the flat weight of the simplified objective."
-              caption="The true bound weights the loss by β_t²/(2σ_t²α_t(1−ᾱ_t)). The simplified objective replaces that with 1, which is why small timesteps are effectively ignored."
+              description="The weight of the true variational bound at each timestep, against the flat weight of the simplified objective."
+              caption={`The true bound weights the loss by β_t²/(2σ_t²α_t(1−ᾱ_t)). The simplified objective replaces that with 1, which is why small timesteps are effectively ignored. The weight runs from ${fmt(curves.maxWeighted, 4)} at its largest to ${fmt(ratioData[ratioData.length - 1].ratio, 6)} at the last step, so most of the change happens in the first few steps — the flat tail is the shape of the curve, not a plotting error.`}
             >
               <TrendChart
                 data={ratioData}
@@ -117,7 +110,7 @@ export function VariationalLab() {
                   { key: 'ratio', name: 'the true weight', colour: 'var(--accent-violet)' },
                 ]}
                 xLabel="timestep t"
-                yLabel="weight (log scale)"
+                yLabel="weight"
                 height={300}
               />
             </Figure>
@@ -141,7 +134,9 @@ export function VariationalLab() {
             </Figure>
 
             <Callout tone="definition" title="Why the simplification is not a small change">
-              The true weight is enormous at small t and negligible at large t. Replacing it with a constant therefore
+              The true weight is {fmt(firstRatio, 4)} at the first step and {fmt(lastRatio, 6)} at the last — a factor
+              of {fmt(firstRatio / lastRatio, 0)} between the two ends of the chain, most of it spent in the first few
+              steps. Replacing it with a constant therefore
               does not rescale the objective — it changes which timesteps the network spends its capacity on. The paper
               reports that this gives worse codelengths and better samples, and the course leaves the judgement to the
               ablation rather than to an argument.
@@ -184,7 +179,7 @@ export function VariationalLab() {
           <>
             <Figure
               title="What a sample costs"
-              description="The number of network evaluations a sample costs for a given number of steps, and the wall-clock estimate that follows."
+              description="The number of network evaluations a sample costs for a given number of steps, and the fraction of the paper's T = 1000 that each one is."
               caption="The number of steps is the only number that matters for sampling cost. The paper uses T = 1000, so one sample costs one thousand network evaluations — which is why every later improvement in this area is about taking fewer steps."
             >
               <DataTable
@@ -192,8 +187,8 @@ export function VariationalLab() {
                 headers={['Steps', 'Network evaluations', 'Relative to T = 1000']}
                 rows={[1, 2, 4, 10, 20, 50, 100, 250, 500, 1000].map((steps) => [
                   steps,
-                  steps,
-                  `${fmt(steps / 1000, 4)}×`,
+                  networkEvaluations(PAPER, steps),
+                  `${fmt(networkEvaluations(PAPER, steps) / networkEvaluations(PAPER, PAPER.steps), 4)}×`,
                 ])}
               />
             </Figure>

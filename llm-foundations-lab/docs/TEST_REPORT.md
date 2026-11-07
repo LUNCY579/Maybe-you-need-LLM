@@ -18,7 +18,8 @@ trust: every assertion below is reproducible with the commands in
 | `src/components/lesson/ExplainBack.test.tsx` | Vitest + RTL | 7 | pass |
 | `src/content/collection.test.ts` | Vitest | 12 | pass |
 | `src/content/concepts.test.tsx` | Vitest + RTL | 13 | pass |
-| `src/content/content.test.tsx` | Vitest + RTL | 25 | pass |
+| `src/content/content.test.tsx` | Vitest + RTL | 26 | pass |
+| `src/content/labs.test.ts` | Vitest | 7 | pass |
 | `src/content/latex-escapes.test.ts` | Vitest | 1 | pass |
 | `src/content/routes.test.ts` | Vitest | 24 | pass |
 | `src/content/status.test.ts` | Vitest | 9 | pass |
@@ -44,14 +45,14 @@ trust: every assertion below is reproducible with the commands in
 | `src/core/studyPlan.test.ts` | Vitest | 17 | pass |
 | `src/pages/ReviewPage.test.tsx` | Vitest + RTL | 9 | pass |
 | `src/test/renderProbe.test.tsx` | Vitest + RTL | 1 | pass |
-| **Unit and component total** | | **543** | **all pass** |
+| **Unit and component total** | | **551** | **all pass** |
 <!-- END GENERATED: unit -->
 
 <!-- BEGIN GENERATED: e2e -->
 | Suite | Framework | Tests | Result |
 | --- | --- | --- | --- |
 | `e2e/capture.spec.ts` | Playwright | 3 (1 per browser) | pass (2 skipped) |
-| `e2e/course.spec.ts` | Playwright | 204 (68 per browser) | pass (2 skipped) |
+| `e2e/course.spec.ts` | Playwright | 207 (69 per browser) | pass (2 skipped) |
 | `e2e/forcedColors.spec.ts` | Playwright | 12 (4 per browser) | pass (4 skipped) |
 | `e2e/layout.spec.ts` | Playwright | 18 (6 per browser) | pass |
 | `e2e/offline.spec.ts` | Playwright | 4 (one engine) | pass |
@@ -59,11 +60,11 @@ trust: every assertion below is reproducible with the commands in
 
 | Suite | Framework | Tests | Result |
 | --- | --- | --- | --- |
-| **End-to-end, chromium** | | **80** | **80 pass** |
-| **End-to-end, firefox** | | **80** | **77 pass (3 skipped)** |
-| **End-to-end, webkit** | | **80** | **73 pass (7 skipped)** |
+| **End-to-end, chromium** | | **81** | **81 pass** |
+| **End-to-end, firefox** | | **81** | **78 pass (3 skipped)** |
+| **End-to-end, webkit** | | **81** | **74 pass (7 skipped)** |
 | **End-to-end, offline** | | **4** | **4 pass** |
-| **End-to-end total** | | **234 passed, 10 skipped** | |
+| **End-to-end total** | | **237 passed, 10 skipped** | |
 <!-- END GENERATED: e2e -->
 
 Also clean:
@@ -93,7 +94,7 @@ produced.
 
 ```bash
 npm install
-npm run test        # 543 unit and component tests
+npm run test        # 551 unit and component tests
 npm run test:e2e    # end-to-end runs (Chromium, Firefox and WebKit)
 npm run report      # rewrite the two tables above from a real run
 npm run check:links # ask every cited source whether it still resolves
@@ -1070,7 +1071,7 @@ npx playwright install chromium firefox webkit
 npm run typecheck   # expect: no output
 npm run lint        # expect: Found 0 warnings and 0 errors
 npm run contrast    # expect: 112 checks, 0 failures
-npm run test        # expect: Test Files 34 passed (34), Tests 543 passed (543)
-npm run test:e2e    # expect: 234 passed, 10 skipped
+npm run test        # expect: Test Files 35 passed (35), Tests 551 passed (551)
+npm run test:e2e    # expect: 237 passed, 10 skipped
 npm run build       # expect: built in ~2s
 ```

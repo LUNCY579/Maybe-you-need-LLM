@@ -132,6 +132,10 @@ const SUBTASKS: Subtask[] = [
   },
 ]
 
+function plural(count: number, noun: string): string {
+  return `${count} ${noun}${count === 1 ? '' : 's'}`
+}
+
 export function runMultiAgentLab(config: MultiAgentConfig = DEFAULT_MULTI_AGENT_CONFIG): MultiAgentRun {
   const rng = createRng(config.seed)
   const messages: AgentMessage[] = []
@@ -175,7 +179,6 @@ export function runMultiAgentLab(config: MultiAgentConfig = DEFAULT_MULTI_AGENT_
   })
 
   let round = 0
-  let coordinationFailures = messages.filter((message) => !message.delivered).length
   let defectsCaught = 0
   let defectsReachingAnswer = 0
 
@@ -265,6 +268,9 @@ export function runMultiAgentLab(config: MultiAgentConfig = DEFAULT_MULTI_AGENT_
 
   const completed = subtasks.filter((subtask) => subtask.status === 'completed').length
   const base = completed / subtasks.length
+  // One definition, used by both the score and the tile that reports it: what
+  // the student reads as a coordination failure is what penalised the score.
+  const coordinationFailures = messages.filter((message) => !message.delivered).length
   const coordinationPenalty = Math.min(0.4, coordinationFailures * 0.08)
   const defectPenalty = Math.min(0.5, defectsReachingAnswer * 0.12)
   const outcomeScore = Math.max(0, Math.round((base - coordinationPenalty - defectPenalty) * 100) / 100)
@@ -278,11 +284,14 @@ export function runMultiAgentLab(config: MultiAgentConfig = DEFAULT_MULTI_AGENT_
     handoffMap.set(key, existing)
   }
 
-  coordinationFailures = messages.filter((message) => !message.delivered).length
-
   const summary =
     outcomeScore >= 0.75
-      ? 'The team resolved the task. Verification and critique kept defects out of the answer.'
+      ? // Stated as the measurement rather than as a verdict: a resolved task with the
+        // verifier switched off must not be described as verified, and a run where the
+        // verifier caught nothing because nothing was defective must not claim credit.
+        `The team resolved the task: ${plural(defectsCaught, 'defect')} caught in review, ${defectsReachingAnswer} reached the answer${
+          config.verificationEnabled ? '' : ' with no verification step in the loop'
+        }.`
       : outcomeScore >= 0.4
         ? 'Partial success: some subtasks were resolved, but defects and dropped handoffs reduced confidence in the answer.'
         : 'Coordination failure: the answer should not be trusted. Check which messages were dropped and which defects were missed.'
@@ -315,13 +324,13 @@ export const MULTI_AGENT_PRESETS: MultiAgentPreset[] = [
   {
     id: 'reliable',
     label: 'Reliable channel, careful verifier',
-    description: 'Near-perfect delivery and a verifier that catches most defects.',
+    description: 'Delivery is near-perfect and the agents are careful: on this seed nothing defective is introduced at all, so the verifier has nothing to catch.',
     config: { ...DEFAULT_MULTI_AGENT_CONFIG, channelReliability: 0.98, verifierQuality: 0.9, researcherQuality: 0.95, executorQuality: 0.95 },
   },
   {
     id: 'lossy',
     label: 'Lossy channel',
-    description: 'One in three handoffs disappears; watch blocked subtasks appear.',
+    description: 'Two of eleven messages never arrive — a verification request and a critique — and the score pays for both, even though every subtask still completes.',
     config: { ...DEFAULT_MULTI_AGENT_CONFIG, channelReliability: 0.66 },
   },
   {

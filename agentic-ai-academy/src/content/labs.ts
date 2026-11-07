@@ -10,10 +10,24 @@
  * the manifest never made, and `sources` names the manifest source that owns it, so the
  * registry cannot invent a promise or launder one from the wrong paper.
  *
+ * `screen` names the component that computes the item. It is the audit's other pairing,
+ * for the entries whose route id is not the screen's file name: this application's pages
+ * are `PlanningLabPage.tsx`, `MemoryLongevityLabPage.tsx` and the rest, and its ids are the
+ * kebab-case routes they are mounted at. Without the field the audit finds a registry
+ * declaration and no screen to attach it to, which it prints as an unpaired row rather than
+ * pretending otherwise. The builder's screen and the context-window demo sit outside the
+ * directories the audit treats as laboratory surfaces, so `screen` is also how those two
+ * point at `src/pages/builder/WorkflowBuilderPage.tsx` and `src/ui/demos/…`.
+ *
  * Items that only a lesson's prose reaches are deliberately absent from this file. A
  * `taught` tier in the audit is not an audit failure: it says the course promises a
  * measurement it has not built yet, and declaring it here would turn an honest gap into a
  * false claim.
+ *
+ * Items reached by an interactive demonstration *inside* a lesson rather than by a laboratory
+ * route are declared in `DEMO_DELIVERIES` below, because the registry is one list of promises
+ * and the audit reads it as one list — the difference between the two is which surface the
+ * `screen` names, not whether the promise is kept.
  */
 export interface LabDefinition {
   id: string
@@ -30,6 +44,8 @@ export interface LabDefinition {
   sources?: string[]
   /** the declared laboratory items this screen computes */
   delivers?: string[]
+  /** the component that computes them, by file name; see the note above */
+  screen?: string
 }
 
 export const LABS: LabDefinition[] = [
@@ -45,6 +61,7 @@ export const LABS: LabDefinition[] = [
     runtime: 'Deterministic simulator · seeded scenarios · no model calls',
     accent: 'cyan',
     sources: ['van-duijn-2026', 'yao-2022-react'],
+    screen: 'WorkflowBuilderPage',
     delivers: [
       'Visual agent workflow builder',
       'Ch. 6, Ch. 9 and Ch. 11: the reason–act–observe loop.',
@@ -61,6 +78,9 @@ export const LABS: LabDefinition[] = [
     sourceChapters: [6, 9],
     runtime: 'Deterministic grid world · BFS planner · no randomness',
     accent: 'cyan',
+    sources: ['van-duijn-2026'],
+    screen: 'PlanningLabPage',
+    delivers: ['Planning'],
   },
   {
     id: 'memory',
@@ -73,8 +93,9 @@ export const LABS: LabDefinition[] = [
     sourceChapters: [9, 12],
     runtime: 'Deterministic memory simulation · salience-based eviction',
     accent: 'violet',
-    sources: ['packer-2023-memgpt'],
-    delivers: ['Ch. 9 §9.3.2.3: explicit memory management with read/write operations.'],
+    sources: ['packer-2023-memgpt', 'van-duijn-2026'],
+    screen: 'MemoryLabPage',
+    delivers: ['Ch. 9 §9.3.2.3: explicit memory management with read/write operations.', 'Memory'],
   },
   {
     id: 'world-model',
@@ -87,6 +108,9 @@ export const LABS: LabDefinition[] = [
     sourceChapters: [7, 9],
     runtime: 'Seeded Q-learning + value iteration · reproducible per seed',
     accent: 'emerald',
+    sources: ['van-duijn-2026', 'schmidhuber-2018-worldmodels'],
+    screen: 'WorldModelLabPage',
+    delivers: ['World model', 'Model-free versus model-based planning'],
   },
   {
     id: 'multi-agent',
@@ -99,6 +123,9 @@ export const LABS: LabDefinition[] = [
     sourceChapters: [14, 16, 17],
     runtime: 'Deterministic message-passing simulation · seeded channel loss',
     accent: 'amber',
+    sources: ['van-duijn-2026'],
+    screen: 'MultiAgentLabPage',
+    delivers: ['Multi-agent'],
   },
   {
     id: 'policy-priors',
@@ -108,13 +135,15 @@ export const LABS: LabDefinition[] = [
     description:
       'Two measurements on the same slip grid. First, one learned Q-table is transferred to three new task families and the interaction cost of each is measured against learning from scratch. Second, a model-based policy is retrained generation after generation on its own rollouts, and the learned model is scored against a fixed probe of the real dynamics.',
     concepts: ['Vision-language-action model (VLA)', 'Transfer', 'Negative transfer', 'Self-generated data', 'Compounding model error'],
-    sourceChapters: [7, 23],
-    runtime: 'Seeded tabular Q-learning + fitted transition counts · no model calls',
+    sourceChapters: [3, 7, 23],
+    runtime: 'Seeded tabular Q-learning + fitted transition counts · reward from the environment, not a learned model',
     accent: 'emerald',
-    sources: ['brohan-2023-rt2', 'black-2024-pi0'],
+    sources: ['brohan-2023-rt2', 'black-2024-pi0', 'guo-2025-deepseek-r1'],
+    screen: 'PolicyPriorsLabPage',
     delivers: [
       'Ch. 7 and Ch. 23: the earliest of the vision-language-action models, and the clearest statement of what web-scale pretraining buys a robot.',
       'Ch. 23 §23.2.2: a generalist robot policy trained on self-generated action data — the open-problem version of the world-model lesson.',
+      "Ch. 3 and Ch. 23 §23.2.2: reinforcement learning with verifiable rewards, and the case for training on the agent's own interaction data.",
     ],
   },
   {
@@ -128,10 +157,12 @@ export const LABS: LabDefinition[] = [
     sourceChapters: [9],
     runtime: 'Deterministic decay curve + seeded tabular softmax REINFORCE · no model calls',
     accent: 'violet',
-    sources: ['zhong-2024-memorybank', 'wang-2025-mem-alpha'],
+    sources: ['zhong-2024-memorybank', 'wang-2025-mem-alpha', 'zhou-2025-mem1'],
+    screen: 'MemoryLongevityLabPage',
     delivers: [
       "Ch. 9 §9.3.2.3: hierarchical summaries of a user's interactions, and memory that is forgotten and reinforced on an Ebbinghaus curve.",
       'Ch. 9 §9.3.2.3: the learned counterpart to explicit memory management — the agent decides what to remember, trained by reinforcement learning.',
+      'Ch. 9 §9.3.2.3: a compact state that is updated after every interaction, so the state does not run out of the context window.',
     ],
   },
   {
@@ -146,6 +177,7 @@ export const LABS: LabDefinition[] = [
     runtime: 'Deterministic battery · seeded per-step error · no model calls',
     accent: 'cyan',
     sources: ['wei-2022-cot', 'sprague-2024-cot-or-not', 'achiam-2024-gpt4'],
+    screen: 'ReasoningLabPage',
     delivers: [
       'Ch. 6 and Ch. 9: chain-of-thought prompting as interaction style C.',
       "Ch. 23 §23.2.2: the measurement behind the chapter's warning that more thinking is not always better.",
@@ -164,6 +196,7 @@ export const LABS: LabDefinition[] = [
     runtime: 'Deterministic scoring over a hand-authored corpus · no model calls',
     accent: 'emerald',
     sources: ['asai-2023-selfrag', 'press-2022-selfask', 'chen-2025-agentic-rag-survey'],
+    screen: 'AgenticRetrievalLabPage',
     delivers: [
       'Ch. 12 §12.4: adaptive retrieval with critique.',
       'Ch. 12 §12.4: question decomposition for multi-hop retrieval.',
@@ -174,9 +207,45 @@ export const LABS: LabDefinition[] = [
 
 export const LAB_BY_ID = new Map(LABS.map((lab) => [lab.id, lab]))
 
+/**
+ * A declared item computed by a demonstration inside a lesson.
+ *
+ * These are not in `LABS` because they are not routes: `content.test.ts` requires every
+ * laboratory entry to carry a page, a tagline and its own questions. What a demonstration and
+ * a laboratory share is the promise, so the audit reads both from the same kind of record —
+ * an `id`, the `screen` that computes the item, the sources that declared it, and a test that
+ * names that screen.
+ */
+export interface DemoDelivery {
+  id: string
+  name: string
+  /** the lesson demonstration that computes the items below */
+  screen: string
+  /** the `id`s in `references/manifest.json` whose `labs[]` entries are quoted below */
+  sources: string[]
+  delivers: string[]
+}
+
+export const DEMO_DELIVERIES: DemoDelivery[] = [
+  {
+    id: 'context-window-demo',
+    name: 'The context window, and what it does to the answer',
+    screen: 'ContextWindowDemo',
+    sources: ['mu-2023-gist'],
+    delivers: [
+      'Ch. 9 §9.3.2.2: learned prompt compression, and the honest caveat that compression necessarily loses nuance.',
+    ],
+  },
+]
+
 /** Every item the registry claims, with the entry and the manifest sources behind it. */
-export const LAB_ITEMS: { item: string; labId: string; sources: string[] }[] = LABS.flatMap(
-  (lab) => (lab.delivers ?? []).map((item) => ({ item, labId: lab.id, sources: lab.sources ?? [] })),
-)
+export const LAB_ITEMS: { item: string; labId: string; sources: string[] }[] = [
+  ...LABS.flatMap((lab) =>
+    (lab.delivers ?? []).map((item) => ({ item, labId: lab.id, sources: lab.sources ?? [] })),
+  ),
+  ...DEMO_DELIVERIES.flatMap((demo) =>
+    demo.delivers.map((item) => ({ item, labId: demo.id, sources: demo.sources })),
+  ),
+]
 
 export const ITEM_TO_LAB = new Map(LAB_ITEMS.map((entry) => [entry.item, entry.labId]))

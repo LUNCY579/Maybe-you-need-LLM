@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { fmt } from '@llm-materials/course-core'
-import { buildTaskSet, precisionTable, tasksNeededForDifference, wilsonInterval } from '../../core/tasks'
+import { buildTaskSet, difficultyHistogram, precisionTable, tasksNeededForDifference, wilsonInterval } from '../../core/tasks'
 import {
   GAIA_LEVELS,
   gaiaQuestions,
@@ -50,14 +50,7 @@ export function DesignLab() {
     [questions],
   )
 
-  const difficulty = useMemo(() => {
-    const buckets = [0, 0, 0, 0, 0]
-    for (const task of taskSet.tasks) {
-      const index = Math.min(4, Math.floor(task.difficulty * 5))
-      buckets[index] = (buckets[index] ?? 0) + 1
-    }
-    return buckets.map((count, index) => ({ x: index + 1, count }))
-  }, [taskSet])
+  const difficulty = useMemo(() => difficultyHistogram(taskSet.tasks), [taskSet])
 
   return (
     <div className="lab">
@@ -94,7 +87,7 @@ export function DesignLab() {
               caption="The mix is a choice, and it decides what the score means. Moving it moves the score, with nothing about the solver changing."
             >
               <TrendChart
-                data={difficulty}
+                data={difficulty.map((row) => ({ x: row.band, count: row.count }))}
                 series={[{ key: 'count', name: 'the tasks', colour: 'var(--accent-indigo)' }]}
                 xLabel="the difficulty band"
                 yLabel="the tasks"

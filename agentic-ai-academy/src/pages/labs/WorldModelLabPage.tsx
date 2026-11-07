@@ -59,6 +59,9 @@ export function WorldModelLabPage() {
   const [tab, setTab] = useState<'grid' | 'curve' | 'divergence'>('grid')
 
   const run = useMemo(() => runWorldModelLab(config), [config])
+  // The same environment with a planning agent that believes nothing ever slips:
+  // the comparison the first discussion prompt asks the student to make.
+  const naiveModel = useMemo(() => runWorldModelLab({ ...config, modelAccuracy: 0 }), [config])
   const cells = useMemo(() => allCells(config), [config])
   const update = (patch: Partial<WorldModelConfig>) => setConfig((current) => ({ ...current, ...patch }))
 
@@ -248,7 +251,13 @@ export function WorldModelLabPage() {
         <Card className="p-4">
           <h2 className="text-sm font-semibold">What to notice</h2>
           <ul className="text-muted mt-2 space-y-2 text-xs">
-            <li>Set model accuracy to 0.0: the planning agent believes its actions always work and walks into the pit more often.</li>
+            <li>
+              Set model accuracy to 0.0: the planning agent believes its actions always work. The cost is measurable rather than dramatic — mean
+              divergence {run.meanDivergence.toFixed(3)} becomes {naiveModel.meanDivergence.toFixed(3)} while on this seed the outcome does not move at
+              all ({naiveModel.modelBased.evaluation.averageReward.toFixed(2)} reward,{' '}
+              {(naiveModel.modelBased.evaluation.successRate * 100).toFixed(0)}% success). Read the divergence rather than the score: a plan built on a
+              wrong model can still arrive, and that is exactly the failure an outcome-only review cannot see.
+            </li>
             <li>Set slip to 0: both agents solve the task; the difference becomes cost, not outcome.</li>
             <li>
               Watch the divergence table: it converts “the model is wrong” into a number per state. That is the diagnostic value of a world model in a

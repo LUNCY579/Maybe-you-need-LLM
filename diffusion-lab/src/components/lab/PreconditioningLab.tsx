@@ -119,7 +119,7 @@ export function PreconditioningLab() {
         </div>
 
         <DataTable
-          caption={`The coefficients at σ = ${fmt(sigma, 4)}`}
+          caption={`The coefficients at σ = ${fmt(sigma, 3)}`}
           headers={['Quantity', 'Value', 'Why it is there']}
           rows={[
             ['c_skip', fmt(coefficients.cSkip, 6), 'keeps the clean input in the denoiser at low noise'],
@@ -157,7 +157,11 @@ export function PreconditioningLab() {
               value={`${fmt(first.distance / Math.max(1e-12, last.distance), 1)}×`}
               hint={`σ_max / σ_min is ${fmt(config.sigmaMax / config.sigmaMin, 0)}×`}
             />
-            <Stat label="The steps" value={String(config.steps)} hint="Euler steps" />
+            <Stat
+              label="The Euler steps"
+              value={String(sample.length - 1)}
+              hint={`one fewer than the ${config.steps} noise levels the schedule visits`}
+            />
           </div>
           <TrendChart
             data={distanceCurve}

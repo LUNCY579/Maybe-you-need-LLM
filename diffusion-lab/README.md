@@ -6,7 +6,7 @@ An interactive course on **diffusion probabilistic models**, built around
 > *Denoising Diffusion Probabilistic Models*,
 > arXiv:2006.11239 [cs.LG] / NeurIPS 2020.
 
-The site is a real learning environment. It contains a source-mapped curriculum, six
+The site is a real learning environment. It contains a source-mapped curriculum, seven
 laboratories that run real algorithms, a glossary whose dependencies are a checked
 directed acyclic graph, an equation reference with derivations and worked examples, and
 a graded assessment bank.
@@ -31,7 +31,7 @@ npm run dev          # http://localhost:5173
 | `npm run build` | Type-check (`tsc -b`) then produce a static bundle in `dist/` |
 | `npm run preview` | Serve the production build locally |
 | `npm run typecheck` | Type-check only |
-| `npm test` | Vitest unit and content tests (70 tests) |
+| `npm test` | Vitest unit and content tests (122 tests) |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run test:e2e` | Playwright browser tests, including the accessibility audit |
 | `npm run lint` | Oxlint |
@@ -57,7 +57,7 @@ There is no backend, no API key and no network call at runtime.
 Every lesson names the section and equation of the paper it was written from, and the
 test suite refuses a lesson that cites a section which is not in the source map.
 
-### The six laboratories
+### The seven laboratories
 
 | Lab | What you can change | What you can measure |
 | --- | --- | --- |
@@ -67,6 +67,7 @@ test suite refuses a lesson that cites a section which is not in the source map.
 | **D · Latent diffusion** | The latent dimension, the seed | The reconstruction error, the variance retained, the unit-variance scale, the saving in elements and in attention |
 | **E · Guidance** | The guidance weight, the condition | The exact guided score, the fidelity–diversity trade-off, the class posterior, and the tilted distribution |
 | **F · The variational bound** | The view | The weight of the true bound, the per-step KL terms, and the cost of a sample |
+| **G · Preconditioning** | The noise level, σ_data, the number of steps | The four EDM coefficients, the Karras noise ladder, and the sampler’s exact contraction from σ_max to σ_min |
 
 ### The rest of the course
 
@@ -98,6 +99,7 @@ actually is:
 | The forward process, the posterior, the KL divergence | Exact. Closed forms, evaluated. |
 | The guided score | Exact. The score of a Gaussian mixture is known in closed form. |
 | The compression saving | Exact arithmetic on the shapes involved. |
+| The Karras ladder and the EDM coefficients | Exact. The sampler runs on a data distribution concentrated at one point, so the optimal denoiser is known. |
 | The reconstruction error | Measured, on a linear autoencoder fitted to a generated dataset. |
 | The denoiser’s samples | From a two-layer perceptron trained here, on a generated ring of eight modes. |
 
@@ -121,9 +123,10 @@ src/
     guidance.ts      the exact score of a Gaussian mixture, and guided Langevin
     variational.ts   the KL between Gaussians, the bound, and its weights
     latent.ts        a principal-component autoencoder and the compression arithmetic
+    preconditioning.ts  the EDM coefficients, the Karras ladder, and the timestep↔σ clock
   content/         the course itself: curriculum, glossary, quiz, equations, sources
   components/
-    lab/             the six laboratories
+    lab/             the seven laboratories
     layout/          the shell and the error boundary
     ui/              the shared primitives and the mathematics renderer
     viz/             the chart wrappers

@@ -31,7 +31,7 @@ npm run dev          # http://localhost:5173
 | `npm run build` | Type-check (`tsc -b`) then produce a static bundle in `dist/` |
 | `npm run preview` | Serve the production build locally |
 | `npm run typecheck` | Type-check only |
-| `npm test` | Vitest unit and content tests (44 tests) |
+| `npm test` | Vitest unit and content tests (81 tests) |
 | `npm run test:e2e` | Playwright browser tests, including the accessibility audit |
 | `npm run lint` | Oxlint |
 

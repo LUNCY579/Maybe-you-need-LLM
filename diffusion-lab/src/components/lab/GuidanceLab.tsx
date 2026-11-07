@@ -17,6 +17,12 @@ const MEANS = [
   [0, -2.2],
 ]
 
+const SWEEP_WEIGHTS = [0, 0.5, 1, 2, 3, 5, 8]
+
+// One measurement setting for the whole screen: the sweep and the chosen weight have to be the
+// same run, or the table and the stats above it would be two different experiments.
+const MEASUREMENT = { samples: 60, stepSize: 0.04, steps: 150, seed: 77 }
+
 export function GuidanceLab() {
   const [view, setView] = useState<'sweep' | 'tradeoff'>('sweep')
   const [weight, setWeight] = useState(2)
@@ -24,35 +30,28 @@ export function GuidanceLab() {
 
   const mixture = useMemo(() => buildMixture(MEANS, 0.55), [])
 
-  const sweep = useMemo(
-    () =>
-      [0, 0.5, 1, 2, 3, 5, 8].map((w) => {
-        const measurement = measureGuidance(mixture, condition, w, {
-          samples: 40,
-          stepSize: 0.04,
-          steps: 150,
-          seed: 31,
-        })
-        return {
-          x: w,
-          fidelity: measurement.fidelity,
-          diversity: measurement.diversity,
-          accuracy: measurement.classAccuracy,
-        }
-      }),
-    [mixture, condition],
+  const weights = useMemo(
+    () => [...new Set([...SWEEP_WEIGHTS, weight])].sort((a, b) => a - b),
+    [weight],
   )
 
-  const current = useMemo(
-    () =>
-      measureGuidance(mixture, condition, weight, {
-        samples: 60,
-        stepSize: 0.04,
-        steps: 150,
-        seed: 77,
-      }),
-    [mixture, condition, weight],
+  const measurements = useMemo(
+    () => weights.map((w) => ({ w, ...measureGuidance(mixture, condition, w, MEASUREMENT) })),
+    [mixture, condition, weights],
   )
+
+  const sweep = useMemo(
+    () =>
+      measurements.map((measurement) => ({
+        x: measurement.w,
+        fidelity: measurement.fidelity,
+        diversity: measurement.diversity,
+        accuracy: measurement.classAccuracy,
+      })),
+    [measurements],
+  )
+
+  const current = measurements[weights.indexOf(weight)]!
 
   const scoreField = useMemo(() => {
     const points: { x: number; y: number; group: string }[] = []
@@ -162,7 +161,7 @@ export function GuidanceLab() {
 
             <Figure
               title="Samples at the chosen weight"
-              description="Sixty samples drawn with annealed Langevin dynamics under the guided score, with the four modes of the mixture marked."
+              description="Sixty samples drawn with Langevin dynamics at a fixed step size under the guided score, with the four modes of the mixture marked."
               caption="Samples from the guided model. They are not drawn from the mixture any more: they are drawn from the mixture tilted by p(c|x)^w."
             >
               <PointChart
@@ -191,7 +190,7 @@ export function GuidanceLab() {
             <Figure
               title="Fidelity against the guidance weight"
               description="The mean distance from a sample to the mode it was asked for, and the mean distance between two samples of the same class, against the guidance weight."
-              caption="Fidelity and diversity against the guidance weight. Both fall as w rises: the samples get closer to the mode they were asked for, and further from each other."
+              caption="Fidelity and diversity against the guidance weight. Both fall as w rises: the samples get closer to the mode they were asked for and closer to each other. The second half of that sentence is the price."
             >
               <TrendChart
                 data={sweep}
@@ -206,10 +205,10 @@ export function GuidanceLab() {
             </Figure>
 
             <DataTable
-              caption="The trade-off, measured"
+              caption="The trade-off, measured — the starred row is the weight on the slider"
               headers={['w', 'Fidelity', 'Diversity', 'Class accuracy']}
               rows={sweep.map((row) => [
-                row.x.toFixed(1),
+                row.x === weight ? `${row.x.toFixed(1)} ✱` : row.x.toFixed(1),
                 fmt(row.fidelity, 4),
                 fmt(row.diversity, 4),
                 `${fmt(row.accuracy * 100, 1)}%`,

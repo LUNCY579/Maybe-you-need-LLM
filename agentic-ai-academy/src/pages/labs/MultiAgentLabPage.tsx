@@ -18,6 +18,17 @@ export function MultiAgentLabPage() {
   const [tab, setTab] = useState<'events' | 'handoffs' | 'subtasks'>('events')
 
   const run = useMemo(() => runMultiAgentLab(config), [config])
+  // The discussion prompts make comparative claims, so the comparisons are run
+  // here rather than asserted from memory: the same task, one setting changed.
+  const variants = useMemo(
+    () => ({
+      noVerification: runMultiAgentLab({ ...config, verificationEnabled: false }),
+      noCritic: runMultiAgentLab({ ...config, criticEnabled: false }),
+    }),
+    [config],
+  )
+  const presetRuns = useMemo(() => MULTI_AGENT_PRESETS.map((preset) => ({ preset, run: runMultiAgentLab(preset.config) })), [])
+  const lossyPreset = presetRuns.find((entry) => entry.preset.id === 'lossy')!
 
   const update = (patch: Partial<MultiAgentConfig>) => {
     const next = { ...config, ...patch }
@@ -75,9 +86,9 @@ export function MultiAgentLabPage() {
             </Button>
           </Panel>
 
-          <Panel title="Presets" subtitle="Each preset changes the coordination conditions, not the task.">
+          <Panel title="Presets" subtitle="Each preset changes the coordination conditions, not the task. The line under each one is that configuration measured, not promised.">
             <div className="space-y-2">
-              {MULTI_AGENT_PRESETS.map((preset) => (
+              {presetRuns.map(({ preset, run: presetRun }) => (
                 <button
                   key={preset.id}
                   onClick={() => setConfig(preset.config)}
@@ -86,13 +97,17 @@ export function MultiAgentLabPage() {
                 >
                   <span className="font-medium">{preset.label}</span>
                   <span className="text-muted mt-1 block">{preset.description}</span>
+                  <span className="text-muted mt-1 block font-mono text-[11px]">
+                    score {presetRun.outcomeScore.toFixed(2)} · {presetRun.coordinationFailures}/{presetRun.messages.length} messages lost ·{' '}
+                    {presetRun.defectsCaught} caught · {presetRun.defectsReachingAnswer} reaching the answer · {presetRun.rounds} round(s)
+                  </span>
                 </button>
               ))}
             </div>
           </Panel>
 
           <Panel title="Roles" subtitle="Specialisation is a harness-level decision.">
-            <ul className="space-y-2 text-xs">
+            <ul aria-label="Role statistics" className="space-y-2 text-xs">
               {(['planner', 'researcher', 'executor', 'verifier', 'critic'] as const).map((role) => {
                 const stats = run.agents.find((agent) => agent.role === role)
                 const active = Boolean(stats)
@@ -212,7 +227,7 @@ export function MultiAgentLabPage() {
 
           <TabPanel idPrefix="multi-agent-tabs" id="subtasks" active={tab === 'subtasks'}>
             <Panel title="Subtask status" subtitle="How each part of the diagnosis ended.">
-              <ul className="space-y-2 text-xs">
+              <ul aria-label="Subtask status" className="space-y-2 text-xs">
                 {run.subtasks.map((subtask) => (
                   <li key={subtask.id} className="surface-2 rounded border p-2" style={{ borderColor: 'var(--border-soft)' }}>
                     <div className="flex flex-wrap items-center gap-2">
@@ -237,17 +252,25 @@ export function MultiAgentLabPage() {
           <h2 className="text-sm font-semibold">Coordination failure modes on display</h2>
           <ul className="text-muted mt-2 space-y-2 text-xs">
             <li>
-              <strong>Dropped handoffs</strong> leave downstream agents working from stale context — the executor-acts-on-old-plan failure of Ch. 16.
+              <strong>A dropped handoff costs the check, not necessarily the answer.</strong> On these settings{' '}
+              {run.coordinationFailures} of {run.messages.length} messages never arrive, the transcript names the subtask whose verification
+              request was lost, and that subtask is still reported as completed. The loss is visible in the log, not in the outcome.
             </li>
             <li>
-              <strong>Verification is not free, but skipping it is expensive.</strong> Turn the verifier off and watch defects reach the answer.
+              <strong>Verification is not free, but skipping it is expensive.</strong> Turn the verifier off and the same task ends with{' '}
+              {variants.noVerification.defectsReachingAnswer} defect(s) uncaught and a score of {variants.noVerification.outcomeScore.toFixed(2)}
+              , against {run.defectsCaught} caught and {run.outcomeScore.toFixed(2)} with it on.
             </li>
             <li>
-              <strong>Critiques can be lost too.</strong> If the critique message is dropped, the team never gets the revision round it needed.
+              <strong>Critiques can be lost too.</strong> An objection is an ordinary message on an ordinary channel: on the Lossy channel preset{' '}
+              {lossyPreset.run.messages.filter((message) => message.kind === 'critique' && !message.delivered).length} of{' '}
+              {lossyPreset.run.messages.filter((message) => message.kind === 'critique').length} critiques never arrives, and every subtask still
+              completes. That is why this lab prints the message log rather than a verdict.
             </li>
             <li>
-              <strong>More structure is not automatically better.</strong> Compare rounds and score as you add the critic: extra roles add coordination
-              cost.
+              <strong>More structure is not automatically better.</strong> The critic adds {run.messages.length - variants.noCritic.messages.length}{' '}
+              messages to the team, and each one that is dropped is charged against the score. Compare rounds and score as you add roles: structure
+              buys checks and costs delivery.
             </li>
           </ul>
         </Card>
@@ -259,8 +282,9 @@ export function MultiAgentLabPage() {
               executor applies it, and the verifier either catches or misses the defect.
             </li>
             <li>
-              Message delivery is drawn from a seeded generator, so a given configuration always yields the same trace and the same score. Changing the
-              seed is the only source of variation.
+              Message delivery is drawn from a seeded generator (seed {config.seed}), so a configuration always yields the same trace and the same
+              score. The seed belongs to the simulation and is not a control on this screen, so every difference you see here comes from the
+              coordination settings rather than from luck.
             </li>
             <li>
               This models <em>coordination mechanics</em>, not language understanding. It shows why handoff reliability, verification and attribution

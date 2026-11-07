@@ -7,7 +7,7 @@ courses, and the components that show them.
 ```bash
 npm install          # from the workspace root
 npm run build        # tsc -b
-npm test             # 42 tests
+npm test             # 23 tests
 ```
 
 ## What it holds

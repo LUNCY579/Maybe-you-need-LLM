@@ -298,6 +298,53 @@ describe('an application’s own registry', () => {
     expect(registry.get(normalise('One idea here')).lab).toBe('first')
     expect(registry.get(normalise('Another idea here')).lab).toBe('second')
   })
+
+  it('reads a double-quoted item that contains an apostrophe', () => {
+    // The bug this pins was silent and cost two of the collection’s declarations: pairing
+    // quotes by scanning left to right treats the apostrophe in `user's` as the end of a
+    // single-quoted literal, so the item is never seen and the application is reported as
+    // not having claimed it.
+    const registry = registryOf([
+      file(
+        'src/content/labs.ts',
+        `export const LABS = [
+  { id: 'memory-longevity', delivers: [
+    "Hierarchical summaries of a user's interactions, forgotten and reinforced on a curve",
+  ] },
+]`
+      ),
+    ])
+    expect(registry.size).toBe(1)
+    expect(registry.get(normalise("Hierarchical summaries of a user's interactions, forgotten and reinforced on a curve")).lab).toBe(
+      'memory-longevity',
+    )
+  })
+
+  it('reads an escaped apostrophe inside a single-quoted item', () => {
+    const registry = registryOf([
+      file(
+        'src/content/labs.ts',
+        `export const LABS = [
+  { id: 'reasoning', delivers: ['The measurement behind the chapter\\'s warning that more thinking is not always better'] },
+]`
+      ),
+    ])
+    expect([...registry.keys()]).toEqual([normalise("The measurement behind the chapter's warning that more thinking is not always better")])
+  })
+
+  it('keeps a screen declaration with the entry that wrote it', () => {
+    const registry = registryOf([
+      file(
+        'src/content/labs.ts',
+        `export const LABS = [
+  { id: 'first', screen: 'FirstLabPage', delivers: ['One idea here'] },
+  { id: 'second', delivers: ['Another idea here'] },
+]`
+      ),
+    ])
+    expect(registry.get(normalise('One idea here')).screen).toBe('FirstLabPage')
+    expect(registry.get(normalise('Another idea here')).screen).toBeUndefined()
+  })
 })
 
 /* ------------------------------------------------------------------ the tiers */
@@ -320,6 +367,52 @@ describe('the tier a declared item lands in', () => {
   it('calls it mapped when no screen file answers the registry id', () => {
     const scan = makeScan({ content: registry, tests: rendering })
     expect(judge('Superposition in a tiny model', scan).status).toBe('mapped')
+  })
+
+  it('pairs a declaration by the screen it names, when its id names no file', () => {
+    // An application whose route ids are kebab-case and whose pages are `…LabPage.tsx` has
+    // no way to reach the id-and-filename convention. `screen:` is how it states the pairing
+    // anyway, and the audit resolves the name against every component in the application —
+    // including ones in directories it does not treat as laboratory surfaces.
+    const named = makeScan({
+      screens: [file('src/pages/labs/WorldModelLabPage.tsx', 'export function WorldModelLabPage() { return null }')],
+      content: [
+        file(
+          'src/content/labs.ts',
+          `export const LABS = [
+  { id: 'world-model', screen: 'WorldModelLabPage', delivers: ['Model-free versus model-based planning'] },
+]`,
+        ),
+      ],
+    })
+    expect(judge('Model-free versus model-based planning', named).unit).toBe('src/pages/labs/WorldModelLabPage.tsx')
+
+    const outside = makeScan({
+      surfaces: [file('src/ui/demos/ContextWindowDemo.tsx', 'export function ContextWindowDemo() { return null }')],
+      content: [
+        file(
+          'src/content/labs.ts',
+          `export const LABS = [
+  { id: 'memory', screen: 'ContextWindowDemo', delivers: ['Which facts survive a smaller window'] },
+]`,
+        ),
+      ],
+    })
+    expect(judge('Which facts survive a smaller window', outside).unit).toBe('src/ui/demos/ContextWindowDemo.tsx')
+  })
+
+  it('says so when a declaration names a screen that is not there', () => {
+    const scan = makeScan({
+      content: [
+        file(
+          'src/content/labs.ts',
+          `export const LABS = [
+  { id: 'gone', screen: 'NoSuchLabPage', delivers: ['An idea whose component was deleted'] },
+]`,
+        ),
+      ],
+    })
+    expect(judge('An idea whose component was deleted', scan).unit).toBe('unpaired')
   })
 
   it('calls an unregistered item tested when a screen and a test both name it', () => {
@@ -408,5 +501,66 @@ describe('the closed course', () => {
     const apps = new Set(manifest.sources.filter((source) => source.app).map((source) => source.app))
     expect(declared).toBe(200)
     expect(apps.size).toBe(16)
+  })
+
+  /** Every application with the items its sources promise. */
+  function itemsByApp() {
+    const byApp = new Map()
+    for (const source of manifest.sources) {
+      if (!source.app) continue
+      if (!byApp.has(source.app)) byApp.set(source.app, [])
+      for (const item of source.labs ?? []) byApp.get(source.app).push(item)
+    }
+    return byApp
+  }
+
+  it('holds every application of the collection at tested, not merely the three first closed', () => {
+    // `--strict` used to be run over the three courses that had adopted it, because the
+    // other thirteen were still being worked through. They are not any more, so the
+    // assertion is the whole collection: an item that loses its unit — a screen deleted,
+    // a test renamed, a matcher loosened — fails here rather than turning `verify` green
+    // with a smaller number in a column nobody reads.
+    const weak = []
+    for (const [app, items] of itemsByApp()) {
+      const scan = scanApp(app)
+      for (const item of items) {
+        const status = judge(item, scan).status
+        if (status !== 'tested') weak.push(`${app} :: ${item} -> ${status}`)
+      }
+    }
+    expect(weak).toEqual([])
+  })
+
+  it('reports which registries still leave items to the word matcher', () => {
+    // A registry entry is the application saying which screen computes which item; the
+    // word matcher is the audit guessing. The count is pinned so that dropping a
+    // `delivers` line is a decision, not an accident. The list is now empty: every item the
+    // collection declares is claimed by a unit that names its screen, including the Gist
+    // promise, which the context-window demo took on by fitting a compressor on the other
+    // windows instead of writing its summaries by hand.
+    const partial = []
+    for (const [app, items] of itemsByApp()) {
+      const scan = scanApp(app)
+      const declared = items.filter((item) => scan.registry.has(normalise(item))).length
+      if (declared < items.length) partial.push(`${app} ${declared}/${items.length}`)
+    }
+    expect(partial).toEqual([])
+  })
+
+  it('pairs every registry declaration with a component that exists', () => {
+    // `declares` says an application wrote the item down; `paired` says the audit found the
+    // screen it points at. A declaration that resolves to nothing is a promise with no
+    // address, and it used to be invisible: an application whose route ids are kebab-case
+    // and whose files are `…LabPage.tsx` paired with none of its own screens, so all of its
+    // rows rested on the word matcher while looking like they rested on a registry.
+    const unpaired = []
+    for (const [app, items] of itemsByApp()) {
+      const scan = scanApp(app)
+      for (const item of items) {
+        const verdict = judge(item, scan)
+        if (verdict.unit === 'unpaired') unpaired.push(`${app} :: ${verdict.lab} -> ${item}`)
+      }
+    }
+    expect(unpaired).toEqual([])
   })
 })

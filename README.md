@@ -58,8 +58,22 @@ evidence it finds — `tested` (a unit is the item and a check runs it), `mapped
 words are the item), `taught` (only the course text names it) or `gap`
 (nothing does).
 The last two are the work list, and a course is closed when `--strict` finds
-none of them; `mech-interp-lab` is the first, and its
-`src/content/labs.ts` is the registry convention the audit trusts most.
+none of them. All sixteen courses are closed now, so `verify` prints the report
+and then asserts over the whole collection, and
+`scripts/check-lab-coverage.test.mjs` asserts the stronger claim item by item:
+every one of the 200 is `tested`. What the audit trusts most is an application's
+own registry — the `src/content/labs.ts` convention, which names the screen that
+computes each promised item, and names it by `screen:` where the entry's route
+id is not the file's name. All 200 are declared that way, and every declaration
+resolves to a component that exists: `declares` and `paired` in the report are
+those two counts, and a registry line that points at no file is printed by
+`--gaps` rather than passing quietly. The last promise to find its unit was
+`agentic-ai-academy`'s learned prompt compression. Its context-window demo now
+fits a compressor on the other windows, ranks the one it is given out of sample,
+and prints the caveat the chapter attaches to the idea: on the report window the
+trained scorer keeps the right document, shortens it, and loses the headline
+number — which is a measurement, and a less flattering one than a demo that
+claimed the compression always works.
 
 The collection has a front door: [`hub/`](hub/) is one page that lists every
 course, every source with its licence, the learning path between the courses,
@@ -153,7 +167,7 @@ npm run sync:authors            # write the live arXiv author lists back into th
 npm run sync:citations          # write the catalogue's author lists into the courses' citations
 npm run check:citations         # fail if a course cites a source the catalogue disagrees with
 npm run check:coverage          # count which declared laboratory ideas have a unit behind them
-npm run check:coverage:strict   # fail if a course claimed closed has lost one
+npm run check:coverage:strict   # fail if any of the 200 declared ideas has lost its unit
 npm run generate:index          # regenerate references/INDEX.md
 npm run sync:catalogue          # copy the manifest where the site needs it
 npm run sync:metadata          # write the sitemaps, robots files and manifests
@@ -177,7 +191,7 @@ verify:standalone` runs those four gates in each of them, and `npm run verify`
 ends with it. The list is read from the directory rather than written down, so a
 course added outside the workspaces is gated the moment it appears;
 `scripts/verify-standalone.test.mjs` holds that invariant, and it is where the
-43 laboratory units these three courses declare are counted.
+laboratory units those three courses declare are counted.
 
 ---
 

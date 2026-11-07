@@ -2,13 +2,21 @@ import { describe, expect, it } from 'vitest'
 import {
   binomialProbability,
   buildTaskSet,
+  difficultyHistogram,
   pairedSignTest,
   passAtK,
   precisionTable,
   tasksNeededForDifference,
   wilsonInterval,
 } from './tasks'
-import { agentSolver, costPerTask, retrievalBaseline, verify } from './verifier'
+import {
+  agentSolver,
+  costPerTask,
+  repeatedRuns,
+  retrievalBaseline,
+  runSpread,
+  verify,
+} from './verifier'
 import {
   buildTrainingCorpus,
   measureContamination,
@@ -143,9 +151,64 @@ describe('the two solvers', () => {
     expect(costPerTask(agent)).toBeGreaterThan(0)
   })
 
-  it('the clean score removes the cheats', () => {
+  it('prices the score a weak criterion would have given', () => {
     const agent = agentSolver(taskSet.tasks, { seed: 5, cheatRate: 0.4 })
-    expect(agent.cleanScore).toBeLessThanOrEqual(agent.solved / taskSet.tasks.length)
+    // A cheat is never counted as solved, so the score the solver would have been given had the
+    // verifier accepted it is the reported score plus the cheats — and with a high cheat rate it
+    // is a great deal more.
+    expect(agent.inflatedScore).toBe((agent.solved + agent.cheated) / taskSet.tasks.length)
+    expect(agent.inflatedScore).toBeGreaterThan(agent.solved / taskSet.tasks.length)
+    expect(agent.cheated).toBeGreaterThan(0)
+  })
+})
+
+describe('the difficulty mix of a task set', () => {
+  it('counts every task once, in the band its difficulty falls in', () => {
+    const bands = difficultyHistogram(taskSet.tasks)
+    expect(bands.map((band) => band.band)).toEqual([1, 2, 3, 4, 5])
+    expect(bands.reduce((sum, band) => sum + band.count, 0)).toBe(taskSet.tasks.length)
+    for (const band of bands) {
+      expect(band.count).toBe(
+        taskSet.tasks.filter((task) => task.difficulty >= (band.band - 1) / 5 && task.difficulty < band.band / 5)
+          .length,
+      )
+    }
+  })
+
+  it('cuts the range into as many bands as it is asked for', () => {
+    const three = difficultyHistogram(taskSet.tasks, 3)
+    expect(three.map((band) => band.band)).toEqual([1, 2, 3])
+    expect(three.reduce((sum, band) => sum + band.count, 0)).toBe(taskSet.tasks.length)
+  })
+})
+
+describe('the noise between runs', () => {
+  it('runs both solvers again over the same tasks', () => {
+    const rows = repeatedRuns(taskSet.tasks, { runs: 4, seed: 3 })
+    expect(rows.map((row) => row.run)).toEqual([1, 2, 3, 4])
+    // The first run is the run the other figures use, so it is not a new number.
+    expect(rows[0]!.baseline).toBe((retrievalBaseline(taskSet.tasks, 3).solved / taskSet.tasks.length) * 100)
+    expect(rows[0]!.agent).toBe((agentSolver(taskSet.tasks, { seed: 3 }).solved / taskSet.tasks.length) * 100)
+    for (const row of rows) {
+      expect(row.baseline).toBeGreaterThanOrEqual(0)
+      expect(row.agent).toBeLessThanOrEqual(100)
+    }
+  })
+
+  it('measures the movement inside each solver, not the gap between them', () => {
+    // Two series that each move two points, with the agent's mean twenty above the baseline's.
+    const rows = [
+      { run: 1, baseline: 60, agent: 80 },
+      { run: 2, baseline: 62, agent: 82 },
+    ]
+    // The pooled within-series deviation of two such series is the deviation of either one: the
+    // gap between the solvers is not noise, and a figure that called it noise would be measuring
+    // the difference it was drawn to explain.
+    expect(runSpread(rows).deviation).toBeCloseTo(Math.SQRT2, 10)
+    expect(runSpread(rows).deviation).toBeLessThan(10)
+    expect(runSpread(rows).mean).toBe(71)
+    // One run of each carries no movement at all.
+    expect(runSpread(rows.slice(0, 1))).toEqual({ mean: 70, deviation: 0 })
   })
 })
 

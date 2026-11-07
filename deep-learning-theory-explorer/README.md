@@ -39,7 +39,7 @@ npm run dev          # http://localhost:5178
 | `npm run dev` | Vite dev server |
 | `npm run build` | Type-check (`tsc -b`) and produce a production build in `dist/` |
 | `npm run typecheck` | Type-check only |
-| `npm test` | Vitest unit, numerical and component suite (355 tests; the one that checks every external link needs the network and skips without it) |
+| `npm test` | Vitest unit, numerical and component suite (386 tests; the one that checks every external link needs the network and skips without it) |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run test:e2e` | Playwright end-to-end suite (166 tests, Chromium) |
 | `npm run test:all` | unit tests → production build → end-to-end tests |
@@ -228,7 +228,7 @@ src/
 tools/               build-time scripts: claims-scan.mjs lists the prose that states a
                      measurement; readCollection.mjs reads the collection's catalogue
                      into src/content/collection.generated.ts
-tests/               Vitest: 37 files, 355 tests
+tests/               Vitest: 40 files, 386 tests
 e2e/                 Playwright: 33 files, 166 tests
 docs/                curriculum map, licensing, reproducibility, test report
 ```

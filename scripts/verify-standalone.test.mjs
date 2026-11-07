@@ -87,4 +87,14 @@ describe('the aggregate gate', () => {
     expect(root.scripts['verify:standalone']).toBe('node scripts/verify-standalone.mjs')
     expect(root.scripts.verify).toContain('npm run verify:standalone')
   })
+
+  it('asserts the laboratory audit rather than only printing it', () => {
+    // `check:coverage` is a report and always exits 0; the collection's promise is
+    // that a declared idea with no unit behind it stops `verify` instead of
+    // becoming a smaller number in a column.
+    const root = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
+    expect(root.scripts['check:coverage']).toBe('node scripts/check-lab-coverage.mjs --gaps')
+    expect(root.scripts['check:coverage:strict']).toBe('node scripts/check-lab-coverage.mjs --strict')
+    expect(root.scripts.verify).toContain('npm run check:coverage:strict')
+  })
 })

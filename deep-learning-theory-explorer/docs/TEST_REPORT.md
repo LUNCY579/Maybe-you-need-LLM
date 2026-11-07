@@ -10,7 +10,7 @@ Recorded on the branch `feature/deep-learning-theory-explorer`.
 ## 1. How to run the suites
 
 ```bash
-npm test          # Vitest: 37 files, 355 tests
+npm test          # Vitest: 40 files, 387 tests (386 pass; one needs the network)
 npm run test:e2e  # Playwright: 33 files, 166 tests (Chromium)
 npm run build     # tsc -b + vite build
 ```
@@ -25,7 +25,7 @@ emit. It is now the plain build, and the copies are gone.
 
 ---
 
-## 2. Unit, numerical and component suite (Vitest) — 355 tests, 354 passing
+## 2. Unit, numerical and component suite (Vitest) — 387 tests, 386 passing
 
 
 
@@ -44,7 +44,7 @@ emit. It is now the plain build, and the copies are gone.
 | `tests/persistence.test.ts` | 10 | Round-trip through `localStorage`, corrupt payloads, foreign payloads, a disabled store, the quiz score, and a browser that refuses to store the record |
 | `tests/components.test.tsx` | 18 | React Testing Library: the guided exercise checks the learner's value against the computed one and reports correctly; the preset banner; KaTeX rendering, inline math inside prose, the fact that prose is escaped rather than injected; a clickable term opens its definition and closes on Escape; the shell components, and the dimming of a result that belongs to the previous settings |
 | `tests/content.test.ts` | 27 | The curriculum inventory, cross-references, exercise answers, quiz validity, equation completeness, preset completeness, the source citation, the terminology registry and every `[[term]]` reference in the prose, every live lesson figure (and that no registered figure is left unused), and the activation registry against the criticality scanner |
-| `tests/exercises.test.ts` | 11 | The computed exercise answers: every entry is finite, the closed form and the numerical scanner agree, the three tanh power-law estimates are ordered as the theory requires, the NTK trace ratio is recomputed independently, and every prose answer quotes its computed value |
+| `tests/exercises.test.ts` | 15 | The computed exercise answers: every entry is finite, the closed form and the numerical scanner agree, the three tanh power-law estimates are ordered as the theory requires, the NTK trace ratio is recomputed independently, and every prose answer quotes its computed value |
 | `tests/shared-setup.test.ts` | 12 | The shared setup encoding: an exact round trip of every field and of the defaults, a compact string, a decoder that treats a link as untrusted input — unknown activations, unknown distributions, malformed and out-of-range numbers are refused — the query-string and URL forms round-tripped through a real URL parser, and the range check that every path into the setup goes through: a link, a pasted record and a button alike |
 | `tests/export.test.ts` | 5 | The CSV export: quoting of commas, quotes and newlines, empty fields, the numbers as written, and the provenance preamble |
 | `tests/search.test.ts` | 15 | The global search: a lesson is found by title, terms and equations and questions and experiments are found by body, a title match outranks a body match, a short or non-matching query returns nothing, the words of a query are matched one by one so that a reader who remembers them in a different order still finds the page, and every word of the query has to be present |
@@ -57,7 +57,7 @@ emit. It is now the plain build, and the copies are gone.
 | `tests/worker.test.ts` | 10 | The Web Worker path: the worker and the main thread return identical results for every runner, a failing runner reports its error rather than hanging, the registry stays the single source of truth, a worker that dies mid-measurement still yields the number, and the two-layer NTK comparison the lesson figure draws gets better as the network widens |
 | `tests/study-plan.test.ts` | 11 | The study plan: the next step is derived from the record rather than from a fixed list, a lesson whose prerequisites are unread is not recommended, a solved exercise is not recommended again, the plan suggests an experiment before the assessment, it labels every kind of step, it is deterministic for a given record, it reaches the end of the curriculum and then says what to review, the progress fraction counts each kind of work once, and the plan knows how long it is |
 | `tests/palette.test.ts` | 5 | The two copies of the palette: the same tokens in both themes, the JavaScript mirror in step with the CSS including the signal colours, both themes exposed, and every token given a paper value so that nothing prints dark on white |
-| `tests/claims.test.ts` | 5 | The claims the README makes, checked: every laboratory carries a limitation callout, records the seed of the run it logs, offers its numbers as a CSV, names the lessons it demonstrates, and does not compute on the main thread inside a render |
+| `tests/claims.test.ts` | 8 | The claims the README makes, checked: every laboratory carries a limitation callout, records the seed of the run it logs, offers its numbers as a CSV, names the lessons it demonstrates, and does not compute on the main thread inside a render |
 | `tests/order-one-numbers.test.ts` | 7 | The order-one numbers: the scanner finds 1, 2 and 1.98 for the linear, ReLU and leaky-ReLU activations, the lesson says exactly those numbers, the scanner reports distinct critical points rather than every wobble of the curve, the trivial fixed point is labelled as such, the sigmoid has one unphysical root and the softplus none |
 | `tests/feature-drift.test.ts` | 7 | The feature-drift claim: the drift falls as the network widens at the step size the application uses, the numbers the lesson and the gallery quote are the ones measured, the class separation is best in the middle as the lesson says, the ordering reverses at a large step size — which is why the claim is stated with its caveat — and the trend is not an artefact of one seed |
 | `tests/recipes.test.ts` | 3 | The reproducibility recipes and the presets they describe: every preset has a recipe, every recipe states the settings the application actually uses, and every setting the preset uses is stated |
@@ -71,6 +71,9 @@ emit. It is now the plain build, and the copies are gone.
 | `tests/external-links.test.ts` | 2 | The external references: every one of them is checked against the network, so a reading list cannot rot — the check needs the network, so it runs with `NETWORK=1` rather than by default |
 | `tests/contrast.test.ts` | 4 | The contrast audit of the tokens: every text colour clears the WCAG AA bar on the page background, the small uppercase labels clear it too, the signal colours are visible, and the panel borders are visible |
 | `tests/chart-colours.test.ts` | 6 | The chart colours: every series colour is visible against the panel it is drawn on, no two series are the same line to a reader, and — with the colours as a deuteranope sees them — no two series are the same line to a reader with the most common colour vision deficiency |
+| `tests/lab-registry.test.ts` | 7 | The laboratory registry: unique ids, names, routes and blurbs, a mounted screen for every entry, the lookup helpers it publishes, each declared item claimed once and nothing the manifest does not list, the list the shell really renders, the laboratories that mount the shared setup, and a lesson that reaches every laboratory |
+| `tests/lab-screens.test.tsx` | 8 | The laboratory screens as the reader meets them: each is mounted the way the shell mounts it — at its own route, inside the theme and shared-setup providers — and is held to its heading and to the numbers it paints, so a screen that prints `NaN` fails here rather than on the page |
+| `tests/drills.test.tsx` | 10 | The prerequisite drills: every tool the navigator lists has a drill, each one points at a screen the application serves, every drill is graded against a computation that exists and is finite, the tolerance is tight enough that the answer is not free, and the screen lists, accepts, explains on request and filters by tool |
 
 ### 2.1 The claims that are actually checked numerically
 
@@ -301,7 +304,7 @@ Playwright      1.64.x
 Platform        win32 (Windows), Chromium
 ```
 
-Unit suite: 354 passed / 355, 37 files, 22.6 s.
+Unit suite: 386 passed / 387, 40 files, 37.2 s.
 End-to-end suite: 155 passed / 166, 11 skipped (the screenshot captures, which
 need `CAPTURE=1`, and the service-worker checks, which need `PWA=1` against a
 production build), 33 files, 5.8 min.
