@@ -109,6 +109,18 @@
   font-weight: 600;
 }
 
+/* A built course is a link on the path; a planned course stays plain text. */
+a.catalogue-path-course-title {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.catalogue-path-course-title:hover,
+a.catalogue-path-course-title:focus-visible {
+  color: var(--accent-indigo, currentColor);
+  text-decoration: underline;
+}
+
 .catalogue-path-course-note {
   font-size: 0.8rem;
   color: var(--text-muted, #777);

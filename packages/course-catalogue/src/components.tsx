@@ -54,12 +54,16 @@ export function CourseList({
 export function LearningPathView({
   completed = [],
   available = [],
+  hrefBase = '/',
 }: {
   completed?: string[]
   available?: string[]
+  /** The prefix a link to a course needs, relative to the page showing the path. */
+  hrefBase?: string
 }): ReactNode {
   const layers = layersOf(LEARNING_PATH)
   const done = new Set(completed)
+  const built = new Set(available)
   const next = new Set(nextCourses(LEARNING_PATH, completed, available))
   const title = (id: string) => LEARNING_PATH.courses.find((course) => course.id === id)?.title ?? id
 
@@ -69,27 +73,40 @@ export function LearningPathView({
         <div key={index} className="catalogue-path-layer">
           <h3 className="catalogue-path-level">Level {index + 1}</h3>
           <ul className="catalogue-path-courses">
-            {layer.map((id) => (
-              <li
-                key={id}
-                className={
-                  done.has(id)
-                    ? 'catalogue-path-course catalogue-path-course-done'
-                    : next.has(id)
-                      ? 'catalogue-path-course catalogue-path-course-next'
-                      : 'catalogue-path-course'
-                }
-              >
-                <span className="catalogue-path-course-title">{title(id)}</span>
-                <span className="catalogue-path-course-note">
-                  {done.has(id)
-                    ? 'finished'
-                    : next.has(id)
-                      ? 'ready to start'
-                      : `needs ${prerequisitesOf(LEARNING_PATH, id).map(title).join(', ') || 'nothing'}`}
-                </span>
-              </li>
-            ))}
+            {layer.map((id) => {
+              /*
+                A course that is built is one a reader can open from the path
+                itself; a planned course stays a name with its prerequisites.
+              */
+              const open = built.has(id)
+              return (
+                <li
+                  key={id}
+                  className={
+                    done.has(id)
+                      ? 'catalogue-path-course catalogue-path-course-done'
+                      : next.has(id)
+                        ? 'catalogue-path-course catalogue-path-course-next'
+                        : 'catalogue-path-course'
+                  }
+                >
+                  {open ? (
+                    <a className="catalogue-path-course-title" href={`${hrefBase}${id}/`}>
+                      {title(id)}
+                    </a>
+                  ) : (
+                    <span className="catalogue-path-course-title">{title(id)}</span>
+                  )}
+                  <span className="catalogue-path-course-note">
+                    {done.has(id)
+                      ? 'finished'
+                      : next.has(id)
+                        ? 'ready to start'
+                        : `needs ${prerequisitesOf(LEARNING_PATH, id).map(title).join(', ') || 'nothing'}`}
+                  </span>
+                </li>
+              )
+            })}
           </ul>
         </div>
       ))}

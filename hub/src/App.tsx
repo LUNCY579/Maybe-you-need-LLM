@@ -7,7 +7,7 @@
  * hub cannot drift from the collection it describes.
  */
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   CONCEPTS,
   CatalogueSearch,
@@ -27,6 +27,7 @@ import { CollectionProgressPanel, useCollectionProgress } from './Progress'
 import { StartHere } from './StartHere'
 import { SourceBrowser } from './SourceBrowser'
 import { GlossaryPage } from './GlossaryPage'
+import '@llm-materials/course-catalogue/styles.css'
 import './styles.css'
 
 const manifest: CatalogueManifest = parseManifest(manifestJson)
@@ -35,6 +36,16 @@ const BUILT = manifest.apps.filter((app) => app.status === 'built')
 const PLANNED = manifest.apps.filter((app) => app.status === 'planned')
 const LAYERS = layersOf(LEARNING_PATH)
 const SUGGESTIONS = CONCEPTS.filter((concept) => concept.courses.length > 1).slice(0, 6)
+
+/** The sections the header links to, in page order; the scroll spy watches these. */
+const NAV_SECTIONS = [
+  { id: 'start', label: 'Start here' },
+  { id: 'courses', label: 'Courses' },
+  { id: 'path', label: 'The path' },
+  { id: 'concepts', label: 'Concepts' },
+  { id: 'sources', label: 'Sources' },
+  { id: 'glossary', label: 'Glossary' },
+]
 
 function App() {
   const [query, setQuery] = useState('')
@@ -50,6 +61,65 @@ function App() {
     () => [...buildCatalogueIndex(manifest), ...buildLessonIndex('', './')],
     [manifest],
   )
+
+  /*
+    How many lessons each built course has, from the same collected index the
+    cross-course search reads. A course whose lessons are not in the index (the
+    three standalone courses) gets no bar — the hub does not know its total, so
+    it does not claim one.
+  */
+  const lessonTotals = useMemo(() => {
+    const totals = new Map<string, number>()
+    for (const document of documents) {
+      if (document.kind === 'Lesson' && document.app) {
+        totals.set(document.app, (totals.get(document.app) ?? 0) + 1)
+      }
+    }
+    return totals
+  }, [documents])
+
+  /* The header underlines the section the reader is looking at. */
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+  useEffect(() => {
+    const sections = NAV_SECTIONS.map((section) => document.getElementById(section.id)).filter(
+      (element): element is HTMLElement => element !== null,
+    )
+    if (sections.length === 0 || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveSection(entry.target.id)
+        }
+      },
+      { rootMargin: '-15% 0px -65% 0px' },
+    )
+    for (const section of sections) observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
+  /* Pressing / anywhere outside a field jumps to the search box. */
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return
+      const target = event.target as HTMLElement | null
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return
+      }
+      const search = document.getElementById('hub-search')
+      if (!search) return
+      event.preventDefault()
+      search.focus()
+      search.scrollIntoView({ block: 'center' })
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark'
@@ -80,12 +150,15 @@ function App() {
             </span>
           </div>
           <nav className="hub-nav" aria-label="The collection">
-            <a href="#start">Start here</a>
-            <a href="#courses">Courses</a>
-            <a href="#path">The path</a>
-            <a href="#concepts">Concepts</a>
-            <a href="#sources">Sources</a>
-            <a href="#glossary">Glossary</a>
+            {NAV_SECTIONS.map((section) => (
+              <a
+                key={section.id}
+                href={`#${section.id}`}
+                aria-current={activeSection === section.id ? 'true' : undefined}
+              >
+                {section.label}
+              </a>
+            ))}
             <button type="button" className="hub-theme" onClick={toggleTheme}>
               Switch to the {theme === 'dark' ? 'light' : 'dark'} theme
             </button>
@@ -137,7 +210,8 @@ function App() {
             the shared core, so it behaves the same in every course.
           </p>
           <label className="hub-search-label" htmlFor="hub-search">
-            Search the collection
+            Search the collection <span className="hub-kbd-hint">or press</span>{' '}
+            <kbd className="hub-kbd">/</kbd>
           </label>
           <input
             id="hub-search"
@@ -201,6 +275,8 @@ function App() {
               const sources = manifest.sources.filter((source) => source.app === app.id)
               const primary = sources.find((source) => source.id === app.primarySource)
               const progress = progressById.get(app.id)
+              const done = progress?.completed ?? 0
+              const total = lessonTotals.get(app.id)
               const touched = progress !== undefined && (progress.completed > 0 || progress.knownTerms > 0)
               return (
                 <article key={app.id} className="hub-course">
@@ -213,12 +289,29 @@ function App() {
                       Built on <em>{primary.title}</em>, {primary.venue}
                     </p>
                   ) : null}
+                  {total !== undefined ? (
+                    <div
+                      className="hub-progress"
+                      role="progressbar"
+                      aria-valuemin={0}
+                      aria-valuemax={total}
+                      aria-valuenow={done}
+                      aria-label={`${done} of ${total} lessons complete`}
+                    >
+                      <div
+                        className="hub-progress-fill"
+                        style={{ width: `${Math.round((done / total) * 100)}%` }}
+                      />
+                    </div>
+                  ) : null}
                   <p className="hub-course-meta">
                     <span className="hub-level">Level {depthOf(LEARNING_PATH, app.id) + 1}</span>
                     {sources.length} sources · {app.modules.length} modules ·{' '}
-                    {touched
-                      ? `${progress.completed} lesson${progress.completed === 1 ? '' : 's'} done`
-                      : 'not started'}
+                    {total !== undefined
+                      ? `${done} of ${total} lessons complete`
+                      : touched
+                        ? `${done} lesson${done === 1 ? '' : 's'} done`
+                        : 'not started'}
                   </p>
                 </article>
               )
@@ -247,7 +340,7 @@ function App() {
             The courses are not independent. This is the order in which the material is cheapest to learn, and it is a
             claim about teaching, not about the mathematics: any course can be taken on its own.
           </p>
-          <LearningPathView available={BUILT.map((app) => app.id)} />
+          <LearningPathView available={BUILT.map((app) => app.id)} hrefBase="../" />
           <details className="hub-details">
             <summary>Why these edges</summary>
             <PathEdges />

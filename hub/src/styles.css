@@ -566,3 +566,86 @@ a {
   border-color: var(--accent-indigo);
   color: var(--accent-indigo);
 }
+
+/* The keyboard hint on the search label. */
+
+.hub-kbd-hint {
+  font-size: 0.78rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.hub-kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 0.3rem;
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+/* The header link for the section on screen. */
+
+.hub-nav a[aria-current='true'] {
+  border-bottom-color: var(--accent-indigo);
+  color: var(--accent-indigo);
+}
+
+/* The progress bar on a course card. */
+
+.hub-progress {
+  height: 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  overflow: hidden;
+}
+
+.hub-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent-teal);
+  transition: width 0.3s ease;
+}
+
+/* The other courses the learner has begun, under the start panel's button. */
+
+.hub-start-more {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.hub-start-more-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.hub-start-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  text-decoration: none;
+}
+
+.hub-start-chip:hover,
+.hub-start-chip:focus-visible {
+  border-color: var(--accent-indigo);
+  color: var(--accent-indigo);
+}
+
+.hub-start-chip-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

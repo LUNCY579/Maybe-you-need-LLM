@@ -66,6 +66,37 @@ test.describe('the collection page', () => {
     await expect(page.locator('.catalogue-path-course').first()).toBeVisible()
   })
 
+  test('a built course on the path is a link to that course', async ({ page }) => {
+    await page.goto('/')
+    const first = page.locator('.catalogue-path-course-title').first()
+    await expect(first).toBeVisible()
+    const tag = await first.evaluate((element) => element.tagName)
+    expect(tag).toBe('A')
+    expect(await first.getAttribute('href')).toMatch(/^\.\.\/.+\/$/)
+  })
+
+  test('a course card shows a progress bar with the lesson total', async ({ page }) => {
+    await page.goto('/')
+    const bar = page.locator('.hub-progress').first()
+    await expect(bar).toBeVisible()
+    const max = Number(await bar.getAttribute('aria-valuemax'))
+    expect(max).toBeGreaterThan(0)
+    expect(Number(await bar.getAttribute('aria-valuenow'))).toBeLessThanOrEqual(max)
+  })
+
+  test('pressing / focuses the collection search', async ({ page }) => {
+    await page.goto('/')
+    await page.keyboard.press('/')
+    await expect(page.getByLabel('Search the collection')).toBeFocused()
+  })
+
+  test('the header underlines the section on screen', async ({ page }) => {
+    await page.goto('/')
+    const link = page.getByRole('link', { name: 'Sources' }).first()
+    await link.click()
+    await expect(link).toHaveAttribute('aria-current', 'true', { timeout: 5000 })
+  })
+
   test('it lists the sources with their licences', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: 'The sources' })).toBeVisible()

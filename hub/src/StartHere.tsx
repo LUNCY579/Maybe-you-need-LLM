@@ -73,6 +73,21 @@ export function StartHere({ manifest }: { manifest: CatalogueManifest }) {
           See the whole path
         </a>
       </div>
+      {begun.length > 1 ? (
+        <div className="hub-start-more">
+          <span className="hub-start-more-label">Also in progress</span>
+          {begun
+            .filter((row) => row.id !== startId)
+            .map((row) => (
+              <a key={row.id} className="hub-start-chip" href={`../${row.id}/`}>
+                {row.title}
+                <span className="hub-start-chip-note">
+                  {row.completed} lesson{row.completed === 1 ? '' : 's'}
+                </span>
+              </a>
+            ))}
+        </div>
+      ) : null}
     </section>
   )
 }
