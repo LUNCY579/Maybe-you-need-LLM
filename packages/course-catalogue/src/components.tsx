@@ -140,13 +140,21 @@ export function PathEdges(): ReactNode {
 /* The concept index                                                           */
 /* -------------------------------------------------------------------------- */
 
-export function ConceptIndex({ sharedOnly = false }: { sharedOnly?: boolean }): ReactNode {
+export function ConceptIndex({ sharedOnly = false, focusTerm }: { sharedOnly?: boolean; focusTerm?: string | null }): ReactNode {
   const concepts = sharedOnly ? sharedConcepts() : CONCEPTS
   const title = (id: string) => LEARNING_PATH.courses.find((course) => course.id === id)?.title ?? id
   return (
     <ul className="catalogue-concept-list">
       {concepts.map((concept) => (
-        <li key={concept.id} className="catalogue-concept">
+        <li
+          key={concept.id}
+          className={
+            focusTerm && concept.term === focusTerm
+              ? 'catalogue-concept catalogue-concept-focus'
+              : 'catalogue-concept'
+          }
+          data-concept-term={concept.term}
+        >
           <span className="catalogue-concept-term">{concept.term}</span>
           <span className="catalogue-concept-summary">{concept.summary}</span>
           <span className="catalogue-concept-courses">{concept.courses.map(title).join(' · ')}</span>
@@ -198,10 +206,17 @@ export function CatalogueSearch({
   manifest,
   query,
   limit = 20,
+  onOpen,
 }: {
   manifest: CatalogueManifest
   query: string
   limit?: number
+  /**
+   * Called when a hit is opened. The component's own hrefs are only meaningful
+   * where a router understands them; a page that shows the hits itself should
+   * take the hit over and decide what opening it means.
+   */
+  onOpen?: (document: CatalogueDocument) => void
 }): ReactNode {
   const documents: CatalogueDocument[] = buildCatalogueIndex(manifest)
   const hits = query.trim().length === 0 ? [] : searchCatalogue(documents, query, { limit })
@@ -213,7 +228,20 @@ export function CatalogueSearch({
       {hits.map((hit) => (
         <li key={hit.document.id} className="catalogue-search-hit">
           <span className="catalogue-search-kind">{hit.document.kind}</span>
-          <a href={hit.document.href} className="catalogue-search-title">
+          <a
+            href={hit.document.href}
+            className="catalogue-search-title"
+            onClick={
+              onOpen
+                ? (event) => {
+                    event.preventDefault()
+                    // The index built above is the source of these hits, so the
+                    // document carries the catalogue's kind and app with it.
+                    onOpen(hit.document as CatalogueDocument)
+                  }
+                : undefined
+            }
+          >
             {hit.document.title}
           </a>
           <span className="catalogue-search-summary">{hit.document.summary}</span>

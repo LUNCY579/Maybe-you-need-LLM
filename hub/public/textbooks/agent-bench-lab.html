@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Benchmark Lab — textbook</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents"><a class="" href="#contents">Contents</a>
+<a class="" href="#1-task-design">1. Task Design</a>
+<a class="l2" href="#lesson-1-what-a-task-is">Lesson 1. What a task is</a>
+<a class="l2" href="#lesson-2-the-score-and-its-uncertainty">Lesson 2. The score and its uncertainty</a>
+<a class="" href="#2-verification">2. Verification</a>
+<a class="l2" href="#lesson-3-the-evaluation-criterion">Lesson 3. The evaluation criterion</a>
+<a class="l2" href="#lesson-4-the-cheat">Lesson 4. The cheat</a>
+<a class="" href="#3-the-baselines">3. The Baselines</a>
+<a class="l2" href="#lesson-5-the-agentless-baseline">Lesson 5. The agentless baseline</a>
+<a class="l2" href="#lesson-6-the-price-of-trying-again">Lesson 6. The price of trying again</a>
+<a class="" href="#4-variance-and-contamination">4. Variance and Contamination</a>
+<a class="l2" href="#lesson-7-one-run-or-many">Lesson 7. One run or many</a>
+<a class="l2" href="#lesson-8-has-the-model-seen-it">Lesson 8. Has the model seen it?</a>
+<a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
+<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+  <main class="book"><h1 id="agent-benchmark-lab">Agent Benchmark Lab</h1>
+<p><strong>Source:</strong> SWE-bench: Can Language Models Resolve Real-World GitHub Issues? — Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, Karthik Narasimhan (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The agentic course has a case study but no benchmark-design lesson, and benchmark design is where most agent claims are won or lost.</p>
+<p><strong>Source:</strong> GAIA: a benchmark for General AI Assistants — Grégoire Mialon, Clémentine Fourrier, Craig Swift, Thomas Wolf, Yann LeCun, Thomas Scialom (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> A benchmark designed around the question: can a general assistant do the easy part of a task and the hard part with the right tools?</p>
+<p><strong>Source:</strong> AgentBench: Evaluating LLMs as Agents — Xiao Liu, Hao Yu, Hanchen Zhang, Yifan Xu, Xuanyu Lei, Hanyu Lai, Yu Gu, Hangliang Ding, Kaiwen Men, Kejuan Yang, Shudan Zhang, Xiang Deng, Aohan Zeng, Zhengxiao Du, Chenhui Zhang, Sheng Shen, Tianjun Zhang, Yu Su, Huan Sun, Minlie Huang, Yuxiao Dong, Jie Tang (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Eight environments, and the finding that a score is only meaningful relative to a matched model size.</p>
+<p><strong>Source:</strong> WebArena: A Realistic Web Environment for Building Autonomous Agents — Shuyan Zhou, Frank F. Xu, Hao Zhu, Xuhui Zhou, Robert Lo, Abishek Sridhar, Xianyi Cheng, Tianyue Ou, Yonatan Bisk, Daniel Fried, Uri Alon, Graham Neubig (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Self-hosted reproducible environments, which is what makes an agent benchmark trustworthy.</p>
+<p><strong>Source:</strong> <span class="math-inline">$\tau$</span>-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains — Shunyu Yao, Noah Shinn, Pedram Razavi, Karthik Narasimhan (2024)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> A user simulator in the loop, which changes what the benchmark is actually measuring.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#1-task-design">1. Task Design</a> - <a href="#lesson-1-what-a-task-is">Lesson 1. What a task is</a> - <a href="#lesson-2-the-score-and-its-uncertainty">Lesson 2. The score and its uncertainty</a></li><li><a href="#2-verification">2. Verification</a> - <a href="#lesson-3-the-evaluation-criterion">Lesson 3. The evaluation criterion</a> - <a href="#lesson-4-the-cheat">Lesson 4. The cheat</a></li><li><a href="#3-the-baselines">3. The Baselines</a> - <a href="#lesson-5-the-agentless-baseline">Lesson 5. The agentless baseline</a> - <a href="#lesson-6-the-price-of-trying-again">Lesson 6. The price of trying again</a></li><li><a href="#4-variance-and-contamination">4. Variance and Contamination</a> - <a href="#lesson-7-one-run-or-many">Lesson 7. One run or many</a> - <a href="#lesson-8-has-the-model-seen-it">Lesson 8. Has the model seen it?</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<h2 id="1-task-design">1. Task Design</h2>
+<p><em>What a benchmark is made of</em></p>
+<p>The tasks, the difficulty mix, and the number of them. What a score on a task set means, and what it does not.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Say what makes a task a task, and what makes it a good one</li><li>Compute the uncertainty on a score, and the number of tasks a difference needs</li><li>Explain why a task set is a sample and the score is an estimate</li></ul>
+<h3 id="lesson-1-what-a-task-is">Lesson 1. What a task is</h3>
+<p><em>And what makes a good one</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what a benchmark task is: an environment, a goal and a verdict</li><li>Explain the three properties a good task set has</li><li>Describe what a difficulty mix does to a score</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A task is a starting state, a goal, and something that decides whether the goal was reached.</li><li>A good task set is diverse, verified, and hard enough that the trivial strategies fail.</li><li>The difficulty mix is a choice, and it decides what the score means.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is a benchmark, exactly? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>A set of tasks and a rule that decides whether each was solved</strong></li><li>- A dataset of problems with reference answers</li><li>- A metric</li><li>- A leaderboard</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The tasks and the verdict. Everything else — the score, the interval, the comparison — follows from the two.</p></blockquote>
+<p>*<em>Q. What does the difficulty mix of a task set decide? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>What the score means: a set of easy tasks and a set of hard ones measure different things</strong></li><li>- How long the benchmark takes to run</li><li>- Whether the tasks are verified</li><li>- The interval on the score</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Moving the mix moves the score, with nothing about the solver changing — which is why two benchmarks with different mixes are not comparable.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The task set, its difficulty mix, and the interval on its score. Open <strong>Look at the tasks</strong> in the agent-bench-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§swebench:3 The benchmark — The tasks, the repositories, and the criterion that decides whether a task is solved.</li><li>§gaia:3 The questions — The three levels, and the design of the questions at each.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>A benchmark</strong> — A set of tasks, and a rule that decides whether each was solved.</li><li><strong>A task</strong> — A starting state, a goal, and a way of telling whether the goal was reached.</li><li><strong>The difficulty mix</strong> — The proportion of the tasks that are easy, and the proportion that are hard.</li></ul>
+<h3 id="lesson-2-the-score-and-its-uncertainty">Lesson 2. The score and its uncertainty</h3>
+<p><em>What a number on a task set means</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Explain why a score on a task set is an estimate rather than a fact</li><li>Compute the interval on a score, and say why the usual one is wrong near zero</li><li>Compute how many tasks a given difference needs</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The tasks are a sample, and the score estimates the rate on the population.</li><li>The interval on a proportion is not symmetric, and near zero the normal approximation is nonsense.</li><li>A difference between two systems has to be bigger than the noise before it means anything.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A solver solves 12 of 200 tasks. Using the Wilson interval, is the score of 6% more likely to be near 6% or near 0%? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> The answer is zero for the normal approximation being useless: with twelve successes the interval is asymmetric, and the normal approximation would give a lower bound below zero. The Wilson interval keeps it inside the unit interval.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The interval on a score, and the number of tasks a difference needs. Open <strong>Size the uncertainty</strong> in the agent-bench-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§swebench:5 Discussion — The variance, and what a score on a task set means.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The interval on a score</strong> — The range the true rate plausibly lies in.</li><li><strong>The task set is a sample</strong> — The tasks are drawn from a population of tasks, and the score estimates the rate on it.</li><li><strong>Power</strong> — The chance of noticing a difference that is really there.</li></ul>
+<p><em>Read first:</em> What a task is</p>
+<h2 id="2-verification">2. Verification</h2>
+<p><em>The criterion that decides the task</em></p>
+<p>The two conditions a solution must satisfy, the failure mode a criterion has to catch, and what a verifier costs.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>State the two conditions and say what each is for</li><li>Describe the failure a verifier has to catch, and how it is caught</li><li>Explain why a verifier is the part of the benchmark that is hardest to get right</li></ul>
+<h3 id="lesson-3-the-evaluation-criterion">Lesson 3. The evaluation criterion</h3>
+<p><em>The two conditions</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the two conditions a solution must satisfy</li><li>Say what each condition is for, and what fails without it</li><li>Explain why the criterion is the hardest part of a benchmark to get right</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The failing test must start failing and end passing, and the passing tests must keep passing.</li><li>The first condition alone is satisfied by a solver that changes the test.</li><li>The second condition is what makes the first one mean something.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What are the two conditions a solution must satisfy? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The failing test must start failing and end passing, and the passing tests must keep passing</strong></li><li>- The failing test must pass, and the patch must be small</li><li>- The tests must pass, and the agent must have finished</li><li>- The failing test must pass, and no test file may be changed</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The first condition makes it a task; the second is what makes the first condition mean something.</p></blockquote>
+<p>*<em>Q. A patch that changes the failing test satisfies the first condition and nothing else. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Yes. The failing test now passes, so the transition holds — and the task is no harder than it was, which is why the second condition and the distrust of patches that touch tests are both needed.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The four kinds of patch, and the verdict each one gets. Open <strong>Check the criterion</strong> in the agent-bench-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§swebench:3.1 The evaluation criterion — The two conditions: the failing test must pass, and the passing tests must keep passing.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The verifier</strong> — The thing that decides whether a task was solved.</li><li><strong>The failing test must start failing and end passing</strong> — The first of the two conditions.</li><li><strong>The passing tests must keep passing</strong> — The second of the two conditions.</li></ul>
+<p><em>Read first:</em> What a task is</p>
+<h3 id="lesson-4-the-cheat">Lesson 4. The cheat</h3>
+<p><em>What a criterion has to catch</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the failure mode a solver that changes the test exploits</li><li>Explain how the criterion catches it</li><li>Say what a score means when the criterion is weak</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A solver that can change the test does not have to solve the task.</li><li>The criterion catches it by requiring the other tests to keep passing, and by distrusting a patch that touches a test.</li><li>A benchmark whose criterion is weak measures something else, and does not say what.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does a benchmark with a weak verifier measure? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>The solver’s ability to satisfy the verifier, which may not be the ability the benchmark claims to measure</strong></li><li>- Nothing at all</li><li>- The verifier’s quality</li><li>- The task set</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Gaming is not a moral failure: it is the correct response to a reward that is not the thing you wanted.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>A solver that changes the test, and the score it would have got. Open <strong>Watch the cheat</strong> in the agent-bench-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§swebench:3.1 The evaluation criterion — The criterion, and the failure it has to catch.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The verifier</strong> — The thing that decides whether a task was solved.</li><li><strong>Gaming the benchmark</strong> — Solving the verifier rather than the task.</li></ul>
+<p><em>Read first:</em> The evaluation criterion</p>
+<h2 id="3-the-baselines">3. The Baselines</h2>
+<p><em>What a score has to beat</em></p>
+<p>The agentless baseline, the agent that tries several times, and the arithmetic of what the second one costs.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Describe the agentless baseline and why it is the number to beat</li><li>Compare an agent with the baseline on the same tasks</li><li>Measure the cost of the agent in attempts, and say what it buys</li></ul>
+<h3 id="lesson-5-the-agentless-baseline">Lesson 5. The agentless baseline</h3>
+<p><em>What a score has to beat</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the agentless baseline and what it does</li><li>Explain why it is the number every agent has to beat</li><li>Compare it with an agent on the same tasks</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The baseline retrieves the relevant file and makes one obvious change.</li><li>Most of what an agent adds is the ability to try again, and that has a price.</li><li>The comparison has to be on the same tasks, with the same verifier.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why is the agentless baseline the number to beat? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Because it is cheap, and an agent that cannot beat a cheap baseline is not earning its cost</strong></li><li>- Because it is stronger</li><li>- Because it is the state of the art</li><li>- Because it does not use a model</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> It does the obvious thing once. An agent that adds a loop and a search has to beat that with the loop’s cost.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The agentless baseline, its score, and the interval on it. Open <strong>Run the baseline</strong> in the agent-bench-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§swebench:4 The results — The agentless baseline, and the argument that the agent is not the bottleneck.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The agentless baseline</strong> — Retrieve the file, make the obvious change, and stop.</li><li><strong>A solver</strong> — The thing that attempts the tasks.</li></ul>
+<p><em>Read first:</em> The evaluation criterion</p>
+<h3 id="lesson-6-the-price-of-trying-again">Lesson 6. The price of trying again</h3>
+<p><em>What the agent spends</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Measure the number of attempts an agent makes</li><li>Compare the agent with the baseline on the same tasks</li><li>Say what the extra attempts buy and what they cost</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>An agent that tries several times solves more tasks and makes more attempts.</li><li>The attempts are the cost, and they are paid in model calls.</li><li>So the comparison is not between the two scores but between the two scores per attempt.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does an agent spend that the baseline does not? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Attempts, which are model calls</strong></li><li>- Nothing</li><li>- Only the score</li><li>- The verifier</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> So the comparison is not between the two scores but between the two scores per attempt.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The agent, the attempts it makes, and the tasks it solves. Open <strong>Run the agent</strong> in the agent-bench-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§swebench:4 The results — The comparison of the agent with the baseline.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>A solver</strong> — The thing that attempts the tasks.</li><li><strong>pass@k</strong> — The chance that at least one of k attempts succeeds.</li></ul>
+<p><em>Read first:</em> The agentless baseline</p>
+<h2 id="4-variance-and-contamination">4. Variance and Contamination</h2>
+<p><em>The two ways a benchmark lies to you</em></p>
+<p>The variance of a score, the difference between one run and many, and the overlap test that finds a task the model has already seen.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Compute the variance of a score, and the interval that goes with it</li><li>Explain the unbiased estimate of pass@k, and why a single run overstates it</li><li>Measure contamination with an n-gram overlap, and say what the length of the n-gram decides</li></ul>
+<h3 id="lesson-7-one-run-or-many">Lesson 7. One run or many</h3>
+<p><em>The variance, and the pass@k estimator</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compute the variance of a score across runs</li><li>Explain why a single run overstates pass@k, and what the unbiased estimate is</li><li>Say how many samples a comparison needs</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A solver is stochastic, so one run is one sample of a distribution.</li><li>The naive estimate of pass@k is biased upwards, and the correction is what makes two sample budgets comparable.</li><li>The paired comparison is more sensitive than comparing two independent scores.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A single run of a stochastic solver is one sample of a distribution, not a measurement of it. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Yes. The spread across runs is the noise in every comparison made from single runs, and it is what a reported score leaves out.</p></blockquote>
+<p>*<em>Q. Why is the naive estimate of pass@k biased upwards? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>Because the samples that succeeded are more likely to be the ones counted, so the estimate overstates the chance of at least one success</strong></li><li>- Because the tasks are hard</li><li>- Because k is usually too small</li><li>- It is not biased</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The unbiased estimator corrects for it, and the correction is what makes two different sample budgets comparable.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The score across repeated runs, and the interval it implies. Open <strong>Measure the variance</strong> in the agent-bench-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§swebench:5 Discussion — The variance of a score across runs.</li><li>§agentbench:3 The environments — The eight environments, and what each one measures.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The variance of a score</strong> — How much the score moves when the solver is run again.</li><li><strong>pass@k</strong> — The chance that at least one of k attempts succeeds.</li><li><strong>A paired comparison</strong> — Comparing two systems on the same tasks.</li></ul>
+<p><em>Read first:</em> The score and its uncertainty</p>
+<h3 id="lesson-8-has-the-model-seen-it">Lesson 8. Has the model seen it?</h3>
+<p><em>Contamination, and the overlap that finds it</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe what benchmark contamination is and why it invalidates a score</li><li>Measure it with an n-gram overlap, and report the two rates it gives</li><li>Say what the length of the n-gram decides, and what the threshold decides</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A task the model has already seen is not a measurement of anything.</li><li>The detection is an overlap test, and it has two failure modes: too short a match catches ordinary text, too long a match misses an edited copy.</li><li>So the length and the threshold are decisions, and the rates they give are the report.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does contamination do to a benchmark? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>It flatters the systems that were trained on the leaked data, and makes the score meaningless for them</strong></li><li>- It lowers every score equally</li><li>- It makes the benchmark harder</li><li>- Nothing, if the tasks are verified</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A task the model has already seen measures the training data rather than the solver, and the error is not evenly spread over the systems.</p></blockquote>
+<p>*<em>Q. What does the length of the n-gram decide in the overlap test? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>Whether an edited copy is caught: a short n-gram survives the edit, a long one does not</strong></li><li>- How fast the test runs</li><li>- Whether the tasks are contaminated</li><li>- The score</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> And a short n-gram also catches ordinary text, so the length trades a false-positive rate against a true-positive rate — which is why both are reported.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The overlap of every task’s solution with a training corpus, and the rates the test gives. Open <strong>Look for the leak</strong> in the agent-bench-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§swebench:5 Discussion — The contamination, and what it does to a score.</li><li>§webarena:4 Evaluation — The evaluation functions, and the difference between them and a string match.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Contamination</strong> — The model has already seen the task, or its answer.</li><li><strong>The overlap test</strong> — Comparing a task’s solution with the training corpus, n-grams at a time.</li></ul>
+<p><em>Read first:</em> One run or many</p>
+<h2 id="appendix-a-glossary">Appendix A — Glossary</h2>
+<p><strong>A benchmark</strong> — A set of tasks, and a rule that decides whether each was solved.</p>
+<p>A benchmark is two things: the tasks and the verdict. Everything else — the score, the interval on it, the comparison between two systems — follows from those, and a benchmark with a weak verdict measures something other than what it claims.</p>
+<p><strong>A task</strong> — A starting state, a goal, and a way of telling whether the goal was reached.</p>
+<p>A task gives the solver an environment and an instruction, and it ends with a verdict. The verdict is the part that has to be objective: a human reading the output is a different kind of benchmark, and a noisier one.</p>
+<p><strong>The difficulty mix</strong> — The proportion of the tasks that are easy, and the proportion that are hard.</p>
+<p>The mix decides what a score means. A set of easy tasks measures whether the solver can do the easy thing, and a set of hard ones measures whether it can do the hard thing. Moving the mix moves the score, without anything about the solver changing.</p>
+<p><strong>The task set is a sample</strong> — The tasks are drawn from a population of tasks, and the score estimates the rate on it.</p>
+<p>This is the reason a score needs an interval. The hundred tasks in the benchmark are a sample of the tasks that could have been in it, and the score is an estimate of the rate on all of them.</p>
+<p><strong>The interval on a score</strong> — The range the true rate plausibly lies in.</p>
+<p>For a proportion, the interval is not symmetric and the usual normal approximation is wrong near zero and near one — which is exactly where a benchmark’s score often is.</p>
+<p><strong>Power</strong> — The chance of noticing a difference that is really there.</p>
+<p>A benchmark with too few tasks has little power: a real difference of two points is invisible. The number of tasks a comparison needs follows from the size of the difference and from the noise, and both are computable.</p>
+<p><strong>The verifier</strong> — The thing that decides whether a task was solved.</p>
+<p>The verifier is the part of the benchmark that is hardest to get right, because it is the part a solver is trying to fool. A benchmark with a weak verifier measures the solver’s ability to fool it.</p>
+<p><strong>The failing test must start failing and end passing</strong> — The first of the two conditions.</p>
+<p>A task comes with a test that fails before the fix and passes after it. Requiring that transition is what makes the task a task — and it is also the condition a solver can satisfy by changing the test.</p>
+<p><strong>The passing tests must keep passing</strong> — The second of the two conditions.</p>
+<p>A solution that fixes the task by breaking something else is not a solution. This condition is what makes the first one mean something, and it is what a cheat usually violates.</p>
+<p><strong>Gaming the benchmark</strong> — Solving the verifier rather than the task.</p>
+<p>A benchmark measures what its verifier measures. A solver that finds the difference between the two is not cheating in a moral sense; it is optimising the objective, which is what a reward is for.</p>
+<p><strong>A solver</strong> — The thing that attempts the tasks.</p>
+<p>A solver may be a program, a model, or a loop around a model. What the benchmark measures is the pair of the solver and the verifier, and a score quoted without the verifier is a quote without a meaning.</p>
+<p><strong>The agentless baseline</strong> — Retrieve the file, make the obvious change, and stop.</p>
+<p>One attempt per task, with no loop and no search. It is the number every agent has to beat, and a surprising number of agents do not.</p>
+<p><strong>pass@k</strong> — The chance that at least one of k attempts succeeds.</p>
+<p>It is the natural metric for a solver that may be tried several times. The estimate from k samples is biased upwards, and the unbiased correction is what makes two different sample budgets comparable.</p>
+<p><strong>The variance of a score</strong> — How much the score moves when the solver is run again.</p>
+<p>A solver is stochastic, so one run is one sample. The spread across runs is the noise in the comparison, and it is what a single-run score leaves out.</p>
+<p><strong>A paired comparison</strong> — Comparing two systems on the same tasks.</p>
+<p>The same tasks remove the task-difficulty variation from the comparison, and with it most of the noise. It is more sensitive than comparing two independent scores, and it is the comparison a benchmark should report.</p>
+<p><strong>Contamination</strong> — The model has already seen the task, or its answer.</p>
+<p>A task whose solution is in the training data is not a measurement of the solver; it is a measurement of the training data. And the score of the benchmark goes up, which is the problem: the contamination flatters the system it is supposed to be testing.</p>
+<p><strong>The overlap test</strong> — Comparing a task’s solution with the training corpus, n-grams at a time.</p>
+<p>A passage that shares a long run of n-grams with the corpus is probably in it. The length of the n-gram is a decision: short n-grams catch ordinary text as well as copies, and long ones miss a copy that was lightly edited.</p>
+<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<ul><li><strong>SWE-bench: Can Language Models Resolve Real-World GitHub Issues?</strong> — Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, Karthik Narasimhan (2023), arXiv:2310.06770 [cs.SE] / ICLR 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The agentic course has a case study but no benchmark-design lesson, and benchmark design is where most agent claims are won or lost.</li><li><strong>GAIA: a benchmark for General AI Assistants</strong> — Grégoire Mialon, Clémentine Fourrier, Craig Swift, Thomas Wolf, Yann LeCun, Thomas Scialom (2023), arXiv:2311.12983 [cs.AI] / ICLR 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. A benchmark designed around the question: can a general assistant do the easy part of a task and the hard part with the right tools?</li><li><strong>AgentBench: Evaluating LLMs as Agents</strong> — Xiao Liu, Hao Yu, Hanchen Zhang, Yifan Xu, Xuanyu Lei, Hanyu Lai, Yu Gu, Hangliang Ding, Kaiwen Men, Kejuan Yang, Shudan Zhang, Xiang Deng, Aohan Zeng, Zhengxiao Du, Chenhui Zhang, Sheng Shen, Tianjun Zhang, Yu Su, Huan Sun, Minlie Huang, Yuxiao Dong, Jie Tang (2023), arXiv:2308.03688 [cs.AI] / ICLR 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Eight environments, and the finding that a score is only meaningful relative to a matched model size.</li><li><strong>WebArena: A Realistic Web Environment for Building Autonomous Agents</strong> — Shuyan Zhou, Frank F. Xu, Hao Zhu, Xuhui Zhou, Robert Lo, Abishek Sridhar, Xianyi Cheng, Tianyue Ou, Yonatan Bisk, Daniel Fried, Uri Alon, Graham Neubig (2023), arXiv:2307.13854 [cs.AI] / ICLR 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Self-hosted reproducible environments, which is what makes an agent benchmark trustworthy.</li><li><strong><span class="math-inline">$\tau$</span>-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains</strong> — Shunyu Yao, Noah Shinn, Pedram Razavi, Karthik Narasimhan (2024), arXiv:2406.12045 [cs.CL] / ICLR 2025. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. A user simulator in the loop, which changes what the benchmark is actually measuring.</li></ul></main>
+</div>
+<footer class="pager">
+  <div><a href="retrieval-lab.html">← Retrieval Lab</a></div>
+  <div><a href="safety-lab.html">Safety and Alignment Lab →</a></div>
+</footer>
+</body>
+</html>

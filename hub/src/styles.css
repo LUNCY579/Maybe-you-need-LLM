@@ -649,3 +649,16 @@ a {
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+
+/* The reading edition of a course, compiled to textbooks/ and shipped with the hub. */
+
+.hub-course-book {
+  font-size: 0.82rem;
+  color: var(--accent-indigo);
+  text-decoration: none;
+}
+
+.hub-course-book:hover,
+.hub-course-book:focus-visible {
+  text-decoration: underline;
+}

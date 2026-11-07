@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scaling Lab — textbook</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents"><a class="" href="#contents">Contents</a>
+<a class="" href="#1-power-laws">1. Power Laws</a>
+<a class="l2" href="#lesson-1-what-a-power-law-says">Lesson 1. What a power law says</a>
+<a class="l2" href="#lesson-2-how-the-exponent-is-measured">Lesson 2. How the exponent is measured</a>
+<a class="" href="#2-compute-optimality">2. Compute Optimality</a>
+<a class="l2" href="#lesson-3-the-compute-budget">Lesson 3. The compute budget</a>
+<a class="l2" href="#lesson-4-the-compute-optimal-allocation">Lesson 4. The compute-optimal allocation</a>
+<a class="l2" href="#lesson-5-the-crossover-between-size-and-data">Lesson 5. The crossover between size and data</a>
+<a class="" href="#3-the-frontier">3. The Frontier</a>
+<a class="l2" href="#lesson-6-the-isoflop-curves-and-the-frontier">Lesson 6. The IsoFLOP curves and the frontier</a>
+<a class="l2" href="#lesson-7-the-twenty-tokens-rule-rederived">Lesson 7. The twenty-tokens rule, rederived</a>
+<a class="l2" href="#lesson-8-when-the-pool-binds">Lesson 8. When the pool binds</a>
+<a class="" href="#4-data-constraints">4. Data Constraints</a>
+<a class="l2" href="#lesson-9-the-three-phases-of-a-repeated-run">Lesson 9. The three phases of a repeated run</a>
+<a class="l2" href="#lesson-10-how-many-epochs-before-repetition-dominates">Lesson 10. How many epochs before repetition dominates</a>
+<a class="l2" href="#lesson-11-the-turn-upward-and-the-early-stopping-epoch">Lesson 11. The turn upward, and the early-stopping epoch</a>
+<a class="l2" href="#lesson-12-when-the-data-runs-out">Lesson 12. When the data runs out</a>
+<a class="l2" href="#lesson-13-the-price-of-repetition">Lesson 13. The price of repetition</a>
+<a class="l2" href="#lesson-14-the-effective-data-law">Lesson 14. The effective-data law</a>
+<a class="" href="#5-pruning-and-percolation">5. Pruning and Percolation</a>
+<a class="l2" href="#lesson-15-the-percolation-threshold">Lesson 15. The percolation threshold</a>
+<a class="l2" href="#lesson-16-four-metrics-on-one-pool">Lesson 16. Four metrics on one pool</a>
+<a class="l2" href="#lesson-17-predicting-the-cliff-before-it-happens">Lesson 17. Predicting the cliff before it happens</a>
+<a class="" href="#6-emergence">6. Emergence</a>
+<a class="l2" href="#lesson-18-what-emergence-looks-like">Lesson 18. What emergence looks like</a>
+<a class="l2" href="#lesson-19-reproducing-the-artefact">Lesson 19. Reproducing the artefact</a>
+<a class="l2" href="#lesson-20-what-causes-the-cliff">Lesson 20. What causes the cliff</a>
+<a class="" href="#7-compute-through-time">7. Compute Through Time</a>
+<a class="l2" href="#lesson-21-three-eras-and-one-straight-line">Lesson 21. Three eras and one straight line</a>
+<a class="l2" href="#lesson-22-a-break-in-the-trend-and-what-it-costs-to-claim-one">Lesson 22. A break in the trend, and what it costs to claim one</a>
+<a class="l2" href="#lesson-23-what-a-trend-buys-and-the-year-it-became-buyable">Lesson 23. What a trend buys, and the year it became buyable</a>
+<a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
+<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+  <main class="book"><h1 id="scaling-lab">Scaling Lab</h1>
+<p><strong>Source:</strong> Scaling Laws for Neural Language Models — Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, Dario Amodei (2020)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Scaling laws are one lesson in two courses. They are the quantitative spine of the field and deserve their own application.</p>
+<p><strong>Source:</strong> Training Compute-Optimal Large Language Models — Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch, Elena Buchatskaya, Trevor Cai, Eliza Rutherford, Diego de Las Casas, Lisa Anne Hendricks, Johannes Welbl, Aidan Clark, Tom Hennigan, Eric Noland, Katie Millican, George van den Driessche, Bogdan Damoc, Aurelia Guy, Simon Osindero, Karen Simonyan, Erich Elsen, Jack W. Rae, Oriol Vinyals, Laurent Sifre (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The compute-optimal result and the IsoFLOP methodology that produced it.</p>
+<p><strong>Source:</strong> Beyond neural scaling laws: beating power law scaling via data pruning — Ben Sorscher, Robert Geirhos, Shashank Shekhar, Surya Ganguli, Ari S. Morcos (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The result that breaks the power law, with a theory that can be checked on real data.</p>
+<p><strong>Source:</strong> Scaling Data-Constrained Language Models — Niklas Muennighoff, Alexander M. Rush, Boaz Barak, Teven Le Scao, Aleksandra Piktus, Nouamane Tazi, Sampo Pyysalo, Thomas Wolf, Colin Raffel (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The regime the field is actually in: repeated epochs over a fixed corpus.</p>
+<p><strong>Source:</strong> Are Emergent Abilities of Large Language Models a Mirage? — Rylan Schaeffer, Brando Miranda, Sanmi Koyejo (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> Whether abilities appear discontinuously is a measurement question, and this shows it is often an artefact of the metric.</p>
+<p><strong>Source:</strong> Compute Trends Across Three Eras of Machine Learning — Jaime Sevilla, Lennart Heim, Anson Ho, Tamay Besiroglu, Marius Hobbhahn, Pablo Villalobos (2022)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The hardware trend that makes the compute curves mean something.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#1-power-laws">1. Power Laws</a> - <a href="#lesson-1-what-a-power-law-says">Lesson 1. What a power law says</a> - <a href="#lesson-2-how-the-exponent-is-measured">Lesson 2. How the exponent is measured</a></li><li><a href="#2-compute-optimality">2. Compute Optimality</a> - <a href="#lesson-3-the-compute-budget">Lesson 3. The compute budget</a> - <a href="#lesson-4-the-compute-optimal-allocation">Lesson 4. The compute-optimal allocation</a> - <a href="#lesson-5-the-crossover-between-size-and-data">Lesson 5. The crossover between size and data</a></li><li><a href="#3-the-frontier">3. The Frontier</a> - <a href="#lesson-6-the-isoflop-curves-and-the-frontier">Lesson 6. The IsoFLOP curves and the frontier</a> - <a href="#lesson-7-the-twenty-tokens-rule-rederived">Lesson 7. The twenty-tokens rule, rederived</a> - <a href="#lesson-8-when-the-pool-binds">Lesson 8. When the pool binds</a></li><li><a href="#4-data-constraints">4. Data Constraints</a> - <a href="#lesson-9-the-three-phases-of-a-repeated-run">Lesson 9. The three phases of a repeated run</a> - <a href="#lesson-10-how-many-epochs-before-repetition-dominates">Lesson 10. How many epochs before repetition dominates</a> - <a href="#lesson-11-the-turn-upward-and-the-early-stopping-epoch">Lesson 11. The turn upward, and the early-stopping epoch</a> - <a href="#lesson-12-when-the-data-runs-out">Lesson 12. When the data runs out</a> - <a href="#lesson-13-the-price-of-repetition">Lesson 13. The price of repetition</a> - <a href="#lesson-14-the-effective-data-law">Lesson 14. The effective-data law</a></li><li><a href="#5-pruning-and-percolation">5. Pruning and Percolation</a> - <a href="#lesson-15-the-percolation-threshold">Lesson 15. The percolation threshold</a> - <a href="#lesson-16-four-metrics-on-one-pool">Lesson 16. Four metrics on one pool</a> - <a href="#lesson-17-predicting-the-cliff-before-it-happens">Lesson 17. Predicting the cliff before it happens</a></li><li><a href="#6-emergence">6. Emergence</a> - <a href="#lesson-18-what-emergence-looks-like">Lesson 18. What emergence looks like</a> - <a href="#lesson-19-reproducing-the-artefact">Lesson 19. Reproducing the artefact</a> - <a href="#lesson-20-what-causes-the-cliff">Lesson 20. What causes the cliff</a></li><li><a href="#7-compute-through-time">7. Compute Through Time</a> - <a href="#lesson-21-three-eras-and-one-straight-line">Lesson 21. Three eras and one straight line</a> - <a href="#lesson-22-a-break-in-the-trend-and-what-it-costs-to-claim-one">Lesson 22. A break in the trend, and what it costs to claim one</a> - <a href="#lesson-23-what-a-trend-buys-and-the-year-it-became-buyable">Lesson 23. What a trend buys, and the year it became buyable</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<h2 id="1-power-laws">1. Power Laws</h2>
+<p><em>The shape of the loss, and how its exponent is measured</em></p>
+<p>A scaling law is a statement that the loss falls as a power of something. This module is about the shape, about how the exponent is measured, and about the things a fitted exponent does not tell you.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>State what a power law says, and what its exponent means in practice</li><li>Fit a power law by least squares in log–log space and read the R²</li><li>Explain why the exponent of a fit depends on the range it was fitted over</li></ul>
+<h3 id="lesson-1-what-a-power-law-says">Lesson 1. What a power law says</h3>
+<p><em>And why the exponent is the number everyone quotes</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the form of a scaling law and the three quantities in it</li><li>Convert an exponent into the factor a doubling of the data buys</li><li>Distinguish a power law in the loss from a power law in the error</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A power law says that the loss falls as L ∝ N^(−α) — a constant factor for every doubling.</li><li>The exponent is the whole of the practical content: a doubling buys a factor 2^(−α).</li><li>The error, not the loss, is the quantity that scales cleanly near the floor.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>A scaling law</strong></p>
+<p><span class="math-display">$L(N) = \left(\frac{N_{\mathrm{c}}}{N}\right)^{\alpha}$</span></p>
+<p><em>The loss falls as a power of the quantity being scaled. The coefficient is written as a critical size, so that the law reads as a ratio.</em></p>
+<p>Symbols:</p>
+<ul><li><code>N</code> — the quantity being scaled (The number of tokens, the number of parameters, or the compute.)</li><li><code>N_{\mathrm{c}}</code> — the critical size (The size at which the loss is one unit.)</li><li><code>\alpha</code> — the exponent (How fast the loss falls. Its practical content is the factor a doubling buys.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The measurement is in a region where the law holds, which is established by the fit and not by the form.</li><li>The floor of the loss is far enough below that it does not bend the curve.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Empirically, the log of the loss falls linearly with the log of the quantity being scaled.</li><li>Exponentiating gives the power law.</li><li>Writing the coefficient as N_c^(−α) fixes the units of the loss at one.</li></ol>
+<p><strong>Worked example.</strong> A law with α = 0.2 and a loss of 2 at 1000 tokens. → <strong>At 2000 tokens the loss is 2 × 2^(−0.2) = 1.741.</strong> (A doubling buys about 13%.)</p>
+<p><strong>The factor a doubling buys</strong></p>
+<p><span class="math-display">$\frac{L(2N)}{L(N)} = 2^{-\alpha}$</span></p>
+<p><em>The multiplicative improvement that a doubling of the scaled quantity buys. It is the form in which a scaling law is worth quoting.</em></p>
+<p>Symbols:</p>
+<ul><li><code>\alpha</code> — the exponent (The same exponent as in the law itself.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The doubling stays inside the region where the law holds.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Substitute 2N for N in the law.</li><li>The factor is 2^(−α) because (2N)^(−α) = N^(−α)·2^(−α).</li></ol>
+<p><strong>Worked example.</strong> An exponent of 0.5. → <strong>The factor is 2^(−0.5) = 0.707, so a doubling improves the loss by about 29%.</strong> (Which is the difference between a law worth obeying and one worth ignoring.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A scaling law says the loss falls as L ∝ N^(−α). What does α say? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>How much a doubling of N improves the loss</strong></li><li>- How many tokens the model has read</li><li>- The size of the model</li><li>- The floor of the loss</li></ul>
+<blockquote><p>Correct — the factor is 2^(−α).</p></blockquote>
+<blockquote><p><strong>Why:</strong> Because the law is multiplicative, the natural unit of improvement is a doubling: 2^(−α). An exponent of 0.1 means a doubling improves the loss by about 7%.</p></blockquote>
+<p>*<em>Q. A loss falls as a power law with exponent 0.2. By what factor is the loss multiplied when the data doubles? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> The factor is 2^(−0.2) = 0.8706, so the loss falls by about 13%.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Training runs here, a power law fitted to them here, and the factor a doubling buys. Open <strong>Fit the law</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§kaplan:1 Introduction — The observation that the loss falls as a power law, and that the loss of the best model at a given compute is itself a power law.</li><li>§kaplan:1.1 Summary of the scaling results — The three results, and the parameter-count and dataset-size exponents.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Scaling law</strong> — A statement that a quantity follows a power of another quantity.</li><li><strong>Exponent</strong> — The number in a power law that says how fast the quantity falls.</li><li><strong>Compute budget</strong> — The total training compute available, which is what the data is bought with.</li></ul>
+<h3 id="lesson-2-how-the-exponent-is-measured">Lesson 2. How the exponent is measured</h3>
+<p><em>Log–log space, and the range the fit depends on</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Fit a power law by least squares in log–log space</li><li>Read the R² of the fit and say what it does and does not certify</li><li>Show that the fitted exponent changes with the range of the data</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The fit is a straight line in log–log space, and ordinary least squares is the right tool for it.</li><li>A high R² says the points are close to a line; it does not say the line will keep holding.</li><li>A fitted exponent is an average over a range, and quoting it without the range is quoting half a result.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>Fitting a law by least squares</strong></p>
+<p><span class="math-display">$\min_{a,b}\sum_i\left(a + b\log x_i - \log y_i\right)^2,\qquad \alpha = -b$</span></p>
+<p><em>The estimator behind every exponent in this course. A power law is a straight line in logs, so the exponent is the negative of the fitted slope and the coefficient is the intercept.</em></p>
+<p>Symbols:</p>
+<ul><li><code>x_i</code> — the scaled quantity (Tokens, parameters, or the product the budget pins down.)</li><li><code>y_i</code> — the measured loss (The held-out loss of run i.)</li><li><code>b</code> — the fitted slope (The negative of the exponent.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The errors are multiplicative, which is what taking logs assumes when the residuals are fitted in log space.</li><li>Every point is in the region where one law describes the curve.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Write the law as log y = a − α log x.</li><li>Least squares in the two coefficients is ordinary linear regression on the logged columns.</li><li>The R² of that regression is the fraction of the log-loss variance the line explains — a number about the fit, not about the range.</li></ol>
+<p><strong>Worked example.</strong> The laboratory’s 20 runs, fitted over capacities 4 to 64. → <strong>The slope in log–log space is negative, and −b is the exponent the screen prints as α.</strong> (The same runs fitted over half the range give a different α, which is the point of screen A’s second tab.)</p>
+<p><strong>A scaling law</strong></p>
+<p><span class="math-display">$L(N) = \left(\frac{N_{\mathrm{c}}}{N}\right)^{\alpha}$</span></p>
+<p><em>The loss falls as a power of the quantity being scaled. The coefficient is written as a critical size, so that the law reads as a ratio.</em></p>
+<p>Symbols:</p>
+<ul><li><code>N</code> — the quantity being scaled (The number of tokens, the number of parameters, or the compute.)</li><li><code>N_{\mathrm{c}}</code> — the critical size (The size at which the loss is one unit.)</li><li><code>\alpha</code> — the exponent (How fast the loss falls. Its practical content is the factor a doubling buys.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The measurement is in a region where the law holds, which is established by the fit and not by the form.</li><li>The floor of the loss is far enough below that it does not bend the curve.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Empirically, the log of the loss falls linearly with the log of the quantity being scaled.</li><li>Exponentiating gives the power law.</li><li>Writing the coefficient as N_c^(−α) fixes the units of the loss at one.</li></ol>
+<p><strong>Worked example.</strong> A law with α = 0.2 and a loss of 2 at 1000 tokens. → <strong>At 2000 tokens the loss is 2 × 2^(−0.2) = 1.741.</strong> (A doubling buys about 13%.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A power law fitted with an R² of 0.999 over two orders of magnitude is guaranteed to hold for another order. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> No. R² says the points are close to a line over the range you fitted; it says nothing about a range you did not. That is why a fitted exponent is quoted together with the range it was fitted over.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The same runs, fitted over different ranges, and the exponent that comes out. Open <strong>Change the range</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§kaplan:2.1 Fitting scaling laws — The loss surface, the method of fitting, and the precautions against fitting noise.</li><li>§kaplan:3 Discussion — The caveats: the range of the fit, the possibility of a break, and what the laws do not say.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2206.14486">Beyond neural scaling laws: beating power law scaling via data pruning</a> — A data-pruning method that beats the power law, and a check on what a law is.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Exponent</strong> — The number in a power law that says how fast the quantity falls.</li><li><strong>R²</strong> — The fraction of the variation a fit explains.</li></ul>
+<p><em>Read first:</em> What a power law says</p>
+<h2 id="2-compute-optimality">2. Compute Optimality</h2>
+<p><em>A budget, and where it should be spent</em></p>
+<p>The compute budget is the constraint, and under it the loss is minimised somewhere between "all parameters" and "all data". This module finds that somewhere, shows what it costs to miss it, and answers the older question of which model size a budget should buy.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Write the loss surface in the model size and the dataset size</li><li>Find the allocation that minimises the loss at a fixed compute budget</li><li>Say what the tokens-per-parameter ratio at the optimum means, and what it does not</li><li>Name the crossover at which a larger model starts to pay for itself</li></ul>
+<h3 id="lesson-3-the-compute-budget">Lesson 3. The compute budget</h3>
+<p><em>The constraint that makes the question a question</em></p>
+<p><em>Estimated study time:</em> 20 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the cost of a training run as a function of the parameters and the tokens</li><li>Explain why a budget turns "how big" into "big in what way"</li><li>Measure the loss along a fixed budget</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The cost of a run is the number of parameters times the number of tokens, times a constant.</li><li>Under a fixed budget, more parameters means fewer tokens, and the loss of each is measured against the other.</li><li>A budget is a statement about what cannot be had, and it is the only reason the allocation is a decision.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The cost of a training run</strong></p>
+<p><span class="math-display">$C = 6 N D$</span></p>
+<p><em>The arithmetic a training run costs, in floating-point operations, up to the constant that counts the arithmetic in the forward and backward passes.</em></p>
+<p>Symbols:</p>
+<ul><li><code>N</code> — the number of parameters (Every parameter is read once per token.)</li><li><code>D</code> — the number of training tokens (Every token causes a pass over the parameters.)</li><li><code>6</code> — the constant (A few operations per parameter per token, in the convention this course follows.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The model is trained on every token once, with a constant amount of work per token.</li><li>The constant does not depend on the architecture, which is an approximation.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The forward pass costs a constant number of operations per parameter per token.</li><li>The backward pass costs about twice the forward pass.</li><li>The constant absorbs all of that.</li></ol>
+<p><strong>Worked example.</strong> A model with 70 billion parameters trained on 1.4 trillion tokens. → <strong>The cost is 6 × 7e10 × 1.4e12 = 5.88e23 floating-point operations.</strong> (Which is the number people quote when they say a run cost five hundred million dollars.)</p>
+<p><strong>The two-variable loss surface</strong></p>
+<p><span class="math-display">$L(N, D) = E + A N^{-\alpha} + B D^{-\beta}$</span></p>
+<p><em>The loss as a function of the model size and the dataset size: a floor, a term that falls with the model, and a term that falls with the data.</em></p>
+<p>Symbols:</p>
+<ul><li><code>E</code> — the irreducible loss (The floor no model beats.)</li><li><code>A, B</code> — the coefficients of the two terms (They set the scale of each term.)</li><li><code>\alpha, \beta</code> — the two exponents (They set where the optimum sits.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The three terms are additive, which the fit checks.</li><li>The exponents are the same across the region being fitted.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Each of the two error sources — not enough capacity, not enough data — contributes a power law.</li><li>The floor is the part of the loss that is neither.</li><li>Adding them gives the surface.</li></ol>
+<p><strong>Worked example.</strong> E = 0.2, A = 1, α = 0.5, B = 2, β = 0.5, N = 1000 and D = 1000. → <strong>The loss is 0.2 + 0.0316 + 0.0632 = 0.295.</strong> (The two terms are in the ratio 1 to 2 here, and that ratio is what the optimum fixes.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why is the compute budget the thing that makes the allocation a decision? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Because it fixes the product of the parameters and the tokens, so more of one means less of the other</strong></li><li>- Because it fixes the loss</li><li>- Because it fixes the model architecture</li><li>- Because it fixes the number of epochs</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The cost is proportional to parameters times tokens. Under a fixed budget they trade against each other, and the question becomes where to put them.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The loss along a fixed compute budget, as the allocation slides from all data to all parameters. Open <strong>Walk the budget</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§chinchilla:1 Introduction — The claim: the compute-optimal model is not the biggest one, and the data has to grow with it.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Compute budget</strong> — The total training compute available, which is what the data is bought with.</li><li><strong>Allocation</strong> — How a fixed budget is split between the model and the data.</li></ul>
+<p><em>Read first:</em> What a power law says</p>
+<h3 id="lesson-4-the-compute-optimal-allocation">Lesson 4. The compute-optimal allocation</h3>
+<p><em>Where the two terms of the loss balance</em></p>
+<p><em>Estimated study time:</em> 28 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the two-variable loss surface and fit it</li><li>Derive the condition that balances the two terms at the optimum</li><li>Compute the allocation and the tokens-per-parameter ratio at a given budget</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The surface is E + A·N^(−α) + B·D^(−β): an irreducible term and two powers.</li><li>At the optimum the two terms balance in a fixed ratio, and that fixes the allocation.</li><li>The tokens-per-parameter ratio at the optimum is a consequence, not a setting.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The condition at the compute optimum</strong></p>
+<p><span class="math-display">$\alpha A N^{-\alpha} = \beta B D^{-\beta}$</span></p>
+<p><em>At the allocation that minimises the loss under a fixed budget, the two terms of the surface balance in a fixed ratio.</em></p>
+<p>Symbols:</p>
+<ul><li><code>A N^{-\alpha}</code> — the capacity term (The part of the loss that more parameters would fix.)</li><li><code>B D^{-\beta}</code> — the data term (The part that more data would fix.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The budget is fixed and the allocation is free.</li><li>The surface is differentiable at the optimum, which it is away from the edges.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Write the budget as N·D = P and substitute D = P/N into the surface.</li><li>Differentiate with respect to N and set the result to zero.</li><li>The condition that falls out is that α times the capacity term equals β times the data term.</li></ol>
+<p><strong>Worked example.</strong> A = 1, B = 2, α = β = 0.5 and a budget of N·D = 1e6. → <strong>The condition gives N = D/4, so N = 500 and D = 2000.</strong> (Four tokens per parameter at that budget.)</p>
+<p><strong>The IsoFLOP curve</strong></p>
+<p><span class="math-display">$L(N;C) = E + A\,N^{-\alpha} + B\left(\frac{C}{kN}\right)^{-\beta},\qquad N^{*} = \left(\frac{\alpha A}{\beta B}\right)^{\frac{1}{\alpha+\beta}} P^{\frac{\beta}{\alpha+\beta}}$</span></p>
+<p><em>The loss along one fixed compute budget, as the allocation slides between parameters and data. It is a U: too small a model and the capacity term dominates, too big and the data term does. Its bottom is the compute-optimal allocation.</em></p>
+<p>Symbols:</p>
+<ul><li><code>C</code> — the budget (Fixed, so that every point on the curve costs the same.)</li><li><code>k</code> — the FLOPs per parameter per token (Six for a transformer’s forward and backward pass.)</li><li><code>P</code> — the product the budget pins down (P = C / k = N·D.)</li><li><code>N^{*}</code> — the optimal capacity (Where the two arms of the U balance.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The surface is the two-power form with a constant floor, fitted inside the region it is used in.</li><li>The budget is exactly the product k·N·D, so spending on one axis is taken off the other.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Put D = P/N into the surface, so the loss is a function of N alone at fixed P.</li><li>Differentiate: the capacity term contributes −αA·N^(−α−1) and the data term +βB·P^(−β)·N^(β−1).</li><li>Set the sum to zero and rearrange: N^(α+β) = αA/(βB) · P^β, which is the expression above.</li><li>The second derivative is positive there, so the stationary point is the bottom of the U rather than its top.</li></ol>
+<p><strong>Worked example.</strong> A surface with α = β and A = B, at a product P of 10^6. → *<em>N</em> = 10^3 and D<em> = 10^3: the budget splits evenly, and any other split is worse.</em>* (The laboratory measures the arms of this U by running the allocations rather than by trusting the algebra.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. At the compute optimum, what is true of the two terms of the loss surface? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>They balance in a fixed ratio</strong></li><li>- They are equal</li><li>- The model term is zero</li><li>- The data term is zero</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> At the optimum the derivative along the budget vanishes, which gives a fixed ratio between the capacity term and the data term. The ratio depends on the exponents.</p></blockquote>
+<p>*<em>Q. A loss surface is L = 0.2 + 1.0·N^(−0.5) + 2.0·D^(−0.5), and the budget allows N·D = 1e6. At the optimum the capacity term and the data term balance: 1.0·N^(−0.5) = 2.0·D^(−0.5). What is N? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> The balance gives N^(−0.5) = 2·D^(−0.5), so N = D/4. With N·D = 1e6 that gives D² = 4e6, so D = 2000 and N = 500. The ratio of tokens to parameters at the optimum is 4.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The fitted surface, the budget, and the allocation that minimises the loss. Open <strong>Find the optimum</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§chinchilla:3 Compute-optimal training — The loss surface in two variables, and the optimisation of the allocation under a fixed budget.</li><li>§chinchilla:3.1 The optimal allocation — The condition that balances the two terms of the loss, and the closed form it gives.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Allocation</strong> — How a fixed budget is split between the model and the data.</li><li><strong>Loss surface</strong> — The loss as a function of the model size and the dataset size.</li><li><strong>Tokens per parameter</strong> — The ratio of training tokens to model parameters.</li></ul>
+<p><em>Read first:</em> The compute budget</p>
+<h3 id="lesson-5-the-crossover-between-size-and-data">Lesson 5. The crossover between size and data</h3>
+<p><em>Kaplan’s question: at what budget does the bigger model start to pay?</em></p>
+<p><em>Estimated study time:</em> 21 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State what a crossover point is, and which two losses are being set equal</li><li>Derive the product at which two given capacities are equally good</li><li>Explain why the crossover moves when the pair of capacities gets wider</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>At a fixed budget the two candidates get D = P/N rows each, so the comparison is one equation in one unknown.</li><li>Below the crossover the small model trained on more data wins; above it the large model trained on less wins.</li><li>The crossover is a property of the fitted surface, and it is only as good as the grid of runs the surface was fitted on.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The crossover between two model sizes</strong></p>
+<p><span class="math-display">$P^{*\beta} = \frac{B\left(N_2^{\beta} - N_1^{\beta}\right)}{A\left(N_1^{-\alpha} - N_2^{-\alpha}\right)}$</span></p>
+<p><em>The compute at which a larger model trained on less data becomes better than a smaller model trained on more. Below it the small model wins; above it the large one does. It is the point at which “scale up” stops being advice about the parameters and starts being advice about the corpus.</em></p>
+<p>Symbols:</p>
+<ul><li><code>N_1</code> — the smaller capacity (The model that is cheaper to fill.)</li><li><code>N_2</code> — the larger capacity (The model that needs the data.)</li><li><code>P^{*}</code> — the product at the crossover (The budget divided by k.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Both models are trained at the same compute, so each gets D = P/N.</li><li>The floor E is the same for both and cancels.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Write both losses on the surface with D = P/N.</li><li>Set them equal; the E terms cancel and the two powers rearrange to the expression above.</li><li>Solve for P by taking the 1/β power — the crossover exists because the two sides have opposite signs when N₂ &gt; N₁.</li></ol>
+<p><strong>Worked example.</strong> A surface with α = β = 0.5, A = B = 1, and the pair N₁ = 4, N₂ = 16. → *<em>P</em> = (2 / 0.25)² = 64, so a budget of 384 at k = 6, and both models then sit at E + 0.75.** (The screen walks the whole table on the laboratory’s own surface, so the reader can see the crossover move as the pair gets wider.)</p>
+<p><strong>The two-variable loss surface</strong></p>
+<p><span class="math-display">$L(N, D) = E + A N^{-\alpha} + B D^{-\beta}$</span></p>
+<p><em>The loss as a function of the model size and the dataset size: a floor, a term that falls with the model, and a term that falls with the data.</em></p>
+<p>Symbols:</p>
+<ul><li><code>E</code> — the irreducible loss (The floor no model beats.)</li><li><code>A, B</code> — the coefficients of the two terms (They set the scale of each term.)</li><li><code>\alpha, \beta</code> — the two exponents (They set where the optimum sits.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The three terms are additive, which the fit checks.</li><li>The exponents are the same across the region being fitted.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Each of the two error sources — not enough capacity, not enough data — contributes a power law.</li><li>The floor is the part of the loss that is neither.</li><li>Adding them gives the surface.</li></ol>
+<p><strong>Worked example.</strong> E = 0.2, A = 1, α = 0.5, B = 2, β = 0.5, N = 1000 and D = 1000. → <strong>The loss is 0.2 + 0.0316 + 0.0632 = 0.295.</strong> (The two terms are in the ratio 1 to 2 here, and that ratio is what the optimum fixes.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. On a surface with α = β = 0.5 and A = B = 1, two models of size 4 and 16 are trained at the same compute. What product P = N·D makes them equally good? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> P^β = B(16^β − 4^β) / A(4^(−α) − 16^(−α)) = (4−2)/(0.5−0.25) = 8, so P = 64. At that product the small model gets 16 rows and the large one 4, and both land at E + 0.75.</p></blockquote>
+<p>*<em>Q. Below the crossover point, the larger model trained on less data is the better choice. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> It is the other way round. Below the crossover the budget cannot fill the larger model, and the smaller one trained on more data wins.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Two capacities, one axis of budgets, and the point where the better choice changes sides. Open <strong>Find the crossover</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§kaplan:2 Main results — The measurement procedure behind the crossover idea: the loss surface measured on a grid of runs, and the comparison of model size against data at a fixed compute.</li><li>§chinchilla:3 Compute-optimal training — The same comparison read the other way: the optimum is where the two terms balance, and the crossover is the pair of allocations around it.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Crossover point</strong> — The compute at which a larger model overtakes a smaller one.</li><li><strong>Allocation</strong> — How a fixed budget is split between the model and the data.</li><li><strong>Loss surface</strong> — The loss as a function of the model size and the dataset size.</li></ul>
+<p><em>Read first:</em> The compute-optimal allocation</p>
+<h2 id="3-the-frontier">3. The Frontier</h2>
+<p><em>Every allocation at every budget, and the law the best ones obey</em></p>
+<p>Slide the allocation at a fixed budget and the loss traces a U. Do it at ten budgets and the bottoms of the U’s form a power law of their own. That law is the one a training budget is actually on, and the ratio at its minima is where the twenty-tokens rule comes from — and where it stops being a rule.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Draw an IsoFLOP curve and read its minimum off the arms around it</li><li>Derive the exponent of the frontier from the two single-variable exponents</li><li>Say when tokens per parameter is a constant and when it is a trend</li><li>Name the budget at which a finite corpus starts to bind</li></ul>
+<h3 id="lesson-6-the-isoflop-curves-and-the-frontier">Lesson 6. The IsoFLOP curves and the frontier</h3>
+<p><em>A U at each budget, and the power law its bottoms obey</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the loss along a fixed budget and find its minimum in closed form</li><li>State the exponent of the frontier and derive it from the two single-variable exponents</li><li>Compare the analytic optimum with the one found by numeric search</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Every point of an IsoFLOP curve costs the same, so the curve is a statement about choice rather than about spend.</li><li>The bottom is where the two marginal losses balance, and that balance gives N<em> and D</em> without a search.</li><li>The bottoms across budgets fall as C^(−αβ/(α+β)) — the frontier is a consequence of the surface, not a new measurement.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The IsoFLOP curve</strong></p>
+<p><span class="math-display">$L(N;C) = E + A\,N^{-\alpha} + B\left(\frac{C}{kN}\right)^{-\beta},\qquad N^{*} = \left(\frac{\alpha A}{\beta B}\right)^{\frac{1}{\alpha+\beta}} P^{\frac{\beta}{\alpha+\beta}}$</span></p>
+<p><em>The loss along one fixed compute budget, as the allocation slides between parameters and data. It is a U: too small a model and the capacity term dominates, too big and the data term does. Its bottom is the compute-optimal allocation.</em></p>
+<p>Symbols:</p>
+<ul><li><code>C</code> — the budget (Fixed, so that every point on the curve costs the same.)</li><li><code>k</code> — the FLOPs per parameter per token (Six for a transformer’s forward and backward pass.)</li><li><code>P</code> — the product the budget pins down (P = C / k = N·D.)</li><li><code>N^{*}</code> — the optimal capacity (Where the two arms of the U balance.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The surface is the two-power form with a constant floor, fitted inside the region it is used in.</li><li>The budget is exactly the product k·N·D, so spending on one axis is taken off the other.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Put D = P/N into the surface, so the loss is a function of N alone at fixed P.</li><li>Differentiate: the capacity term contributes −αA·N^(−α−1) and the data term +βB·P^(−β)·N^(β−1).</li><li>Set the sum to zero and rearrange: N^(α+β) = αA/(βB) · P^β, which is the expression above.</li><li>The second derivative is positive there, so the stationary point is the bottom of the U rather than its top.</li></ol>
+<p><strong>Worked example.</strong> A surface with α = β and A = B, at a product P of 10^6. → *<em>N</em> = 10^3 and D<em> = 10^3: the budget splits evenly, and any other split is worse.</em>* (The laboratory measures the arms of this U by running the allocations rather than by trusting the algebra.)</p>
+<p><strong>The law the minima obey</strong></p>
+<p><span class="math-display">$L^{*}(C) = E + K\,C^{-\gamma},\qquad \gamma = \frac{\alpha\beta}{\alpha+\beta}$</span></p>
+<p><em>The bottom of each IsoFLOP curve, traced across budgets, is itself a power law. Its exponent is made of the two single-variable exponents and of nothing else, which is why the compute-optimal law can be predicted from the parameter and data laws.</em></p>
+<p>Symbols:</p>
+<ul><li><code>L^{*}(C)</code> — the best loss at budget C (The loss of the compute-optimal allocation.)</li><li><code>K</code> — the frontier’s coefficient (Fixed by A, B, α and β; the laboratory measures it at a unit budget.)</li><li><code>\gamma</code> — the frontier exponent (The harmonic half of the two exponents: always smaller than either.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Both terms of the surface are powers with positive exponents over the whole range of budgets.</li><li>The optimum is interior — no constraint on the pool and no hard floor on either axis.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>At the optimum, N ∝ P^(β/(α+β)), so the capacity term falls as P^(−αβ/(α+β)).</li><li>D<em> = P/N</em> ∝ P^(α/(α+β)), so the data term falls as P^(−βα/(α+β)) — the same power.</li><li>Both terms therefore fall at γ = αβ/(α+β), and their sum is a constant times that same power.</li><li>Since P is proportional to C, the exponent in the budget is the exponent in the product.</li></ol>
+<p><strong>Worked example.</strong> α = β = 0.5, so γ = 0.25. → <strong>A budget ten times larger leaves the excess loss at 10^(−0.25) = 0.56 of what it was; a doubling leaves it at 0.84.</strong> (A doubling buys about 16% at the frontier, which is the number a training budget is actually worth.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the bottom of an IsoFLOP curve give? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The compute-optimal allocation at that budget</strong></li><li>- The largest model that fits in the budget</li><li>- The point where the loss stops falling with compute</li><li>- The tokens-per-parameter rule</li></ul>
+<blockquote><p>Correct — the curve is the budget and the bottom is its best split.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Every point on the curve costs the same. The bottom is the allocation the budget should have been spent on, and the arms are what the other choices pay.</p></blockquote>
+<p>*<em>Q. A surface has exponents α = 0.4 and β = 0.6. What is the exponent of the frontier through the IsoFLOP minima? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> γ = αβ/(α+β) = 0.24/1.0 = 0.24. It is always smaller than either single-variable exponent, which is why the compute-optimal loss falls more slowly than the data alone.</p></blockquote>
+<p>*<em>Q. The minima of a family of IsoFLOP curves are themselves a power law in the budget. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Both terms of the surface fall as C^(−αβ/(α+β)) at the optimum, so their sum does too. The laboratory measures that exponent on fitted runs rather than quoting it.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Three budgets, each with its own curve normalised by its own optimum, and the frontier through their minima. Open <strong>Read the U’s</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§chinchilla:3 Compute-optimal training — The family of models trained along each fixed budget — the measurement the IsoFLOP curve is named after.</li><li>§chinchilla:3.1 The optimal allocation — The condition that balances the two terms at the minimum, and the frontier the minima trace.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>IsoFLOP curve</strong> — The loss along one fixed compute budget, as the allocation slides.</li><li><strong>The frontier</strong> — The best loss at each budget, traced across budgets.</li><li><strong>Loss surface</strong> — The loss as a function of the model size and the dataset size.</li></ul>
+<p><em>Read first:</em> The compute-optimal allocation</p>
+<h3 id="lesson-7-the-twenty-tokens-rule-rederived">Lesson 7. The twenty-tokens rule, rederived</h3>
+<p><em>What the ratio at the optimum is, and what it is not</em></p>
+<p><em>Estimated study time:</em> 23 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Derive the tokens-per-parameter ratio the optimum chooses for itself</li><li>Measure the exponent of that ratio against the budget on a fitted surface</li><li>Say which property of the surface makes the rule a constant, and which makes it a trend</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The ratio is a consequence: D<em>/N</em> has an exponent (α−β)/(α+β) and is flat only when the two exponents agree.</li><li>The predicted allocation exponents and the measured ones are two instruments on one fact, and the screen prints both.</li><li>A rule quoted without the budget it was measured at is a number that will not travel.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The tokens-per-parameter rule</strong></p>
+<p><span class="math-display">$\frac{D^{*}}{N^{*}} = \left(\frac{\beta B}{\alpha A}\right)^{\frac{2}{\alpha+\beta}} P^{\frac{\alpha-\beta}{\alpha+\beta}}$</span></p>
+<p><em>The ratio the optimum chooses for itself. It is a constant only when the two exponents are equal; otherwise it drifts with the budget as a power whose exponent is (α−β)/(α+β). That is the whole content of the rule quoted as “twenty tokens per parameter”.</em></p>
+<p>Symbols:</p>
+<ul><li><code>D^{*}/N^{*}</code> — tokens per parameter at the optimum (A consequence of the surface, not a setting.)</li><li><code>\alpha-\beta</code> — the difference of the exponents (When it is zero the ratio is a constant; when it is not, the rule is a trend.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The same two-power surface as the IsoFLOP curve.</li><li>The budget range is one in which neither term has saturated against the floor.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Divide D<em> = P/N</em> by N* from the IsoFLOP result.</li><li>The P powers combine as 1 − 2β/(α+β) = (α−β)/(α+β).</li><li>The constant is the reciprocal of N*’s constant, squared in the appropriate powers, which is (βB/αA)^(2/(α+β)).</li></ol>
+<p><strong>Worked example.</strong> A surface whose fitted exponents are α = 0.44 and β = 0.61. → <strong>The exponent of the ratio is (0.44−0.61)/1.05 = −0.16, so tokens per parameter falls as budgets rise.</strong> (Quoting “20” without the budget it was measured at is quoting a number that is not constant.)</p>
+<p><strong>The law the minima obey</strong></p>
+<p><span class="math-display">$L^{*}(C) = E + K\,C^{-\gamma},\qquad \gamma = \frac{\alpha\beta}{\alpha+\beta}$</span></p>
+<p><em>The bottom of each IsoFLOP curve, traced across budgets, is itself a power law. Its exponent is made of the two single-variable exponents and of nothing else, which is why the compute-optimal law can be predicted from the parameter and data laws.</em></p>
+<p>Symbols:</p>
+<ul><li><code>L^{*}(C)</code> — the best loss at budget C (The loss of the compute-optimal allocation.)</li><li><code>K</code> — the frontier’s coefficient (Fixed by A, B, α and β; the laboratory measures it at a unit budget.)</li><li><code>\gamma</code> — the frontier exponent (The harmonic half of the two exponents: always smaller than either.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Both terms of the surface are powers with positive exponents over the whole range of budgets.</li><li>The optimum is interior — no constraint on the pool and no hard floor on either axis.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>At the optimum, N ∝ P^(β/(α+β)), so the capacity term falls as P^(−αβ/(α+β)).</li><li>D<em> = P/N</em> ∝ P^(α/(α+β)), so the data term falls as P^(−βα/(α+β)) — the same power.</li><li>Both terms therefore fall at γ = αβ/(α+β), and their sum is a constant times that same power.</li><li>Since P is proportional to C, the exponent in the budget is the exponent in the product.</li></ol>
+<p><strong>Worked example.</strong> α = β = 0.5, so γ = 0.25. → <strong>A budget ten times larger leaves the excess loss at 10^(−0.25) = 0.56 of what it was; a doubling leaves it at 0.84.</strong> (A doubling buys about 16% at the frontier, which is the number a training budget is actually worth.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. On a surface with α = 0.44 and β = 0.61, what is the exponent of tokens-per-parameter against the budget? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> (α−β)/(α+β) = −0.17/1.05 = −0.162. The ratio is constant only when the two exponents are equal, so “twenty tokens per parameter” is a rule with a budget attached to it.</p></blockquote>
+<p>*<em>Q. When is the tokens-per-parameter ratio at the optimum a constant? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>When the two exponents of the surface are equal</strong></li><li>- When the budget is large enough</li><li>- When the floor E is zero</li><li>- Always, for a transformer</li></ul>
+<blockquote><p>Correct — the exponent of the ratio is (α−β)/(α+β).</p></blockquote>
+<blockquote><p><strong>Why:</strong> D<em>/N</em> is a power of the budget whose exponent is (α−β)/(α+β). Equal exponents make that power vanish; anything else makes the rule a trend.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The ratio at each budget, the exponent fitted through it, and the exponent the algebra predicts. Open <strong>Measure the rule</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§chinchilla:4 Results — The reported tokens-per-parameter ratio at the compute optimum, and the comparison of the optimal models with the state of the art.</li><li>§chinchilla:3.1 The optimal allocation — Where the ratio comes from: the balance of the two terms, read as a number of tokens per parameter.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Tokens per parameter</strong> — The ratio of training tokens to model parameters.</li><li><strong>The frontier</strong> — The best loss at each budget, traced across budgets.</li><li><strong>Exponent</strong> — The number in a power law that says how fast the quantity falls.</li></ul>
+<p><em>Read first:</em> The IsoFLOP curves and the frontier</p>
+<h3 id="lesson-8-when-the-pool-binds">Lesson 8. When the pool binds</h3>
+<p><em>The budget at which the data runs out, and what happens past it</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compute the budget at which the optimal allocation asks for the whole corpus</li><li>Explain why the frontier and the achievable loss come apart past that budget</li><li>Read the price of the constraint off the optimum at a binding budget</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The frontier says how much data the optimum wants; a corpus is a finite number of rows, and that is where the two stories diverge.</li><li>Beyond the binding budget, extra compute buys repeats rather than data, and the loss falls more slowly than the law says.</li><li>The size of the pool is a variable, and the same budget is unconstrained in one corpus and bound in another.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The IsoFLOP curve</strong></p>
+<p><span class="math-display">$L(N;C) = E + A\,N^{-\alpha} + B\left(\frac{C}{kN}\right)^{-\beta},\qquad N^{*} = \left(\frac{\alpha A}{\beta B}\right)^{\frac{1}{\alpha+\beta}} P^{\frac{\beta}{\alpha+\beta}}$</span></p>
+<p><em>The loss along one fixed compute budget, as the allocation slides between parameters and data. It is a U: too small a model and the capacity term dominates, too big and the data term does. Its bottom is the compute-optimal allocation.</em></p>
+<p>Symbols:</p>
+<ul><li><code>C</code> — the budget (Fixed, so that every point on the curve costs the same.)</li><li><code>k</code> — the FLOPs per parameter per token (Six for a transformer’s forward and backward pass.)</li><li><code>P</code> — the product the budget pins down (P = C / k = N·D.)</li><li><code>N^{*}</code> — the optimal capacity (Where the two arms of the U balance.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The surface is the two-power form with a constant floor, fitted inside the region it is used in.</li><li>The budget is exactly the product k·N·D, so spending on one axis is taken off the other.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Put D = P/N into the surface, so the loss is a function of N alone at fixed P.</li><li>Differentiate: the capacity term contributes −αA·N^(−α−1) and the data term +βB·P^(−β)·N^(β−1).</li><li>Set the sum to zero and rearrange: N^(α+β) = αA/(βB) · P^β, which is the expression above.</li><li>The second derivative is positive there, so the stationary point is the bottom of the U rather than its top.</li></ol>
+<p><strong>Worked example.</strong> A surface with α = β and A = B, at a product P of 10^6. → *<em>N</em> = 10^3 and D<em> = 10^3: the budget splits evenly, and any other split is worse.</em>* (The laboratory measures the arms of this U by running the allocations rather than by trusting the algebra.)</p>
+<p><strong>What a repeated corpus is worth</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = U\left(1 + R^{\star}\left(1 - e^{-R/R^{\star}}\right)\right)$</span></p>
+<p><em>The effective amount of unique data a run of R extra passes over a pool of U tokens is worth. It saturates: the pool can never be worth more than U·(1 + R★), however many times it is read.</em></p>
+<p>Symbols:</p>
+<ul><li><code>U</code> — the unique tokens (The size of the pool.)</li><li><code>R</code> — the extra passes (The epoch count minus one.)</li><li><code>R^{\star}</code> — the repetition constant (Fitted; the paper’s data-side value is 15.39.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every row is read the same number of times.</li><li>The law is a fit over the regime 1 to 16 epochs, and is used inside it.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The marginal epoch of the expression is e^(−R/R★): the first repeat is worth almost a fresh one, the twentieth is worth nothing.</li><li>Summing that decay from zero to R gives R★(1 − e^(−R/R★)) fresh-equivalents.</li><li>Adding the pool itself gives the law.</li></ol>
+<p><strong>Worked example.</strong> A pool read four times, so R = 3, at the paper’s R★ = 15.39. → <strong>D_eff = U·(1 + 15.39·(1 − e^(−3/15.39))) = 3.73·U, so four epochs are worth 3.73 fresh passes.</strong> (The screen prints the measured curve next to this closed form, and the two are different instruments.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. On a loss surface whose two exponents are equal, the compute-optimal number of rows grows as the square root of the budget. A pool of 1,000 rows is exactly exhausted at one budget. By what factor does the exhausting budget change for a pool of 250 rows? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> D<em> ∝ C^(α/(α+β)), which is C^(1/2) when the exponents agree. Inverting it, the budget that makes D</em> equal to a given pool grows as the square of the pool: 250/1000 is a quarter, and a quarter squared is 0.0625.</p></blockquote>
+<p>*<em>Q. Past the budget at which a finite corpus stops covering the frontier’s demand, what does extra compute buy? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Passes over rows the model has already read, so the loss falls more slowly than the frontier says</strong></li><li>- Nothing: the loss is flat from there on</li><li>- More data, at the same price</li><li>- A bigger model, with the data unchanged</li></ul>
+<blockquote><p>Correct — and the screen prices the difference.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The frontier is a statement about an unbounded supply of rows. Beyond the binding budget the surplus is spent on repeats, and the effective-data law decides what they are worth — which is why the price grows with the budget rather than appearing all at once.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The budget where the demand for data meets the pool, and the price at each budget past it. Open <strong>Run the pool out</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§constrained:4 Model size and data constraints — How the optimal allocation changes when the unique data is exhausted before the compute is.</li><li>§chinchilla:3 Compute-optimal training — The unconstrained optimum the constrained one is measured against.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The finite pool</strong> — The corpus: a fixed number of rows that cannot be increased.</li><li><strong>Effective data</strong> — The number of unique rows a run actually learned from.</li><li><strong>IsoFLOP curve</strong> — The loss along one fixed compute budget, as the allocation slides.</li></ul>
+<p><em>Read first:</em> The IsoFLOP curves and the frontier</p>
+<h2 id="4-data-constraints">4. Data Constraints</h2>
+<p><em>What to do when the data runs out</em></p>
+<p>The regime where the unique data is exhausted and the training run has to go round again. The algebra of repetition is simple, and the bill it produces is not: three phases in the measured curve, and a closed form that says how many epochs were ever worth having.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Define the number of repeats and the effective number of unique tokens</li><li>Prove that repetition does not change the model a well-specified learner finds</li><li>Measure the price of repetition against the same number of fresh rows</li><li>Tell warmup, plateau and decay apart in a measured epoch curve</li><li>State how many epochs the paper’s own constant says are nearly free</li></ul>
+<h3 id="lesson-9-the-three-phases-of-a-repeated-run">Lesson 9. The three phases of a repeated run</h3>
+<p><em>Warmup, plateau, and the turn upward</em></p>
+<p><em>Estimated study time:</em> 25 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Name the three phases and say what each one is a fact about</li><li>Explain why the gap between the repeated and the fresh run is exactly zero at the first epoch</li><li>Read the decay phase off a held-out curve rather than off a training curve</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>At one epoch the two runs have read the same rows, so they are the same run — the warmup is arithmetic, not behaviour.</li><li>The plateau is the pool’s empirical optimum in sight and the fresh data still buying real improvements.</li><li>The decay is the repeated run walking towards a fit to the noise in its own pool, and it shows on held-out data first.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>What a repeated corpus is worth</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = U\left(1 + R^{\star}\left(1 - e^{-R/R^{\star}}\right)\right)$</span></p>
+<p><em>The effective amount of unique data a run of R extra passes over a pool of U tokens is worth. It saturates: the pool can never be worth more than U·(1 + R★), however many times it is read.</em></p>
+<p>Symbols:</p>
+<ul><li><code>U</code> — the unique tokens (The size of the pool.)</li><li><code>R</code> — the extra passes (The epoch count minus one.)</li><li><code>R^{\star}</code> — the repetition constant (Fitted; the paper’s data-side value is 15.39.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every row is read the same number of times.</li><li>The law is a fit over the regime 1 to 16 epochs, and is used inside it.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The marginal epoch of the expression is e^(−R/R★): the first repeat is worth almost a fresh one, the twentieth is worth nothing.</li><li>Summing that decay from zero to R gives R★(1 − e^(−R/R★)) fresh-equivalents.</li><li>Adding the pool itself gives the law.</li></ol>
+<p><strong>Worked example.</strong> A pool read four times, so R = 3, at the paper’s R★ = 15.39. → <strong>D_eff = U·(1 + 15.39·(1 − e^(−3/15.39))) = 3.73·U, so four epochs are worth 3.73 fresh passes.</strong> (The screen prints the measured curve next to this closed form, and the two are different instruments.)</p>
+<p><strong>The effective amount of data</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = \frac{D_{\mathrm{total}}}{E} = \frac{D_{\mathrm{total}}^{2}}{D_{\mathrm{unique}}}$</span></p>
+<p><em>The number of unique rows a run actually learned from, which is what the loss curve should be read against.</em></p>
+<p>Symbols:</p>
+<ul><li><code>D_{\mathrm{total}}</code> — the tokens read (The size of the training run.)</li><li><code>D_{\mathrm{unique}}</code> — the unique tokens (The size of the dataset before repetition.)</li><li><code>E</code> — the number of repeats (The ratio of the two.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every unique row is read the same number of times, which is what a standard training schedule does.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The number of repeats is the total read divided by the unique rows.</li><li>The effective data is the total read divided by the number of repeats.</li><li>The two together give the effective data as the total squared over the unique.</li></ol>
+<p><strong>Worked example.</strong> A run of 400 billion tokens over a unique dataset of 100 billion tokens. → <strong>The number of repeats is 4 and the effective data is 100 billion tokens.</strong> (The loss curve of that run should be compared with a run of 100 billion fresh tokens, not with 400.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. With the paper’s repetition constant R★ = 15.39, how many fresh passes is a pool read four times worth? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> D_eff/U = 1 + R★(1 − e^(−R/R★)) with R = 3 extra passes, which is 1 + 15.39 × 0.1771 = 3.73. The fourth epoch is worth most of a fresh one; the twentieth is worth nothing.</p></blockquote>
+<p>*<em>Q. Why is the gap between the repeated run and the fresh run exactly zero at the first epoch? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Because the two runs have read the same rows — at epoch one they are the same run</strong></li><li>- Because the loss has not started falling yet</li><li>- Because the learning rate is still warming up</li><li>- Because the held-out set is too small to tell them apart</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The repeated run has nothing to repeat until it has seen the pool once. That is what makes the warmup phase arithmetic rather than an assertion about behaviour.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Two SGD runs over the same tokens, one on repeats and one on fresh rows, epoch by epoch. Open <strong>Watch the phases</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§constrained:1 Introduction — The setting: what to do when the unique data runs out before the compute does, and the three-part shape of the answer.</li><li>§constrained:3 Repeating data — The measured curves whose phases this lesson is about.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Epoch</strong> — One pass over the whole pool.</li><li><strong>The finite pool</strong> — The corpus: a fixed number of rows that cannot be increased.</li><li><strong>Repeats</strong> — The number of times the training set is read again.</li><li><strong>Effective data</strong> — The number of unique rows a run actually learned from.</li></ul>
+<p><em>Read first:</em> The compute budget</p>
+<h3 id="lesson-10-how-many-epochs-before-repetition-dominates">Lesson 10. How many epochs before repetition dominates</h3>
+<p><em>The dominance epoch, and the fraction that defines it</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the dominance epoch and say what it is measured against</li><li>Show that the epoch you report depends on the fraction you chose</li><li>Compare the measured dominance epoch with the one the paper’s constant predicts</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Repetition dominates when the next epoch is worth so little that the compute would have been better spent on new rows.</li><li>The criterion is a fraction of the fresh run’s gain, and the table of fractions is the honest version of a single number.</li><li>The closed form says half a fresh epoch at R★·ln 2 passes; the measured curve is allowed to disagree, and the screen prints the disagreement.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>What a repeated corpus is worth</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = U\left(1 + R^{\star}\left(1 - e^{-R/R^{\star}}\right)\right)$</span></p>
+<p><em>The effective amount of unique data a run of R extra passes over a pool of U tokens is worth. It saturates: the pool can never be worth more than U·(1 + R★), however many times it is read.</em></p>
+<p>Symbols:</p>
+<ul><li><code>U</code> — the unique tokens (The size of the pool.)</li><li><code>R</code> — the extra passes (The epoch count minus one.)</li><li><code>R^{\star}</code> — the repetition constant (Fitted; the paper’s data-side value is 15.39.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every row is read the same number of times.</li><li>The law is a fit over the regime 1 to 16 epochs, and is used inside it.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The marginal epoch of the expression is e^(−R/R★): the first repeat is worth almost a fresh one, the twentieth is worth nothing.</li><li>Summing that decay from zero to R gives R★(1 − e^(−R/R★)) fresh-equivalents.</li><li>Adding the pool itself gives the law.</li></ol>
+<p><strong>Worked example.</strong> A pool read four times, so R = 3, at the paper’s R★ = 15.39. → <strong>D_eff = U·(1 + 15.39·(1 − e^(−3/15.39))) = 3.73·U, so four epochs are worth 3.73 fresh passes.</strong> (The screen prints the measured curve next to this closed form, and the two are different instruments.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. At R★ = 15.39, after how many extra passes is one more worth half a fresh epoch? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> The marginal epoch is e^(−R/R★), so R = −R★·ln(0.5) = 10.67. It is the paper’s own constant answering the paper’s own question, and the measured dominance epoch on screen E is the independent check.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>What one more epoch buys against what one more fresh epoch buys, and the dominance epoch at five different fractions. Open <strong>Price the epochs</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§constrained:3 Repeating data — The number of repeats, the loss as a function of it, and the point at which repeats stop paying.</li><li>§constrained:5 Discussion — The practical rule: up to about four epochs is nearly free, and beyond that the value decays away.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The dominance epoch</strong> — The epoch at which a repeat stops being worth the compute it costs.</li><li><strong>Epoch</strong> — One pass over the whole pool.</li><li><strong>Effective data</strong> — The number of unique rows a run actually learned from.</li></ul>
+<p><em>Read first:</em> The three phases of a repeated run</p>
+<h3 id="lesson-11-the-turn-upward-and-the-early-stopping-epoch">Lesson 11. The turn upward, and the early-stopping epoch</h3>
+<p><em>The pool gets easier while the model gets worse</em></p>
+<p><em>Estimated study time:</em> 23 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Explain why the loss on the pool keeps falling after the held-out loss has turned upward</li><li>Read the best epoch off a held-out curve, and say what the run loses by passing it</li><li>State why a single restart is not a curve</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The pool has its own optimum, which is a fit to the noise planted in the pool; past the shared optimum the two come apart.</li><li>The third phase is not a change in the optimiser. It is the same descent aimed at a target that is not the task.</li><li>The compute already spent is not a reason to keep going, and the loss that is visibly falling is not the loss being bought.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>What a repeated corpus is worth</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = U\left(1 + R^{\star}\left(1 - e^{-R/R^{\star}}\right)\right)$</span></p>
+<p><em>The effective amount of unique data a run of R extra passes over a pool of U tokens is worth. It saturates: the pool can never be worth more than U·(1 + R★), however many times it is read.</em></p>
+<p>Symbols:</p>
+<ul><li><code>U</code> — the unique tokens (The size of the pool.)</li><li><code>R</code> — the extra passes (The epoch count minus one.)</li><li><code>R^{\star}</code> — the repetition constant (Fitted; the paper’s data-side value is 15.39.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every row is read the same number of times.</li><li>The law is a fit over the regime 1 to 16 epochs, and is used inside it.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The marginal epoch of the expression is e^(−R/R★): the first repeat is worth almost a fresh one, the twentieth is worth nothing.</li><li>Summing that decay from zero to R gives R★(1 − e^(−R/R★)) fresh-equivalents.</li><li>Adding the pool itself gives the law.</li></ol>
+<p><strong>Worked example.</strong> A pool read four times, so R = 3, at the paper’s R★ = 15.39. → <strong>D_eff = U·(1 + 15.39·(1 − e^(−3/15.39))) = 3.73·U, so four epochs are worth 3.73 fresh passes.</strong> (The screen prints the measured curve next to this closed form, and the two are different instruments.)</p>
+<p><strong>The effective amount of data</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = \frac{D_{\mathrm{total}}}{E} = \frac{D_{\mathrm{total}}^{2}}{D_{\mathrm{unique}}}$</span></p>
+<p><em>The number of unique rows a run actually learned from, which is what the loss curve should be read against.</em></p>
+<p>Symbols:</p>
+<ul><li><code>D_{\mathrm{total}}</code> — the tokens read (The size of the training run.)</li><li><code>D_{\mathrm{unique}}</code> — the unique tokens (The size of the dataset before repetition.)</li><li><code>E</code> — the number of repeats (The ratio of the two.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every unique row is read the same number of times, which is what a standard training schedule does.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The number of repeats is the total read divided by the unique rows.</li><li>The effective data is the total read divided by the number of repeats.</li><li>The two together give the effective data as the total squared over the unique.</li></ol>
+<p><strong>Worked example.</strong> A run of 400 billion tokens over a unique dataset of 100 billion tokens. → <strong>The number of repeats is 4 and the effective data is 100 billion tokens.</strong> (The loss curve of that run should be compared with a run of 100 billion fresh tokens, not with 400.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. In the third phase, the loss on the pool keeps falling while the held-out loss rises. Why? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The pool has its own optimum — a fit to the noise in the pool — and the descent is still aimed at it</strong></li><li>- The learning rate has grown too large</li><li>- The held-out set is too small to be reliable</li><li>- The repeated run has fewer parameters</li></ul>
+<blockquote><p>Correct. Nothing changed in the optimiser; the target it is aiming at stopped being the task.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The training curve is a measurement of the fit to the pool, and a fit to the pool’s planted noise is still a better fit to the pool. Only the held-out set can tell you that the two have come apart, which is the content of early stopping.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The loss on the pool against the held-out loss, the turn, and the epoch the run should have stopped at. Open <strong>Watch the two curves part</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§constrained:3 Repeating data — The measured epoch curves, and the point past which the held-out loss rises while the training loss falls.</li><li>§constrained:5 Discussion — The practical consequence: repetition is bounded, and the bound is found by early stopping rather than by arithmetic.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Epoch</strong> — One pass over the whole pool.</li><li><strong>The dominance epoch</strong> — The epoch at which a repeat stops being worth the compute it costs.</li><li><strong>The finite pool</strong> — The corpus: a fixed number of rows that cannot be increased.</li></ul>
+<p><em>Read first:</em> The three phases of a repeated run, How many epochs before repetition dominates</p>
+<h3 id="lesson-12-when-the-data-runs-out">Lesson 12. When the data runs out</h3>
+<p><em>Repeats, and what they are worth</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the number of repeats and the effective number of unique tokens</li><li>Write the loss of a learner trained on repeated data</li><li>Show that repetition does not change the model a ridge estimator finds</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>E repeats of U unique rows is E·U rows of training and U rows of information.</li><li>The ridge normal equations are homogeneous in the data, so the solution is unchanged by repetition.</li><li>What repetition buys is the illusion of progress: the same model, at a higher price.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The effect of repetition on a ridge solution</strong></p>
+<p><span class="math-display">$X^{\top} X \to E\, X^{\top} X, \quad X^{\top} y \to E\, X^{\top} y \quad \Longrightarrow \quad w \text{ unchanged}$</span></p>
+<p><em>Repeating every row of the training data E times multiplies both sides of the normal equations by E, so the solution does not change.</em></p>
+<p>Symbols:</p>
+<ul><li><code>X</code> — the design matrix (One row per training example.)</li><li><code>E</code> — the number of repeats (How many times the unique data is read.)</li><li><code>w</code> — the ridge solution (What the learner would find.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The penalty is relative to the mean loss, so it is scaled with the number of rows.</li><li>The learner is closed-form, so there is no optimisation noise to accumulate.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The normal equations are (XᵀX/N + λI)w = Xᵀy/N.</li><li>Repeating every row E times multiplies both XᵀX and Xᵀy by E, and the N in the denominator by E.</li><li>Every term is multiplied by the same factor, so the solution is identical.</li></ol>
+<p><strong>Worked example.</strong> A dataset of 100 unique rows, read four times. → <strong>The model is the same as the one trained on the 100 rows once.</strong> (The only difference is the bill: four times the arithmetic for the same answer.)</p>
+<p><strong>The effective amount of data</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = \frac{D_{\mathrm{total}}}{E} = \frac{D_{\mathrm{total}}^{2}}{D_{\mathrm{unique}}}$</span></p>
+<p><em>The number of unique rows a run actually learned from, which is what the loss curve should be read against.</em></p>
+<p>Symbols:</p>
+<ul><li><code>D_{\mathrm{total}}</code> — the tokens read (The size of the training run.)</li><li><code>D_{\mathrm{unique}}</code> — the unique tokens (The size of the dataset before repetition.)</li><li><code>E</code> — the number of repeats (The ratio of the two.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every unique row is read the same number of times, which is what a standard training schedule does.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The number of repeats is the total read divided by the unique rows.</li><li>The effective data is the total read divided by the number of repeats.</li><li>The two together give the effective data as the total squared over the unique.</li></ol>
+<p><strong>Worked example.</strong> A run of 400 billion tokens over a unique dataset of 100 billion tokens. → <strong>The number of repeats is 4 and the effective data is 100 billion tokens.</strong> (The loss curve of that run should be compared with a run of 100 billion fresh tokens, not with 400.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A ridge estimator is trained on a dataset in which every row is repeated four times. What happens to the solution? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Nothing: the normal equations are homogeneous in the data</strong></li><li>- It is regularised four times as strongly</li><li>- It overfits four times as much</li><li>- It is four times as large</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> XᵀX and Xᵀy are both multiplied by the number of repeats, so the solution is unchanged. Repeating the data buys the same model at four times the price.</p></blockquote>
+<p>*<em>Q. A training run reads 400 billion tokens over a unique dataset of 100 billion tokens. How many repeats is that? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> The number of repeats is the tokens read divided by the unique tokens: 400/100 = 4.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The repeated run against a fresh run of the same length, and the bill. Open <strong>Pay for the repeats</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§constrained:1 Introduction — The setting: what to do when the unique data runs out before the compute does.</li><li>§constrained:3 Repeating data — The number of repeats, the loss as a function of it, and the point at which repeats stop paying.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Repeats</strong> — The number of times the training set is read again.</li><li><strong>Effective data</strong> — The number of unique rows a run actually learned from.</li></ul>
+<p><em>Read first:</em> The compute budget</p>
+<h3 id="lesson-13-the-price-of-repetition">Lesson 13. The price of repetition</h3>
+<p><em>Fresh rows against the same rows again</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compare a repeated run with a fresh run of the same length on the same held-out set</li><li>Measure how the gap grows with the number of repeats</li><li>State the practical rule the measurement supports</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Fresh rows keep improving the estimate; repeated rows stop improving it immediately.</li><li>The gap between the two is the price of repetition, and it is paid in compute.</li><li>The rule that falls out is about <em>unique</em> tokens, not about tokens.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The effective amount of data</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = \frac{D_{\mathrm{total}}}{E} = \frac{D_{\mathrm{total}}^{2}}{D_{\mathrm{unique}}}$</span></p>
+<p><em>The number of unique rows a run actually learned from, which is what the loss curve should be read against.</em></p>
+<p>Symbols:</p>
+<ul><li><code>D_{\mathrm{total}}</code> — the tokens read (The size of the training run.)</li><li><code>D_{\mathrm{unique}}</code> — the unique tokens (The size of the dataset before repetition.)</li><li><code>E</code> — the number of repeats (The ratio of the two.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every unique row is read the same number of times, which is what a standard training schedule does.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The number of repeats is the total read divided by the unique rows.</li><li>The effective data is the total read divided by the number of repeats.</li><li>The two together give the effective data as the total squared over the unique.</li></ol>
+<p><strong>Worked example.</strong> A run of 400 billion tokens over a unique dataset of 100 billion tokens. → <strong>The number of repeats is 4 and the effective data is 100 billion tokens.</strong> (The loss curve of that run should be compared with a run of 100 billion fresh tokens, not with 400.)</p>
+<p><strong>What a repeated corpus is worth</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = U\left(1 + R^{\star}\left(1 - e^{-R/R^{\star}}\right)\right)$</span></p>
+<p><em>The effective amount of unique data a run of R extra passes over a pool of U tokens is worth. It saturates: the pool can never be worth more than U·(1 + R★), however many times it is read.</em></p>
+<p>Symbols:</p>
+<ul><li><code>U</code> — the unique tokens (The size of the pool.)</li><li><code>R</code> — the extra passes (The epoch count minus one.)</li><li><code>R^{\star}</code> — the repetition constant (Fitted; the paper’s data-side value is 15.39.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every row is read the same number of times.</li><li>The law is a fit over the regime 1 to 16 epochs, and is used inside it.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The marginal epoch of the expression is e^(−R/R★): the first repeat is worth almost a fresh one, the twentieth is worth nothing.</li><li>Summing that decay from zero to R gives R★(1 − e^(−R/R★)) fresh-equivalents.</li><li>Adding the pool itself gives the law.</li></ol>
+<p><strong>Worked example.</strong> A pool read four times, so R = 3, at the paper’s R★ = 15.39. → <strong>D_eff = U·(1 + 15.39·(1 − e^(−3/15.39))) = 3.73·U, so four epochs are worth 3.73 fresh passes.</strong> (The screen prints the measured curve next to this closed form, and the two are different instruments.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the comparison of a repeated run with a fresh run of the same length show? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Fresh rows keep improving the model and repeated rows do not, so the gap is the price of repetition</strong></li><li>- They are the same, so repetition is free</li><li>- The repeated run is better, because it sees the data more often</li><li>- Nothing can be compared without a different model</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Every fresh row is new information; a repeated row is not. The gap between the two curves, measured on the same held-out set, is the price.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The two curves, and the gap between them, as the number of repeats grows. Open <strong>Watch the gap open</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§constrained:5 Discussion — The practical rules: how many repeats, and what to do when there is no more data.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Effective data</strong> — The number of unique rows a run actually learned from.</li><li><strong>Repeats</strong> — The number of times the training set is read again.</li></ul>
+<p><em>Read first:</em> When the data runs out</p>
+<h3 id="lesson-14-the-effective-data-law">Lesson 14. The effective-data law</h3>
+<p><em>D′ = U·(1 + R★·(1 − e^(−R/R★))), evaluated rather than quoted</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the law and say what each of the three quantities in it is</li><li>Compute the ceiling a pool is ever worth, and the epoch at which a pass is worth half a fresh one</li><li>Name the thing the law has no term for, and say which screen measures it</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The first pass is worth exactly itself; every later pass is worth e^(−R/R★) of a fresh epoch, which is a decay with no knee in it.</li><li>R★ is the whole of the law’s content: it sets the ceiling U·(1 + R★) and the epoch at which the marginal pass halves.</li><li>The law saturates and a real run turns upward, so the ceiling bounds the law’s optimism rather than the run’s achievement.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>What a repeated corpus is worth</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = U\left(1 + R^{\star}\left(1 - e^{-R/R^{\star}}\right)\right)$</span></p>
+<p><em>The effective amount of unique data a run of R extra passes over a pool of U tokens is worth. It saturates: the pool can never be worth more than U·(1 + R★), however many times it is read.</em></p>
+<p>Symbols:</p>
+<ul><li><code>U</code> — the unique tokens (The size of the pool.)</li><li><code>R</code> — the extra passes (The epoch count minus one.)</li><li><code>R^{\star}</code> — the repetition constant (Fitted; the paper’s data-side value is 15.39.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every row is read the same number of times.</li><li>The law is a fit over the regime 1 to 16 epochs, and is used inside it.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The marginal epoch of the expression is e^(−R/R★): the first repeat is worth almost a fresh one, the twentieth is worth nothing.</li><li>Summing that decay from zero to R gives R★(1 − e^(−R/R★)) fresh-equivalents.</li><li>Adding the pool itself gives the law.</li></ol>
+<p><strong>Worked example.</strong> A pool read four times, so R = 3, at the paper’s R★ = 15.39. → <strong>D_eff = U·(1 + 15.39·(1 − e^(−3/15.39))) = 3.73·U, so four epochs are worth 3.73 fresh passes.</strong> (The screen prints the measured curve next to this closed form, and the two are different instruments.)</p>
+<p><strong>The effective amount of data</strong></p>
+<p><span class="math-display">$D_{\mathrm{eff}} = \frac{D_{\mathrm{total}}}{E} = \frac{D_{\mathrm{total}}^{2}}{D_{\mathrm{unique}}}$</span></p>
+<p><em>The number of unique rows a run actually learned from, which is what the loss curve should be read against.</em></p>
+<p>Symbols:</p>
+<ul><li><code>D_{\mathrm{total}}</code> — the tokens read (The size of the training run.)</li><li><code>D_{\mathrm{unique}}</code> — the unique tokens (The size of the dataset before repetition.)</li><li><code>E</code> — the number of repeats (The ratio of the two.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Every unique row is read the same number of times, which is what a standard training schedule does.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The number of repeats is the total read divided by the unique rows.</li><li>The effective data is the total read divided by the number of repeats.</li><li>The two together give the effective data as the total squared over the unique.</li></ol>
+<p><strong>Worked example.</strong> A run of 400 billion tokens over a unique dataset of 100 billion tokens. → <strong>The number of repeats is 4 and the effective data is 100 billion tokens.</strong> (The loss curve of that run should be compared with a run of 100 billion fresh tokens, not with 400.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. With the paper’s fitted constant R★ = 15.387756, a pool of 10 billion unique tokens is worth at most U·(1 + R★) effective tokens however many times it is read. What is that ceiling, in billions of tokens? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> 10 × (1 + 15.387756) = 163.87756 billion. The constant is a multiplier on the pool, and the ceiling is reached only in the limit of infinitely many passes.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The effective data and the marginal value of a pass over a pool, at the paper’s constant and at any other. Open <strong>Evaluate the law</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§constrained:3 Repeating data — The law itself: the effective number of unique tokens as a function of the repeats, and the constant fitted to the measured curves.</li><li>§constrained:5 Discussion — The rule of thumb read off the same expression near its start — up to about four epochs is nearly free.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Effective data</strong> — The number of unique rows a run actually learned from.</li><li><strong>Repeats</strong> — The number of times the training set is read again.</li><li><strong>The dominance epoch</strong> — The epoch at which a repeat stops being worth the compute it costs.</li><li><strong>The finite pool</strong> — The corpus: a fixed number of rows that cannot be increased.</li></ul>
+<p><em>Read first:</em> When the data runs out, The turn upward, and the early-stopping epoch</p>
+<h2 id="5-pruning-and-percolation">5. Pruning and Percolation</h2>
+<p><em>What a corpus is worth when it is half as big</em></p>
+<p>Volume is not the only variable a corpus has. Rank the rows by what they are worth and the loss falls faster than any law of volume alone; keep ranking and there comes a fraction below which the rows going are the ones nothing else can replace. Where that fraction is depends on the metric.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>State the percolation argument for a threshold keep fraction</li><li>Rank four pruning metrics on one pool, and price what each ranking costs</li><li>Predict a threshold from the structure of the pool and compare it with the measured one</li><li>Say what the metric’s own error does to a cliff</li></ul>
+<h3 id="lesson-15-the-percolation-threshold">Lesson 15. The percolation threshold</h3>
+<p><em>When the rows going are the rows nothing else can replace</em></p>
+<p><em>Estimated study time:</em> 25 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the percolation argument for a threshold keep fraction</li><li>Read a threshold, a best fraction and a cliff edge off one pruning curve</li><li>Explain why the threshold is a property of the metric’s queue rather than of the pool alone</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Volume laws say a smaller corpus is a worse corpus in a fixed way; percolation says that past some fraction the loss goes faster, because what is being removed stops being redundant.</li><li>The rare rows carry the tail directions, and a direction covered by three rows stops existing when two of them are cut.</li><li>Rank the same pool four ways and the same event happens at four different fractions, because each ranking loses the rare rows when its own queue reaches them.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The percolation threshold of a pruned pool</strong></p>
+<p><span class="math-display">$f^{\star} \approx \frac{m\,d_{\mathrm{tail}}}{N}\quad\text{with}\quad \mathbb{E}[\text{rare kept}] = \sum_{n\,\mathrm{rare}} \Phi\!\left(\frac{\ell_n - \tau(f)}{\sigma}\right)$</span></p>
+<p><em>The keep fraction at which a pruned corpus stops working. Above it the bulk that goes is redundant and the loss barely moves; at it, the rare rows that carry the tail directions start going and the curve breaks.</em></p>
+<p>Symbols:</p>
+<ul><li><code>d_{\mathrm{tail}}</code> — the tail directions (The parts of the task only a handful of rows carry.)</li><li><code>m</code> — the rows needed per direction (Three in the laboratory, because one row fixes a direction but does not test it.)</li><li><code>N</code> — the size of the pool (All of it, rare and bulk together.)</li><li><code>\ell_n</code> — the log information of row n (‖x‖²/σ² for a linear-Gaussian row.)</li><li><code>\sigma</code> — the metric’s own error (Zero is a perfect metric; the threshold moves with it.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The tail directions need a fixed number of rows each, and a direction with none is lost.</li><li>The metric ranks rows by informativeness, so the cut is a threshold on ℓ rather than a random subsample.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The requirement is m·d_tail rare rows; with a perfect metric, keeping fraction f keeps the top f·N rows.</li><li>Setting the top fraction equal to the requirement gives f★ ≈ m·d_tail/N.</li><li>With a noisy metric the surviving count is the sum of the normal tails above the cut, and the cut τ(f) is found by bisection on the same mixture.</li><li>Because that sum falls as f falls, there is a smallest f at which it still reaches the requirement: the threshold.</li></ol>
+<p><strong>Worked example.</strong> The laboratory’s pool: 400 rows, 24 dimensions of which the last 4 are tail directions, m = 3. → <strong>The requirement is 12 rows, so the predicted threshold is 12/400 = 3% of the pool.</strong> (The screen compares that with the threshold the training runs actually break at.)</p>
+<p><strong>What one row is worth</strong></p>
+<p><span class="math-display">$I_n = \frac{x_n x_n^{\mathsf T}}{\sigma_n^{2}},\qquad \operatorname{tr} I_n = \frac{\lVert x_n\rVert^{2}}{\sigma_n^{2}}$</span></p>
+<p><em>The information a single labelled row carries about the fitted parameters, for a linear model with per-row noise. Its trace is the scalar a pruning metric is trying to rank by, and it is exactly computable here — which is what lets the laboratory define a best possible metric.</em></p>
+<p>Symbols:</p>
+<ul><li><code>x_n</code> — the row (Its amplitude is what a norm-based metric sees.)</li><li><code>\sigma_n</code> — the noise on that row’s label (Invisible to the inputs, decisive in the ratio.)</li><li><code>\operatorname{tr} I_n</code> — the scalar informativeness (Large when the row is far out and its label is clean.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The model is linear in the features and the noise is independent per row.</li><li>The metric may use the labels; a norm-only metric is estimating this quantity without σ.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>For a Gaussian likelihood the Fisher information is the outer product of the gradient of the log-likelihood, which for a linear row is x xᵀ/σ².</li><li>A scalar ranking needs one number per row, so take the trace.</li><li>A residual-based score sees the small σ because it fits the row; a norm-based score sees only the large ‖x‖.</li></ol>
+<p><strong>Worked example.</strong> A rare row with an ordinary norm and a label noise ten times smaller than the bulk’s. → <strong>Its information is about two orders above a bulk row of the same size, and a norm ranks it in the middle of the pool.</strong> (That single mismatch is why the two metrics have two different cliffs.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A pool of 400 rows has 4 tail directions and needs 3 rare rows per direction. What keep fraction does the percolation argument predict? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> 12 rows out of 400 is 3%. The prediction is a count of rows, not a property of the loss; the screen compares it with the fraction at which the trained runs actually break.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The loss as the pool shrinks, against a random subset of the same size, with the threshold and the cliff edge marked. Open <strong>Break the curve</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sorscher:1 Introduction — The claim that breaks the law: a pruned corpus can scale better than a larger one, because the information in the data and not its volume is what the loss is a function of.</li><li>§sorscher:3 An analytic theory of data pruning — The percolation argument: clusters, rarity, and the keep fraction below which the tail of the distribution starts going.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Percolation threshold</strong> — The keep fraction at which a pruned corpus stops working.</li><li><strong>Rare rows</strong> — The few rows that carry what nothing else in the pool carries.</li><li><strong>Pruning metric</strong> — The score that ranks the rows of a pool from most to least worth keeping.</li><li><strong>The finite pool</strong> — The corpus: a fixed number of rows that cannot be increased.</li></ul>
+<p><em>Read first:</em> What a power law says, When the data runs out</p>
+<h3 id="lesson-16-four-metrics-on-one-pool">Lesson 16. Four metrics on one pool</h3>
+<p><em>Oracle, strong, weak, random — and what each ranking costs</em></p>
+<p><em>Estimated study time:</em> 27 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Rank four pruning metrics at matched volume and read each one’s own threshold</li><li>Explain the difference between a comparison at matched volume and one at matched compute</li><li>Say which of the four metrics a practitioner can actually compute, and what that costs</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The oracle ranks rows by the information they truly carry and nobody has it; it is the ceiling the computable metrics are scored against rather than a fifth option.</li><li>A strong metric has to be fitted over the whole pool before it can score a row, so its win on volume has to survive a baseline handed the same number of extra rows.</li><li>The paper’s ordering — strong beats weak, weak beats random, each with its own cliff — is a claim, and the table is the test of it on this pool with this seed.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>What one row is worth</strong></p>
+<p><span class="math-display">$I_n = \frac{x_n x_n^{\mathsf T}}{\sigma_n^{2}},\qquad \operatorname{tr} I_n = \frac{\lVert x_n\rVert^{2}}{\sigma_n^{2}}$</span></p>
+<p><em>The information a single labelled row carries about the fitted parameters, for a linear model with per-row noise. Its trace is the scalar a pruning metric is trying to rank by, and it is exactly computable here — which is what lets the laboratory define a best possible metric.</em></p>
+<p>Symbols:</p>
+<ul><li><code>x_n</code> — the row (Its amplitude is what a norm-based metric sees.)</li><li><code>\sigma_n</code> — the noise on that row’s label (Invisible to the inputs, decisive in the ratio.)</li><li><code>\operatorname{tr} I_n</code> — the scalar informativeness (Large when the row is far out and its label is clean.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The model is linear in the features and the noise is independent per row.</li><li>The metric may use the labels; a norm-only metric is estimating this quantity without σ.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>For a Gaussian likelihood the Fisher information is the outer product of the gradient of the log-likelihood, which for a linear row is x xᵀ/σ².</li><li>A scalar ranking needs one number per row, so take the trace.</li><li>A residual-based score sees the small σ because it fits the row; a norm-based score sees only the large ‖x‖.</li></ol>
+<p><strong>Worked example.</strong> A rare row with an ordinary norm and a label noise ten times smaller than the bulk’s. → <strong>Its information is about two orders above a bulk row of the same size, and a norm ranks it in the middle of the pool.</strong> (That single mismatch is why the two metrics have two different cliffs.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. On one pool, four metrics give four different cliffs. What does that establish about the threshold? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>It is a property of the metric and the pool together</strong></li><li>- It is a property of the pool alone</li><li>- It is a measurement error</li><li>- It is set by the model’s capacity</li></ul>
+<blockquote><p>Correct — the ranking decides which rows go, so it decides where they stop going.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A threshold is where the rows a metric values run out. Two metrics that rank differently run out in different places, which is the paper’s point about curation being a property of the data and the tool.</p></blockquote>
+<p>*<em>Q. A metric that ranks rows by their norm can be beaten by one that ranks them by what the labels support. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> The information a row carries is ‖x‖²/σ²: the norm sees the amplitude and not the noise. A residual-based ranking sees both, keeps the rare rows, and has a lower threshold.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Each metric at the fraction where it is best, with its excess over random and its own cost in rows. Open <strong>Rank the metrics</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sorscher:5 Benchmarking supervised pruning metrics on ImageNet — The ranking of the metrics at matched volume, and the finding that a metric’s own cost is part of the comparison.</li><li>§sorscher:2 Background and related work — Where the volume laws come from, and why a similarity metric is expected to beat them.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Pruning metric</strong> — The score that ranks the rows of a pool from most to least worth keeping.</li><li><strong>Metric</strong> — The function that turns a model’s output into a score.</li><li><strong>Rare rows</strong> — The few rows that carry what nothing else in the pool carries.</li><li><strong>Percolation threshold</strong> — The keep fraction at which a pruned corpus stops working.</li></ul>
+<p><em>Read first:</em> The percolation threshold</p>
+<h3 id="lesson-17-predicting-the-cliff-before-it-happens">Lesson 17. Predicting the cliff before it happens</h3>
+<p><em>m rare rows per direction, and the survival of a queue with error in it</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compute the threshold the structure of a pool predicts, with no free parameter</li><li>Compare the predicted fraction with the measured one on the same pool</li><li>Say what the prediction does as the metric’s error grows past the information spread</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The prediction is a survival calculation: how many rare rows are expected to outrank the cut at each keep fraction, against the number the tail directions need.</li><li>At zero error the answer is the share of the pool that ranks above the rarest rare row — a property of the pool, not of the loss.</li><li>Past the information spread a rare row survives a cut exactly as often as a bulk row does, the predicted threshold goes to one, and there is nothing left to prune.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The percolation threshold of a pruned pool</strong></p>
+<p><span class="math-display">$f^{\star} \approx \frac{m\,d_{\mathrm{tail}}}{N}\quad\text{with}\quad \mathbb{E}[\text{rare kept}] = \sum_{n\,\mathrm{rare}} \Phi\!\left(\frac{\ell_n - \tau(f)}{\sigma}\right)$</span></p>
+<p><em>The keep fraction at which a pruned corpus stops working. Above it the bulk that goes is redundant and the loss barely moves; at it, the rare rows that carry the tail directions start going and the curve breaks.</em></p>
+<p>Symbols:</p>
+<ul><li><code>d_{\mathrm{tail}}</code> — the tail directions (The parts of the task only a handful of rows carry.)</li><li><code>m</code> — the rows needed per direction (Three in the laboratory, because one row fixes a direction but does not test it.)</li><li><code>N</code> — the size of the pool (All of it, rare and bulk together.)</li><li><code>\ell_n</code> — the log information of row n (‖x‖²/σ² for a linear-Gaussian row.)</li><li><code>\sigma</code> — the metric’s own error (Zero is a perfect metric; the threshold moves with it.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The tail directions need a fixed number of rows each, and a direction with none is lost.</li><li>The metric ranks rows by informativeness, so the cut is a threshold on ℓ rather than a random subsample.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The requirement is m·d_tail rare rows; with a perfect metric, keeping fraction f keeps the top f·N rows.</li><li>Setting the top fraction equal to the requirement gives f★ ≈ m·d_tail/N.</li><li>With a noisy metric the surviving count is the sum of the normal tails above the cut, and the cut τ(f) is found by bisection on the same mixture.</li><li>Because that sum falls as f falls, there is a smallest f at which it still reaches the requirement: the threshold.</li></ol>
+<p><strong>Worked example.</strong> The laboratory’s pool: 400 rows, 24 dimensions of which the last 4 are tail directions, m = 3. → <strong>The requirement is 12 rows, so the predicted threshold is 12/400 = 3% of the pool.</strong> (The screen compares that with the threshold the training runs actually break at.)</p>
+<p><strong>What one row is worth</strong></p>
+<p><span class="math-display">$I_n = \frac{x_n x_n^{\mathsf T}}{\sigma_n^{2}},\qquad \operatorname{tr} I_n = \frac{\lVert x_n\rVert^{2}}{\sigma_n^{2}}$</span></p>
+<p><em>The information a single labelled row carries about the fitted parameters, for a linear model with per-row noise. Its trace is the scalar a pruning metric is trying to rank by, and it is exactly computable here — which is what lets the laboratory define a best possible metric.</em></p>
+<p>Symbols:</p>
+<ul><li><code>x_n</code> — the row (Its amplitude is what a norm-based metric sees.)</li><li><code>\sigma_n</code> — the noise on that row’s label (Invisible to the inputs, decisive in the ratio.)</li><li><code>\operatorname{tr} I_n</code> — the scalar informativeness (Large when the row is far out and its label is clean.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The model is linear in the features and the noise is independent per row.</li><li>The metric may use the labels; a norm-only metric is estimating this quantity without σ.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>For a Gaussian likelihood the Fisher information is the outer product of the gradient of the log-likelihood, which for a linear row is x xᵀ/σ².</li><li>A scalar ranking needs one number per row, so take the trace.</li><li>A residual-based score sees the small σ because it fits the row; a norm-based score sees only the large ‖x‖.</li></ol>
+<p><strong>Worked example.</strong> A rare row with an ordinary norm and a label noise ten times smaller than the bulk’s. → <strong>Its information is about two orders above a bulk row of the same size, and a norm ranks it in the middle of the pool.</strong> (That single mismatch is why the two metrics have two different cliffs.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. As a pruning metric’s own error grows far past the spread of information in the pool, what does the predicted threshold approach? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>One: a rare row survives a cut exactly as often as a bulk row does, so there is nothing to prune</strong></li><li>- Zero: the metric gets braver as its error grows</li><li>- The share of the pool that is rare</li><li>- It does not move: the threshold is a property of the pool</li></ul>
+<blockquote><p>Correct — the ranking has become a shuffle.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The prediction is a survival calculation on the metric’s queue. Once the noise on the score exceeds the difference between the groups, the queue is random, the rare rows are lost at the same rate as everything else, and the honest answer is that no fraction is safe.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The rare rows surviving each cut, the requirement the tail needs, and the prediction against the measurement. Open <strong>Make the prediction</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sorscher:3 An analytic theory of data pruning — The prediction: m rows per direction have to survive, and the keep fraction that does that is the threshold.</li><li>§sorscher:7 Discussion — The limits of the theory: it is about a clustered corpus and a similarity metric, and the numbers are the ones the argument needs.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Percolation threshold</strong> — The keep fraction at which a pruned corpus stops working.</li><li><strong>Rare rows</strong> — The few rows that carry what nothing else in the pool carries.</li><li><strong>Pruning metric</strong> — The score that ranks the rows of a pool from most to least worth keeping.</li><li><strong>A cliff</strong> — A steep transition in a measured curve.</li></ul>
+<p><em>Read first:</em> The percolation threshold, Four metrics on one pool</p>
+<h2 id="6-emergence">6. Emergence</h2>
+<p><em>The cliff, and the metric that makes it</em></p>
+<p>Some abilities appear to arrive suddenly. The mechanism is a metric with a threshold in it, applied to a capability that rises smoothly. Both halves of that sentence are computable.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Describe what an emergent curve looks like, and what an alternative metric shows</li><li>Explain the mechanism by which a threshold in the metric creates a cliff</li><li>Show that the point of the cliff moves when the metric’s threshold moves</li></ul>
+<h3 id="lesson-18-what-emergence-looks-like">Lesson 18. What emergence looks like</h3>
+<p><em>A score that is zero, and then is not</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the shape of an emergent curve and what makes it striking</li><li>Read an emergent curve and say what it does not establish about the model</li><li>Compute the same capability under a second, continuous metric</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The curve is flat, then steep, and the steep part is where the attention goes.</li><li>A flat region is not a model that cannot do the task; it is a metric that cannot see it.</li><li>The same model, scored differently, can look smooth.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The whole-sequence score</strong></p>
+<p><span class="math-display">$S_{\mathrm{seq}} = q^{L}$</span></p>
+<p><em>The score of a task scored only when every token is right, given a per-token accuracy. It is the mechanism by which a smooth capability produces an apparent cliff.</em></p>
+<p>Symbols:</p>
+<ul><li><code>q</code> — the per-token accuracy (The smooth, underlying quantity.)</li><li><code>L</code> — the length of the sequence (The number of tokens that must all be right.)</li><li><code>S_{\mathrm{seq}}</code> — the score (The probability that the whole sequence is right.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The tokens are correct independently, which is a simplification and a generous one.</li><li>The metric gives no partial credit, which is the usual case for exact match.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The probability that all L tokens are right is the product of L probabilities.</li><li>If each is q, the product is q^L.</li><li>A number below one, raised to a higher power, falls further and faster — so the transition sharpens as L grows.</li></ol>
+<p><strong>Worked example.</strong> A per-token accuracy of 0.95 and a sequence of ten tokens. → <strong>The score is 0.95^10 = 0.599.</strong> (The model is right about 95% of the time and scores under 60%. Change the metric and the cliff moves.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does an emergent curve establish? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>That the measured score is flat and then steep</strong></li><li>- That the model’s capability is flat and then steep</li><li>- That the task is impossible below a size</li><li>- That the training run failed</li></ul>
+<blockquote><p>Correct — and that is a statement about the score.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The curve is a fact about the metric applied to the model. Whether the model itself changed discontinuously is a separate question, and the answer depends on the metric.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>One capability, two metrics, and the two curves they produce. Open <strong>Look at the cliff</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§mirage:1 Introduction — The claim under examination: that some abilities appear suddenly, and that the appearance is a property of the metric.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Emergence</strong> — An ability whose measured score appears suddenly rather than gradually.</li><li><strong>Metric</strong> — The function that turns a model’s output into a score.</li></ul>
+<p><em>Read first:</em> What a power law says</p>
+<h3 id="lesson-19-reproducing-the-artefact">Lesson 19. Reproducing the artefact</h3>
+<p><em>One sweep, two readings, and the gap between them</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the reporting floor and read an onset off it</li><li>Find the widest gap between the per-token accuracy and the whole-sequence score on one sweep</li><li>Explain why the location of a cliff is a fact about the floor as much as about the model</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The onset is the first point above a chosen floor, so the claimed discovery moves when the floor moves — and the floor is a defensible choice, which is not the same as a forced one.</li><li>The gap is widest in the middle of the climb: that is where “the model cannot do this” and “the model gets most of the tokens right” are both true, and only one of them is about the metric.</li><li>A cliff interval needs two onsets, and the underlying accuracy never has one because it never stops rising.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The whole-sequence score</strong></p>
+<p><span class="math-display">$S_{\mathrm{seq}} = q^{L}$</span></p>
+<p><em>The score of a task scored only when every token is right, given a per-token accuracy. It is the mechanism by which a smooth capability produces an apparent cliff.</em></p>
+<p>Symbols:</p>
+<ul><li><code>q</code> — the per-token accuracy (The smooth, underlying quantity.)</li><li><code>L</code> — the length of the sequence (The number of tokens that must all be right.)</li><li><code>S_{\mathrm{seq}}</code> — the score (The probability that the whole sequence is right.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The tokens are correct independently, which is a simplification and a generous one.</li><li>The metric gives no partial credit, which is the usual case for exact match.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The probability that all L tokens are right is the product of L probabilities.</li><li>If each is q, the product is q^L.</li><li>A number below one, raised to a higher power, falls further and faster — so the transition sharpens as L grows.</li></ol>
+<p><strong>Worked example.</strong> A per-token accuracy of 0.95 and a sequence of ten tokens. → <strong>The score is 0.95^10 = 0.599.</strong> (The model is right about 95% of the time and scores under 60%. Change the metric and the cliff moves.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. The onset of the cliff is reported as the first compute at which the score clears a chosen floor. What follows from that? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Move the floor and the claimed discovery moves, with nothing changed in the model</strong></li><li>- The floor is arbitrary, so the whole measurement is worthless</li><li>- The underlying accuracy moves with the floor too</li><li>- A lower floor makes the ability more real</li></ul>
+<blockquote><p>Correct — and the screen names the floor it made the choice at.</p></blockquote>
+<blockquote><p><strong>Why:</strong> An onset read against a reporting floor is a property of the reporting rule as much as of the model. The gap column is widest mid-climb, where “the model cannot do this” and “the model gets most tokens right” are simultaneously true.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Forty points over three decades of compute: the accuracy, the score, the difference, and the floor that decides where the cliff began. Open <strong>Measure the gap</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§mirage:3 The metric — The argument that a nonlinear or thresholded metric on a smooth capability produces the appearance of a discontinuity.</li><li>§mirage:4 Results — The re-readings: abilities that look emergent under one metric and smooth under another, on the same models.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Per-token accuracy</strong> — The fraction of the tokens a model gets right.</li><li><strong>Metric</strong> — The function that turns a model’s output into a score.</li><li><strong>A cliff</strong> — A steep transition in a measured curve.</li><li><strong>Emergence</strong> — An ability whose measured score appears suddenly rather than gradually.</li></ul>
+<p><em>Read first:</em> What emergence looks like</p>
+<h3 id="lesson-20-what-causes-the-cliff">Lesson 20. What causes the cliff</h3>
+<p><em>A threshold in the metric, on a smooth capability</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Derive the whole-sequence score as a power of the per-token accuracy</li><li>Show that the sharper the metric, the sharper the apparent transition</li><li>Show that moving the metric’s threshold moves the cliff</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A whole-sequence score is the per-token accuracy raised to the length of the sequence.</li><li>The longer the sequence, the steeper the apparent transition — and nothing about the model changed.</li><li>The cliff is in the metric; the capability underneath it is smooth all the way.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>The whole-sequence score</strong></p>
+<p><span class="math-display">$S_{\mathrm{seq}} = q^{L}$</span></p>
+<p><em>The score of a task scored only when every token is right, given a per-token accuracy. It is the mechanism by which a smooth capability produces an apparent cliff.</em></p>
+<p>Symbols:</p>
+<ul><li><code>q</code> — the per-token accuracy (The smooth, underlying quantity.)</li><li><code>L</code> — the length of the sequence (The number of tokens that must all be right.)</li><li><code>S_{\mathrm{seq}}</code> — the score (The probability that the whole sequence is right.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The tokens are correct independently, which is a simplification and a generous one.</li><li>The metric gives no partial credit, which is the usual case for exact match.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>The probability that all L tokens are right is the product of L probabilities.</li><li>If each is q, the product is q^L.</li><li>A number below one, raised to a higher power, falls further and faster — so the transition sharpens as L grows.</li></ol>
+<p><strong>Worked example.</strong> A per-token accuracy of 0.95 and a sequence of ten tokens. → <strong>The score is 0.95^10 = 0.599.</strong> (The model is right about 95% of the time and scores under 60%. Change the metric and the cliff moves.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A model gets each token right with probability 0.95, and a task is scored only when the whole sequence of 10 tokens is right. What is the score? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> The whole-sequence score is 0.95^10 ≈ 0.5987. The model is right about 95% of tokens and scores under 60% on the task.</p></blockquote>
+<p>*<em>Q. Why does a longer task make the transition look sharper? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>The whole-sequence score is the per-token accuracy raised to the length</strong></li><li>- Longer tasks are harder for every model</li><li>- The metric is noisier for long tasks</li><li>- The compute per token falls</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Raising a number below one to a higher power pushes it down and makes the transition steeper. Nothing about the model changed; the length of the task did.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The same capability, scored with a threshold that moves. Open <strong>Move the metric</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§mirage:3 The metric — How a discontinuous metric on a continuous capability creates an apparent cliff, and the nonlinearity argument.</li><li>§mirage:4 Results — The experiments: emergent-looking abilities that are not emergent, and the metrics that reveal it.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Emergence</strong> — An ability whose measured score appears suddenly rather than gradually.</li><li><strong>Metric</strong> — The function that turns a model’s output into a score.</li><li><strong>Per-token accuracy</strong> — The fraction of the tokens a model gets right.</li></ul>
+<p><em>Read first:</em> What emergence looks like</p>
+<h2 id="7-compute-through-time">7. Compute Through Time</h2>
+<p><em>The trend under the budgets</em></p>
+<p>A budget is a number until somebody buys the machine to spend it. The record of what has been spent grows log-linearly, with breaks in it that the analyst places rather than finds, and a scaling law turned into a rate is the only way to say what a loss cost in a given year.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Convert a slope in orders of magnitude a year into a doubling time and back</li><li>Tell a break in a trend from a straight line that has been split anyway</li><li>Say what a target loss costs, and the year it became buyable</li><li>Name the assumption every date on that chain rests on</li></ul>
+<h3 id="lesson-21-three-eras-and-one-straight-line">Lesson 21. Three eras and one straight line</h3>
+<p><em>The reported slope, the reported doubling, and the reported range</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Convert a slope in orders of magnitude a year into a doubling time, and back</li><li>Say why the reported range of an era and the reported slope of it disagree</li><li>Name which numbers on the screen are quoted from the paper rather than computed</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A slope and a doubling time are one statement in two units, and the conversion is exact: twelve times log₁₀2 divided by the months.</li><li>A range is an envelope — the two most extreme runs — and a slope is a trend through a scattered middle, so reading the first as the second is how a headline growth rate is made.</li><li>The eras are placed by the analyst: one boundary is a date in the middle of a year rather than a bin, because the event it marks is a date.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>A trend in compute, and what it buys</strong></p>
+<p><span class="math-display">$T_{\mathrm{double}} = \frac{12\log_{10} 2}{s}\ \text{months},\qquad \frac{L(t+1)}{L(t)} = 10^{-\gamma s}$</span></p>
+<p><em>A log-linear trend in compute, stated in the two units it is quoted in — orders of magnitude a year and months per doubling — and turned into a capability by the frontier exponent. A hardware trend is only a capability once it is multiplied by a law.</em></p>
+<p>Symbols:</p>
+<ul><li><code>s</code> — orders of magnitude a year (The slope of the log-compute trend.)</li><li><code>T_{\mathrm{double}}</code> — months per doubling (The same slope in the other unit: 24 months is s = 0.15.)</li><li><code>\gamma</code> — the frontier exponent (From the law the minima obey, not from the hardware.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The trend is log-linear over the window it is quoted for; a break makes a single slope meaningless.</li><li>The money to spend the capability exists, and a run fits in the wall-clock assumed.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>A doubling is log₁₀2 orders of magnitude, so the doubling time in years is log₁₀2/s; twelve times that is in months.</li><li>The frontier says the best loss at budget C falls as C^(−γ), so a year multiplying C by 10^s multiplies the excess loss by 10^(−γs).</li><li>Inverting the same law gives the budget a target loss costs, and so the year that target became buyable.</li></ol>
+<p><strong>Worked example.</strong> The deep-learning era, reported as 0.6 orders of magnitude a year and a doubling every 5.7 months, against a frontier exponent of 0.25. → <strong>The slope converts to 6.0 months a doubling — the paper’s two statistics disagree by half a month — and the loss factor is 10^(−0.15) = 0.71 a year.</strong> (The era’s numbers are quoted from the paper; the conversion, the disagreement and the multiplication by γ are this course’s arithmetic, and screen H prints all three.)</p>
+<p><strong>The factor a doubling buys</strong></p>
+<p><span class="math-display">$\frac{L(2N)}{L(N)} = 2^{-\alpha}$</span></p>
+<p><em>The multiplicative improvement that a doubling of the scaled quantity buys. It is the form in which a scaling law is worth quoting.</em></p>
+<p>Symbols:</p>
+<ul><li><code>\alpha</code> — the exponent (The same exponent as in the law itself.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The doubling stays inside the region where the law holds.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Substitute 2N for N in the law.</li><li>The factor is 2^(−α) because (2N)^(−α) = N^(−α)·2^(−α).</li></ol>
+<p><strong>Worked example.</strong> An exponent of 0.5. → <strong>The factor is 2^(−0.5) = 0.707, so a doubling improves the loss by about 29%.</strong> (Which is the difference between a law worth obeying and one worth ignoring.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A compute trend rises by 0.6 orders of magnitude a year. How many months per doubling does that convert to? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> A doubling is log₁₀2 = 0.3010 orders, so 0.3010/0.6 = 0.5017 years = 6.02 months. The paper reports 5.7 for the same era, and screen H prints the disagreement rather than smoothing it.</p></blockquote>
+<p>*<em>Q. Why can a trend’s slope and its reported range imply different doubling times? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>A fitted slope describes the middle of a scattered set; a range is the distance between two extremes</strong></li><li>- One of them must be a mistake</li><li>- The units differ by a factor of twelve</li><li>- The trend is not log-linear</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Extremes are single runs; the slope is a least-squares line through dozens. In an era with a lot of scatter they disagree, and that is a fact about trend lines rather than about this course.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Each era’s three readings of its own growth, and the rate the whole fixture’s trend gives back. Open <strong>Read the eras</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sevilla:1 Introduction — The measurement: training compute has grown log-linearly, and the growth has breaks in it.</li><li>§sevilla:3 Trends — The three eras and the statistics reported for each: the slope in orders of magnitude a year, the doubling time, and the range of the runs.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Log-linear trend</strong> — A straight line on a log scale: a constant multiplicative growth.</li><li><strong>A doubling</strong> — The unit in which a scaling law is usually quoted.</li><li><strong>A break in a trend</strong> — A change of slope, fitted rather than noticed.</li></ul>
+<p><em>Read first:</em> How the exponent is measured</p>
+<h3 id="lesson-22-a-break-in-the-trend-and-what-it-costs-to-claim-one">Lesson 22. A break in the trend, and what it costs to claim one</h3>
+<p><em>Every split, both sides fitted, and a penalty of two log n</em></p>
+<p><em>Estimated study time:</em> 23 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the split search and the penalty a detected break has to pay</li><li>Explain why a series that is exactly straight must not report a change of slope</li><li>Say why a break is a claim about the future rather than a description of the past</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The search tries every split, fits both sides, and keeps the smallest residual sum of squares only once the split has paid for its two extra parameters.</li><li>Requiring the two slopes to differ is what stops floating-point noise from being read as a discovery.</li><li>One trend over a broken series is not wrong so much as averaged: it reports the middle of two rates and predicts neither.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>A trend in compute, and what it buys</strong></p>
+<p><span class="math-display">$T_{\mathrm{double}} = \frac{12\log_{10} 2}{s}\ \text{months},\qquad \frac{L(t+1)}{L(t)} = 10^{-\gamma s}$</span></p>
+<p><em>A log-linear trend in compute, stated in the two units it is quoted in — orders of magnitude a year and months per doubling — and turned into a capability by the frontier exponent. A hardware trend is only a capability once it is multiplied by a law.</em></p>
+<p>Symbols:</p>
+<ul><li><code>s</code> — orders of magnitude a year (The slope of the log-compute trend.)</li><li><code>T_{\mathrm{double}}</code> — months per doubling (The same slope in the other unit: 24 months is s = 0.15.)</li><li><code>\gamma</code> — the frontier exponent (From the law the minima obey, not from the hardware.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The trend is log-linear over the window it is quoted for; a break makes a single slope meaningless.</li><li>The money to spend the capability exists, and a run fits in the wall-clock assumed.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>A doubling is log₁₀2 orders of magnitude, so the doubling time in years is log₁₀2/s; twelve times that is in months.</li><li>The frontier says the best loss at budget C falls as C^(−γ), so a year multiplying C by 10^s multiplies the excess loss by 10^(−γs).</li><li>Inverting the same law gives the budget a target loss costs, and so the year that target became buyable.</li></ol>
+<p><strong>Worked example.</strong> The deep-learning era, reported as 0.6 orders of magnitude a year and a doubling every 5.7 months, against a frontier exponent of 0.25. → <strong>The slope converts to 6.0 months a doubling — the paper’s two statistics disagree by half a month — and the loss factor is 10^(−0.15) = 0.71 a year.</strong> (The era’s numbers are quoted from the paper; the conversion, the disagreement and the multiplication by γ are this course’s arithmetic, and screen H prints all three.)</p>
+<p><strong>Fitting a law by least squares</strong></p>
+<p><span class="math-display">$\min_{a,b}\sum_i\left(a + b\log x_i - \log y_i\right)^2,\qquad \alpha = -b$</span></p>
+<p><em>The estimator behind every exponent in this course. A power law is a straight line in logs, so the exponent is the negative of the fitted slope and the coefficient is the intercept.</em></p>
+<p>Symbols:</p>
+<ul><li><code>x_i</code> — the scaled quantity (Tokens, parameters, or the product the budget pins down.)</li><li><code>y_i</code> — the measured loss (The held-out loss of run i.)</li><li><code>b</code> — the fitted slope (The negative of the exponent.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The errors are multiplicative, which is what taking logs assumes when the residuals are fitted in log space.</li><li>Every point is in the region where one law describes the curve.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>Write the law as log y = a − α log x.</li><li>Least squares in the two coefficients is ordinary linear regression on the logged columns.</li><li>The R² of that regression is the fraction of the log-loss variance the line explains — a number about the fit, not about the range.</li></ol>
+<p><strong>Worked example.</strong> The laboratory’s 20 runs, fitted over capacities 4 to 64. → <strong>The slope in log–log space is negative, and −b is the exponent the screen prints as α.</strong> (The same runs fitted over half the range give a different α, which is the point of screen A’s second tab.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Run on a series that is exactly one straight line in log space, a break detector should report a change of slope. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> It should report nothing. A split always improves the fit slightly, so a break only counts when the two sides disagree by more than the noise — otherwise the answer is whichever year the rounding favours.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>A planted change of slope, the split the detector finds, and the single fit it replaces. Open <strong>Find the break</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sevilla:3 Trends — The piecewise fits: the eras are separate regressions, and the change between them is the result being reported.</li><li>§sevilla:4 Conclusion — What the trend is and is not: a fit to landmark runs, with the eras placed by the analyst rather than given by the data.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>A break in a trend</strong> — A change of slope, fitted rather than noticed.</li><li><strong>Log-linear trend</strong> — A straight line on a log scale: a constant multiplicative growth.</li><li><strong>R²</strong> — The fraction of the variation a fit explains.</li></ul>
+<p><em>Read first:</em> Three eras and one straight line</p>
+<h3 id="lesson-23-what-a-trend-buys-and-the-year-it-became-buyable">Lesson 23. What a trend buys, and the year it became buyable</h3>
+<p><em>Inverting the frontier, dividing by a wall-clock, reading a series</em></p>
+<p><em>Estimated study time:</em> 25 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Name the three steps from a loss target to a year, and what each one assumes</li><li>Explain why the factor between the budget’s units and FLOP/s moves every date and no shape</li><li>Read the flag that says whether an answer was interpolated inside the series or projected outside it</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The frontier inverted gives the budget a loss costs, the budget over the run’s hours gives the rate, and the series read at the rate gives the year.</li><li>The surface’s budget is in the units of its own runs, so the bridge to FLOP/s is an assumption; halving it changes every date by a predictable amount and changes nothing else.</li><li>A target at or below the fitted floor cannot be bought at any price, and reporting that is the answer rather than a failure to produce one.</li></ul>
+<h4 id="the-mathematics">The mathematics</h4>
+<p><strong>A trend in compute, and what it buys</strong></p>
+<p><span class="math-display">$T_{\mathrm{double}} = \frac{12\log_{10} 2}{s}\ \text{months},\qquad \frac{L(t+1)}{L(t)} = 10^{-\gamma s}$</span></p>
+<p><em>A log-linear trend in compute, stated in the two units it is quoted in — orders of magnitude a year and months per doubling — and turned into a capability by the frontier exponent. A hardware trend is only a capability once it is multiplied by a law.</em></p>
+<p>Symbols:</p>
+<ul><li><code>s</code> — orders of magnitude a year (The slope of the log-compute trend.)</li><li><code>T_{\mathrm{double}}</code> — months per doubling (The same slope in the other unit: 24 months is s = 0.15.)</li><li><code>\gamma</code> — the frontier exponent (From the law the minima obey, not from the hardware.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>The trend is log-linear over the window it is quoted for; a break makes a single slope meaningless.</li><li>The money to spend the capability exists, and a run fits in the wall-clock assumed.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>A doubling is log₁₀2 orders of magnitude, so the doubling time in years is log₁₀2/s; twelve times that is in months.</li><li>The frontier says the best loss at budget C falls as C^(−γ), so a year multiplying C by 10^s multiplies the excess loss by 10^(−γs).</li><li>Inverting the same law gives the budget a target loss costs, and so the year that target became buyable.</li></ol>
+<p><strong>Worked example.</strong> The deep-learning era, reported as 0.6 orders of magnitude a year and a doubling every 5.7 months, against a frontier exponent of 0.25. → <strong>The slope converts to 6.0 months a doubling — the paper’s two statistics disagree by half a month — and the loss factor is 10^(−0.15) = 0.71 a year.</strong> (The era’s numbers are quoted from the paper; the conversion, the disagreement and the multiplication by γ are this course’s arithmetic, and screen H prints all three.)</p>
+<p><strong>The law the minima obey</strong></p>
+<p><span class="math-display">$L^{*}(C) = E + K\,C^{-\gamma},\qquad \gamma = \frac{\alpha\beta}{\alpha+\beta}$</span></p>
+<p><em>The bottom of each IsoFLOP curve, traced across budgets, is itself a power law. Its exponent is made of the two single-variable exponents and of nothing else, which is why the compute-optimal law can be predicted from the parameter and data laws.</em></p>
+<p>Symbols:</p>
+<ul><li><code>L^{*}(C)</code> — the best loss at budget C (The loss of the compute-optimal allocation.)</li><li><code>K</code> — the frontier’s coefficient (Fixed by A, B, α and β; the laboratory measures it at a unit budget.)</li><li><code>\gamma</code> — the frontier exponent (The harmonic half of the two exponents: always smaller than either.)</li></ul>
+<p><strong>Assumptions:</strong></p>
+<ul><li>Both terms of the surface are powers with positive exponents over the whole range of budgets.</li><li>The optimum is interior — no constraint on the pool and no hard floor on either axis.</li></ul>
+<p><strong>Derivation:</strong></p>
+<ol><li>At the optimum, N ∝ P^(β/(α+β)), so the capacity term falls as P^(−αβ/(α+β)).</li><li>D<em> = P/N</em> ∝ P^(α/(α+β)), so the data term falls as P^(−βα/(α+β)) — the same power.</li><li>Both terms therefore fall at γ = αβ/(α+β), and their sum is a constant times that same power.</li><li>Since P is proportional to C, the exponent in the budget is the exponent in the product.</li></ol>
+<p><strong>Worked example.</strong> α = β = 0.5, so γ = 0.25. → <strong>A budget ten times larger leaves the excess loss at 10^(−0.25) = 0.56 of what it was; a doubling leaves it at 0.84.</strong> (A doubling buys about 16% at the frontier, which is the number a training budget is actually worth.)</p>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A scaling law says a loss costs 10^23 FLOPs. What else is needed to say what year it became reachable? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>A capability trend and the wall-clock a run is allowed</strong></li><li>- Nothing: the law gives a date</li><li>- The number of parameters</li><li>- The size of the corpus</li></ul>
+<blockquote><p>Correct — FLOPs per second times hours is what a run can actually spend.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The bridge from a law to a date is a rate: what the hardware of the year could do in the hours a run takes. The screen makes that bridge a slider, because it is the assumption the answer depends on most.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The whole chain in one table: the loss, its budget, the rate it needs, the year the series reaches it. Open <strong>Price a loss in years</strong> in the scaling-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sevilla:1 Introduction — The reason a trend matters: it is the quantity that says when a given training run stops being science fiction.</li><li>§sevilla:4 Conclusion — The caution attached to any extrapolation of the fitted rates.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Feasible compute</strong> — The FLOPs the hardware of a year could do inside a run’s wall-clock.</li><li><strong>Log-linear trend</strong> — A straight line on a log scale: a constant multiplicative growth.</li><li><strong>Irreducible loss</strong> — The loss no model can beat, set by the noise in the data.</li><li><strong>The frontier</strong> — The best loss at each budget, traced across budgets.</li></ul>
+<p><em>Read first:</em> The IsoFLOP curves and the frontier, Three eras and one straight line</p>
+<h2 id="appendix-a-glossary">Appendix A — Glossary</h2>
+<p><strong>Scaling law</strong> — A statement that a quantity follows a power of another quantity.</p>
+<p>A scaling law says that as one quantity grows, another follows a power of it: the loss falls as the number of tokens raised to a negative power. The law is a description of a measured region, not a law of nature, and it is worth exactly as much as the range it was measured over.</p>
+<p><strong>Exponent</strong> — The number in a power law that says how fast the quantity falls.</p>
+<p>If the loss falls as L ∝ N^(−α), then α is the exponent. Its practical content is the factor a doubling buys: 2^(−α). An exponent of 0.1 means a doubling of the data improves the loss by about 7%, and an exponent of 0.5 means it improves it by about 29%.</p>
+<p><strong>A doubling</strong> — The unit in which a scaling law is usually quoted.</p>
+<p>Because a power law is multiplicative, the natural unit of improvement is a doubling of whatever is being scaled. Quoting the factor a doubling buys, rather than the exponent, is what makes two different scaling laws comparable.</p>
+<p><strong>R²</strong> — The fraction of the variation a fit explains.</p>
+<p>R² is one minus the residual sum of squares divided by the total sum of squares. In log–log space it is the fraction of the variation in log-loss that the straight line explains. It is a statement about the fit, not about the future: a high R² over a narrow range is still a narrow range.</p>
+<p><strong>Compute budget</strong> — The total training compute available, which is what the data is bought with.</p>
+<p>The cost of a training run is proportional to the number of parameters times the number of tokens processed. A compute budget fixes that product, and therefore forces a choice: the parameters and the tokens trade against each other. Without a budget there is nothing to optimise.</p>
+<p><strong>Allocation</strong> — How a fixed budget is split between the model and the data.</p>
+<p>The allocation is the pair (parameters, tokens) that a budget is spent on. Its quality is the loss at that pair. The compute-optimal allocation is the pair that minimises the loss, and it is a consequence of the two exponents of the loss surface, not a free choice.</p>
+<p><strong>Loss surface</strong> — The loss as a function of the model size and the dataset size.</p>
+<p>The two-variable surface is the object the compute-optimal allocation is read off. It is usually written as E + A·N^(−α) + B·D^(−β): an irreducible loss, a term that falls with the model size, and a term that falls with the amount of data. The two terms pull in opposite directions under a fixed budget.</p>
+<p><strong>Irreducible loss</strong> — The loss no model can beat, set by the noise in the data.</p>
+<p>The irreducible loss is the floor: the part of the loss that comes from the noise in the labels rather than from the model’s ignorance. It matters for scaling because a power law in the <em>loss</em> must flatten as the model approaches the floor, and a fit that ignores that will over-predict how far the law will hold.</p>
+<p><strong>Tokens per parameter</strong> — The ratio of training tokens to model parameters.</p>
+<p>The ratio is how much text the model reads for every weight it has. It is the quantity the compute-optimal allocation pins down, and it is a number with units only in the loosest sense: it depends on the task, the architecture and the budget, and quoting it without those is quoting half a result.</p>
+<p><strong>Repeats</strong> — The number of times the training set is read again.</p>
+<p>If the unique dataset has U rows and the training run reads R rows in total, the number of repeats is R/U. It is the standard way of saying that the data ran out and the run went round again, and the number that matters for the model is the number of unique rows, not the number of rows read.</p>
+<p><strong>Effective data</strong> — The number of unique rows a run actually learned from.</p>
+<p>The effective data is the number of unique rows, which is the total rows read divided by the number of repeats. A run that reads a hundred billion tokens four times over has twenty-five billion tokens of effective data, and the loss curve should be read against the effective number, not against the tokens.</p>
+<p><strong>Emergence</strong> — An ability whose measured score appears suddenly rather than gradually.</p>
+<p>An emergent ability is one whose score is near zero for a range of model sizes and then rises sharply. The shape is striking and it is often taken as a fact about the model. It is at least as much a fact about the metric that produced the number.</p>
+<p><strong>Metric</strong> — The function that turns a model’s output into a score.</p>
+<p>A metric decides what counts as a correct answer: the whole string or a token, a pass or a fail, a graded fraction. Different metrics applied to the same model can give curves of entirely different shapes, and any claim about a model’s abilities is a claim about the metric as much as about the model.</p>
+<p><strong>Per-token accuracy</strong> — The fraction of the tokens a model gets right.</p>
+<p>Per-token accuracy is a continuous quantity with no threshold in it, and it is what the emergent curves are secretly made of. A whole-sequence score is the per-token accuracy raised to the length of the sequence, which is where the apparent discontinuity comes from.</p>
+<p><strong>A cliff</strong> — A steep transition in a measured curve.</p>
+<p>A cliff is a region of a curve where the rate of change is much larger than anywhere else. Whether a cliff in a score means a cliff in the model is the question the emergence literature asks, and the answer depends on whether the metric has a threshold in it.</p>
+<p><strong>IsoFLOP curve</strong> — The loss along one fixed compute budget, as the allocation slides.</p>
+<p>Hold the compute fixed and vary the split between parameters and data, and the loss traces a U. The bottom of the U is the compute-optimal allocation at that budget, and the two arms are what the naive choices pay: a big model starved of data, or a small model with more data than it can use. Hoffmann et al. trained a whole family of models to find each bottom, which is why the curves are named after the fixed-FLOPs constraint they are drawn on.</p>
+<p><strong>The frontier</strong> — The best loss at each budget, traced across budgets.</p>
+<p>Take the minimum of every IsoFLOP curve and plot those minima against the budget, and the result is itself a power law, with an exponent made of the two single-variable exponents. The frontier is the only curve a training budget is actually on, which is why it is the object the hardware trend is compared with.</p>
+<p><em>Example:</em> With α = β = 0.5, what is the exponent of the frontier? → αβ/(α+β) = 0.25, so a tenfold budget multiplies the excess loss by 10^(−0.25) = 0.56.</p>
+<p><strong>Crossover point</strong> — The compute at which a larger model overtakes a smaller one.</p>
+<p>At a fixed budget a bigger model has proportionally less data. Kaplan et al.’s observation is that the bigger model is the better choice only once the budget is large enough to fill it, and the budget at which the two losses are equal is computable from the surface. Below it, scale the data; above it, scale the model.</p>
+<p><strong>The finite pool</strong> — The corpus: a fixed number of rows that cannot be increased.</p>
+<p>Every scaling law in this course assumes the data can be whatever size you ask for. A real corpus is a finite number of rows, and once they have all been read the only way to spend more compute is to read them again. The pool is the constraint that turns the optimum into a decision about repeats rather than about size.</p>
+<p><strong>Epoch</strong> — One pass over the whole pool.</p>
+<p>An epoch is one complete pass over the training rows. The first epoch is the only one that sees every row for the first time; every epoch after it is a repeat, and the loss curve of a run that stays inside one epoch is a different object from the curve of a run that has gone round the pool four times at the same number of tokens.</p>
+<p><strong>The dominance epoch</strong> — The epoch at which a repeat stops being worth the compute it costs.</p>
+<p>Muennighoff et al. define the point at which the repetition term dominates the fresh-data term in the loss: past it, the next epoch is worth so little that the compute would have been spent on new data. It is measured as the epoch at which a repeated run has fallen a given fraction of the way from the fresh run’s gain, and the number moves with the fraction chosen — which is why the laboratory prints the whole table rather than one epoch.</p>
+<p><strong>Percolation threshold</strong> — The keep fraction at which a pruned corpus stops working.</p>
+<p>Above the threshold, the rows that go are redundant and the loss barely notices. At it, the rare rows that carry the parts of the task nothing else carries start going, and the curve breaks. Sorscher et al. borrowed the word from percolation physics, where it names the point at which a connected path spans a medium; here it names the point at which the corpus stops spanning the task.</p>
+<p><strong>Pruning metric</strong> — The score that ranks the rows of a pool from most to least worth keeping.</p>
+<p>A metric can be a distance to a class prototype, a norm, a residual, or a seeded shuffle. The ranking decides which rows survive a keep fraction, so the threshold is a property of the metric as much as of the data: two metrics on one pool have two different cliffs, and the one that costs most to compute usually has the lowest.</p>
+<p><strong>Rare rows</strong> — The few rows that carry what nothing else in the pool carries.</p>
+<p>In a clustered corpus most rows repeat information the pool already has, and a small number carry directions of the task that appear nowhere else. Those are the rows a pruned corpus cannot afford to lose, and they are the reason a ranking by volume and a ranking by information disagree.</p>
+<p><strong>Log-linear trend</strong> — A straight line on a log scale: a constant multiplicative growth.</p>
+<p>A quantity growing by a fixed factor per unit time is a straight line when its logarithm is plotted against time. That is the shape of the compute record — training FLOPs, transistor density, and the loss frontier are all log-linear over the ranges they are measured on — and it is why a slope and a doubling time are two units for one number rather than two facts.</p>
+<p><strong>A break in a trend</strong> — A change of slope, fitted rather than noticed.</p>
+<p>A break is a year at which the growth rate changes, and it is a claim about a fit: put a split in a log-linear trend where the two halves disagree, and choose the year that minimises the total squared error. The eras of the compute record are breaks of this kind, which means they are placed by the analyst, and a detection run on a series with a break planted in it can be checked against the planted year.</p>
+<p><strong>Feasible compute</strong> — The FLOPs the hardware of a year could do inside a run’s wall-clock.</p>
+<p>A loss is not reachable because the law says it is; it is reachable because somebody could have bought the machine time to train at that budget. Multiplying the capability trend of a year by the hours a run is allowed gives the FLOPs actually available, and comparing that with the budget the frontier demands is what turns a scaling law into a date.</p>
+<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<ul><li><strong>Scaling Laws for Neural Language Models</strong> — Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, Dario Amodei (2020), arXiv:2001.08361 [cs.CL]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Scaling laws are one lesson in two courses. They are the quantitative spine of the field and deserve their own application.</li><li><strong>Training Compute-Optimal Large Language Models</strong> — Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch, Elena Buchatskaya, Trevor Cai, Eliza Rutherford, Diego de Las Casas, Lisa Anne Hendricks, Johannes Welbl, Aidan Clark, Tom Hennigan, Eric Noland, Katie Millican, George van den Driessche, Bogdan Damoc, Aurelia Guy, Simon Osindero, Karen Simonyan, Erich Elsen, Jack W. Rae, Oriol Vinyals, Laurent Sifre (2022), arXiv:2203.15556 [cs.CL] / NeurIPS 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The compute-optimal result and the IsoFLOP methodology that produced it.</li><li><strong>Beyond neural scaling laws: beating power law scaling via data pruning</strong> — Ben Sorscher, Robert Geirhos, Shashank Shekhar, Surya Ganguli, Ari S. Morcos (2022), arXiv:2206.14486 [cs.LG] / NeurIPS 2022 Outstanding Paper. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The result that breaks the power law, with a theory that can be checked on real data.</li><li><strong>Scaling Data-Constrained Language Models</strong> — Niklas Muennighoff, Alexander M. Rush, Boaz Barak, Teven Le Scao, Aleksandra Piktus, Nouamane Tazi, Sampo Pyysalo, Thomas Wolf, Colin Raffel (2023), arXiv:2305.16264 [cs.CL] / NeurIPS 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The regime the field is actually in: repeated epochs over a fixed corpus.</li><li><strong>Are Emergent Abilities of Large Language Models a Mirage?</strong> — Rylan Schaeffer, Brando Miranda, Sanmi Koyejo (2023), arXiv:2304.15004 [cs.CL] / NeurIPS 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Whether abilities appear discontinuously is a measurement question, and this shows it is often an artefact of the metric.</li><li><strong>Compute Trends Across Three Eras of Machine Learning</strong> — Jaime Sevilla, Lennart Heim, Anson Ho, Tamay Besiroglu, Marius Hobbhahn, Pablo Villalobos (2022), arXiv:2202.05924 [cs.LG] / ICLR 2022 Workshop on ML for Systems. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The hardware trend that makes the compute curves mean something.</li></ul></main>
+</div>
+<footer class="pager">
+  <div><a href="data-lab.html">← Data Lab</a></div>
+  <div><a href="systems-lab.html">Systems Lab →</a></div>
+</footer>
+</body>
+</html>

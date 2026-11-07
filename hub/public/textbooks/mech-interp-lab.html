@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechanistic Interpretability Lab — textbook</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents"><a class="" href="#contents">Contents</a>
+<a class="" href="#1-superposition">1. Superposition</a>
+<a class="l2" href="#lesson-1-the-toy-model">Lesson 1. The toy model</a>
+<a class="l2" href="#lesson-2-the-importance-threshold">Lesson 2. The importance threshold</a>
+<a class="" href="#2-features-not-neurons">2. Features, Not Neurons</a>
+<a class="l2" href="#lesson-3-polysemanticity">Lesson 3. Polysemanticity</a>
+<a class="l2" href="#lesson-4-the-sparse-autoencoder">Lesson 4. The sparse autoencoder</a>
+<a class="" href="#3-patching">3. Patching</a>
+<a class="l2" href="#lesson-5-activation-patching">Lesson 5. Activation patching</a>
+<a class="" href="#4-circuits">4. Circuits</a>
+<a class="l2" href="#lesson-6-the-workflow">Lesson 6. The workflow</a>
+<a class="l2" href="#lesson-9-the-qk-and-ov-circuits">Lesson 9. The QK and OV circuits</a>
+<a class="l2" href="#lesson-10-automating-the-search">Lesson 10. Automating the search</a>
+<a class="" href="#5-composition">5. Composition</a>
+<a class="l2" href="#lesson-7-induction-heads">Lesson 7. Induction heads</a>
+<a class="l2" href="#lesson-8-the-ioi-circuit">Lesson 8. The IOI circuit</a>
+<a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
+<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+  <main class="book"><h1 id="mechanistic-interpretability-lab">Mechanistic Interpretability Lab</h1>
+<p><strong>Source:</strong> Toy Models of Superposition — Noah Elhage, Shan Carter, Chris Olah, Dan Hendrycks (2023)</p>
+<p><strong>Licence:</strong> Publicly readable web publication. The machine-check could not be completed from this environment (the site blocks automated clients); verify the terms on the page itself before reusing any text or figure.</p>
+<p><strong>Why this course exists:</strong> Mechanistic interpretability is only summarised in one chapter of the agentic course, and it is the fastest-moving area in the field.</p>
+<p><strong>Source:</strong> A Mathematical Framework for Transformer Circuits — Noah Elhage, Tristan Hume, Shan Carter, Scott Ostheim, Scott Linderman, Gabe, Dianne Hudon, Chris Olah (2021)</p>
+<p><strong>Licence:</strong> Publicly readable web publication. The machine-check could not be completed from this environment (the site blocks automated clients); verify the terms before reuse.</p>
+<p><strong>Why this course exists:</strong> The vocabulary of weights, activations, pathways and nodes that the rest of the interpretability literature assumes.</p>
+<p><strong>Source:</strong> Towards Automated Circuit Discovery for Mechanistic Interpretability — Arthur Conmy, Augustine N. Mavor-Parker, Aengus Lynch, Stefan Heimersheim, Adrià Garriga-Alonso (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> The activation-patching algorithm, which is the causal test that distinguishes an explanation from a correlation.</p>
+<p><strong>Source:</strong> Sparse Autoencoders Find Highly Interpretable Features in Language Models — Hoagy Cunningham, Aidan Ewart, Logan Riggs, Robert Huben, Lee Sharkey (2023)</p>
+<p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
+<p><strong>Why this course exists:</strong> How superposition is resolved in practice: a sparse dictionary over activations.</p>
+<p><strong>Source:</strong> In-context Learning and Induction Heads — Catherine Olsson, Nelson Elhage, Neel Nanda, Nicholas Joseph, Nova DasSarma, Tom Henighan, Ben Mann, Amanda Askell, Yuntao Bai, Anna Chen, Tom Conerly, Dawn Drain, Deep Ganguli, Zac Hatfield-Dodds, Danny Hernandez, Scott Johnston, Andy Jones, Jackson Kernion, Liane Lovitt, Kamal Ndousse, Dario Amodei, Tom Brown, Jack Clark, Jared Kaplan, Sam McCandlish, Chris Olah (2022)</p>
+<p><strong>Licence:</strong> CC BY 4.0 (as stated on the arXiv record).</p>
+<p><strong>Why this course exists:</strong> The residual-stream framework was described but the composition of two heads into a circuit was never built.</p>
+<p><strong>Source:</strong> Interpretability in the Wild: a Circuit for Indirect Object Identification in GPT-2 small — Kevin Wang, Alexandre Variengien, Arthur Conmy, Buck Shlegeris, Jacob Steinhardt (2022)</p>
+<p><strong>Licence:</strong> CC BY 4.0 (as stated on the arXiv record).</p>
+<p><strong>Why this course exists:</strong> Patching was taught on a toy graph; the name-mover circuit is the published case the procedure generalises to.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#1-superposition">1. Superposition</a> - <a href="#lesson-1-the-toy-model">Lesson 1. The toy model</a> - <a href="#lesson-2-the-importance-threshold">Lesson 2. The importance threshold</a></li><li><a href="#2-features-not-neurons">2. Features, Not Neurons</a> - <a href="#lesson-3-polysemanticity">Lesson 3. Polysemanticity</a> - <a href="#lesson-4-the-sparse-autoencoder">Lesson 4. The sparse autoencoder</a></li><li><a href="#3-patching">3. Patching</a> - <a href="#lesson-5-activation-patching">Lesson 5. Activation patching</a></li><li><a href="#4-circuits">4. Circuits</a> - <a href="#lesson-6-the-workflow">Lesson 6. The workflow</a> - <a href="#lesson-9-the-qk-and-ov-circuits">Lesson 9. The QK and OV circuits</a> - <a href="#lesson-10-automating-the-search">Lesson 10. Automating the search</a></li><li><a href="#5-composition">5. Composition</a> - <a href="#lesson-7-induction-heads">Lesson 7. Induction heads</a> - <a href="#lesson-8-the-ioi-circuit">Lesson 8. The IOI circuit</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<h2 id="1-superposition">1. Superposition</h2>
+<p><em>Why a dimension has to hold more than one thing</em></p>
+<p>When a model has fewer dimensions than the features it wants to represent, something has to give. This module builds the toy model in which that something is computable, and measures the interference that follows.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>State the linear toy model and the loss it optimises</li><li>Compute the interference between two features that share a direction</li><li>Explain what the importance threshold is and why it exists</li></ul>
+<h3 id="lesson-1-the-toy-model">Lesson 1. The toy model</h3>
+<p><em>A model with fewer dimensions than features</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the linear toy model and the loss it minimises</li><li>Derive the expected squared error of one feature</li><li>Explain what the interference term is</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The loss of one feature is 1 − 2‖w_k‖² + Σ_m (w_k·w_m)².</li><li>When the columns are orthonormal, what is left is pure interference.</li><li>Interference is the price of putting two features in one direction.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does superposition force a model to do? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Pack several features into one direction</strong></li><li>- Drop the features it cannot represent</li><li>- Make the features more important</li><li>- Use more dimensions</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> With fewer dimensions than features, the columns cannot all be orthogonal, so some features share a direction and interfere with each other.</p></blockquote>
+<p>*<em>Q. Two features share a direction, and the squared projection of one onto the other is 0.25. What is the interference term in the loss? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> The cross term is (w_i·w_j)², so the interference is the square of the projection: 0.25.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Fit the toy model at a given number of dimensions and read the interference. Open <strong>Fit the model</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sae:2 Taking Features out of Superposition with Sparse Dictionary Learning · p. 2 — The toy model of superposition that the sparse-autoencoder paper is built on, and the interference it costs.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://transformer-circuits.pub/2021/framework.html">A Mathematical Framework for Transformer Circuits</a> — The vocabulary of the residual stream, nodes, edges and paths.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Superposition</strong> — Several features packed into one direction of the model’s activation.</li><li><strong>Interference</strong> — The cost two features pay for sharing a direction.</li><li><strong>Importance</strong> — How much a feature matters to the loss.</li></ul>
+<h3 id="lesson-2-the-importance-threshold">Lesson 2. The importance threshold</h3>
+<p><em>When a feature is not worth representing</em></p>
+<p><em>Estimated study time:</em> 20 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Explain why the model drops some features and keeps others</li><li>Measure the threshold at which a feature starts to be represented</li><li>Say what happens to the interference as the tail is dropped</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Hosting a feature costs the host; dropping it costs the feature itself.</li><li>The threshold is where those two prices cross.</li><li>A power law of importances produces a sharp threshold.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why does a model drop some features? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>Because hosting them would cost the host more than dropping them costs them</strong></li><li>- Because they do not fit</li><li>- Because they are noisy</li><li>- It never does</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Hosting a feature costs the host the interference; dropping it costs the feature its own importance. The threshold is where those cross.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Sweep a feature’s importance and watch the model decide whether to keep it. Open <strong>Find the threshold</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sae:2 Taking Features out of Superposition with Sparse Dictionary Learning · p. 3 — The importance threshold, and the argument that the tail of the importance distribution is not worth representing.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Importance</strong> — How much a feature matters to the loss.</li><li><strong>Interference</strong> — The cost two features pay for sharing a direction.</li><li><strong>Polysemanticity</strong> — A neuron that responds to several unrelated things.</li></ul>
+<p><em>Read first:</em> The toy model</p>
+<h2 id="2-features-not-neurons">2. Features, Not Neurons</h2>
+<p><em>A neuron is a mixture; a feature is not</em></p>
+<p>The central observation of mechanistic interpretability: individual neurons are polysemantic, and the features a model represents do not line up with the neurons it uses to represent them. This module unpacks that, and builds the tool that fixes it.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Explain polysemanticity and why it is a problem</li><li>Write the sparse autoencoder and its objective</li><li>Measure the sparsity, the reconstruction and the interpretability of a dictionary</li></ul>
+<h3 id="lesson-3-polysemanticity">Lesson 3. Polysemanticity</h3>
+<p><em>Why a neuron is not a feature</em></p>
+<p><em>Estimated study time:</em> 20 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define polysemanticity</li><li>Explain why superposition makes it unavoidable</li><li>Say what a monosemantic feature would look like</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A neuron that responds to several things is polysemantic.</li><li>Superposition makes polysemantic neurons the cheap option.</li><li>A feature is a thing the model represents, not a neuron it represents it with.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. A neuron in a superposed model is usually polysemantic. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Yes. Superposition is what makes it cheap for one neuron to respond to several things, so polysemantic neurons are the cheap option rather than a failure.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Count how many features each direction is carrying. Open <strong>How many features per direction</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sae:1 Introduction · p. 1 — The problem: a neuron responds to several things, and the features a model represents are not the neurons it uses.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Polysemanticity</strong> — A neuron that responds to several unrelated things.</li><li><strong>Monosemanticity</strong> — A direction that responds to one thing and nothing else.</li><li><strong>Feature</strong> — A thing the model represents, as distinct from the neuron it uses.</li></ul>
+<p><em>Read first:</em> The importance threshold</p>
+<h3 id="lesson-4-the-sparse-autoencoder">Lesson 4. The sparse autoencoder</h3>
+<p><em>Asking for a sparse code</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write the encoder, the decoder and the objective of a sparse autoencoder</li><li>Explain what the sparsity penalty is for</li><li>Measure the reconstruction, the sparsity and the explained variance</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The autoencoder asks for a code that is sparse and reconstructs.</li><li>The L1 penalty is what makes the code sparse.</li><li>A dictionary feature that activates for one thing is interpretable.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What is the L1 penalty in a sparse autoencoder for? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>To make the code sparse</strong></li><li>- To make the reconstruction better</li><li>- To make the dictionary larger</li><li>- To make the training faster</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The L1 term penalises the number of active features, and the sparsity is what makes a dictionary feature correspond to one thing.</p></blockquote>
+<p>*<em>Q. A sparse autoencoder reconstructs activations with a mean squared error of 0.1, and the activations have variance 0.8. What is the explained variance? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> 1 − 0.1/0.8 = 0.875. The dictionary has kept most of the information.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Train a real sparse autoencoder on a real residual stream and watch it find features. Open <strong>Train the autoencoder</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sae:2 Taking Features out of Superposition with Sparse Dictionary Learning · p. 4 — The encoder, the decoder, the sparsity penalty, and the objective.</li><li>§sae:3 Interpreting Dictionary Features · p. 5 — How a dictionary feature is scored, and the comparison against the neurons it replaces.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Sparse autoencoder</strong> — An autoencoder trained to reconstruct with a sparse code.</li><li><strong>Dictionary feature</strong> — A feature found by a sparse autoencoder.</li><li><strong>L0</strong> — The number of features that are active.</li><li><strong>Explained variance</strong> — How much of the activation the reconstruction accounts for.</li></ul>
+<p><em>Read first:</em> Polysemanticity</p>
+<h2 id="3-patching">3. Patching</h2>
+<p><em>From what a neuron responds to, to what it does</em></p>
+<p>A correlational claim about a neuron is cheap; a causal one is not. This module covers the intervention that distinguishes them, and the measurement that comes with it.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Describe activation patching and what it establishes</li><li>Compute the effect of patching a node, and the normalised effect</li><li>Define the faithfulness of a proposed circuit</li></ul>
+<h3 id="lesson-5-activation-patching">Lesson 5. Activation patching</h3>
+<p><em>The intervention that makes a claim causal</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe activation patching and what it establishes</li><li>Compute the effect of patching a node and the normalised effect</li><li>Explain why a self-consistent model is not an explanation</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Run the model twice, and replace one activation in one of the runs.</li><li>If the output moves, that node was causally responsible for the move.</li><li>Correlational evidence survives the patch; causal evidence does not.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does activation patching establish? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>That a node is causally responsible for a change in the output</strong></li><li>- That a node responds to a particular input</li><li>- That the model has understood the input</li><li>- That a node is important</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> You run the model twice, replace one activation in one of the runs, and look at what moves. If the output changes, the node was responsible for it.</p></blockquote>
+<p>*<em>Q. A model with a perfect self-consistency score can still be wrong about what it is doing. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> Yes. Self-consistency is a correlational property; a model can be perfectly self-consistent and implement a mechanism that does not explain the behaviour.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Patch each node in turn and read the effect on the output. Open <strong>Patch a node</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§circuits:2.3 Step 3: Patch model activations to isolate the relevant subgraph · p. 3 — The intervention, and what it rules out.</li><li>§sae:4 Identifying Causally-Important Dictionary Features · p. 8 — Adapting the patching procedure to dictionary features.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Activation patching</strong> — Run the model twice, and replace one activation in one of the runs.</li><li><strong>Causal</strong> — A claim that survives an intervention.</li><li><strong>Attribution</strong> — How much a component is responsible for the output.</li></ul>
+<p><em>Read first:</em> Polysemanticity</p>
+<h2 id="4-circuits">4. Circuits</h2>
+<p><em>An explanation that accounts for the behaviour</em></p>
+<p>The workflow the circuit-discovery paper lays out: choose a behaviour, divide the model into components, find the ones that matter, and explain them. This module puts the pieces in order and says what each one buys.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>State the four steps of the mechanistic-interpretability workflow</li><li>Explain what a node, an edge and a path are in a transformer</li><li>Argue for a behavioural explanation over a correlational one</li><li>Split one head’s QK and OV circuits, and one pathway into the terms that make it up</li><li>Say what an automated circuit search is scored against, and what it can get wrong</li></ul>
+<h3 id="lesson-6-the-workflow">Lesson 6. The workflow</h3>
+<p><em>Four steps, and what each one is for</em></p>
+<p><em>Estimated study time:</em> 20 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>State the four steps of the mechanistic-interpretability workflow</li><li>Say what a node, an edge and a path are in a transformer</li><li>Argue for a behavioural explanation over a correlational one</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Choose a behaviour, divide the model into a graph, patch, and explain.</li><li>A node is a component that does one thing; an edge is a causal influence.</li><li>A finished explanation accounts for the behaviour, not for a correlation.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What are the four steps of the mechanistic-interpretability workflow? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Select a behaviour, divide the model into a graph, patch to isolate the subgraph, and explain the components</strong></li><li>- Collect data, train a probe, read the probe, write it up</li><li>- Find the neurons, find the features, find the data, find the answer</li><li>- Prune, retrain, compare, publish</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The order matters: a behaviour first, so that the explanation is of something the model actually does.</p></blockquote>
+<p>*<em>Q. In a transformer, what is the natural unit of a circuit node? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>An attention head or a feed-forward block, reading from and writing to the residual stream</strong></li><li>- A single weight</li><li>- A whole layer</li><li>- A training example</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The natural decomposition is the one the architecture gives you: the components that write to the residual stream, and the causal influences between them.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The graph of nodes and edges, with the attribution on each. Open <strong>The circuit</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§circuits:2 The Mechanistic Interpretability Workflow · p. 2 — The four steps, in order, and why each one is needed.</li><li>§circuits:2.2 Step 2: Divide the neural network into a graph of smaller units · p. 3 — The graph, and the vocabulary of components.</li><li>§circuits:2.4 Explaining the circuit components · p. 4 — What a finished explanation has to contain.</li><li>§circuits:4 Evaluating Subgraph Recovery Algorithms · p. 9 — How a discovery method is scored against a hand-built circuit.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://transformer-circuits.pub/2021/framework.html">A Mathematical Framework for Transformer Circuits</a> — The residual stream, the nodes, the edges and the paths.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Circuit</strong> — A graph of components that accounts for a behaviour.</li><li><strong>Node</strong> — A component of the graph that does one thing.</li><li><strong>Path</strong> — A chain of causal influences from an input to the output.</li><li><strong>Faithfulness</strong> — How much of the effect a proposed subgraph accounts for.</li></ul>
+<p><em>Read first:</em> Activation patching</p>
+<h3 id="lesson-9-the-qk-and-ov-circuits">Lesson 9. The QK and OV circuits</h3>
+<p><em>One head, two matrices, and an exact split of what it contributes</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Factor one attention head into the circuit that chooses a position and the circuit that writes from it</li><li>State the pathway decomposition of a last-layer head and why it is an identity rather than an approximation</li><li>Explain why a head in an earlier layer has no such split, and what can be measured instead</li><li>Describe what path patching asks that component patching cannot</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A head is four matrices and two products: W_QᵀW_K decides where it looks, W_OW_V decides what it writes when it gets there.</li><li>A last-layer head’s effect on a logit difference is exactly the sum over source positions of attention times the write that position is worth — so the decomposition can be checked against an ablation to machine precision.</li><li>A composed head’s QK circuit is a property of the path into it, which is why the induction circuit cannot be read off either head alone.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does a head’s QK circuit decide, and what does its OV circuit decide? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>QK decides which positions the head looks at; OV decides what it writes once it has looked</strong></li><li>- QK decides the layer, OV decides the head</li><li>- QK decides what is written, OV decides what is attended to</li><li>- Both describe the attention pattern, in different bases</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> W_Qᵀ W_K and W_O W_V are two separate d_model × d_model products that factor out of the head, and that factorisation is what lets you patch a head through one circuit input of another head instead of through the head as a whole.</p></blockquote>
+<p>*<em>Q. Splitting a last-layer head’s effect on the metric into per-position terms is an approximation that leaves a few percent unexplained. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> No. The head’s output is a sum over source positions and the readout is linear, so the split is an identity: in the laboratory the sum of the terms equals the ablation’s effect and the discrepancy column is driven below 1e-12 by a test. A head in an <em>earlier</em> layer has no such split, because its effect runs through the softmax of the layer above.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Pick a head and a position, and read the head’s whole contribution as one term per source position, next to the ablation that has to equal it. Open <strong>Decompose a pathway</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§framework:1 The Residual Stream · p. 1 — The computational graph a transformer induces, and the factorisation of a head into a QK and an OV circuit.</li><li>§induction:reverse-engineering Summary of Reverse Engineering Induction Heads · p. 26 — The composed circuit those two circuits are read in, on a model whose wiring is known.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://transformer-circuits.pub/2021/framework.html">A Mathematical Framework for Transformer Circuits</a> — The QK/OV vocabulary, the path expansion, and the composition of heads.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Residual stream</strong> — The vector every component reads from and writes to.</li><li><strong>QK circuit</strong> — The product W_Qᵀ W_K, which decides which positions a head attends to.</li><li><strong>OV circuit</strong> — The product W_O W_V, which decides what a head writes for the positions it attends to.</li><li><strong>Path</strong> — A chain of causal influences from an input to the output.</li><li><strong>Path patching</strong> — Patching one head’s output into a single circuit input of another head.</li></ul>
+<p><em>Read first:</em> The workflow, Induction heads</p>
+<h3 id="lesson-10-automating-the-search">Lesson 10. Automating the search</h3>
+<p><em>Edge attribution, pruning, and what a discovered circuit is graded against</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the attribution score of an edge and say why it is marginal rather than intrinsic</li><li>Describe the prune-and-rescore loop and the threshold it stops at</li><li>State faithfulness and completeness as two different failures</li><li>Explain why a hand-wired circuit is the only honest ground truth for a discovery algorithm</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>An edge’s score is what the current graph loses when that edge is deleted, so an edge can look essential only because its partner is in the graph — which is why the search re-scores everything at every step.</li><li>A graph can be faithful without being complete, or complete without being faithful: one names a route that carries the behaviour on its own, the other names everything the behaviour cannot do without.</li><li>On a random model the strongest available claim is that the numbers are self-consistent. On a model wired by hand the search’s answer is a test.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why does an ACDC-style search re-score every remaining edge at every step? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Because an edge’s score is its contribution to the graph it is currently in, so deleting one edge changes what the others are worth</strong></li><li>- Because the metric is stochastic and needs averaging</li><li>- Because the model is retrained between steps</li><li>- Because scores have to increase monotonically</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A key path and the query path that reads it only work together: each looks essential while both are present, and one becomes free the moment the other goes. A single ranking would delete the wrong edge first.</p></blockquote>
+<p>*<em>Q. A pruned graph that is faithful but not complete names every component the behaviour depends on. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> No. Faithfulness says the graph reproduces the behaviour on its own; completeness says nothing outside it is needed. A faithful-but-incomplete graph is an explanation that still leans on a component it has never named — which is why the two criteria are reported as a pair.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>Score every edge, delete the weakest, and watch faithfulness and completeness fall — then compare what the search reports against the four edges the wiring needs, from two different corruptions. Open <strong>Prune a graph down to a circuit</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§circuits:3 Automating circuit discovery (Step 3) · p. 3 — The attribution-patching loop, its cost, and the threshold it stops at.</li><li>§circuits:4 Evaluating Subgraph Recovery Algorithms · p. 9 — How a discovery method is scored — against a hand-built circuit, on tasks where the answer is known.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2304.14997">Towards Automated Circuit Discovery for Mechanistic Interpretability</a> — ACDC, and the two criteria the pruned graphs are graded on.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Circuit</strong> — A graph of components that accounts for a behaviour.</li><li><strong>Node</strong> — A component of the graph that does one thing.</li><li><strong>Edge attribution</strong> — One edge’s marginal contribution to the graph that currently contains it.</li><li><strong>Faithfulness</strong> — How much of the effect a proposed subgraph accounts for.</li><li><strong>ACDC</strong> — The search that deletes the least-scored component until the graph stops being faithful.</li><li><strong>Completeness</strong> — How much of a behaviour the circuit reproduces.</li></ul>
+<p><em>Read first:</em> The workflow, The QK and OV circuits</p>
+<h2 id="5-composition">5. Composition</h2>
+<p><em>One head shifts the keys; another completes the pattern</em></p>
+<p>A single attention head can only match what is written at a position. Most of what a transformer does happens because one head’s output becomes another head’s input. This module builds the clearest example — the induction circuit — and then the largest hand-built circuit in the literature, where the same logic is followed through a whole model.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Describe the two-head induction circuit and what each head contributes</li><li>Measure the accuracy of the composed circuit, and the effect of removing its first head</li><li>Explain completeness and minimality as tests of a circuit, not of a story</li></ul>
+<h3 id="lesson-7-induction-heads">Lesson 7. Induction heads</h3>
+<p><em>The smallest circuit that is more than one head</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Describe the induction algorithm: [A][B] … [A] predicts [B]</li><li>Explain what the previous-token head contributes to the second head</li><li>Measure the accuracy of the composed circuit, and of the ablation</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>An induction head matches the current token against the token that came before each earlier position, then copies the token after the match.</li><li>The previous-token head is what shifts the keys: without it, the second head can only find the current token itself.</li><li>The paper’s causal test is an ablation, and in the laboratory the ablation takes the accuracy to zero while the fixed circuit is exact.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the previous-token head contribute to the induction circuit? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>It shifts the keys, so the second head can match the current token against what came before each position</strong></li><li>- It copies the answer token into the output</li><li>- It suppresses the wrong answer</li><li>- It decides when to stop attending</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The first head writes each token’s predecessor into the position’s key. The induction head then matches the current token against that shifted content; without the shift, it can only find the current token itself.</p></blockquote>
+<p>*<em>Q. An induction head with no previous-token head can still find the token that followed the previous occurrence. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> Without the shift, its keys are the tokens themselves, so it matches the earlier occurrence of the current token and copies that token — not the one that followed it. The laboratory’s ablation measures exactly this collapse.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>A hand-wired two-head circuit on a repeated sequence, with both attention patterns and the ablation. Open <strong>Complete the pattern</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§induction:key-concepts Key Concepts: In-context Learning and Induction Heads · p. 4 — The [A][B] … [A] definition, and the two heads that implement it.</li><li>§induction:reverse-engineering Summary of Reverse Engineering Induction Heads · p. 26 — The mechanism stated as a circuit: shifted keys, matched queries, copied values.</li><li>§induction:phase-change Looking at the Phase Change More Closely · p. 13 — Induction heads forming at the same moment in-context learning appears.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2209.11895">In-context Learning and Induction Heads</a> — The six lines of evidence, of which the ablation is the causal one.</li><li><a href="https://transformer-circuits.pub/2021/framework.html">A Mathematical Framework for Transformer Circuits</a> — The composition of heads that makes the circuit possible.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Induction head</strong> — A head that completes a pattern it has already seen.</li><li><strong>Previous-token head</strong> — A head whose attention is on the position before it.</li><li><strong>Composition</strong> — One head’s output used as another head’s input.</li><li><strong>In-context learning</strong> — Learning a pattern from the context, without changing a weight.</li></ul>
+<p><em>Read first:</em> The workflow</p>
+<h3 id="lesson-8-the-ioi-circuit">Lesson 8. The IOI circuit</h3>
+<p><em>A whole behaviour, reverse-engineered</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Explain how the name-mover heads and the S-inhibition heads divide the work</li><li>Say what completeness and minimality measure, and why both are needed</li><li>Describe what the circuit leaves unexplained</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The circuit has 26 attention heads in seven classes: some move the name, and some decide which name is moved.</li><li>Completeness asks how much of the behaviour the circuit accounts for; minimality asks whether every part of it is needed.</li><li>The paper’s own evaluation finds the explanation supported and incomplete at the same time — which is what an honest circuit looks like.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does minimality measure about a proposed circuit? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Whether every component in it is needed for the behaviour</strong></li><li>- Whether it explains the whole behaviour</li><li>- Whether it is smaller than a baseline circuit</li><li>- Whether its components are attention heads</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Minimality removes components and checks the behaviour survives. Completeness asks how much is explained; minimality asks whether each part is doing work.</p></blockquote>
+<p>*<em>Q. A circuit that passes completeness and minimality is therefore a complete account of how the model does the task. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> No. The paper reports its explanation as supported by both criteria and still incomplete: the criteria constrain the circuit, they do not prove that nothing else is involved.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The paper’s own procedure — direct effects, then path patches into the movers’ circuits, then one layer down, then the two criteria — run on a hand-wired circuit with four heads, on the paper’s prompt and on the mirrored one. Open <strong>Run the four steps</strong> in the mech-interp-lab application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§ioi:3.1 Which heads directly affect the output? (Name Mover Heads) · p. 5 — The heads that write the answer, found by ablating heads one at a time.</li><li>§ioi:3.2 Which heads affect the Name Mover Heads’ attention? (S-Inhibition Heads) · p. 6 — The upstream heads that decide which name is copied.</li><li>§ioi:4.1 Completeness · p. 9 — How much of the behaviour the circuit reproduces.</li><li>§ioi:4.2 Minimality · p. 10 — Whether every component in the circuit is doing necessary work.</li></ul>
+<p><strong>Further reading</strong></p>
+<ul><li><a href="https://arxiv.org/abs/2211.00593">Interpretability in the Wild</a> — The 26-head circuit, and the three criteria it is evaluated by.</li><li><a href="https://arxiv.org/abs/2304.14997">Towards Automated Circuit Discovery</a> — The automated procedure that this circuit was a target for.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Name-mover head</strong> — The head that writes the answer name into the output.</li><li><strong>S-inhibition head</strong> — The head that suppresses the wrong name.</li><li><strong>Completeness</strong> — How much of a behaviour the circuit reproduces.</li><li><strong>Minimality</strong> — Whether every part of a circuit is needed.</li></ul>
+<p><em>Read first:</em> Induction heads</p>
+<h2 id="appendix-a-glossary">Appendix A — Glossary</h2>
+<p><strong>Superposition</strong> — Several features packed into one direction of the model’s activation.</p>
+<p>When a model has fewer dimensions than the features it represents, it cannot give each feature a direction of its own. It packs them together instead, and the features interfere.</p>
+<p><em>Cunningham et al. (2023)</em></p>
+<p><strong>Interference</strong> — The cost two features pay for sharing a direction.</p>
+<p>The cross term in the loss, (w_i·w_j)², weighted by the importance of the feature that pays it. It is zero for orthogonal directions and grows quadratically as they align.</p>
+<p><em>Course term</em></p>
+<p><strong>Importance</strong> — How much a feature matters to the loss.</p>
+<p>A weight on each feature’s squared error. The toy model assumes the importances follow a power law: a few features matter and a long tail does not.</p>
+<p><em>Cunningham et al. (2023)</em></p>
+<p><strong>Polysemanticity</strong> — A neuron that responds to several unrelated things.</p>
+<p>It is the direct consequence of superposition, and it is why you cannot read a model’s computation off its neurons.</p>
+<p><em>Cunningham et al. (2023)</em></p>
+<p><strong>Monosemanticity</strong> — A direction that responds to one thing and nothing else.</p>
+<p>The property a good dictionary feature has, and the one the interpretability scoring measures.</p>
+<p><em>Cunningham et al. (2023)</em></p>
+<p><strong>Feature</strong> — A thing the model represents, as distinct from the neuron it uses.</p>
+<p>A feature is a direction in activation space that corresponds to something the model can talk about. It need not be a neuron, and in a superposed model it usually is not.</p>
+<p><em>Cunningham et al. (2023)</em></p>
+<p><strong>Dictionary feature</strong> — A feature found by a sparse autoencoder.</p>
+<p>One element of the overcomplete dictionary the autoencoder learns. It is a candidate answer to "what is this model representing?".</p>
+<p><em>Cunningham et al. (2023)</em></p>
+<p><strong>Sparse autoencoder</strong> — An autoencoder trained to reconstruct with a sparse code.</p>
+<p>f = ReLU(W_enc(x − b_pre) + b_enc), x̂ = W_dec f + b_pre, with the loss ‖x − x̂‖² + λ‖f‖₁. The L1 term is what makes the code sparse, and the sparsity is what makes the features interpretable.</p>
+<p><em>Cunningham et al. (2023)</em></p>
+<p><strong>L0</strong> — The number of features that are active.</p>
+<p>The count of non-zero entries in the code. It is the sparsity the penalty buys, and the smaller it is the more interpretable the dictionary tends to be.</p>
+<p><em>Course term</em></p>
+<p><strong>Explained variance</strong> — How much of the activation the reconstruction accounts for.</p>
+<p>One minus the reconstruction error, divided by the variance of the activations. A dictionary that explains the variance has not thrown the information away.</p>
+<p><em>Course term</em></p>
+<p><strong>Activation patching</strong> — Run the model twice, and replace one activation in one of the runs.</p>
+<p>If the output changes, the node that was patched was causally responsible for the change. It is the difference between "responds to" and "does".</p>
+<p><em>Conmy et al. (2023)</em></p>
+<p><strong>Causal</strong> — A claim that survives an intervention.</p>
+<p>A correlational claim holds over the data you have; a causal claim holds over the data you would have had if you had intervened.</p>
+<p><em>Course term</em></p>
+<p><strong>Attribution</strong> — How much a component is responsible for the output.</p>
+<p>The effect of patching it, measured against the largest effect any component could have had.</p>
+<p><em>Conmy et al. (2023)</em></p>
+<p><strong>Circuit</strong> — A graph of components that accounts for a behaviour.</p>
+<p>Not a list of the features a model uses, but a small set of components and the causal paths between them that together explain what the model did.</p>
+<p><em>Conmy et al. (2023)</em></p>
+<p><strong>Node</strong> — A component of the graph that does one thing.</p>
+<p>In a transformer the natural nodes are the attention heads and the feed-forward blocks, and the natural edges are the causal influences between them.</p>
+<p><em>Elhage et al. (2021)</em></p>
+<p><strong>Path</strong> — A chain of causal influences from an input to the output.</p>
+<p>What an explanation is made of: a small number of paths, each of which carries the signal that mattered.</p>
+<p><em>Elhage et al. (2021)</em></p>
+<p><strong>Faithfulness</strong> — How much of the effect a proposed subgraph accounts for.</p>
+<p>If a graph of nodes reproduces the output change when patched, it is faithful; the score is the fraction of the effect it explains.</p>
+<p><em>Conmy et al. (2023)</em></p>
+<p><strong>Residual stream</strong> — The vector every component reads from and writes to.</p>
+<p>The computational graph a transformer induces is a set of components reading from and writing to this one vector, and it is the graph that a circuit is a subgraph of.</p>
+<p><em>Elhage et al. (2021)</em></p>
+<p><strong>Induction head</strong> — A head that completes a pattern it has already seen.</p>
+<p>It matches the current token against the token that preceded each earlier position, attends to the position after the match, and copies that token. [A][B] … [A] becomes [A][B] … [A][B].</p>
+<p><em>Olsson et al. (2022)</em></p>
+<p><strong>Previous-token head</strong> — A head whose attention is on the position before it.</p>
+<p>It moves each token one position forward in the residual stream. The induction head reads that shifted content as its keys, which is the whole of the first head’s contribution.</p>
+<p><em>Olsson et al. (2022)</em></p>
+<p><strong>Composition</strong> — One head’s output used as another head’s input.</p>
+<p>Heads write to the residual stream, and a later head reads from it. A behaviour that neither head can produce alone can be produced by the two in composition — which is why an explanation has to talk about paths and not just heads.</p>
+<p><em>Olsson et al. (2022)</em></p>
+<p><strong>In-context learning</strong> — Learning a pattern from the context, without changing a weight.</p>
+<p>Loss on tokens later in a sequence is lower than loss on tokens earlier in it, because the model can use what it has already read. The induction-head paper argues that much of this is pattern completion by circuits like the one in the laboratory.</p>
+<p><em>Olsson et al. (2022)</em></p>
+<p><strong>Name-mover head</strong> — The head that writes the answer name into the output.</p>
+<p>In the IOI circuit, the name movers attend to the two names in the sentence and copy one of them to the final position. Which one they copy is decided upstream.</p>
+<p><em>Wang et al. (2022)</em></p>
+<p><strong>S-inhibition head</strong> — The head that suppresses the wrong name.</p>
+<p>It writes a signal that keeps the name movers from copying the subject, so the indirect object wins. It does not write the answer; it decides which of two candidates does.</p>
+<p><em>Wang et al. (2022)</em></p>
+<p><strong>Completeness</strong> — How much of a behaviour the circuit reproduces.</p>
+<p>Patch every node in the proposed circuit and measure how much of the behaviour comes back. A complete circuit accounts for the behaviour; an incomplete one leaves a residue it does not explain.</p>
+<p><em>Wang et al. (2022)</em></p>
+<p><strong>Minimality</strong> — Whether every part of a circuit is needed.</p>
+<p>Remove components one at a time and see whether the behaviour survives. A circuit can be complete and still contain components that are doing nothing for this behaviour.</p>
+<p><em>Wang et al. (2022)</em></p>
+<p><strong>QK circuit</strong> — The product W_Qᵀ W_K, which decides which positions a head attends to.</p>
+<p>One head reads the residual stream through two independent matrices, and this is the one that scores pairs of positions. It is the whole of the head’s where, and because it factorises out of the head it can be measured on its own — which is what makes a composed head’s influence patchable through its key input rather than through the head.</p>
+<p><em>Elhage et al. (2021)</em></p>
+<p><strong>OV circuit</strong> — The product W_O W_V, which decides what a head writes for the positions it attends to.</p>
+<p>Attention chooses the sources; W_O W_V chooses what is taken from each of them and written back into the stream. Because the head’s output is a sum over sources, its contribution to a logit splits into one term per position — the attention weight times the OV write projected on the readout — and that split is exact.</p>
+<p><em>Elhage et al. (2021)</em></p>
+<p><strong>Path patching</strong> — Patching one head’s output into a single circuit input of another head.</p>
+<p>Activation patching asks whether a component matters. Path patching asks which of its influences mattered: substitute the ablated head’s write into the query, key or value input of the later head, and the difference is that edge’s contribution. It is the tool that turns the framework’s paths into measurements.</p>
+<p><em>Elhage et al. (2021)</em></p>
+<p><strong>Edge attribution</strong> — One edge’s marginal contribution to the graph that currently contains it.</p>
+<p>Score an edge by what deleting it costs the graph, with all the other kept edges still in place. The score is a property of the edge <em>and its neighbours</em>, not of the edge alone: two edges that only work together each look essential while both are present. That is why a pruning search re-scores every remaining edge at every step.</p>
+<p><em>Conmy et al. (2023)</em></p>
+<p><strong>ACDC</strong> — The search that deletes the least-scored component until the graph stops being faithful.</p>
+<p>Given a metric and a behavioural gap: score every remaining node and edge by its marginal contribution, delete the smallest, repeat, and take as the answer the smallest graph that still cleared the threshold. Nothing is trained and no human chooses the components — which is why the method has to be graded on a model whose wiring is already known.</p>
+<p><em>Conmy et al. (2023)</em></p>
+<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<ul><li><strong>Toy Models of Superposition</strong> — Noah Elhage, Shan Carter, Chris Olah, Dan Hendrycks (2023), Transformer Circuits publication. Licence: Publicly readable web publication. The machine-check could not be completed from this environment (the site blocks automated clients); verify the terms on the page itself before reusing any text or figure.. Mechanistic interpretability is only summarised in one chapter of the agentic course, and it is the fastest-moving area in the field.</li><li><strong>A Mathematical Framework for Transformer Circuits</strong> — Noah Elhage, Tristan Hume, Shan Carter, Scott Ostheim, Scott Linderman, Gabe, Dianne Hudon, Chris Olah (2021), Transformer Circuits publication. Licence: Publicly readable web publication. The machine-check could not be completed from this environment (the site blocks automated clients); verify the terms before reuse.. The vocabulary of weights, activations, pathways and nodes that the rest of the interpretability literature assumes.</li><li><strong>Towards Automated Circuit Discovery for Mechanistic Interpretability</strong> — Arthur Conmy, Augustine N. Mavor-Parker, Aengus Lynch, Stefan Heimersheim, Adrià Garriga-Alonso (2023), arXiv:2304.14997 [cs.LG]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The activation-patching algorithm, which is the causal test that distinguishes an explanation from a correlation.</li><li><strong>Sparse Autoencoders Find Highly Interpretable Features in Language Models</strong> — Hoagy Cunningham, Aidan Ewart, Logan Riggs, Robert Huben, Lee Sharkey (2023), arXiv:2309.08600 [cs.LG] / ICLR 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. How superposition is resolved in practice: a sparse dictionary over activations.</li><li><strong>In-context Learning and Induction Heads</strong> — Catherine Olsson, Nelson Elhage, Neel Nanda, Nicholas Joseph, Nova DasSarma, Tom Henighan, Ben Mann, Amanda Askell, Yuntao Bai, Anna Chen, Tom Conerly, Dawn Drain, Deep Ganguli, Zac Hatfield-Dodds, Danny Hernandez, Scott Johnston, Andy Jones, Jackson Kernion, Liane Lovitt, Kamal Ndousse, Dario Amodei, Tom Brown, Jack Clark, Jared Kaplan, Sam McCandlish, Chris Olah (2022), arXiv:2209.11895 [cs.LG]. Licence: CC BY 4.0 (as stated on the arXiv record).. The residual-stream framework was described but the composition of two heads into a circuit was never built.</li><li><strong>Interpretability in the Wild: a Circuit for Indirect Object Identification in GPT-2 small</strong> — Kevin Wang, Alexandre Variengien, Arthur Conmy, Buck Shlegeris, Jacob Steinhardt (2022), arXiv:2211.00593 [cs.LG] / ICLR 2023. Licence: CC BY 4.0 (as stated on the arXiv record).. Patching was taught on a toy graph; the name-mover circuit is the published case the procedure generalises to.</li></ul></main>
+</div>
+<footer class="pager">
+  <div><a href="lm-from-scratch.html">← Language Model from Scratch</a></div>
+  <div><a href="data-lab.html">Data Lab →</a></div>
+</footer>
+</body>
+</html>

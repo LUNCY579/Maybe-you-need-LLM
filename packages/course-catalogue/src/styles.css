@@ -121,6 +121,22 @@ a.catalogue-path-course-title:focus-visible {
   text-decoration: underline;
 }
 
+/* A row a search hit has opened: where it is, on the page, right now. */
+.catalogue-source-row-focus {
+  border-color: var(--accent-indigo, currentColor);
+  box-shadow: 0 0 0 1px var(--accent-indigo, currentColor) inset;
+}
+
+.catalogue-concept {
+  border-radius: 0.4rem;
+  padding: 0.15rem 0.4rem;
+  margin-left: -0.4rem;
+}
+
+.catalogue-concept-focus {
+  background: color-mix(in srgb, var(--accent-indigo, currentColor) 12%, transparent);
+}
+
 .catalogue-path-course-note {
   font-size: 0.8rem;
   color: var(--text-muted, #777);

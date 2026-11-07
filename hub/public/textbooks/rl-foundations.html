@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reinforcement Learning Foundations — textbook</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents"><a class="" href="#contents">Contents</a>
+<a class="" href="#1-the-mdp">1. The MDP</a>
+<a class="l2" href="#lesson-1-states-and-returns">Lesson 1. States and returns</a>
+<a class="" href="#2-value-functions">2. Value functions</a>
+<a class="l2" href="#lesson-2-the-value-function">Lesson 2. The value function</a>
+<a class="l2" href="#lesson-8-the-optimal-policy">Lesson 8. The optimal policy</a>
+<a class="" href="#3-policy-gradients">3. Policy gradients</a>
+<a class="l2" href="#lesson-3-the-likelihood-ratio-trick">Lesson 3. The likelihood-ratio trick</a>
+<a class="" href="#4-actorcritic">4. Actor–critic</a>
+<a class="l2" href="#lesson-4-the-baseline">Lesson 4. The baseline</a>
+<a class="l2" href="#lesson-5-the-n-step-return">Lesson 5. The n-step return</a>
+<a class="l2" href="#lesson-6-the--return">Lesson 6. The λ-return</a>
+<a class="l2" href="#lesson-7-the-actorcritic-loop">Lesson 7. The actor–critic loop</a>
+<a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
+<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+  <main class="book"><h1 id="reinforcement-learning-foundations">Reinforcement Learning Foundations</h1>
+<p><strong>Source:</strong> Reinforcement Learning: An Introduction (second edition) — Richard S. Sutton, Andrew G. Barto (2018)</p>
+<p><strong>Licence:</strong> The book is distributed free of charge by the authors for personal use. The machine-check could not be completed from this environment (TLS trust failure on the host); the canonical page is incompleteideas.net/book/the-book-2nd.html.</p>
+<p><strong>Why this course exists:</strong> The agentic course uses reinforcement learning loosely. Nothing in the collection defines an MDP, a value function or a policy gradient.</p>
+<p><strong>Source:</strong> Spinning Up in Deep RL — OpenAI (2019)</p>
+<p><strong>Licence:</strong> MIT (verified via the GitHub API for openai/spinningup, 2026-10-19)</p>
+<p><strong>Why this course exists:</strong> A derivation-first path from the policy gradient theorem to the algorithms in use, with runnable reference code.</p>
+<p><strong>Source:</strong> Asymptotic Confidence Bounds for the Monte Carlo Estimation of the Value Function: A Bootstrap Approach — Gert Williams, Christopher J. C. Burges (1990)</p>
+<p><strong>Licence:</strong> Springer article. Bibliographic reference only; the text is not redistributed. The λ-return estimator it generalises is implemented from the published definition in the course.</p>
+<p><strong>Why this course exists:</strong> The variance–bias trade-off in the advantage estimate.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#1-the-mdp">1. The MDP</a> - <a href="#lesson-1-states-and-returns">Lesson 1. States and returns</a></li><li><a href="#2-value-functions">2. Value functions</a> - <a href="#lesson-2-the-value-function">Lesson 2. The value function</a> - <a href="#lesson-8-the-optimal-policy">Lesson 8. The optimal policy</a></li><li><a href="#3-policy-gradients">3. Policy gradients</a> - <a href="#lesson-3-the-likelihood-ratio-trick">Lesson 3. The likelihood-ratio trick</a></li><li><a href="#4-actorcritic">4. Actor–critic</a> - <a href="#lesson-4-the-baseline">Lesson 4. The baseline</a> - <a href="#lesson-5-the-n-step-return">Lesson 5. The n-step return</a> - <a href="#lesson-6-the--return">Lesson 6. The λ-return</a> - <a href="#lesson-7-the-actorcritic-loop">Lesson 7. The actor–critic loop</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<h2 id="1-the-mdp">1. The MDP</h2>
+<p><em>The problem, written down exactly</em></p>
+<p>States, actions, rewards, transitions and returns. The Markov property, the discount, and the two things the discount is for.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Write down a Markov decision process and say what the Markov property rules out</li><li>Compute a return, and say what the discount is for</li><li>Say what a policy is, and what a stochastic policy buys</li></ul>
+<h3 id="lesson-1-states-and-returns">Lesson 1. States and returns</h3>
+<p><em>The problem, written down exactly</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Write down a Markov decision process</li><li>Compute the return of a trajectory, with and without a discount</li><li>Say what the Markov property rules out and what it buys</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>A Markov decision process is a tuple: states, actions, a reward function and a transition kernel.</li><li>The Markov property says the next state depends only on the present one — not on the whole history.</li><li>The discount is not a preference; it is what makes the infinite sum converge and what makes the problem finite.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the Markov property say? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The next state depends only on the present state</strong></li><li>- The states arrive in a random order</li><li>- The reward depends only on the state</li><li>- The process never revisits a state</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The whole history is irrelevant to the future. That is what makes the value function a function of the state alone, and the problem finite.</p></blockquote>
+<p>*<em>Q. A trajectory collects rewards 2, 1, 1 with a discount of 0.5. What is the return from the first step? — numeric </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> 2 + 0.5×1 + 0.25×1 = 2.75. Each reward is weighted by a power of the discount.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The gridworld, its transition kernel, and the return of a trajectory. Open <strong>Walk the grid</strong> in the rl-foundations application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sutton:3 The Markov Decision Process — The formalisation, and the returns.</li><li>§spinningup:2 The reinforcement learning problem — The return, the discount, and the vocabulary.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>A Markov decision process</strong> — States, actions, a reward function and a transition kernel, with the Markov property.</li><li><strong>The return</strong> — The total reward a trajectory collects, with the future discounted.</li><li><strong>The discount</strong> — The factor by which the future is weighted less than the present.</li><li><strong>Policy</strong> — What the agent does in each state.</li></ul>
+<h2 id="2-value-functions">2. Value functions</h2>
+<p><em>What a state is worth, and how to find out</em></p>
+<p>The value of a state under a policy, the value of the best policy, and the two sweeps that compute them exactly.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>State the Bellman equation and say what each term is</li><li>Compute a value function by policy evaluation, and check that it satisfies the equation</li><li>Compute the optimal value function and read the optimal policy off it</li></ul>
+<h3 id="lesson-2-the-value-function">Lesson 2. The value function</h3>
+<p><em>What a state is worth</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Define the value of a state under a policy</li><li>State the Bellman equation and say what each term is</li><li>Explain why the value is a fixed point, and what that means</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The value of a state is the expected return from it, under a policy.</li><li>The Bellman equation says the value is the reward plus the discounted value of the next state.</li><li>Iterating the equation converges to the value: it is a contraction, and the iteration is a fixed-point method.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the Bellman equation say? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The value of a state is the reward plus the discounted value of the next state</strong></li><li>- The value of a state is the average reward from it</li><li>- The value of a state is the value of the best action</li><li>- The value of a state is the reward of the best action</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> It is a fixed point: the value function is the one that satisfies it, and iterating it converges to that function.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The value iteration, sweep by sweep, and the policy it produces. Open <strong>Sweep the values</strong> in the rl-foundations application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sutton:4 The value function — What a value function is, and the two ways of writing it.</li><li>§sutton:6 Policy evaluation — Finding the value of a policy by iteration.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The value function</strong> — The expected return from a state, under a policy.</li><li><strong>The Bellman equation</strong> — The value is the reward now plus the discounted value of what comes next.</li></ul>
+<p><em>Read first:</em> States and returns</p>
+<h3 id="lesson-8-the-optimal-policy">Lesson 8. The optimal policy</h3>
+<p><em>And the answer every laboratory is checked against</em></p>
+<p><em>Estimated study time:</em> 22 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compute the optimal value function by value iteration</li><li>Read the greedy policy off the optimal value function</li><li>Say what a policy gradient is trying to find, in these terms</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The optimal value function is the largest value any policy achieves, and it satisfies its own Bellman equation.</li><li>The greedy policy with respect to the optimal value function is optimal.</li><li>A policy gradient is a stochastic way of finding the same thing, without ever writing the equation down.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Value iteration finds the optimal policy without ever evaluating a policy. — boolean </em>(core)***</p>
+<blockquote><p><strong>Why:</strong> Yes. One sweep of the optimality operator gives the greedy policy with respect to the current values, and repeating the sweep converges to the optimal pair. A policy evaluation is not needed anywhere in it.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The optimal policy and the value of reaching the goal, computed exactly. Open <strong>See the optimum</strong> in the rl-foundations application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sutton:9 Value iteration — The Bellman optimality equation, and the sweep that solves it.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The optimal policy</strong> — The policy that reaches the largest value in every state.</li><li><strong>Value iteration</strong> — Solving the Bellman optimality equation by sweeping it.</li></ul>
+<p><em>Read first:</em> The value function</p>
+<h2 id="3-policy-gradients">3. Policy gradients</h2>
+<p><em>The gradient, and how to estimate it while acting</em></p>
+<p>The likelihood-ratio trick, the policy gradient theorem, and the estimator that follows from it — checked here against the exact gradient of the exact expected return.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Derive the likelihood-ratio trick from the definition of the gradient</li><li>State the policy gradient theorem and say what it is the gradient of</li><li>Estimate the gradient while acting, and check the estimate against the exact answer</li></ul>
+<h3 id="lesson-3-the-likelihood-ratio-trick">Lesson 3. The likelihood-ratio trick</h3>
+<p><em>How the gradient is turned into something you can measure while acting</em></p>
+<p><em>Estimated study time:</em> 28 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Derive the likelihood-ratio trick from the definition of the gradient</li><li>Explain what the trick does to the terms that do not depend on the parameters</li><li>Write the estimator that follows from it</li><li>Check the derivation on a problem small enough to compute it exactly</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The gradient of a log-probability is the score function.</li><li>Multiplying by the likelihood turns an expectation under one distribution into an expectation under another.</li><li>Everything that does not depend on the parameters drops out, and what is left can be sampled.</li><li>With one state the expectation is a finite sum, so the three forms of the gradient can be printed side by side and their difference is arithmetic error rather than luck.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the likelihood-ratio trick do? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>It turns an expectation under one distribution into one under another</strong></li><li>- It makes the estimator unbiased</li><li>- It reduces the variance of the estimate</li><li>- It removes the discount</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Multiplying by the ratio of the two densities does it, and the ratio does not depend on the parameters being differentiated — which is what lets the terms that do not depend on them drop out.</p></blockquote>
+<p>*<em>Q. A policy gives an action probability of 0.25 in a state. What is the gradient of its log-probability with respect to a logit that only that action has? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> The derivative of log p with respect to its own logit is 1 − p, so it is 1 − 0.25 = 0.75.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>One state, so every line of the derivation is computable: the gradient three ways, the exact moments of the sampled estimate, and the sixty uphill steps the derivative predicts. The next two views run the same estimator on the gridworld against a finite difference, with and without a baseline. Open <strong>Derive it, and check it</strong> in the rl-foundations application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sutton:13 Policy gradients — The likelihood-ratio trick, the policy gradient theorem, and the estimate.</li><li>§spinningup:3 Deriving the policy gradient — The derivation and the estimators that follow from it.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The score function</strong> — The gradient of the log-probability of an action.</li><li><strong>The log-probability</strong> — The logarithm of the probability of an action, and the thing the gradient is taken of.</li><li><strong>The likelihood-ratio trick</strong> — Turning an expectation under one distribution into one under another.</li><li><strong>A bandit</strong> — One state, one action each round, and no consequences.</li><li><strong>REINFORCE</strong> — The policy gradient estimated from whole episodes.</li></ul>
+<p><em>Read first:</em> States and returns</p>
+<h2 id="4-actorcritic">4. Actor–critic</h2>
+<p><em>A smaller signal, and what it costs</em></p>
+<p>The baseline that removes the variance, the λ-return and the general advantage estimate, and the loop that puts them together.</p>
+<p><strong>Learning outcomes</strong></p>
+<ul><li>Say what a baseline does to the expectation and to the variance</li><li>Compare the n-step and the λ-return as estimators of the advantage</li><li>Run an actor–critic loop and read its learning curves</li></ul>
+<h3 id="lesson-4-the-baseline">Lesson 4. The baseline</h3>
+<p><em>A smaller signal that means the same thing</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Show that a baseline does not change the expectation of the gradient</li><li>Explain why a good baseline reduces the variance so much</li><li>Say what the advantage is, and what it is worth</li><li>Say which rewards a step may be weighted by, and why the choice is free in expectation</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>Subtracting any function of the state leaves the expected gradient unchanged.</li><li>The reason is that the baseline does not depend on the action, so its expectation is zero.</li><li>A good baseline removes the part of the return that was going to happen anyway, and that part is most of the noise.</li><li>The same argument covers the weighting: the rewards a step arrived with cannot be influenced by it, so dropping them changes the spread and not the mean.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Why does subtracting a baseline leave the expected gradient unchanged? — multiple-choice </em>(hard)***</p>
+<ul><li>✓ <strong>The baseline does not depend on the action, so its expectation is zero</strong></li><li>- The baseline is a constant</li><li>- The gradient of the baseline is zero</li><li>- The baseline is unbiased</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The term is the score function times the baseline, and the score function has mean zero over the action distribution. So the baseline drops out of the expectation.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>One estimator, two weights: the rewards still to come, and the whole episode’s return. The two means agree to the sampling noise of the batches, and the two spreads do not. Laboratory B holds the other half of the saving — the same comparison with the value of the state subtracted. Open <strong>Reward-to-go, and the spread it leaves</strong> in the rl-foundations application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sutton:13 Policy gradients — The baseline, and what it does to the variance of the estimate.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The baseline</strong> — A function of the state subtracted from the return.</li><li><strong>The advantage</strong> — How much better an action is than the policy’s average in that state.</li><li><strong>The reward-to-go</strong> — The rewards still to come, rather than the whole episode’s return.</li></ul>
+<p><em>Read first:</em> The likelihood-ratio trick</p>
+<h3 id="lesson-5-the-n-step-return">Lesson 5. The n-step return</h3>
+<p><em>Trading the bias of the bootstrap against the noise of the sample</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compute the n-step return</li><li>Say what makes it biased, and what makes it noisy</li><li>Explain why the two ends of the range are bad in different ways</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The n-step return bootstraps after n steps, and the bootstrap is biased while the sample is noisy.</li><li>The one-step return is the least noisy and the most biased; the Monte Carlo return is the reverse.</li><li>The λ-return is a mixture, and λ is the knob between them.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. Which end of the n-step range is biased? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Both, in opposite ways: the one-step return is biased and the Monte Carlo return is noisy</strong></li><li>- Neither</li><li>- Only the one-step return</li><li>- Only the Monte Carlo return</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The bootstrap is what biases an estimate, and the Monte Carlo return has no bootstrap. The sample is what makes an estimate noisy, and the one-step return has almost no sample in it.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The n-step returns of a real trajectory, and the truth they are aiming at. Open <strong>Count the steps</strong> in the rl-foundations application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§sutton:5 One-step prediction methods — The temporal-difference error, and the update it produces.</li><li>§gae:1 The bootstrap estimator — The λ-return and the trade-off it makes.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The n-step return</strong> — The reward for n steps, and then a bootstrapped value.</li><li><strong>Bootstrapping</strong> — Using an estimate of the future value in place of the future value.</li><li><strong>The λ-return</strong> — A weighted mixture of the n-step returns.</li></ul>
+<p><em>Read first:</em> The baseline</p>
+<h3 id="lesson-6-the--return">Lesson 6. The λ-return</h3>
+<p><em>A whole family of estimators, and the one knob</em></p>
+<p><em>Estimated study time:</em> 24 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Compute the λ-return and the general advantage estimate</li><li>Measure the bias and the variance of an estimator, rather than assuming them</li><li>Say where the best λ is, and why it depends on the horizon</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The λ-return is a weighted mixture of the n-step returns, with weights (1−λ)λ^(n−1).</li><li>The general advantage estimate is the same thing, written in terms of the temporal-difference errors.</li><li>The best λ is the one that matches the estimator to the horizon you actually have.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. The best λ for an advantage estimate depends on how long the episodes are. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Why:</strong> Yes. The bias comes from the truncation of the episode, so a short horizon wants a small λ and a long one can afford a large λ. The right λ is a function of the horizon you actually have.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The bias and the variance of the estimator, measured, as λ moves. Open <strong>Sweep λ</strong> in the rl-foundations application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§gae:1 The bootstrap estimator — The λ-return, the variance–bias trade-off, and the general advantage estimate.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>The λ-return</strong> — A weighted mixture of the n-step returns.</li><li><strong>The general advantage estimate</strong> — The λ-return, written in terms of the temporal-difference errors.</li></ul>
+<p><em>Read first:</em> The n-step return</p>
+<h3 id="lesson-7-the-actorcritic-loop">Lesson 7. The actor–critic loop</h3>
+<p><em>The two halves, and how they are put together</em></p>
+<p><em>Estimated study time:</em> 26 minutes</p>
+<p><strong>What you will learn</strong></p>
+<ul><li>Say what the actor does and what the critic does</li><li>Describe the temporal-difference update the critic makes</li><li>Run the loop and read the learning curve it produces</li></ul>
+<p><strong>The ideas</strong></p>
+<ul><li>The critic estimates the value; the actor follows the advantage the critic makes available.</li><li>The critic is a bootstrapping estimator, so it is biased and it is noisy, and it learns fast.</li><li>The two halves have different learning rates, and the difference matters.</li></ul>
+<h4 id="practice">Practice</h4>
+<p>*<em>Q. What does the critic contribute to the actor–critic loop? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>An estimate of the value, and through it the advantage the actor follows</strong></li><li>- The parameters the actor starts from</li><li>- The reward function</li><li>- The discount</li></ul>
+<blockquote><p>Correct.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The critic turns the return into the advantage, which is a smaller and less noisy signal, and the actor follows the advantage rather than the return.</p></blockquote>
+<h4 id="go-and-do-it">Go and do it</h4>
+<p>The actor–critic loop, run here, with its learning curves. Open <strong>Run the loop</strong> in the rl-foundations application.</p>
+<p><strong>Where this came from</strong></p>
+<ul><li>§spinningup:4 Beyond policy gradients — The actor–critic family and what it adds.</li></ul>
+<p><strong>The words this lesson uses</strong></p>
+<ul><li><strong>Actor–critic</strong> — A policy and a value function, learning together.</li><li><strong>The temporal-difference error</strong> — The reward plus the discounted next value, minus the current value.</li><li><strong>The advantage</strong> — How much better an action is than the policy’s average in that state.</li></ul>
+<p><em>Read first:</em> The λ-return</p>
+<h2 id="appendix-a-glossary">Appendix A — Glossary</h2>
+<p><strong>A Markov decision process</strong> — States, actions, a reward function and a transition kernel, with the Markov property.</p>
+<p>An MDP is a tuple of five things: the states, the actions, the probability of each immediate reward, the probability of each next state, and the discount. The Markov property says the next state depends only on the present state — so the history is not needed, and the problem is finite.</p>
+<p><strong>The return</strong> — The total reward a trajectory collects, with the future discounted.</p>
+<p>The return from a time is the sum of the rewards from then on, each weighted by a power of the discount. It is the quantity an agent is trying to maximise, and the quantity every estimator in this course is trying to estimate.</p>
+<p><strong>The discount</strong> — The factor by which the future is weighted less than the present.</p>
+<p>The discount is usually between zero and one. It makes an infinite sum converge, which is what makes the problem finite; and it encodes a preference for the near future, which is what makes an infinite-horizon problem well posed.</p>
+<p><strong>Policy</strong> — What the agent does in each state.</p>
+<p>A policy is a distribution over actions for each state. A deterministic policy takes one action; a stochastic one takes an action at random. The stochastic kind is what a policy gradient needs, and what the exact expected return of a parameterised policy has to be computed for.</p>
+<p><strong>The value function</strong> — The expected return from a state, under a policy.</p>
+<p>The value of a state is what the agent expects to collect from it, on average, if it follows the policy from then on. It is a function of the state and of the policy, and it is the object every dynamic-programming method computes.</p>
+<p><strong>The Bellman equation</strong> — The value is the reward now plus the discounted value of what comes next.</p>
+<p>The equation is a fixed point: the value function is the one that satisfies it. Iterating it converges to that fixed point, because the operator is a contraction — and the difference between the iteration and the answer is the residual, which the course measures.</p>
+<p><strong>Value iteration</strong> — Solving the Bellman optimality equation by sweeping it.</p>
+<p>One sweep replaces every value with the value of the best action, and repeating the sweep converges to the optimal value function. The greedy policy with respect to the result is the optimal policy, and it costs no more than a policy evaluation to find.</p>
+<p><strong>The optimal policy</strong> — The policy that reaches the largest value in every state.</p>
+<p>The optimal policy is the answer the dynamic-programming methods compute exactly. It is also the answer a policy gradient is looking for, by a much more expensive route — and comparing the two is the sharpest check there is.</p>
+<p><strong>The score function</strong> — The gradient of the log-probability of an action.</p>
+<p>The score of a state and action is the gradient of the log of the probability of taking that action. It is the direction in which the log-probability rises, and it is what the likelihood-ratio trick turns the gradient of the return into.</p>
+<p><strong>The log-probability</strong> — The logarithm of the probability of an action, and the thing the gradient is taken of.</p>
+<p>The log is what makes the gradient of a probability well behaved: the derivative of log p with respect to the parameters is the score, and the score is what an estimator can be built from. The log is also what turns a product of probabilities into a sum.</p>
+<p><strong>The likelihood-ratio trick</strong> — Turning an expectation under one distribution into one under another.</p>
+<p>Multiplying by p/q inside an expectation under q turns it into an expectation under p, and the factor does not depend on the parameters being differentiated. That is the whole of the trick, and it is what lets a policy gradient be estimated from samples.</p>
+<p><strong>A bandit</strong> — One state, one action each round, and no consequences.</p>
+<p>A multi-armed bandit is the smallest problem on which a policy gradient can be written down: there is one state, so the expectation over trajectories becomes a finite sum over the actions. That is what makes it the place to check a derivation — every line of it, including the variance of the estimator, is arithmetic rather than a report of one run.</p>
+<p><strong>REINFORCE</strong> — The policy gradient estimated from whole episodes.</p>
+<p>REINFORCE draws trajectories from the policy, multiplies the score of each step by a return, and averages. The average is an unbiased estimate of the gradient of the expected return — unbiased in the sense that its expectation is exactly that vector, which is what the finite-difference check in the laboratory measures.</p>
+<p><strong>The reward-to-go</strong> — The rewards still to come, rather than the whole episode’s return.</p>
+<p>A step can be weighted by the total return of the episode or by the rewards that came after it. The rewards already collected are fixed before the action is drawn, so their contribution has mean zero and only adds noise. Dropping them is free in expectation and expensive to skip in variance — and the laboratory measures the difference rather than asserting it.</p>
+<p><strong>The baseline</strong> — A function of the state subtracted from the return.</p>
+<p>Subtracting a baseline from the return leaves the expected gradient unchanged, because the baseline does not depend on the action and its expectation is therefore zero. What it does change is the spread of the estimator — and the spread is what decides how many samples a practitioner needs.</p>
+<p><strong>The advantage</strong> — How much better an action is than the policy’s average in that state.</p>
+<p>The advantage of a state and action is the value of taking it minus the value of the state: Q(s,a) − V(s). It is the part of the return that the agent’s own choices made, and it is what a policy gradient actually follows.</p>
+<p><strong>The n-step return</strong> — The reward for n steps, and then a bootstrapped value.</p>
+<p>The n-step return looks n steps ahead and then adds the discounted value of the state it arrives at. Small n means a small bootstrap and a noisy sample; large n means a large bootstrap and a quiet one. The Monte Carlo return is the limit, and the one-step return is the other end.</p>
+<p><strong>Bootstrapping</strong> — Using an estimate of the future value in place of the future value.</p>
+<p>Bootstrapping is what makes an infinite-horizon problem solvable in finite time, and it is also what makes the estimate biased: the value that is added is an estimate, and the error in it comes back. A method that does not bootstrap is unbiased, and needs the whole episode.</p>
+<p><strong>The λ-return</strong> — A weighted mixture of the n-step returns.</p>
+<p>The λ-return weights the n-step return by (1−λ)λ^(n−1) and takes the remaining weight on the longest one. At λ = 0 it is the one-step return; at λ = 1 it is the Monte Carlo return. Everything between is a different trade between bias and noise.</p>
+<p><strong>The general advantage estimate</strong> — The λ-return, written in terms of the temporal-difference errors.</p>
+<p>The advantage estimate is the sum of the temporal-difference errors, each weighted by (γλ) to the power of how far ahead it is. It is the same estimator as the λ-return, and it is the one the modern algorithms use, because the errors can be computed on the fly.</p>
+<p><strong>The temporal-difference error</strong> — The reward plus the discounted next value, minus the current value.</p>
+<p>The error is what the critic is trying to predict and the actor is trying to exploit. In expectation, and with the true value function, the one-step error is exactly the advantage — which is why the one-step estimate is unbiased and noisy, and why λ trades the noise away for a bias.</p>
+<p><strong>Actor–critic</strong> — A policy and a value function, learning together.</p>
+<p>The actor is the policy and the critic is the value estimate. The critic supplies the advantage, which is a smaller and less noisy signal than the return, and the actor follows it. The two halves have separate learning rates, and the difference between them is a real parameter.</p>
+<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<ul><li><strong>Reinforcement Learning: An Introduction (second edition)</strong> — Richard S. Sutton, Andrew G. Barto (2018), MIT Press; the authors publish the complete PDF free. Licence: The book is distributed free of charge by the authors for personal use. The machine-check could not be completed from this environment (TLS trust failure on the host); the canonical page is incompleteideas.net/book/the-book-2nd.html.. The agentic course uses reinforcement learning loosely. Nothing in the collection defines an MDP, a value function or a policy gradient.</li><li><strong>Spinning Up in Deep RL</strong> — OpenAI (2019), Online course and reference implementations. Licence: MIT (verified via the GitHub API for openai/spinningup, 2026-10-19). A derivation-first path from the policy gradient theorem to the algorithms in use, with runnable reference code.</li><li><strong>Asymptotic Confidence Bounds for the Monte Carlo Estimation of the Value Function: A Bootstrap Approach</strong> — Gert Williams, Christopher J. C. Burges (1990), Machine Learning 8, 375–389. Licence: Springer article. Bibliographic reference only; the text is not redistributed. The λ-return estimator it generalises is implemented from the published definition in the course.. The variance–bias trade-off in the advantage estimate.</li></ul></main>
+</div>
+<footer class="pager">
+  <div><a href="systems-lab.html">← Systems Lab</a></div>
+  <div><a href="retrieval-lab.html">Retrieval Lab →</a></div>
+</footer>
+</body>
+</html>

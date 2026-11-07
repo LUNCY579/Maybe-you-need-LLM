@@ -60,6 +60,38 @@ test.describe('the collection page', () => {
     await expect(page.locator('.catalogue-search-hit').first()).toBeVisible()
   })
 
+  test('a source hit opens the source in the browser below', async ({ page }) => {
+    await page.goto('/')
+    await page.getByLabel('Search the collection').fill('flashattention')
+    const sourceHit = page.locator('.catalogue-search-hit').filter({ hasText: 'Source' }).first()
+    await sourceHit.getByRole('link').click()
+    await expect(page.locator('.catalogue-source-row-focus')).toBeVisible()
+  })
+
+  test('a concept hit highlights the concept in the index', async ({ page }) => {
+    await page.goto('/')
+    await page.getByLabel('Search the collection').fill('perplexity')
+    const conceptHit = page.locator('.catalogue-search-hit').filter({ hasText: 'Concept' }).first()
+    await conceptHit.getByRole('link').click()
+    await expect(page.locator('.catalogue-concept-focus')).toBeVisible()
+  })
+
+  test('every course card links to its textbook', async ({ page }) => {
+    await page.goto('/')
+    const link = page.locator('.hub-course-book').first()
+    const href = await link.getAttribute('href')
+    expect(href).toMatch(/^textbooks\/[\w-]+\.html$/)
+    await page.goto(href ?? '')
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  })
+
+  test('the header links to the reading edition', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('link', { name: 'Textbooks' }).click()
+    await expect(page).toHaveURL(/textbooks\/index\.html$/)
+    await expect(page.locator('.card').first()).toBeVisible()
+  })
+
   test('it shows the learning path', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: 'The learning path' })).toBeVisible()

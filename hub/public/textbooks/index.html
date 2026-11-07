@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Materials — textbooks</title>
+
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('llm-materials:theme')
+    var dark = stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  } catch (e) { document.documentElement.dataset.theme = 'light' }
+})()
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer>
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
+    })
+  }
+})
+</script>
+
+<style>
+:root {
+  --bg: #fbfbfa; --surface: #ffffff; --text: #16181d; --muted: #5d636e;
+  --border: rgba(22,24,29,.12); --accent: #4c5fd7; --teal: #1f8f86;
+  --radius: .85rem; --measure: 72ch;
+}
+:root[data-theme='dark'] {
+  --bg: #0e1014; --surface: #16191f; --text: #e8eaee; --muted: #9aa1ad;
+  --border: rgba(232,234,238,.14); --accent: #97a4ff; --teal: #63d6c8;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.65;
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+header.book { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--border); }
+header.book .inner { max-width: 78rem; margin: 0 auto; padding: .7rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+header.book a.home { color: var(--text); text-decoration: none; font-weight: 600; }
+header.book .tools { display: flex; gap: .75rem; align-items: center; font-size: .9rem; }
+header.book button { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 999px; padding: .25rem .8rem; cursor: pointer; }
+.layout { max-width: 78rem; margin: 0 auto; padding: 2rem 1.25rem 4rem;
+  display: grid; grid-template-columns: 16rem minmax(0,1fr); gap: 2.5rem; }
+nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
+  overflow: auto; font-size: .88rem; }
+nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a:hover { color: var(--accent); }
+main.book { max-width: var(--measure); }
+main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
+main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
+main.book h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+main.book h4 { font-size: 1rem; margin-top: 1.4rem; }
+main.book h5 { font-size: .95rem; margin-top: 1.2rem; color: var(--muted); }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 3px solid var(--teal);
+  background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+blockquote p { margin: .3rem 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em;
+  background: color-mix(in srgb, var(--text) 7%, transparent); padding: .1em .35em; border-radius: .3rem; }
+pre code { display: block; padding: .8rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: .92rem; }
+th, td { border: 1px solid var(--border); padding: .4rem .65rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.math-display { display: block; overflow-x: auto; padding: .4rem 0; }
+footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
+  display: flex; justify-content: space-between; gap: 1rem; font-size: .95rem; }
+.index-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05); }
+.card h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+.card p { margin: .2rem 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 60rem) { .layout { grid-template-columns: 1fr; } nav.toc { display: none; } }
+</style>
+</head>
+<body>
+<header class="book"><div class="inner">
+  <a class="home" href="../">LLM Materials</a>
+  <div class="tools"><button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button></div>
+</div></header>
+<div style="max-width:72rem;margin:0 auto;padding:2.5rem 1.25rem 4rem">
+  <h1>The collection, as textbooks</h1>
+  <p style="max-width:60ch;color:var(--muted)">Every course, compiled end-to-end into one readable volume — the lesson prose, the mathematics with derivations, the practice questions with their answer key, the laboratory work, and the glossary. The math renders with KaTeX; the courses themselves remain the primary artefact, because the laboratories run in the browser.</p>
+  <div class="index-grid"><a class="card" href="diffusion-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Diffusion Lab</h3>
+  <p>Denoising Diffusion Probabilistic Models — Jonathan Ho, Ajay Jain, Pieter Abbeel (2020)</p>
+  <p>12 lessons · 7,212 words</p>
+</a>
+<a class="card" href="evaluation-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Evaluation Lab</h3>
+  <p>Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena — Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric P. Xing, Hao Zhang, Joseph E. Gonzalez, Ion Stoica (2023)</p>
+  <p>12 lessons · 7,016 words</p>
+</a>
+<a class="card" href="rlhf-lab.html" style="text-decoration:none;color:inherit">
+  <h3>RLHF Lab</h3>
+  <p>The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization — Shengyi Huang, Michael Noukhovitch, Arian Hosseini, Kashif Rasul, Weixun Wang, Lewis Tunstall (2024)</p>
+  <p>11 lessons · 6,469 words</p>
+</a>
+<a class="card" href="lm-from-scratch.html" style="text-decoration:none;color:inherit">
+  <h3>Language Model from Scratch</h3>
+  <p>CS336: Language Modeling from Scratch — Stanford CS336 staff (2026)</p>
+  <p>11 lessons · 6,407 words</p>
+</a>
+<a class="card" href="mech-interp-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Mechanistic Interpretability Lab</h3>
+  <p>Toy Models of Superposition — Noah Elhage, Shan Carter, Chris Olah, Dan Hendrycks (2023)</p>
+  <p>10 lessons · 6,945 words</p>
+</a>
+<a class="card" href="data-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Data Lab</h3>
+  <p>DataComp: In search of the next generation of multimodal datasets — Samir Yitzhak Gadre, Gabriel Ilharco, Alex Fang, Jonathan Hayase, Georgios Smyrnis, Thao Nguyen, Ryan Marten, Mitchell Wortsman, Dhruba Ghosh, Jieyu Zhang, Eyal Orgad, Rahim Entezari, Giannis Daras, Sarah Pratt, Vivek Ramanujan, Yonatan Bitton, Kalyani Marathe, Stephen Mussmann, Richard Vencu, Mehdi Cherti, Ranjay Krishna, Pang Wei Koh, Olga Saukh, Alexander Ratner, Shuran Song, Hannaneh Hajishirzi, Ali Farhadi, Romain Beaumont, Sewoong Oh, Alex Dimakis, Jenia Jitsev, Yair Carmon, Vaishaal Shankar, Ludwig Schmidt (2023)</p>
+  <p>10 lessons · 6,792 words</p>
+</a>
+<a class="card" href="scaling-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Scaling Lab</h3>
+  <p>Scaling Laws for Neural Language Models — Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, Dario Amodei (2020)</p>
+  <p>23 lessons · 22,434 words</p>
+</a>
+<a class="card" href="systems-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Systems Lab</h3>
+  <p>FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness — Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, Christopher Ré (2022)</p>
+  <p>8 lessons · 5,286 words</p>
+</a>
+<a class="card" href="rl-foundations.html" style="text-decoration:none;color:inherit">
+  <h3>Reinforcement Learning Foundations</h3>
+  <p>Reinforcement Learning: An Introduction (second edition) — Richard S. Sutton, Andrew G. Barto (2018)</p>
+  <p>8 lessons · 4,683 words</p>
+</a>
+<a class="card" href="retrieval-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Retrieval Lab</h3>
+  <p>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks — Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela (2020)</p>
+  <p>8 lessons · 4,754 words</p>
+</a>
+<a class="card" href="agent-bench-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Agent Benchmark Lab</h3>
+  <p>SWE-bench: Can Language Models Resolve Real-World GitHub Issues? — Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, Karthik Narasimhan (2023)</p>
+  <p>8 lessons · 4,451 words</p>
+</a>
+<a class="card" href="safety-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Safety and Alignment Lab</h3>
+  <p>Constitutional AI: Harmlessness from AI Feedback — Yuntao Bai, Saurav Kadavath, Sandipan Kundu, Amanda Askell, Jackson Kernion, Andy Jones, Anna Chen, Anna Goldie, Azalia Mirhoseini, Cameron McKinnon, Carol Chen, Catherine Olsson, Christopher Olah, Danny Hernandez, Dawn Drain, Deep Ganguli, Dustin Li, Eli Tran-Johnson, Ethan Perez, Jamie Kerr, Jared Mueller, Jeffrey Ladish, Joshua Landau, Kamal Ndousse, Kamile Lukosuite, Liane Lovitt, Michael Sellitto, Nelson Elhage, Nicholas Schiefer, Noemi Mercado, Nova DasSarma, Robert Lasenby, Robin Larson, Sam Ringer, Scott Johnston, Shauna Kravec, Sheer El Showk, Stanislav Fort, Tamera Lanham, Timothy Telleen-Lawton, Tom Conerly, Tom Henighan, Tristan Hume, Samuel R. Bowman, Zac Hatfield-Dodds, Ben Mann, Dario Amodei, Nicholas Joseph, Sam McCandlish, Tom Brown, Jared Kaplan (2022)</p>
+  <p>14 lessons · 7,808 words</p>
+</a>
+<a class="card" href="multimodal-lab.html" style="text-decoration:none;color:inherit">
+  <h3>Multimodal Lab</h3>
+  <p>Learning Transferable Visual Models From Natural Language Supervision — Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, Ilya Sutskever (2021)</p>
+  <p>9 lessons · 5,372 words</p>
+</a>
+<a class="card" href="llm-foundations-lab.html" style="text-decoration:none;color:inherit">
+  <h3>LLM Foundations Lab</h3>
+  <p>Foundations of Large Language Models — Tong Xiao, Jingbo Zhu (2026)</p>
+  <p>18 lessons · 28,399 words</p>
+</a>
+<a class="card" href="agentic-ai-academy.html" style="text-decoration:none;color:inherit">
+  <h3>Agentic AI Academy</h3>
+  <p>Agentic Large Language Models — Max van Duijn, Michiel van der Meer, Aske Plaat, Niki van Stein (2026)</p>
+  <p>12 lessons · 39,486 words</p>
+</a>
+<a class="card" href="deep-learning-theory-explorer.html" style="text-decoration:none;color:inherit">
+  <h3>Deep Learning Theory Explorer</h3>
+  <p>The Principles of Deep Learning Theory — Daniel A. Roberts, Sho Yaida, Boris Hanin (2022)</p>
+  <p>10 lessons · 9,915 words</p>
+</a></div>
+</div>
+</body>
+</html>

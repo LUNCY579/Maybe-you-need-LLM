@@ -15,6 +15,12 @@ import { join } from 'node:path'
 const root = process.cwd()
 const booksDir = join(root, 'textbooks')
 const outDir = join(booksDir, 'html')
+/*
+ * The hub ships the reading edition: its public directory is copied into the
+ * built site, so a learner can reach every textbook from the hub. Both copies
+ * are written by this one script, so they cannot drift apart.
+ */
+const hubPublic = join(root, 'hub', 'public', 'textbooks')
 
 /* --------------------------------------------------------- inline formatting */
 
@@ -308,6 +314,7 @@ function bookPage(course, body, toc, previous, next) {
 
 const bookFiles = (await readdir(booksDir)).filter((name) => name.endsWith('.md') && name !== 'README.md').sort()
 await mkdir(outDir, { recursive: true })
+await mkdir(hubPublic, { recursive: true })
 
 // Course order follows the reading path of the collection, which the index lists.
 const indexMarkdown = await readFile(join(booksDir, 'README.md'), 'utf8')
@@ -340,6 +347,7 @@ for (const course of courses) {
     slug: slug(match[2].replace(/\*+/g, '')),
   }))
   await writeFile(join(outDir, `${course.id}.html`), bookPage(course, body, toc, previous, next))
+  await writeFile(join(hubPublic, `${course.id}.html`), bookPage(course, body, toc, previous, next))
   process.stdout.write(`${course.id}.html `)
 }
 
@@ -367,4 +375,5 @@ const indexBody = `<header class="book"><div class="inner">
   <div class="index-grid">${cards}</div>
 </div>`
 await writeFile(join(outDir, 'index.html'), page('LLM Materials — textbooks', indexBody))
+await writeFile(join(hubPublic, 'index.html'), page('LLM Materials — textbooks', indexBody))
 process.stdout.write(`\n${courses.length} books rendered to textbooks/html/\n`)

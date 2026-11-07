@@ -20,6 +20,7 @@ import {
   depthOf,
   layersOf,
   parseManifest,
+  type CatalogueDocument,
   type CatalogueManifest,
 } from '@llm-materials/course-catalogue'
 import manifestJson from './manifest.json'
@@ -97,6 +98,39 @@ function App() {
     return () => observer.disconnect()
   }, [])
 
+  /*
+    Opening a search hit.
+
+    The catalogue's own hrefs are only meaningful where a router reads them;
+    the hub has no router, so a hit the hub can show in place is shown in
+    place — a source is focused in the source browser, a concept is
+    highlighted in the index — and a hit that lives in a course navigates
+    there.
+  */
+  const [focusSourceId, setFocusSourceId] = useState<string | null>(null)
+  const [focusTerm, setFocusTerm] = useState<string | null>(null)
+  const openDocument = (hit: CatalogueDocument) => {
+    if (hit.kind === 'Course') {
+      window.location.assign(`../${hit.app}/`)
+      return
+    }
+    if (hit.kind === 'Lesson') {
+      window.location.assign(hit.href.replace(/^\.\//, '../'))
+      return
+    }
+    if (hit.kind === 'Source') {
+      setFocusSourceId(hit.id.replace(/^source:/, ''))
+      document.getElementById('sources')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+    if (hit.kind === 'Concept') {
+      setFocusTerm(hit.title)
+      document.getElementById('concepts')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+    document.getElementById('path')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   /* Pressing / anywhere outside a field jumps to the search box. */
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -162,6 +196,7 @@ function App() {
             <button type="button" className="hub-theme" onClick={toggleTheme}>
               Switch to the {theme === 'dark' ? 'light' : 'dark'} theme
             </button>
+            <a href="textbooks/index.html">Textbooks</a>
           </nav>
         </div>
       </header>
@@ -230,7 +265,7 @@ function App() {
             ))}
           </div>
           {query.trim().length > 0 ? (
-            <CatalogueSearch manifest={manifest} query={query} limit={25} />
+            <CatalogueSearch manifest={manifest} query={query} limit={25} onOpen={openDocument} />
           ) : (
             <p className="hub-note">Type to search {documents.length} indexed documents.</p>
           )}
@@ -313,6 +348,9 @@ function App() {
                         ? `${done} lesson${done === 1 ? '' : 's'} done`
                         : 'not started'}
                   </p>
+                  <a className="hub-course-book" href={`textbooks/${app.id}.html`}>
+                    Read as a textbook <span aria-hidden="true">→</span>
+                  </a>
                 </article>
               )
             })}
@@ -361,7 +399,7 @@ function App() {
             A term taught in one course usually reappears in another. These are the concepts more than one course
             teaches, which is what turns a set of courses into a curriculum.
           </p>
-          <ConceptIndex sharedOnly />
+          <ConceptIndex sharedOnly focusTerm={focusTerm} />
         </section>
 
         <section id="sources" className="hub-section">
@@ -371,7 +409,7 @@ function App() {
             the way its identifier was verified. The full catalogue — with every field — is in
             <code> references/manifest.json</code>, and is validated by a script that re-reads every arXiv title live.
           </p>
-          <SourceBrowser manifest={manifest} />
+          <SourceBrowser manifest={manifest} focusSourceId={focusSourceId} onFocusHandled={() => setFocusSourceId(null)} />
         </section>
 
         <section id="glossary" className="hub-section">

@@ -7,11 +7,18 @@
  * place, and filter the collection down to what they need.
  */
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CatalogueManifest, CatalogueSource } from '@llm-materials/course-catalogue'
 
 export interface SourceBrowserProps {
   manifest: CatalogueManifest
+  /**
+   * A source to open, from a search hit elsewhere on the page. The filters
+   * yield so the row is visible, the row is scrolled to and highlighted, and
+   * the caller is told it has been handled.
+   */
+  focusSourceId?: string | null
+  onFocusHandled?: () => void
 }
 
 /** The distinct values of a field, for the filters. */
@@ -21,11 +28,31 @@ function distinct(sources: CatalogueSource[], field: 'app' | 'kind' | 'role'): s
   return [...values].sort()
 }
 
-export function SourceBrowser({ manifest }: SourceBrowserProps) {
+export function SourceBrowser({ manifest, focusSourceId, onFocusHandled }: SourceBrowserProps) {
   const [query, setQuery] = useState('')
   const [app, setApp] = useState('all')
   const [kind, setKind] = useState('all')
   const [role, setRole] = useState('all')
+  const [highlighted, setHighlighted] = useState<string | null>(null)
+
+  /* Opening a source from a search hit: clear the filters, find the row, point at it. */
+  const handled = useRef(onFocusHandled)
+  handled.current = onFocusHandled
+  useEffect(() => {
+    if (!focusSourceId) return
+    setQuery('')
+    setApp('all')
+    setKind('all')
+    setRole('all')
+    setHighlighted(focusSourceId)
+    const timer = window.setTimeout(() => {
+      document
+        .querySelector(`[data-source-id="${focusSourceId}"]`)
+        ?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      handled.current?.()
+    }, 80)
+    return () => window.clearTimeout(timer)
+  }, [focusSourceId])
 
   const sources = useMemo(() => {
     const lower = query.trim().toLowerCase()
@@ -126,7 +153,15 @@ export function SourceBrowser({ manifest }: SourceBrowserProps) {
 
       <ul className="catalogue-source-browser">
         {sources.map((source) => (
-          <li key={source.id} className="catalogue-source-row">
+          <li
+            key={source.id}
+            data-source-id={source.id}
+            className={
+              highlighted === source.id
+                ? 'catalogue-source-row catalogue-source-row-focus'
+                : 'catalogue-source-row'
+            }
+          >
             <a className="catalogue-source-row-title" href={source.url} rel="noreferrer">
               {source.title}
             </a>
