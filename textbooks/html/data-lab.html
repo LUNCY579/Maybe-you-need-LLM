@@ -110,7 +110,16 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <a class="l2" href="#lesson-9-recursive-training">Lesson 9. Recursive training</a>
 <a class="l2" href="#lesson-10-the-refinement-loop">Lesson 10. The refinement loop</a>
 <a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
-<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+<a class="" href="#appendix-b-the-laboratories">Appendix B — The laboratories</a>
+<a class="l2" href="#a-the-pipeline">A · The pipeline</a>
+<a class="l2" href="#f-the-budget">F · The budget</a>
+<a class="l2" href="#e-midas-and-the-reference-model">E · MIDAS and the reference model</a>
+<a class="l2" href="#b-deduplication">B · Deduplication</a>
+<a class="l2" href="#c-the-mixture">C · The mixture</a>
+<a class="l2" href="#h-the-proxy-step">H · The proxy step</a>
+<a class="l2" href="#g-the-loop">G · The loop</a>
+<a class="l2" href="#d-collapse">D · Collapse</a>
+<a class="" href="#appendix-c-sources">Appendix C — Sources</a></nav>
   <main class="book"><h1 id="data-lab">Data Lab</h1>
 <p><strong>Source:</strong> DataComp: In search of the next generation of multimodal datasets — Samir Yitzhak Gadre, Gabriel Ilharco, Alex Fang, Jonathan Hayase, Georgios Smyrnis, Thao Nguyen, Ryan Marten, Mitchell Wortsman, Dhruba Ghosh, Jieyu Zhang, Eyal Orgad, Rahim Entezari, Giannis Daras, Sarah Pratt, Vivek Ramanujan, Yonatan Bitton, Kalyani Marathe, Stephen Mussmann, Richard Vencu, Mehdi Cherti, Ranjay Krishna, Pang Wei Koh, Olga Saukh, Alexander Ratner, Shuran Song, Hannaneh Hajishirzi, Ali Farhadi, Romain Beaumont, Sewoong Oh, Alex Dimakis, Jenia Jitsev, Yair Carmon, Vaishaal Shankar, Ludwig Schmidt (2023)</p>
 <p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
@@ -135,7 +144,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p><strong>Why this course exists:</strong> The model-collapse chapter of the agentic course has no experiment behind it. This one does, and it is small enough to reproduce.</p>
 <hr>
 <h2 id="contents">Contents</h2>
-<ul><li><a href="#1-sources">1. Sources</a> - <a href="#lesson-1-what-a-crawl-gives-you">Lesson 1. What a crawl gives you</a> - <a href="#lesson-2-the-qualityquantity-frontier">Lesson 2. The quality–quantity frontier</a></li><li><a href="#2-filtering">2. Filtering</a> - <a href="#lesson-3-the-filtering-pipeline">Lesson 3. The filtering pipeline</a> - <a href="#lesson-4-the-reference-model">Lesson 4. The reference model</a></li><li><a href="#3-deduplication">3. Deduplication</a> - <a href="#lesson-5-exact-and-fuzzy">Lesson 5. Exact and fuzzy</a> - <a href="#lesson-6-decontamination">Lesson 6. Decontamination</a></li><li><a href="#4-mixtures">4. Mixtures</a> - <a href="#lesson-7-a-mixture-is-a-policy">Lesson 7. A mixture is a policy</a> - <a href="#lesson-8-optimising-the-mixture">Lesson 8. Optimising the mixture</a></li><li><a href="#5-collapse">5. Collapse</a> - <a href="#lesson-9-recursive-training">Lesson 9. Recursive training</a> - <a href="#lesson-10-the-refinement-loop">Lesson 10. The refinement loop</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<ul><li><a href="#1-sources">1. Sources</a> - <a href="#lesson-1-what-a-crawl-gives-you">Lesson 1. What a crawl gives you</a> - <a href="#lesson-2-the-qualityquantity-frontier">Lesson 2. The quality–quantity frontier</a></li><li><a href="#2-filtering">2. Filtering</a> - <a href="#lesson-3-the-filtering-pipeline">Lesson 3. The filtering pipeline</a> - <a href="#lesson-4-the-reference-model">Lesson 4. The reference model</a></li><li><a href="#3-deduplication">3. Deduplication</a> - <a href="#lesson-5-exact-and-fuzzy">Lesson 5. Exact and fuzzy</a> - <a href="#lesson-6-decontamination">Lesson 6. Decontamination</a></li><li><a href="#4-mixtures">4. Mixtures</a> - <a href="#lesson-7-a-mixture-is-a-policy">Lesson 7. A mixture is a policy</a> - <a href="#lesson-8-optimising-the-mixture">Lesson 8. Optimising the mixture</a></li><li><a href="#5-collapse">5. Collapse</a> - <a href="#lesson-9-recursive-training">Lesson 9. Recursive training</a> - <a href="#lesson-10-the-refinement-loop">Lesson 10. The refinement loop</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-the-laboratories">Appendix B — The laboratories</a></li><li><a href="#appendix-c-sources">Appendix C — Sources</a></li></ul>
 <h2 id="1-sources">1. Sources</h2>
 <p><em>What a crawl gives you, and what it costs</em></p>
 <p>A web crawl is a large, noisy, duplicated and partly hostile collection of text. This module is about the shape of that collection, and about the frontier between how much data you have and how good it is.</p>
@@ -150,11 +159,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A crawl is large, noisy, duplicated and partly adversarial.</li><li>The score of a filter is the model trained on what survives it, not the number of documents it removed.</li><li>Filtering is a benchmark: the same rules, the same budget, the same metric.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What is the honest score of a filtering rule? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The accuracy of the model trained on the documents that survive it</strong></li><li>- The number of documents it removes</li><li>- How fast it runs</li><li>- How many rules it replaces</li></ul>
+<ul><li>✓ <strong>The accuracy of the model trained on the documents that survive it</strong></li><li>The number of documents it removes</li><li>How fast it runs</li><li>How many rules it replaces</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A filter earns its place by making the model better. The ablation table is the scoreboard, and the score is the model, not the count.</p></blockquote>
 <p>*<em>Q. Why is a crawl hard to train on? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>It is large, noisy, duplicated and partly adversarial</strong></li><li>- It is too small</li><li>- It is all one language</li><li>- It is already tokenised</li></ul>
+<ul><li>✓ <strong>It is large, noisy, duplicated and partly adversarial</strong></li><li>It is too small</li><li>It is all one language</li><li>It is already tokenised</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Those four properties are the reason the whole pipeline exists: noise needs filtering, duplicates need deduplicating, and the adversarial part needs both.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -174,6 +183,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>At a fixed compute budget, the tokens you can afford are the ones that matter.</li><li>Filtering is a trade: you spend compute on selection to buy back the compute you spend on training.</li><li>A corpus of a hundred billion tokens is not a hundred billion tokens of training.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. A corpus holds 10 billion tokens, and deduplication shows that 40% of the documents are near-duplicates of another document. How many tokens of distinct text are there? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 6</p></blockquote>
 <blockquote><p><strong>Why:</strong> Ten billion tokens, of which 40% are duplicates: 10 × (1 − 0.4) = 6 billion tokens of distinct text.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Five rows trained under the same token and compute budget — the raw corpus, the filtered one at full and at half budget, the control with the same documents and the same steps, and an oracle nobody can run. Open <strong>Spend one budget five ways</strong> in the data-lab application.</p>
@@ -196,10 +206,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Structural filters first, model-based filters second, deduplication last.</li><li>Every filter that runs late has to look at more documents.</li><li>A filter that removes a document the model would have learned from is a bug, not a filter.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Why do the cheap structural filters run before the model-based ones? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>A filter that runs late only has to look at the documents that are left</strong></li><li>- The order does not matter</li><li>- Because the model-based filters are more accurate</li><li>- Because structural filters are easier to write</li></ul>
+<ul><li>✓ <strong>A filter that runs late only has to look at the documents that are left</strong></li><li>The order does not matter</li><li>Because the model-based filters are more accurate</li><li>Because structural filters are easier to write</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Every stage only sees what the previous stage left. Running the cheap rules first means the expensive ones run on a small fraction of the crawl.</p></blockquote>
 <p>*<em>Q. A filter that removes a document the model would have learned from is a bug rather than a filter. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. The ablation table catches it: remove the filter and the model gets better, which means the filter was removing signal.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The pipeline reports what each stage removed; the laboratory recomputes it from the corpus. Open <strong>Read the stage counts</strong> in the data-lab application.</p>
@@ -217,6 +228,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Perplexity is the exponential of the mean negative log-likelihood per token.</li><li>Stupid backoff discounts the probability once for every level of context that is missing.</li><li>Boilerplate has common words in an unusual arrangement, and only the arrangement gives it away.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. A document has 100 tokens and the model assigns it a total log-likelihood of −460. What is its perplexity? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 99.484 ± 0.01</p></blockquote>
 <blockquote><p><strong>Why:</strong> The mean negative log-likelihood per token is 460/100 = 4.6, and the perplexity is exp(4.6) ≈ 99.48.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The same corpus scored under references fitted on different pools — the crawl, one domain, another — and the two rules that use them: the near-duplicate clusters MIDAS keeps, and the perplexity cut taken at a quantile. Open <strong>Cut at a quantile of the reference model</strong> in the data-lab application.</p>
@@ -239,10 +251,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A document is a set of its token n-grams, and two documents are duplicates when those sets overlap.</li><li>A MinHash signature estimates the Jaccard similarity in k hash functions instead of |A ∩ B| comparisons.</li><li>The band structure of the LSH index decides which pairs are compared for real.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What is the Jaccard similarity of two documents that share 30 shingles and have 70 shingles between them? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>30/70</strong></li><li>- 30/100</li><li>- 70/30</li><li>- 30</li></ul>
+<ul><li>✓ <strong>30/70</strong></li><li>30/100</li><li>70/30</li><li>30</li></ul>
 <blockquote><p>Correct: the intersection is 30 and the union is 70.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The Jaccard similarity divides the size of the intersection by the size of the union: 30/70 ≈ 0.43.</p></blockquote>
 <p>*<em>Q. A MinHash signature has 128 entries. Two documents share 90 of them. What is the estimated Jaccard similarity? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 0.703125 ± 0.001</p></blockquote>
 <blockquote><p><strong>Why:</strong> The estimate is the fraction of positions that agree: 90/128 = 0.703125.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The corpus is deduplicated here, with the candidate pairs the index proposed shown alongside the pairs it verified. Open <strong>Find the near-duplicates</strong> in the data-lab application.</p>
@@ -260,7 +273,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Deduplication removes copies of each other; decontamination removes copies of the test set.</li><li>The overlap test is an n-gram test, and the n has to be long enough to be unmistakable.</li><li>A decontamination procedure that is too aggressive removes real data; one that is too lax leaves the leak in.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What is the difference between deduplication and decontamination? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>Deduplication removes copies of each other; decontamination removes copies of the evaluation set</strong></li><li>- They are two names for the same procedure</li><li>- Deduplication is exact and decontamination is fuzzy</li><li>- Decontamination is applied before deduplication</li></ul>
+<ul><li>✓ <strong>Deduplication removes copies of each other; decontamination removes copies of the evaluation set</strong></li><li>They are two names for the same procedure</li><li>Deduplication is exact and decontamination is fuzzy</li><li>Decontamination is applied before deduplication</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Deduplication is about wasting compute; decontamination is about whether the score means anything.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -286,7 +299,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The mixture decides how much of the model’s capacity goes to each kind of text.</li><li>A domain that is under-represented is a domain the model will be weak in.</li><li>The average loss is not the loss that matters when the use is specialised.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does a data mixture decide? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The proportion of training tokens each domain receives</strong></li><li>- Which documents are duplicates</li><li>- The learning rate schedule</li><li>- The tokeniser</li></ul>
+<ul><li>✓ <strong>The proportion of training tokens each domain receives</strong></li><li>Which documents are duplicates</li><li>The learning rate schedule</li><li>The tokeniser</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The mixture is a distribution over domains, and it is a decision about which capability the model buys with its compute.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -305,10 +318,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Group DRO raises the weight of whichever group is doing worst, and trains on the reweighted sample.</li><li>If each domain’s loss is linear in its weight, the optimal mixture equalises the active domains.</li><li>The optimal mixture is found by a one-dimensional search for the level at which the weights sum to one.</li><li>The weights are learned on a proxy and extrapolated for the target, so the proxy’s ranking has to agree with the target’s — where it does not, the handed-over weights are the weights of a different run.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does group DRO optimise? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The loss of the worst-performing group</strong></li><li>- The average loss over all the groups</li><li>- The size of the training set</li><li>- The number of groups</li></ul>
+<ul><li>✓ <strong>The loss of the worst-performing group</strong></li><li>The average loss over all the groups</li><li>The size of the training set</li><li>The number of groups</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Group DRO raises the weight of whichever group is doing worst and trains on the reweighted sample, so the model is not left behind in one domain.</p></blockquote>
 <p>*<em>Q. Two domains have losses L₁(w₁) = 2w₁ + 1 and L₂(w₂) = 3w₂ + 0.5, with w₁ + w₂ = 1. What weight minimises the worse of the two? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 0.555556 ± 0.001</p></blockquote>
 <blockquote><p><strong>Why:</strong> At the optimum the two losses are equal: 2w₁ + 1 = 3(1 − w₁) + 0.5, so 2w₁ + 1 = 3.5 − 3w₁, giving 5w₁ = 2.5 and w₁ = 0.5556. The common loss is 2.111.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The extrapolation arithmetic that rescales the proxy’s weights around a pinned domain, and the ranking the method depends on, tested against the run it came from. Open <strong>Hand the weights to a bigger run</strong> in the data-lab application.</p>
@@ -331,10 +345,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Train on data, generate from the model, train on that, and the distribution moves away from the original.</li><li>A bounded model loses the tail completely; an unbounded model floors it.</li><li>Real data in the mixture is what keeps the tail alive.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Which part of a distribution is lost first under recursive training? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The tail — the rare symbols</strong></li><li>- The head — the common symbols</li><li>- Both equally</li><li>- The mean</li></ul>
+<ul><li>✓ <strong>The tail — the rare symbols</strong></li><li>The head — the common symbols</li><li>Both equally</li><li>The mean</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The rare symbols lose their probability first, generation after generation, and the distribution becomes narrower than the one it started from.</p></blockquote>
 <p>*<em>Q. A model that can represent any symbol, with a floor under each one, still loses its tail completely under recursive training. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. The floor is the point: an unbounded model floors the tail rather than losing it. It is the bounded model — the one that cannot represent the rare outputs — whose tail disappears entirely.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The loop, run here, with the tail’s mass measured at every generation. Open <strong>Run the recursion</strong> in the data-lab application.</p>
@@ -352,8 +367,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Refit the reference on the survivors, cut again at the same quantile, and every pass leaves a corpus of higher measured quality.</li><li>The measured quality of the corpus and the loss on it are two different things: here the first rises while the second does too.</li><li>Four gentle passes and one hard one can remove exactly the same total, because the removals compose — and only the loop refits the reference on what each earlier pass left behind.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. A refinement loop removes 25% of the corpus in total, spread over four passes. What fraction of the documents standing at the start of a pass does each pass remove, in percent? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 6.94 ± 0.06</p></blockquote>
 <blockquote><p><strong>Why:</strong> The removals compose, so each pass keeps the fourth root of what the whole loop keeps: (1 − 0.25)^(1/4) = 0.9306, and 1 − 0.9306 = 0.0694 — 6.94% of what is standing when the pass begins. Four passes of 25% each would remove 68%, not 25%.</p></blockquote>
 <p>*<em>Q. In the loop on this course’s toy corpus, each pass leaves a corpus of higher measured quality, and the model trained on it reaches a lower held-out loss. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> Only the first half. The corpus does get purer at every pass, and the held-out loss on it rises rather than falls — the filter’s score of a document and the model’s loss on it are not the same quantity, and a purer corpus is a harder one to predict.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The reference retrained on each pass’s survivors, with the corpus quality and the held-out loss plotted on the same axes — and one pass against four at the same total removal. Open <strong>Run the loop pass after pass</strong> in the data-lab application.</p>
@@ -407,7 +424,49 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>A bounded model has a limited output vocabulary. Because it cannot represent the rare outputs, a model trained on its own samples loses them, and its support shrinks at every generation. An unbounded model, with a floor under every symbol, floors the tail instead of losing it.</p>
 <p><strong>Data licence</strong> — The terms under which a dataset may be used, studied or redistributed.</p>
 <p>A dataset’s licence decides what a project may do with it: train on it, publish statistics about it, or redistribute it. The licences differ, and a course that cites a dataset must record the one it checked, because the terms are attached to a specific version and can change.</p>
-<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<h2 id="appendix-b-the-laboratories">Appendix B — The laboratories</h2>
+<p>Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.</p>
+<h3 id="a-the-pipeline">A · The pipeline</h3>
+<p><em>Five filters in order, what each stage leaves, and the model trained on the survivors — ablated one filter at a time.</em></p>
+<p><em>Route:</em> <code>/labs/pipeline</code></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>A full filtering pipeline as a benchmark</li><li>Per-filter ablation curves</li><li>Per-stage filtering ablations</li></ul>
+<h3 id="f-the-budget">F · The budget</h3>
+<p><em>Five ways to spend one compute budget, with a control row that has the same documents and the same steps as the filtered one.</em></p>
+<p><em>Route:</em> <code>/labs/budget</code></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Quality versus quantity under a fixed compute budget</li></ul>
+<h3 id="e-midas-and-the-reference-model">E · MIDAS and the reference model</h3>
+<p><em>Near-duplicates kept as clusters rather than collapsed, a perplexity cut taken at a quantile, and a two-view score against a one-view score.</em></p>
+<p><em>Route:</em> <code>/labs/midas</code></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Midas and perplexity filtering</li><li>Why CLIP filtering works</li></ul>
+<h3 id="b-deduplication">B · Deduplication</h3>
+<p><em>MinHash and LSH against the exact shingle sets, and the same machinery turned on a benchmark to find what leaked into the corpus.</em></p>
+<p><em>Route:</em> <code>/labs/dedup</code></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Deduplication with exact, fuzzy and MinHash methods</li><li>Decontamination against a benchmark</li></ul>
+<h3 id="c-the-mixture">C · The mixture</h3>
+<p><em>Domain weights raised by group DRO, the worst domain rescued at a cost to the mean, and a closed-form solver that is degenerate on purpose.</em></p>
+<p><em>Route:</em> <code>/labs/mixture</code></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Group-DRO as a data-mixture objective</li><li>Per-component mixture ablations</li></ul>
+<h3 id="h-the-proxy-step">H · The proxy step</h3>
+<p><em>The extrapolation arithmetic that hands proxy weights to a bigger run, and the ranking transfer it depends on, tested against the run it came from.</em></p>
+<p><em>Route:</em> <code>/labs/proxy</code></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>The proxy-model extrapolation step</li></ul>
+<h3 id="g-the-loop">G · The loop</h3>
+<p><em>The perplexity reference retrained on the survivors, pass after pass, against one hard pass at the same total removal.</em></p>
+<p><em>Route:</em> <code>/labs/refinement</code></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>The recursive training loop at toy scale</li></ul>
+<h3 id="d-collapse">D · Collapse</h3>
+<p><em>The tail of a distribution measured directly: the mass that leaves, the symbols it leaves from, and the total variation against the original.</em></p>
+<p><em>Route:</em> <code>/labs/collapse</code></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>The tail-mass argument, computed</li></ul>
+<h2 id="appendix-c-sources">Appendix C — Sources</h2>
 <ul><li><strong>DataComp: In search of the next generation of multimodal datasets</strong> — Samir Yitzhak Gadre, Gabriel Ilharco, Alex Fang, Jonathan Hayase, Georgios Smyrnis, Thao Nguyen, Ryan Marten, Mitchell Wortsman, Dhruba Ghosh, Jieyu Zhang, Eyal Orgad, Rahim Entezari, Giannis Daras, Sarah Pratt, Vivek Ramanujan, Yonatan Bitton, Kalyani Marathe, Stephen Mussmann, Richard Vencu, Mehdi Cherti, Ranjay Krishna, Pang Wei Koh, Olga Saukh, Alexander Ratner, Shuran Song, Hannaneh Hajishirzi, Ali Farhadi, Romain Beaumont, Sewoong Oh, Alex Dimakis, Jenia Jitsev, Yair Carmon, Vaishaal Shankar, Ludwig Schmidt (2023), arXiv:2304.14108 [cs.CV] / NeurIPS 2023 Datasets and Benchmarks. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Data is half the story of modern training and is entirely absent from the collection. This paper is also a full curriculum for data curation.</li><li><strong>DataComp-LM: In search of the next generation of training sets for language models</strong> — Jeffrey Li, Alex Fang, Georgios Smyrnis, Maor Ivgi, Matt Jordan, Samir Gadre, Hritik Bansal, Etash Guha, Sedrick Keh, Kushal Arora, Saurabh Garg, Rui Xin, Niklas Muennighoff, Reinhard Heckel, Jean Mercat, Mayee Chen, Suchin Gururangan, Mitchell Wortsman, Alon Albalak, Yonatan Bitton, Marianna Nezhurina, Amro Abbas, Cheng-Yu Hsieh, Dhruba Ghosh, Josh Gardner, Maciej Kilian, Hanlin Zhang, Rulin Shao, Sarah Pratt, Sunny Sanyal, Gabriel Ilharco, Giannis Daras, Kalyani Marathe, Aaron Gokaslan, Jieyu Zhang, Khyathi Chandu, Thao Nguyen, Igor Vasiljevic, Sham Kakade, Shuran Song, Sujay Sanghavi, Fartash Faghri, Sewoong Oh, Luke Zettlemoyer, Kyle Lo, Alaaeldin El-Nouby, Hadi Pouransari, Alexander Toshev, Stephanie Wang, Dirk Groeneveld, Luca Soldaini, Pang Wei Koh, Jenia Jitsev, Thomas Kollar, Alexandros G. Dimakis, Yair Carmon, Achal Dave, Ludwig Schmidt, Vaishaal Shankar (2024), arXiv:2406.11794 [cs.CL] / NeurIPS 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The language-model counterpart, with the data-quality trade-off measured against compute.</li><li><strong>The RefinedWeb Dataset for Falcon LLM: Outperforming Curated Corpora with Web Data, and Web Data Only</strong> — Guilherme Penedo, Quentin Malartic, Daniel Hesslow, Ruxandra Cojocaru, Alessandro Cappelli, Hamza Alobeidli, Baptiste Pannier, Ebtesam Almazrouei, Julien Launay (2023), arXiv:2306.01116 [cs.CL]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The complete Midas-style pipeline with ablations for every filtering stage.</li><li><strong>DoReMi: Optimizing Data Mixtures Speeds Up Language Model Pretraining</strong> — Sang Michael Xie, Hieu Pham, Xuanyi Dong, Nan Du, Hanxiao Liu, Yifeng Lu, Percy Liang, Quoc V. Le, Tengyu Ma, Adams Wei Yu (2023), arXiv:2305.10429 [cs.LG] / NeurIPS 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The mixture is a policy over domains, and it can be optimised against a small proxy model.</li><li><strong>Dolma: an Open Corpus of Three Trillion Tokens for Language Model Pretraining Research</strong> — Luca Soldaini, Rodney Kinney, Akshita Bhagia, Dustin Schwenk, David Atkinson, Russell Authur, Ben Bogin, Khyathi Chandu, Jennifer Dumas, Yanai Elazar, Valentin Hofmann, Ananya Harsh Jha, Sachin Kumar, Li Lucy, Xinxi Lyu, Nathan Lambert, Ian Magnusson, Jacob Morrison, Niklas Muennighoff, Aakanksha Naik, Crystal Nam, Matthew E. Peters, Abhilasha Ravichander, Kyle Richardson, Zejiang Shen, Emma Strubell, Nishant Subramani, Oyvind Tafjord, Pete Walsh, Luke Zettlemoyer, Noah A. Smith, Hannaneh Hajishirzi, Iz Beltagy, Dirk Groeneveld, Jesse Dodge, Kyle Lo (2024), arXiv:2402.00159 [cs.CL]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. What a fully open corpus looks like, and the decontamination procedure it needs.</li><li><strong>The Pile: An 800GB Dataset of Diverse Text for Language Modeling</strong> — Leo Gao, Stella Biderman, Sid Black, Laurence Golding, Travis Hoppe, Charles Foster, Jason Phang, Horace He, Anish Thite, Noa Nabeshima, Shawn Presser, Connor Leahy (2020), arXiv:2101.00027 [cs.CL]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The component-dataset view of a corpus, and the basis for mixture experiments.</li><li><strong>The Curse of Recursion: Training on Generated Data Makes Models Forget</strong> — Ilia Shumailov, Zakhar Shumaylov, Yiren Zhao, Yarin Gal, Nicolas Papernot, Ross Anderson (2024), arXiv:2305.17493 [cs.LG] / Nature 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The model-collapse chapter of the agentic course has no experiment behind it. This one does, and it is small enough to reproduce.</li></ul></main>
 </div>
 <footer class="pager">

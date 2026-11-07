@@ -42,7 +42,8 @@
   - [Lesson 7. Lost in the middle](#lesson-7-lost-in-the-middle)
   - [Lesson 8. What retrieval is for](#lesson-8-what-retrieval-is-for)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Sparse Retrieval
 
@@ -79,9 +80,9 @@ The lexical index: what it stores, what it scores, and where it fails when the q
 **Q. What does an inverted index store? — multiple-choice *(core)***
 
 - ✓ **For each word, the documents that contain it**
-- - For each document, its words
-- - A vector for each document
-- - The answer to every question
+- For each document, its words
+- A vector for each document
+- The answer to every question
 
 > Correct.
 
@@ -124,15 +125,17 @@ The postings of the corpus, and the size of the index. Open **Look at the index*
 **Q. What does the inverse document frequency do in BM25? — multiple-choice *(core)***
 
 - ✓ **It says how rare the word is, so a common word does not dominate the score**
-- - It normalises for the length of the document
-- - It saturates the term frequency
-- - It counts the postings
+- It normalises for the length of the document
+- It saturates the term frequency
+- It counts the postings
 
 > Correct.
 
 > **Why:** A word in every document tells you nothing. The logarithm of the inverse of its document frequency is what stops it from dominating.
 
 **Q. A lexical retriever can find an answer that uses different words from the question. — boolean *(core)***
+
+> **Answer:** False
 
 > **Why:** No. It matches words, and it is blind to everything else. That blind spot is the whole reason the dense retriever exists.
 
@@ -187,9 +190,9 @@ The learned embedding: how a question and a document are put in the same space, 
 **Q. Why does the dual encoder let the document vectors be precomputed? — multiple-choice *(core)***
 
 - ✓ **Because the document is embedded without the question**
-- - Because the embedding is low-dimensional
-- - Because the documents are shorter than the questions
-- - Because the index is stored on disk
+- Because the embedding is low-dimensional
+- Because the documents are shorter than the questions
+- Because the index is stored on disk
 
 > Correct.
 
@@ -234,9 +237,9 @@ The embedding of a question and of a document, and the score between them. Open 
 **Q. What are the in-batch negatives for? — multiple-choice *(core)***
 
 - ✓ **They make one batch of questions into many training examples, almost for free**
-- - They make the loss unbiased
-- - They replace the positive examples
-- - They reduce the size of the index
+- They make the loss unbiased
+- They replace the positive examples
+- They reduce the size of the index
 
 > Correct.
 
@@ -293,15 +296,17 @@ The MaxSim score: a question and a document compared word by word, the price of 
 **Q. What does the MaxSim score compare? — multiple-choice *(core)***
 
 - ✓ **Each word of the question with the best-matching word of the document**
-- - One vector of the question with one vector of the document
-- - The words of the question with the words of the document, in order
-- - The topics of the question and the document
+- One vector of the question with one vector of the document
+- The words of the question with the words of the document, in order
+- The topics of the question and the document
 
 > Correct.
 
 > **Why:** The sum, over the question’s words, of the maximum similarity to any word of the document. It rewards a document for containing something that matches each part of the question.
 
 **Q. The MaxSim score is larger for a longer document, all else equal. — boolean *(hard)***
+
+> **Answer:** True
 
 > **Why:** Yes. The maximum is taken over more candidates in a longer document, and the score inherits that. It is a real bias, it is measurable, and the laboratory measures it.
 
@@ -358,9 +363,9 @@ The retrieval-augmented reader, the position effect, and the argument that a lon
 **Q. What is the division of labour in a retrieval-augmented system? — multiple-choice *(core)***
 
 - ✓ **The retriever supplies the facts and the reader does the reasoning**
-- - The retriever does the reasoning and the reader supplies the facts
-- - Both do both
-- - The retriever trains the reader
+- The retriever does the reasoning and the reader supplies the facts
+- Both do both
+- The retriever trains the reader
 
 > Correct.
 
@@ -408,15 +413,17 @@ The reader, with the evidence retrieved for it and with the evidence lost. Open 
 **Q. What does the position effect say? — multiple-choice *(core)***
 
 - ✓ **The evidence in the middle of a long context is used worse than the evidence at the ends**
-- - A model can only read the first page of a context
-- - Long contexts are useless
-- - The middle of a context is corrupted
+- A model can only read the first page of a context
+- Long contexts are useless
+- The middle of a context is corrupted
 
 > Correct.
 
 > **Why:** The effect is measurable with a needle in a haystack, and it is a property of how models attend rather than of the content.
 
 **Q. Putting the retrieved passages at the start of the context is a meaningful design decision. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Yes. The reader looks at the beginning and the end, so where the retriever puts the evidence decides whether the evidence is used.
 
@@ -461,9 +468,9 @@ A document in a context, moved from the beginning to the end, and the attention 
 **Q. Is a long context a substitute for a good retriever? — multiple-choice *(core)***
 
 - ✓ **No: a long context raises the ceiling, and the position effect lowers the floor**
-- - Yes: put everything in and the model will find it
-- - Yes, for tasks with a single document
-- - No, because retrieval is always cheaper
+- Yes: put everything in and the model will find it
+- Yes, for tasks with a single document
+- No, because retrieval is always cheaper
 
 > Correct.
 
@@ -582,7 +589,43 @@ Before a model looks at anything, it already has a preference: the beginning of 
 
 A long context raises the ceiling on what can be answered, because everything can be present at once. It does not follow that everything is used: the position effect says a good deal of a long context is ignored.
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The sparse index
+
+*Matching the words, exactly.*
+
+### B · The dense retriever
+
+*Matching the meaning, approximately.*
+
+**Delivers:**
+
+- A bi-encoder over a toy corpus
+- The three query and document encoders
+- Recall as a function of embedding dimension
+
+### C · The late interaction
+
+*Word by word, and the index it costs.*
+
+**Delivers:**
+
+- MaxSim scoring
+- Why late interaction beats both endpoints on multi-hop questions
+
+### D · The long context
+
+*Where the evidence is put, and whether it is used.*
+
+**Delivers:**
+
+- Parametric versus non-parametric memory
+- Accuracy as a function of the position of the evidence
+
+## Appendix C — Sources
 
 - **Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks** — Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela (2020), arXiv:2005.11401 [cs.CL] / NeurIPS 2020. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing..
   Retrieval is one laboratory in the agentic course. The retrieval stack has four distinct layers, each with its own failure mode.

@@ -55,7 +55,8 @@
   - [Lesson 8. The frozen bridge](#lesson-8-the-frozen-bridge)
   - [Lesson 9. The resampler](#lesson-9-the-resampler)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Contrastive Pretraining
 
@@ -92,15 +93,17 @@ The loss that says a pair should be closer than the other pairs in the batch, th
 **Q. What does the contrastive loss ask for? — multiple-choice *(core)***
 
 - ✓ **The paired image and caption to score higher than every other pair in the batch**
-- - The image to be classified as the caption’s class
-- - The two encoders to be identical
-- - The batch to contain one pair of each class
+- The image to be classified as the caption’s class
+- The two encoders to be identical
+- The batch to contain one pair of each class
 
 > Correct.
 
 > **Why:** It is a cross-entropy over the batch, with the true pairing on the diagonal. Nothing in it needs a label.
 
 **Q. The in-batch negatives are free: they are the other pairs the batch already contains. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Yes. A batch of B pairs gives B² pairs of which B are correct, and the rest cost nothing — which is why the method scales with the size of the batch.
 
@@ -141,9 +144,9 @@ The loss, the gradient, and the retrieval, with the temperature and the batch si
 **Q. Why can the document vectors be computed once and stored? — multiple-choice *(core)***
 
 - ✓ **Because a document’s embedding does not depend on what is being retrieved**
-- - Because the encoder is small
-- - Because the training has finished
-- - Because the index is approximate
+- Because the encoder is small
+- Because the training has finished
+- Because the index is approximate
 
 > Correct.
 
@@ -199,9 +202,9 @@ The images and the captions end up in one space, and the space is not quite symm
 **Q. What is the modality gap? — multiple-choice *(core)***
 
 - ✓ **The two modalities are further apart in the shared space than either is from itself**
-- - The two encoders have different numbers of parameters
-- - The training data has more images than captions
-- - The retrieval is inaccurate
+- The two encoders have different numbers of parameters
+- The training data has more images than captions
+- The retrieval is inaccurate
 
 > Correct.
 
@@ -245,9 +248,9 @@ The within-modal and the between-modal similarities, and the gap between them. O
 **Q. Why does the zero-shot classifier work at all? — multiple-choice *(core)***
 
 - ✓ **Because a class name is a caption, and the model was trained to match captions to images**
-- - Because the model was trained to classify
-- - Because the embeddings are normalised
-- - Because the batch contained the classes
+- Because the model was trained to classify
+- Because the embeddings are normalised
+- Because the batch contained the classes
 
 > Correct.
 
@@ -305,15 +308,17 @@ The recipe that turns a model into an assistant, and the tax it pays on everythi
 **Q. What does instruction tuning do? — multiple-choice *(core)***
 
 - ✓ **Tunes the model on instructions and their answers, so that it follows instructions**
-- - Trains the model from scratch on instructions
-- - Changes the tokenizer
-- - Makes the model multimodal
+- Trains the model from scratch on instructions
+- Changes the tokenizer
+- Makes the model multimodal
 
 > Correct.
 
 > **Why:** And the model that comes out is a different model from the one that went in — which is the next lesson.
 
 **Q. A 1024-wide vision token is projected to 4096 dimensions by a linear layer with a bias. How many parameters does the layer have? — numeric *(hard)***
+
+> **Answer:** 4198400
 
 > **Why:** 1024 × 4096 = 4,194,304 entries in the matrix, plus 4096 bias terms, is 4,198,400. The number of tokens does not appear: the same matrix projects 576 tokens or four.
 
@@ -355,9 +360,9 @@ The gain on the instructions and the tax on everything else, as the tuning is st
 **Q. What is the alignment tax? — multiple-choice *(core)***
 
 - ✓ **The accuracy the model gives up on its original task, measured before and after the tuning**
-- - The cost of running the tuning
-- - The size of the instruction dataset
-- - A failure of the method
+- The cost of running the tuning
+- The size of the instruction dataset
+- A failure of the method
 
 > Correct.
 
@@ -415,9 +420,9 @@ Two later answers to the same recipe: a loss that decides each pair on its own, 
 **Q. What does the sigmoid loss remove from the contrastive objective? — multiple-choice *(core)***
 
 - ✓ **The normalisation over the batch**
-- - The image encoder
-- - The negatives
-- - The temperature
+- The image encoder
+- The negatives
+- The temperature
 
 > Correct.
 
@@ -425,9 +430,13 @@ Two later answers to the same recipe: a loss that decides each pair on its own, 
 
 **Q. Appending an unrelated pair to the batch leaves the sigmoid loss of an existing pair exactly unchanged. — boolean *(core)***
 
+> **Answer:** True
+
 > **Why:** Yes. The pair’s loss is a function of its own similarity, its label and the two learned constants. The softmax loss of its row, by contrast, changes, because the denominator has grown.
 
 **Q. With a scale of 10, a bias of 0 and a similarity of 0, what is the sigmoid loss of one pair? (Three decimal places.) — numeric *(hard)***
+
+> **Answer:** 0.693 ± 0.001
 
 > **Why:** The logit is 0, and −log σ(0) = log 2 ≈ 0.693. The label does not matter at zero: a positive and a negative pair are equally undecided.
 
@@ -476,15 +485,17 @@ Append unrelated pairs to the batch and watch one loss move while the other does
 **Q. In BLIP-2, which parts of the system are trained? — multiple-choice *(core)***
 
 - ✓ **The learned queries and the bridge around them**
-- - The image encoder
-- - The language model
-- - All of it, end to end
+- The image encoder
+- The language model
+- All of it, end to end
 
 > Correct.
 
 > **Why:** Both towers are frozen, and only the Q-Former and the projection are trained — which is what makes the bridge cheap next to the towers.
 
 **Q. Widening the bridge leaves the number of frozen parameters unchanged. — boolean *(hard)***
+
+> **Answer:** True
 
 > **Why:** Yes. The frozen towers are what they are; the bridge’s width changes only the trainable side, which is the whole point of the accounting in the laboratory.
 
@@ -534,15 +545,17 @@ A learned query over the patch tokens, and the parameter bill of the bridge that
 **Q. After a resampler, what sets the number of visual tokens the language model reads? — multiple-choice *(core)***
 
 - ✓ **The number of latents in the resampler**
-- - The resolution of the image
-- - The patch size of the vision encoder
-- - The number of images in the interleaved sequence
+- The resolution of the image
+- The patch size of the vision encoder
+- The number of images in the interleaved sequence
 
 > Correct.
 
 > **Why:** The resampler has one output vector per latent, so the output length is fixed by the latents and does not grow with the image or with the number of images.
 
 **Q. How many visual tokens does a 448-pixel square image produce with 14-pixel patches? — numeric *(core)***
+
+> **Answer:** 1024
 
 > **Why:** The grid is 448 / 14 = 32 patches per side, and 32 squared is 1,024 tokens going into the resampler — of which a fixed number will come out.
 
@@ -644,7 +657,57 @@ A matrix with one row per vision coordinate and one column per language coordina
 
 Each latent attends to every visual token and returns one vector, so the language model receives as many vectors as there are latents — whatever the resolution or the number of images. The token count is bounded by the latents, by construction rather than by truncation.
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The contrastive model
+
+*Two encoders, one space, the temperature and the loss.*
+
+**Delivers:**
+
+- The contrastive loss and its temperature
+- Zero-shot classification as a text-embedding lookup
+
+### B · The instruction tax
+
+*What the tuning gives up, the projection, and the data.*
+
+**Delivers:**
+
+- The projection matrix and its dimension
+- Generating instruction data from captions
+
+### C · The sigmoid loss
+
+*No normalisation, no coupling.*
+
+**Delivers:**
+
+- The softmax and the sigmoid loss side by side
+- The coupling experiment: an appended pair moves one loss and not the other
+- The bias that matches a batch
+
+### D · The frozen bridge
+
+*What is trained, and what is held still.*
+
+**Delivers:**
+
+- Learned queries over patch tokens
+- The trainable share of a frozen bridge
+- The patch token as the input to the frozen bridge
+
+### E · The resampler
+
+*A fixed number of latents, and a bounded token count.*
+
+**Delivers:**
+
+- The resampler and why it bounds the visual token count
+
+## Appendix C — Sources
 
 - **Learning Transferable Visual Models From Natural Language Supervision** — Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, Ilya Sutskever (2021), arXiv:2103.00020 [cs.CV] / ICML 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing..
   Nothing in the collection handles a second modality at all.

@@ -90,6 +90,7 @@
   - [Lesson 17. Learning to reason](#lesson-17-learning-to-reason)
   - [Lesson 18. Evaluating reasoning, honestly](#lesson-18-evaluating-reasoning-honestly)
 - [Appendix A — Glossary](#appendix-a-glossary)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
 
 ## 1. Pre-training
 
@@ -269,36 +270,36 @@ The multiplication that matters is at corpus scale. A one-trillion-token corpus 
 **Q. What makes a pre-training objective "self-supervised"? — concept**
 
 - ✓ **Labels are derived from the input data itself, such as predicting a hidden part of the text**
-- - The model is trained without any loss function
-- - A separate teacher model supplies soft labels for every token
-- - Humans annotate every training example
+- The model is trained without any loss function
+- A separate teacher model supplies soft labels for every token
+- Humans annotate every training example
 
 > **Why:** Self-supervision constructs the supervision signal from the raw text: hide or shift part of the input and predict it. No human labels and no separate teacher are required.
 
 **Q. In the book’s unified view o = g(x₀, x₁, …, xₘ; θ), what are the two aspects of pre-training? — concept**
 
 - ✓ **Optimising θ on a general objective, then adapting ĝ(·) to downstream tasks**
-- - Compressing the dataset, then decompressing it at inference
-- - Training a tokenizer, then freezing it forever
-- - Maximising accuracy on one specific benchmark from the start
+- Compressing the dataset, then decompressing it at inference
+- Training a tokenizer, then freezing it forever
+- Maximising accuracy on one specific benchmark from the start
 
 > **Why:** Pre-training first optimises θ on a task-agnostic objective, then the resulting model ĝ(·) is adapted by fine-tuning or prompting.
 
 **Q. A team has 2,000 unlabelled documents and 200 labelled examples for a classification task. Why does self-supervised pre-training usually beat supervised pre-training here? — concept**
 
 - ✓ **The unlabelled corpus can train a general representation, and the small labelled set only needs to adapt it**
-- - Unlabelled data always produces better accuracy than labelled data
-- - Supervised pre-training cannot use neural networks
-- - Self-supervised pre-training eliminates the need for a task head
+- Unlabelled data always produces better accuracy than labelled data
+- Supervised pre-training cannot use neural networks
+- Self-supervised pre-training eliminates the need for a task head
 
 > **Why:** The scarce resource is labels; self-supervision converts the abundant unlabelled corpus into a training signal and leaves the small labelled set for adaptation.
 
 **Q. A company has fifty thousand support transcripts and no labels, and trains a model on them by predicting the next word. What has the model learned that a keyword search over the same transcripts would not have? — transfer**
 
 - ✓ **The regularities that make a plausible continuation likely: which words follow which, in which contexts, and therefore what the transcripts are about**
-- - The transcripts verbatim, because the objective is to reproduce the input
-- - Only the vocabulary, because only the input tokens are supervised
-- - Nothing useful: without labels the objective is unsupervised by definition
+- The transcripts verbatim, because the objective is to reproduce the input
+- Only the vocabulary, because only the input tokens are supervised
+- Nothing useful: without labels the objective is unsupervised by definition
 
 > **Why:** Predicting the next word forces the model to model the regularities of the domain, because a continuation is only likely if the model knows what tends to follow what. A keyword search finds strings; the model learns which words follow which in which contexts, and that is what makes its continuation plausible. "Unsupervised" describes where the labels come from, not what can be learned from them.
 
@@ -451,9 +452,9 @@ Same data, different supervision density and different geometry — that is the 
 **Q. Which objective can be used directly for left-to-right generation at inference time? — concept**
 
 - ✓ **Causal next-token prediction (decoder-only)**
-- - Masked language modelling (encoder-only)
-- - Span corruption (encoder–decoder)
-- - None of them; generation always needs a separate model
+- Masked language modelling (encoder-only)
+- Span corruption (encoder–decoder)
+- None of them; generation always needs a separate model
 
 > **Why:** A decoder-only model is trained on exactly the operation used for generation: predict the next token given the preceding ones.
 
@@ -462,27 +463,27 @@ Same data, different supervision density and different geometry — that is the 
 $$\operatorname{Mask}_{(i,k)} = 0 \;\text{if}\; i \ge k,\; -\infty \;\text{otherwise}$$
 
 - ✓ **It sets the attention weight of future positions to zero so token i only sees i and earlier**
-- - It removes padding tokens from the batch
-- - It scales scores by 1/√d to keep gradients stable
-- - It replaces rare tokens with an unknown token
+- It removes padding tokens from the batch
+- It scales scores by 1/√d to keep gradients stable
+- It replaces rare tokens with an unknown token
 
 > **Why:** Adding −∞ before the softmax makes e^{−∞} = 0, so every future position receives exactly zero attention weight.
 
 **Q. Why do encoder–decoder models such as T5 corrupt spans instead of single tokens? — concept**
 
 - ✓ **Predicting a whole removed span creates a harder, more structured target and shortens the output sequence**
-- - Single-token masking is mathematically impossible in an encoder–decoder model
-- - Sparse corruption requires a separate tokenizer per span
-- - Span corruption removes the need for a decoder
+- Single-token masking is mathematically impossible in an encoder–decoder model
+- Sparse corruption requires a separate tokenizer per span
+- Span corruption removes the need for a decoder
 
 > **Why:** Span corruption asks the decoder to reconstruct contiguous chunks, which is a sequence-to-sequence task and yields more supervision per removed region.
 
 **Q. A team must both classify a document and write a summary of it. Which pre-training family fits, and why does the shape of the prediction decide it? — transfer**
 
 - ✓ **An encoder–decoder: the encoder reads the whole document in both directions, the decoder writes the summary one token at a time**
-- - A decoder-only model, because it can be prompted to classify and then to summarise
-- - An encoder-only model, because classification is an encoder task and a summary is a classification with more classes
-- - Either one, because the objective does not constrain the architecture
+- A decoder-only model, because it can be prompted to classify and then to summarise
+- An encoder-only model, because classification is an encoder task and a summary is a classification with more classes
+- Either one, because the objective does not constrain the architecture
 
 > **Why:** The three families differ in the shape of the prediction, and the shape decides what the model can do at inference. A decoder has only ever continued text, so it cannot fill a blank in the middle; an encoder has only ever filled blanks, so it cannot continue. The encoder–decoder does both, with one set of weights.
 
@@ -636,27 +637,27 @@ That arithmetic explains a practical detail: masked **pre-training** is usually 
 **Q. In BERT-style masking, a chosen position is replaced by [MASK] with probability 0.8, a random token with 0.1, and left unchanged with 0.1. Why not always use [MASK]? — concept**
 
 - ✓ **Because [MASK] never appears at fine-tuning time, the mixed recipe keeps the model usable on ordinary text**
-- - Because [MASK] is a reserved token that cannot be embedded
-- - Because random tokens increase the vocabulary size
-- - Because the loss cannot be computed when every target is [MASK]
+- Because [MASK] is a reserved token that cannot be embedded
+- Because random tokens increase the vocabulary size
+- Because the loss cannot be computed when every target is [MASK]
 
 > **Why:** The encoder must remain competent on unmasked input. Occasionally leaving the true token or a random token in place prevents the model from assuming that the input always contains [MASK].
 
 **Q. You need a system that classifies sentences into 8 topics with only 5,000 labelled examples. Which plan fits the book’s guidance best? — concept**
 
 - ✓ **Fine-tune a pre-trained encoder with a new classification head on the labelled data**
-- - Pre-train a decoder-only model from scratch on the 5,000 examples
-- - Use the masked language modelling objective as the final classifier
-- - Concatenate the labelled examples into one long prompt and hope for a label
+- Pre-train a decoder-only model from scratch on the 5,000 examples
+- Use the masked language modelling objective as the final classifier
+- Concatenate the labelled examples into one long prompt and hope for a label
 
 > **Why:** This is the canonical adaptation recipe: reuse a pre-trained encoder and fine-tune a task head on the small labelled set.
 
 **Q. A company adds twenty of its own product names to the vocabulary of a masked language model and continues training. Why are the new tokens badly predicted at first, and what would fix it? — transfer**
 
 - ✓ **The embedding rows for the new tokens are still at their random initialisation, so the model has never seen them; continued training moves them into place**
-- - The [MASK] token was trained only on the original vocabulary, so it can never predict the new tokens
-- - The new tokens are rare in the corpus, so the model cannot learn them however long it trains
-- - The output head is tied to the input embeddings, so adding tokens breaks the tie
+- The [MASK] token was trained only on the original vocabulary, so it can never predict the new tokens
+- The new tokens are rare in the corpus, so the model cannot learn them however long it trains
+- The output head is tied to the input embeddings, so adding tokens breaks the tie
 
 > **Why:** A new token starts as a random vector that the model has no reason to associate with anything, so it is predicted at chance until training moves it. The mechanism is otherwise unaffected: the model is still told which position to predict, and the output head is still a softmax over the whole — now larger — vocabulary.
 
@@ -730,9 +731,9 @@ The model itself: token embeddings, positional information, query–key–value 
 **Q. A sequence has length m and hidden dimension d. What are the shapes of Q, K and V? — concept**
 
 - ✓ **All three are m × d**
-- - Q is m × m, K and V are d × d
-- - Q is m × d, K and V are d × m
-- - All three are d × d
+- Q is m × m, K and V are d × d
+- Q is m × d, K and V are d × m
+- All three are d × d
 
 > **Why:** Each position contributes one row, so Q, K, V ∈ ℝ^{m×d}; the score matrix Q Kᵀ is m × m.
 
@@ -741,36 +742,36 @@ The model itself: token embeddings, positional information, query–key–value 
 $$\operatorname{Softmax}\!\left(\frac{q k^{\top}}{\sqrt{d}}\right)$$
 
 - ✓ **[0.7311, 0.2689]**
-- - [0.88, 0.12]
-- - [0.5, 0.5]
-- - [1.0, 0.0]
+- [0.88, 0.12]
+- [0.5, 0.5]
+- [1.0, 0.0]
 
 > **Why:** Divide by √4 = 2 to get [1, 0]; then softmax([1,0]) = [e/(e+1), 1/(e+1)] ≈ [0.731, 0.269].
 
 **Q. Why is the first row of a causally masked attention matrix always [1, 0, 0, …]? — concept**
 
 - ✓ **Position 0 has no past, so the softmax is taken over a single legal position**
-- - The first token is always a special token with a fixed embedding
-- - Softmax always returns a one-hot vector for short rows
-- - Because the value matrix is lower triangular
+- The first token is always a special token with a fixed embedding
+- Softmax always returns a one-hot vector for short rows
+- Because the value matrix is lower triangular
 
 > **Why:** With masking, row 0 can only attend to column 0, and a softmax over a single value is exactly 1.
 
 **Q. What does adding a positional encoding to a token embedding actually provide? — concept**
 
 - ✓ **Order information, since attention itself is permutation-invariant**
-- - A larger embedding dimension
-- - A probability distribution over the vocabulary
-- - A causal mask for the attention scores
+- A larger embedding dimension
+- A probability distribution over the vocabulary
+- A causal mask for the attention scores
 
 > **Why:** Attention compares rows without any notion of order; positional signals inject the index so the model can distinguish “model learns” from “learns model”.
 
 **Q. A model is trained without the causal mask. It reaches a near-zero training loss, and yet it produces nonsense when it generates. Explain both facts with one reason. — transfer**
 
 - ✓ **Each position could attend to the future, so the model learned to copy the answer rather than to predict it; at generation time there is no future to copy**
-- - The loss was computed on the wrong split, so the model was never really trained
-- - The model overfitted, which is why the training loss is low and the generation is bad
-- - The softmax was applied to the wrong axis
+- The loss was computed on the wrong split, so the model was never really trained
+- The model overfitted, which is why the training loss is low and the generation is bad
+- The softmax was applied to the wrong axis
 
 > **Why:** Without the mask the answer is in the input, so the task is trivial and the loss says nothing about the model’s ability to predict. At generation, position i is asked for token i+1 with only the past available — a distribution the model never had to learn, because it never had to predict without seeing the answer.
 
@@ -1042,27 +1043,27 @@ demo check: one query–key row, masked scores 0.35  -1.00e+30
 **Q. A scaling law says loss falls as a power law in compute C. What does compute-optimal training imply? — concept**
 
 - ✓ **For a fixed budget, parameters and training tokens should grow together in a balanced ratio**
-- - Larger models always win regardless of token count
-- - More tokens with a tiny model is always optimal
-- - Scaling laws only apply to vision models
+- Larger models always win regardless of token count
+- More tokens with a tiny model is always optimal
+- Scaling laws only apply to vision models
 
 > **Why:** The compute-optimal result is a joint allocation: for a budget of C FLOPs, choose model size and token count together rather than maximising either alone.
 
 **Q. Why is data deduplication performed before large-scale pre-training? — concept**
 
 - ✓ **Duplicated documents are over-weighted and inflate loss-based progress without adding information**
-- - Duplicates increase the tokenizer vocabulary
-- - Deduplication reduces the number of attention heads needed
-- - Deduplication is required by the causal mask
+- Duplicates increase the tokenizer vocabulary
+- Deduplication reduces the number of attention heads needed
+- Deduplication is required by the causal mask
 
 > **Why:** Repeated text is memorised more easily and distorts both the effective data distribution and the apparent loss, so it is removed during data preparation.
 
 **Q. Two teams have the same compute budget. One trains a model with twice the parameters on half the data; the other trains half the parameters on twice the data. What does the scaling law say about this, and what does it not say? — transfer**
 
 - ✓ **The law compares losses for different parameter and data splits at fixed compute, so it says which is better for the loss; it says nothing about whether that loss corresponds to a useful model**
-- - The law says the bigger model is always better, whatever the data
-- - The law says the two are always identical, because compute is what matters
-- - The law says the choice only matters if the data is duplicated
+- The law says the bigger model is always better, whatever the data
+- The law says the two are always identical, because compute is what matters
+- The law says the choice only matters if the data is duplicated
 
 > **Why:** A scaling law is a statement about the loss as a function of parameters, data and compute, and it is exactly the tool for this trade-off: it tells you how the loss moves when you move along the curve. What it cannot tell you is whether the loss you land on is a loss on a task anybody cares about.
 
@@ -1115,18 +1116,18 @@ Plug parameters, tokens and compute into power-law estimates and see the margina
 $$2 \times L \times h_{kv} \times d_h \times T \times \text{bytes}$$
 
 - ✓ **≈ 512 MiB**
-- - ≈ 64 MiB
-- - ≈ 2 GiB
-- - ≈ 8 MiB
+- ≈ 64 MiB
+- ≈ 2 GiB
+- ≈ 8 MiB
 
 > **Why:** 2 × 32 × 8 × 128 × 4096 × 2 = 2^{29} bytes = 512 MiB. That is already half a gigabyte for a single 4k-token sequence.
 
 **Q. Grouped-query attention reduces the KV cache by: — concept**
 
 - ✓ **Sharing key/value heads among several query heads**
-- - Reducing the number of layers
-- - Quantising activations to 8 bits
-- - Skipping every other attention layer
+- Reducing the number of layers
+- Quantising activations to 8 bits
+- Skipping every other attention layer
 
 > **Why:** GQA keeps many query heads but fewer key/value heads, so the cache term L·h_kv·d_h·T shrinks while query expressiveness stays higher than in multi-query attention.
 
@@ -1135,18 +1136,18 @@ $$2 \times L \times h_{kv} \times d_h \times T \times \text{bytes}$$
 $$\text{work} \propto n^2 \quad\Rightarrow\quad \left(\frac{16\text{k}}{4\text{k}}\right)^2 = 16$$
 
 - ✓ **16**
-- - 4
-- - 8
-- - 2
+- 4
+- 8
+- 2
 
 > **Why:** Prefill attention is quadratic in the sequence length: (16k/4k)² = 16. Decode cost, which is linear in the cache length, only grows by 4.
 
 **Q. A team has to read a hundred-thousand-token document once and then ask it several questions. Which costs are paid once and which are paid per question? — transfer**
 
 - ✓ **The prefill — the quadratic attention over the whole document — is paid once; the cache is then reused, so each question costs a decode pass over the stored keys and values**
-- - Both are paid per question, because nothing is kept between them
-- - The prefill is paid per question and the cache is paid once
-- - Neither matters, because attention is linear
+- Both are paid per question, because nothing is kept between them
+- The prefill is paid per question and the cache is paid once
+- Neither matters, because attention is linear
 
 > **Why:** The quadratic term is paid when the tokens are read. The cache exists precisely so that the read is not paid again: each new token attends to the stored keys and values linearly. So a long document is expensive once and cheap to interrogate afterwards.
 
@@ -1349,36 +1350,36 @@ Shrink the window to 32 tokens and the same prompt exceeds it by $167$ tokens. D
 **Q. Which change is a prompt change rather than a parameter change? — concept**
 
 - ✓ **Adding three worked examples before the question**
-- - Fine-tuning the model on 10,000 instructions
-- - Lowering the learning rate
-- - Retraining the tokenizer on a new corpus
+- Fine-tuning the model on 10,000 instructions
+- Lowering the learning rate
+- Retraining the tokenizer on a new corpus
 
 > **Why:** Prompting alters the conditioning context for a frozen model; the weights, tokenizer and optimiser are untouched.
 
 **Q. Why can few-shot examples improve performance without any weight update? — concept**
 
 - ✓ **The examples condition the same forward pass on a specific input→output pattern**
-- - The model caches the examples as new parameters
-- - The examples are stored in the KV cache permanently
-- - The tokenizer learns the new pattern
+- The model caches the examples as new parameters
+- The examples are stored in the KV cache permanently
+- The tokenizer learns the new pattern
 
 > **Why:** In-context learning is conditioning: the demonstrations occupy the context window and bias the conditional distribution of the next tokens.
 
 **Q. A prompt contains "Answer with one word" and also "Explain your reasoning in detail". What is the most likely failure? — concept**
 
 - ✓ **Conflicting constraints make the output contract ambiguous**
-- - The model will refuse to answer
-- - The tokenizer will produce an error
-- - The attention mask will become invalid
+- The model will refuse to answer
+- The tokenizer will produce an error
+- The attention mask will become invalid
 
 > **Why:** Two instructions demand incompatible output shapes, so the model must guess which to satisfy — a specification bug, not a model failure.
 
 **Q. A prompt says "Explain the trend in the data" and the model writes three paragraphs. The application needs one number. What is missing, and why is adding "be concise" not the same fix? — transfer**
 
 - ✓ **The output contract is missing: the prompt does not say what shape the answer must take. "Be concise" is a length instruction, and a short paragraph is still not a number**
-- - The prompt is too long for the model to follow
-- - The model needs more examples of prose to imitate
-- - The temperature is set too high, so the model is being creative
+- The prompt is too long for the model to follow
+- The model needs more examples of prose to imitate
+- The temperature is set too high, so the model is being creative
 
 > **Why:** The three parts of a prompt do different jobs. The instruction says what to do, the demonstrations show what the answer looks like, and the contract fixes the shape of the answer. A contract is what makes the output usable by a program. "Be concise" changes the length, not the format, and a short paragraph is still not a number.
 
@@ -1558,36 +1559,36 @@ A beam of two keeps 0.75 and 0.60 alive; at the next depth the 0.60 branch expan
 **Q. Why can writing intermediate steps improve accuracy on an arithmetic task? — concept**
 
 - ✓ **Each generated token is another pass through the network, so the total sequential computation grows**
-- - The chain-of-thought text is added to the training data
-- - Intermediate tokens are excluded from the loss
-- - The model’s parameter count increases
+- The chain-of-thought text is added to the training data
+- Intermediate tokens are excluded from the loss
+- The model’s parameter count increases
 
 > **Why:** A decoder performs a fixed amount of computation per token; emitting steps turns one forward pass into many, each able to condition on the previous result.
 
 **Q. In the toy reasoning tree used in the course, why does greedy search fail while a beam of 3 succeeds? — concept**
 
 - ✓ **The wrong branch scores highest at the first step but a correct branch overtakes it two steps later**
-- - Greedy search cannot traverse trees
-- - Beam search exploits the answer key
-- - The tree has a cycle that fools greedy search
+- Greedy search cannot traverse trees
+- Beam search exploits the answer key
+- The tree has a cycle that fools greedy search
 
 > **Why:** Step-level scores are locally misleading: the confident wrong branch (0.75) leads to a terminal score of 0.90, while the correct branch eventually reaches 0.97.
 
 **Q. When is self-refinement most likely to help? — concept**
 
 - ✓ **When an external check — a test, a calculation, a verifier — can reject a bad candidate**
-- - When the model is asked to simply try again with no new information
-- - When the answer is a matter of taste
-- - When the prompt already contains the final answer
+- When the model is asked to simply try again with no new information
+- When the answer is a matter of taste
+- When the prompt already contains the final answer
 
 > **Why:** Improvement requires feedback. Without an external signal, a second attempt mostly re-samples the same distribution and can reinforce the original error.
 
 **Q. A system gives the model intermediate steps but does not show them to the reader, and the accuracy does not improve. What does that tell you about how chain of thought works? — transfer**
 
 - ✓ **The steps have to be in the context the model conditions on, not merely computed; if the model cannot attend to the written steps, they are no use to it**
-- - The steps must be shown to a human to count as reasoning
-- - Chain of thought only works for problems with a single numeric answer
-- - The steps have to be written in the reader’s language
+- The steps must be shown to a human to count as reasoning
+- Chain of thought only works for problems with a single numeric answer
+- The steps have to be written in the reader’s language
 
 > **Why:** Generating a token and attending to it are the same mechanism. A written step becomes context, and the next step is conditioned on it. If the steps are computed somewhere the model cannot attend to, they are not part of its input and the benefit disappears — which is why asking a model to keep its reasoning private often makes it worse at the task it was asked to do.
 
@@ -1885,9 +1886,9 @@ Both score highly because the query activates the attention axis and the inferen
 **Q. In retrieval-augmented generation, what exactly is retrieved? — concept**
 
 - ✓ **Passages that are concatenated into the prompt before the model generates**
-- - Extra parameters that are merged into the model
-- - A fine-tuned copy of the model for each document
-- - Gradients from a separate database
+- Extra parameters that are merged into the model
+- A fine-tuned copy of the model for each document
+- Gradients from a separate database
 
 > **Why:** RAG is prompt assembly at run time: the retriever selects passages, and the generator conditions on them.
 
@@ -1896,27 +1897,27 @@ Both score highly because the query activates the attention axis and the inferen
 $$\cos(q, d) = \frac{q \cdot d}{\lVert q \rVert \, \lVert d \rVert}$$
 
 - ✓ **a, with similarity 1.0 versus 0.6**
-- - b, with similarity 0.8
-- - They tie
-- - Cosine similarity cannot rank two documents
+- b, with similarity 0.8
+- They tie
+- Cosine similarity cannot rank two documents
 
 > **Why:** cos(q, a) = 1·1 + 0·0 = 1; cos(q, b) = 1·0.6 + 0·0.8 = 0.6 (both document vectors have unit length here).
 
 **Q. What is a soft prompt? — concept**
 
 - ✓ **A learned continuous vector prepended to the input instead of text**
-- - A prompt written in polite language
-- - A prompt that is shorter than 20 tokens
-- - A prompt whose tokens are removed by the causal mask
+- A prompt written in polite language
+- A prompt that is shorter than 20 tokens
+- A prompt whose tokens are removed by the causal mask
 
 > **Why:** Soft prompts are optimised embeddings rather than words: they live in the model’s input space and require access to the model during training.
 
 **Q. A company’s policy changes every week, and every answer must name the document it came from. What does that rule out, and what does it point to? — transfer**
 
 - ✓ **It rules out the knowledge being in the weights, because a weight cannot be dated, quoted or revoked; it points to putting the document in the context, where the model can read it and quote it**
-- - It rules out retrieval, because the model learned the policy during pre-training
-- - It points to a larger model, which memorises more
-- - It rules out tool use, because tools cannot return documents
+- It rules out retrieval, because the model learned the policy during pre-training
+- It points to a larger model, which memorises more
+- It rules out tool use, because tools cannot return documents
 
 > **Why:** Pre-training compresses facts into weights, which is a lossy and undated summary: the model cannot quote them, date them, or be corrected when they change. Retrieval puts the passage in the context, where the model can read it, quote it, and be checked against it.
 
@@ -2168,36 +2169,36 @@ Because the toy feature vectors are close together, the loss cannot go to zero: 
 **Q. In supervised fine-tuning on instruction data, which tokens are normally used to compute the loss? — concept**
 
 - ✓ **The response tokens only**
-- - The instruction tokens only
-- - Both instruction and response tokens equally
-- - Randomly masked tokens throughout the sequence
+- The instruction tokens only
+- Both instruction and response tokens equally
+- Randomly masked tokens throughout the sequence
 
 > **Why:** The instruction is context; training on it would teach the model to generate instructions. Loss is applied to the demonstrated response.
 
 **Q. What is the fundamental limitation of imitating demonstrations? — concept**
 
 - ✓ **The model can only learn to prefer answers that appear in the demonstrations**
-- - The loss function cannot be differentiated
-- - Demonstrations are always factually wrong
-- - Imitation requires reinforcement learning
+- The loss function cannot be differentiated
+- Demonstrations are always factually wrong
+- Imitation requires reinforcement learning
 
 > **Why:** Imitation matches a distribution over the shown responses. If a better answer was never demonstrated, nothing in the objective pushes toward it — which is why preference-based methods were introduced.
 
 **Q. A demonstration dataset contains 90% answers that begin with "Certainly!". What is the likely effect of SFT? — concept**
 
 - ✓ **The model over-produces that opening because it is statistically favoured by the data**
-- - The model learns to dislike that phrase
-- - The phrase is removed by the tokenizer
-- - The model’s context window shrinks
+- The model learns to dislike that phrase
+- The phrase is removed by the tokenizer
+- The model’s context window shrinks
 
 > **Why:** SFT reproduces the demonstration distribution, including stylistic artefacts that appear frequently in it — a data-quality problem with a modelling consequence.
 
 **Q. A team has five thousand high-quality demonstrations of a support assistant and five million raw support transcripts. Which set teaches the desired behaviour, and why is the ratio of numbers irrelevant? — transfer**
 
 - ✓ **The demonstrations: they are the specification of the behaviour and the model is fitted to them. The transcripts say nothing about what a good answer looks like**
-- - The transcripts, because there are a thousand times more of them
-- - Both equally, because more data is always better
-- - Neither, because demonstrations cannot be used for fine-tuning
+- The transcripts, because there are a thousand times more of them
+- Both equally, because more data is always better
+- Neither, because demonstrations cannot be used for fine-tuning
 
 > **Why:** Fine-tuning does not add more of the same; it points the objective at a different distribution. What the demonstrations contain is the *target* — what a good answer looks like — and that is not in the raw corpus at any quantity. This is why the quality of the demonstrations matters more than their number, and why a small well-chosen set can move the behaviour a long way.
 
@@ -2428,45 +2429,45 @@ A difference of about 5.6 corresponds to a strong but not absolute preference. T
 $$\Pr(a \succ b) = \;?$$
 
 - ✓ **σ(r(a) − r(b))**
-- - σ(r(a) + r(b))
-- - r(a) − r(b)
-- - softmax(r(a), r(b))
+- σ(r(a) + r(b))
+- r(a) − r(b)
+- softmax(r(a), r(b))
 
 > **Why:** The preference likelihood is the logistic function of the reward difference; this is the model trained on pairwise comparisons.
 
 **Q. Why does the RLHF policy objective include a KL penalty against a reference model? — concept**
 
 - ✓ **Without it, reward maximisation can drift into degenerate text that scores highly but is unusable**
-- - The KL term makes training faster
-- - The KL term replaces the reward model
-- - The KL term removes the need for a policy
+- The KL term makes training faster
+- The KL term replaces the reward model
+- The KL term removes the need for a policy
 
 > **Why:** The penalty keeps the tuned policy near the pre-aligned reference, limiting reward hacking and preserving fluency.
 
 **Q. A reward model scores a verbose but empty answer very highly. What is this failure called? — concept**
 
 - ✓ **Reward hacking (the policy exploits the reward model’s weaknesses)**
-- - Catastrophic forgetting
-- - Tokenization drift
-- - Gradient vanishing
+- Catastrophic forgetting
+- Tokenization drift
+- Gradient vanishing
 
 > **Why:** The reward model is an imperfect proxy; optimising it hard finds inputs that score well without satisfying the underlying preference.
 
 **Q. Outcome of training a linear reward model on the course’s four toy preference pairs: — concept**
 
 - ✓ **It assigns a higher score to every chosen response than to its rejected partner**
-- - It assigns identical scores to chosen and rejected responses
-- - It cannot be trained without a policy
-- - It overfits and inverts every pair
+- It assigns identical scores to chosen and rejected responses
+- It cannot be trained without a policy
+- It overfits and inverts every pair
 
 > **Why:** The pairwise logistic loss drives the score difference positive on every training pair, which the unit test asserts explicitly.
 
 **Q. After RLHF, the policy produces responses the reward model loves and people do not. Explain this in one step. — transfer**
 
 - ✓ **The policy has found the region where the reward model is confidently wrong, because the reward model is a model of the raters’ preferences rather than of truth, and optimising it hard moves the policy towards that region**
-- - The reward model was trained on too few comparisons
-- - The policy is too large for the reward model to score reliably
-- - The KL penalty was too small, so the policy drifted too far from the reference
+- The reward model was trained on too few comparisons
+- The policy is too large for the reward model to score reliably
+- The KL penalty was too small, so the policy drifted too far from the reference
 
 > **Why:** RLHF optimises a learned proxy. The proxy is only as good as the preferences it was trained on, and only as good as the data the policy produces. As the policy moves away from the reference distribution it moves into territory where the reward model has less training signal, and that is where it is most confidently wrong. It is why the objective is usually regularised towards the reference model.
 
@@ -2713,18 +2714,18 @@ The implied reward difference is the same quantity divided by $\lambda$ : $3.797
 $$r(x,y) = \beta \log \frac{\pi_\theta(y\mid x)}{\pi_{\text{ref}}(y\mid x)} + \beta \log Z(x)$$
 
 - ✓ **The reward implied by a policy, given its reference model**
-- - The gradient of the reward model
-- - The tokenizer’s merge rule
-- - The KL divergence between two tokenizers
+- The gradient of the reward model
+- The tokenizer’s merge rule
+- The KL divergence between two tokenizers
 
 > **Why:** Inverting the closed-form optimal policy gives the reward in terms of the policy/reference log-ratio plus a normalisation term that cancels in pairwise comparisons.
 
 **Q. Why does Z(x) disappear from the DPO preference probability? — concept**
 
 - ✓ **It depends on x but not on the response, so it cancels in the difference r(a) − r(b)**
-- - It is always exactly 1
-- - It is absorbed into the tokenizer
-- - It is removed by the causal mask
+- It is always exactly 1
+- It is absorbed into the tokenizer
+- It is removed by the causal mask
 
 > **Why:** Both r(a) and r(b) contain the same β log Z(x) term for a fixed prompt, so subtracting one from the other eliminates it.
 
@@ -2733,18 +2734,18 @@ $$r(x,y) = \beta \log \frac{\pi_\theta(y\mid x)}{\pi_{\text{ref}}(y\mid x)} + \b
 $$d = \beta\,(w - w_{\text{ref}})\cdot \Delta\phi$$
 
 - ✓ **0.2**
-- - 0.4
-- - 0.1
-- - 2.0
+- 0.4
+- 0.1
+- 2.0
 
 > **Why:** Dot product is 1·0.4 = 0.4; multiplying by β = 0.5 gives d = 0.2, and Pr(a ≻ b) = σ(0.2) ≈ 0.5498.
 
 **Q. A team wants the loop of "generate new responses, score them, train on the result", but has only a fixed set of preference pairs. What does DPO make impossible, and what does it make easy? — transfer**
 
 - ✓ **With no reward model there is nothing to ask about the responses the policy currently produces, so the loop is closed: DPO can only fit the preferences it was given. It makes the fit easy, because the objective has a closed form**
-- - DPO makes the loop possible, because it trains a reward model implicitly
-- - DPO makes the loop impossible because it needs a reward model
-- - Nothing changes; the two approaches are the same thing
+- DPO makes the loop possible, because it trains a reward model implicitly
+- DPO makes the loop impossible because it needs a reward model
+- Nothing changes; the two approaches are the same thing
 
 > **Why:** DPO reparameterises the objective so that the optimal policy can be written directly in terms of the reference policy and the preference data, and fitted by supervised learning. What it gives up is the ability to ask a question the data does not answer: with no reward model, nothing can be queried about the current policy, so the policy cannot explore and the data cannot be extended by generation.
 
@@ -2820,36 +2821,36 @@ Serving a language model is two different workloads: a parallel prefill pass and
 **Q. What is the essential difference between prefill and decode? — concept**
 
 - ✓ **Prefill processes all prompt positions in parallel; decode generates one token at a time using cached keys and values**
-- - Prefill is done on a CPU and decode on a GPU
-- - Prefill uses a different vocabulary
-- - Decode does not need attention
+- Prefill is done on a CPU and decode on a GPU
+- Prefill uses a different vocabulary
+- Decode does not need attention
 
 > **Why:** Both phases use the same weights. Prefill is one large parallel pass; decode is a sequential loop that appends to the KV cache.
 
 **Q. Without a KV cache, generating token t requires recomputing keys and values for all t−1 previous tokens. What does caching change? — concept**
 
 - ✓ **Per-token work becomes approximately linear in the context instead of quadratic in recomputation**
-- - The model becomes non-autoregressive
-- - The attention mask is no longer needed
-- - The vocabulary shrinks
+- The model becomes non-autoregressive
+- The attention mask is no longer needed
+- The vocabulary shrinks
 
 > **Why:** Caching stores K and V once per position, so each new token computes one query against the cache — a linear read instead of a full recomputation.
 
 **Q. Two requests share the same 2,000-token system prompt. What does prefix caching save? — concept**
 
 - ✓ **The prefill computation for the shared prefix**
-- - The decode computation for new tokens only
-- - The need for a KV cache
-- - The tokenizer pass
+- The decode computation for new tokens only
+- The need for a KV cache
+- The tokenizer pass
 
 > **Why:** The cached key/value tensors of the shared prefix are reused, so only the differing suffix must be prefilled.
 
 **Q. A service receives a long document and a short question, and generates a short answer. Which phase dominates the cost, and what would change that? — transfer**
 
 - ✓ **The prefill dominates: the document is read once, quadratically, and the decode over the cached document is cheap. Fewer tokens, or reusing the cache across questions about the same document, are what change it**
-- - The decode dominates, because every token is generated one at a time
-- - Both cost the same, because the model has a fixed cost per request
-- - Neither matters, because the cost is the number of parameters
+- The decode dominates, because every token is generated one at a time
+- Both cost the same, because the model has a fixed cost per request
+- Neither matters, because the cost is the number of parameters
 
 > **Why:** Prefill is parallel and compute-bound; decode is sequential and memory-bound. A long prompt with a short answer is a prefill problem, and the ways out are the ones that touch the prefill: fewer tokens, a cheaper read, or reading the document once and reusing the cache for every question about it.
 
@@ -3096,45 +3097,45 @@ Now apply the filters: with **top-k** = 4 and **top-p** = 0.9, the lab keeps 4 c
 $$\Pr(y_i) = \frac{\exp(u_{y_i}/\tau)}{\sum_j \exp(u_{y_j}/\tau)}$$
 
 - ✓ **[0.866, 0.117, 0.016]**
-- - [0.665, 0.245, 0.090]
-- - [0.960, 0.039, 0.001]
-- - [0.5, 0.3, 0.2]
+- [0.665, 0.245, 0.090]
+- [0.960, 0.039, 0.001]
+- [0.5, 0.3, 0.2]
 
 > **Why:** Scaling by 1/τ = 2 gives [4, 2, 0]; softmax of that is [e⁴, e², 1]/(e⁴+e²+1) ≈ [0.866, 0.117, 0.016].
 
 **Q. What distinguishes top-p from top-k? — concept**
 
 - ✓ **Top-p keeps the smallest set whose cumulative probability reaches p; top-k keeps a fixed number of tokens**
-- - Top-p is deterministic; top-k is random
-- - Top-k uses logits; top-p uses probabilities only
-- - They are identical operations with different names
+- Top-p is deterministic; top-k is random
+- Top-k uses logits; top-p uses probabilities only
+- They are identical operations with different names
 
 > **Why:** The candidate pool size is fixed for top-k and adapts per step for top-p, although the mass threshold p is constant.
 
 **Q. In the course’s sampling laboratory, which is true of the base (temperature 1) distribution shown in the chart? — concept**
 
 - ✓ **It is the raw softmax of the logits and does not change when you move the top-k slider**
-- - It changes whenever the seed changes
-- - It is renormalised after top-p filtering
-- - It is the distribution actually sampled from
+- It changes whenever the seed changes
+- It is renormalised after top-p filtering
+- It is the distribution actually sampled from
 
 > **Why:** The base distribution is a property of the logits alone; filters act on the temperature-scaled distribution and produce the final renormalised one.
 
 **Q. What is the effect of temperature on entropy? — concept**
 
 - ✓ **Lower temperature reduces entropy; higher temperature increases it**
-- - Temperature does not affect entropy
-- - Higher temperature reduces entropy
-- - Entropy only depends on top-k
+- Temperature does not affect entropy
+- Higher temperature reduces entropy
+- Entropy only depends on top-k
 
 > **Why:** Dividing logits by a small τ sharpens the distribution (lower entropy); dividing by a large τ flattens it (higher entropy).
 
 **Q. The same model has to emit a valid JSON object in one case and a varied story in the other. How do the three knobs differ between the two jobs? — transfer**
 
 - ✓ **The JSON wants a sharp distribution with the tail cut off; the story wants a flatter distribution with the tail kept, so that the unlikely continuations stay reachable**
-- - Both want a sharp distribution, because precision is always better
-- - Both want a flat distribution, because variety is always better
-- - Temperature is the only knob that matters; top-k and top-p are the same thing
+- Both want a sharp distribution, because precision is always better
+- Both want a flat distribution, because variety is always better
+- Temperature is the only knob that matters; top-k and top-p are the same thing
 
 > **Why:** The three act on different things. Temperature reshapes the whole distribution and keeps every token reachable. Top-k cuts the tail by count. Top-p cuts it by mass, so how much is cut depends on how peaked the distribution already is. A task with one right answer wants the tail gone; a task with many right answers needs it.
 
@@ -3185,27 +3186,27 @@ Move temperature, top-k, top-p and the seed and watch the actual softmax probabi
 **Q. Best-of-n sampling improves an answer only if: — concept**
 
 - ✓ **Some scoring or verification signal can distinguish better candidates**
-- - n is a prime number
-- - The temperature is exactly 1
-- - The model’s context window is empty
+- n is a prime number
+- The temperature is exactly 1
+- The model’s context window is empty
 
 > **Why:** Extra samples expand the candidate set; selection needs a signal, otherwise the choice is arbitrary or returns to the model prior.
 
 **Q. The course’s KV-cache and attention figures are described as analytical models. Why is that stated explicitly? — concept**
 
 - ✓ **Because they estimate cost from formulas; only measurement on real hardware proves a speed-up**
-- - Because the formulas are wrong
-- - Because caching has no effect on memory
-- - Because benchmarks are forbidden
+- Because the formulas are wrong
+- Because caching has no effect on memory
+- Because benchmarks are forbidden
 
 > **Why:** Analytical accounting shows how cost scales with shape and configuration, but real latency depends on hardware, kernels and scheduling. Distinguishing the two keeps the claim honest.
 
 **Q. A team turns on a setting that spends ten times the compute at answer time, and the answers come out the same. What has the setting bought, and what would have been worth buying instead? — transfer**
 
 - ✓ **Nothing: the extra compute was spent without changing the answer. What pays is a change in the answer — usually by searching over candidates and verifying them**
-- - Better answers, because ten times the compute is ten times the knowledge
-- - A shorter answer, because more compute is more efficient
-- - Nothing, because inference-time compute never helps
+- Better answers, because ten times the compute is ten times the knowledge
+- A shorter answer, because more compute is more efficient
+- Nothing, because inference-time compute never helps
 
 > **Why:** Inference-time scaling is only worth its cost when the extra compute changes the output. The interesting work is on the diversity of the candidates sampled and the quality of the verifier, not on the length of the chain. Ten times the compute that produces the same answer is ten times the bill.
 
@@ -3416,36 +3417,36 @@ The beam’s extra calls bought the correct answer here. That will not always be
 **Q. What operational definition of reasoning does this course use? — concept**
 
 - ✓ **Producing intermediate steps that can be checked against a task criterion**
-- - Responding faster than a baseline model
-- - Using more parameters than a baseline model
-- - Storing more facts in the parameters
+- Responding faster than a baseline model
+- Using more parameters than a baseline model
+- Storing more facts in the parameters
 
 > **Why:** Reasoning is treated operationally: intermediate steps plus a way to verify or score them. This makes claims testable instead of philosophical.
 
 **Q. On the course’s toy reasoning tree, greedy search spends the fewest verifier calls. What does comparing it with beam search show? — concept**
 
 - ✓ **More verification calls can buy correctness when step scores are locally misleading**
-- - Greedy search is always wrong
-- - Beam search is always cheaper
-- - Verification calls are free
+- Greedy search is always wrong
+- Beam search is always cheaper
+- Verification calls are free
 
 > **Why:** Greedy follows the highest immediate score and ends on the wrong terminal; the wider beam spends more calls and finds the correct path. The trade-off is real, not free.
 
 **Q. A verifier is systematically overconfident about a wrong family of answers. What is the expected effect of scaling search? — concept**
 
 - ✓ **It amplifies the verifier’s bias, selecting wrong answers more reliably**
-- - It removes the bias through averaging
-- - It has no effect because the model is frozen
-- - It converts the task into a retrieval problem
+- It removes the bias through averaging
+- It has no effect because the model is frozen
+- It converts the task into a retrieval problem
 
 > **Why:** Search optimises the combination of model proposals and verifier scores. A biased verifier is optimised just as faithfully as an accurate one.
 
 **Q. A reasoning system samples many candidate answers and a learned verifier picks one, and the system is confidently wrong. What is the most likely cause, and what would you check? — transfer**
 
 - ✓ **The verifier is the weak half: the search is adversarial to it, so it finds the candidate the verifier is most wrong about. Check the verifier against answers it was not trained on**
-- - The proposer is too weak, because the correct answer was never sampled
-- - The sampling is too random, because the temperature was set too low
-- - The prompt is too long, because the context is truncated
+- The proposer is too weak, because the correct answer was never sampled
+- The sampling is too random, because the temperature was set too low
+- The prompt is too long, because the context is truncated
 
 > **Why:** The search is an adversary. It looks for the candidate that maximises the verifier’s score, which is not the same as the best candidate. A verifier that is right most of the time on the candidates it was trained on can be fooled by the ones the search produces. That is why the two halves have to be strong together, and why the pair is usually weaker than either half alone.
 
@@ -3499,27 +3500,27 @@ Run greedy, best-of-n and beam search over an explicit step tree with verifier s
 **Q. Which statement about process supervision is correct? — concept**
 
 - ✓ **It rewards intermediate steps, which helps credit assignment but costs step-level annotation and can be gamed**
-- - It rewards only the final answer
-- - It eliminates the need for a verifier
-- - It cannot be combined with reinforcement learning
+- It rewards only the final answer
+- It eliminates the need for a verifier
+- It cannot be combined with reinforcement learning
 
 > **Why:** Step-level rewards localise credit, at the price of obtaining reliable step labels — the classic trade-off against outcome-only rewards.
 
 **Q. Why does outcome-only supervision make credit assignment hard? — concept**
 
 - ✓ **A single final reward must be attributed across many intermediate steps, and one bad step may be invisible**
-- - Because the final answer is unknown during training
-- - Because the model has no output layer
-- - Because tokenisation loses step boundaries
+- Because the final answer is unknown during training
+- Because the model has no output layer
+- Because tokenisation loses step boundaries
 
 > **Why:** One scalar at the end gives no information about which step was responsible, especially when a wrong step still happens to produce a correct answer.
 
 **Q. A team can afford process labels for one trace in ten, and outcome labels for all of them. What should it label with what, and why? — transfer**
 
 - ✓ **Process-label the tenth, because the outcome labels already give the cheap signal and only the process labels can tell a right answer reached by a wrong route from one reached by a right one**
-- - Outcome-label the tenth and process-label the rest, because process labels are more informative per label
-- - Label everything with outcome labels; process labels are not worth their cost
-- - Label everything with process labels, because outcome labels are misleading
+- Outcome-label the tenth and process-label the rest, because process labels are more informative per label
+- Label everything with outcome labels; process labels are not worth their cost
+- Label everything with process labels, because outcome labels are misleading
 
 > **Why:** Outcome labels are cheap and give the broad signal; process labels are expensive and give the *specific* one. The combination that pays is to spend the expensive labels on a sample in order to learn what a good step looks like, and then use that to check the cheap ones. Process supervision does not make outcome labels wrong — it makes them blind.
 
@@ -3572,27 +3573,27 @@ Train a toy step scorer on outcome-only and process labels and compare the credi
 **Q. A benchmark reports 82% accuracy, but 30% of its items appeared in the model’s pre-training data. What is the correct interpretation? — concept**
 
 - ✓ **The score is inflated by contamination and may reflect memorisation rather than the claimed capability**
-- - The score is still valid because the metric is defined correctly
-- - The score is understated
-- - Contamination only matters for vision benchmarks
+- The score is still valid because the metric is defined correctly
+- The score is understated
+- Contamination only matters for vision benchmarks
 
 > **Why:** A metric measures a task setup. If the setup leaks training items, the measurement no longer supports the capability claim.
 
 **Q. Which evaluation design best supports a claim that a method improves reasoning? — concept**
 
 - ✓ **Held-out, contamination-checked tasks with a matched compute budget and an error analysis of the traces**
-- - A single benchmark run with the highest temperature
-- - Reporting only the best of ten runs
-- - Reporting the metric without the protocol
+- A single benchmark run with the highest temperature
+- Reporting only the best of ten runs
+- Reporting the metric without the protocol
 
 > **Why:** Matching compute makes the comparison about method rather than budget, and held-out contamination-checked tasks keep the claim about capability rather than recall.
 
 **Q. A benchmark is published on the web, and a model is evaluated on it two years later. What has to be reported for the number to mean anything? — transfer**
 
 - ✓ **The contamination rate and the item-level breakdown, because a model that has seen the answers scores higher for reasons that have nothing to do with reasoning**
-- - The overall score and the model size, because the score is the score
-- - The training data size, because a bigger model is better
-- - Nothing extra, because the benchmark is the benchmark
+- The overall score and the model size, because the score is the score
+- The training data size, because a bigger model is better
+- Nothing extra, because the benchmark is the benchmark
 
 > **Why:** Anything published publicly before the evaluation is very likely in the pre-training or fine-tuning data. The number therefore measures a mixture of capability and recognition, and the two can only be separated by reporting how much of the benchmark was in the training data and how the model did item by item.
 
@@ -3905,3 +3906,72 @@ A metric that counts a task as solved if any of k sampled attempts is correct. I
 **Outcome-based evaluation** — Judge the final answer only
 
 Scoring a solution by its final answer. Cheap to automate and reproducible, but blind to whether the reasoning was sound or accidentally correct.
+
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### Transformer Explorer
+
+*the full forward pass, stage by stage, with the attention arithmetic as its own step*
+
+**Delivers:**
+
+- Transformer Explorer
+- Scaled dot-product attention
+- CNN, RNN and attention side by side
+
+### Tokenization and embeddings
+
+*three segmentation strategies, one toy vocabulary, and the masking recipes*
+
+**Delivers:**
+
+- Tokenisation and embeddings
+- Masked language modelling
+
+### Text generation and sampling
+
+*temperature, top-k, top-p and seeds applied to explicit logits*
+
+**Delivers:**
+
+- Sampling
+
+### Learning and optimisation
+
+*real gradient descent on a bigram model, and a Chinchilla-style budget calculator*
+
+**Delivers:**
+
+- Learning
+- Chinchilla-optimal token budget
+
+### Alignment and preference learning
+
+*SFT, reward modelling, DPO, process supervision and a red-team profile*
+
+**Delivers:**
+
+- Alignment (SFT / Bradley–Terry / DPO)
+- Safety evaluation of a chat model
+
+### Inference and reasoning
+
+*decoding, cache accounting, long context, draft-then-verify and reasoning search*
+
+**Delivers:**
+
+- Inference and reasoning
+- Position interpolation and the effective context length
+- Speculative decoding: draft-then-verify
+- The eight risk categories
+
+### Prompting, budgets and retrieval
+
+*a hard token budget, cosine-scored passages and a few-shot demonstration set*
+
+**Delivers:**
+
+- Prompting
+- Few-shot prompting

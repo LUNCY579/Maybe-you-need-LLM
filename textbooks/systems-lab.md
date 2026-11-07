@@ -78,7 +78,8 @@
   - [Lesson 7. Proposing and checking](#lesson-7-proposing-and-checking)
   - [Lesson 8. When speculation pays](#lesson-8-when-speculation-pays)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Attention Memory
 
@@ -115,15 +116,17 @@ The naive attention builds an N×N matrix that it needs once. This module is abo
 **Q. Why is the score matrix the problem in a long context? — multiple-choice *(core)***
 
 - ✓ **It has N squared entries, so it grows faster than anything else in the program**
-- - It is the largest matrix the model can represent
-- - It is hard to compute
-- - It is not differentiable
+- It is the largest matrix the model can represent
+- It is hard to compute
+- It is not differentiable
 
 > Correct.
 
 > **Why:** The table has one entry per pair of positions, so it grows with the square of the context while everything else grows with the context itself.
 
 **Q. A context of 8192 tokens produces a score matrix in four-byte floats. How many bytes is it? — numeric *(core)***
+
+> **Answer:** 268435456
 
 > **Why:** 8192 squared is 67,108,864 entries, and four bytes each is 268,435,456 bytes — two hundred and fifty-six megabytes for one layer, one head.
 
@@ -165,9 +168,9 @@ The naive attention, run here, with the memory and the traffic it uses. Open **B
 **Q. What makes the tiled attention exact rather than an approximation? — multiple-choice *(hard)***
 
 - ✓ **The running maximum and sum are rescaled whenever the maximum moves**
-- - The blocks are small enough to be exact in floating point
-- - The computation is done in a higher precision
-- - The last block is computed again
+- The blocks are small enough to be exact in floating point
+- The computation is done in a higher precision
+- The last block is computed again
 
 > Correct.
 
@@ -226,15 +229,17 @@ Decoding reads a model and grows a cache. This module is about the arithmetic in
 **Q. Why is a decode step memory-bound? — multiple-choice *(core)***
 
 - ✓ **It is a matrix-vector product: two operations for every byte of weight read**
-- - The arithmetic is too difficult
-- - The cache is too large
-- - The model has too many layers
+- The arithmetic is too difficult
+- The cache is too large
+- The model has too many layers
 
 > Correct.
 
 > **Why:** At two operations per byte, the arithmetic intensity of a matrix-vector product is about one, and a machine whose balance point is tens of operations per byte is waiting for memory.
 
 **Q. The arithmetic intensity of a decode step rises without limit as the batch size grows. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. The weights are read once for the whole batch, so that part of the intensity rises with the batch; but the cache is read once per sequence, and its intensity is fixed. So the total rises and then saturates.
 
@@ -277,9 +282,9 @@ The arithmetic intensity of a decode step, as the batch size and the context gro
 **Q. What does the paged allocation waste? — multiple-choice *(core)***
 
 - ✓ **The tail of the last block of each sequence**
-- - Nothing at all
-- - The difference between the longest and the shortest sequence, for every sequence
-- - A whole block for every sequence
+- Nothing at all
+- The difference between the longest and the shortest sequence, for every sequence
+- A whole block for every sequence
 
 > Correct.
 
@@ -337,9 +342,9 @@ A mixture of experts keeps many experts and activates few. This module is about 
 **Q. Why does an unbalanced router hurt the model? — multiple-choice *(core)***
 
 - ✓ **The experts that get fewer tokens are trained on less, and stay worse**
-- - The router itself becomes the bottleneck
-- - The tokens are dropped
-- - The model loses capacity
+- The router itself becomes the bottleneck
+- The tokens are dropped
+- The model loses capacity
 
 > Correct.
 
@@ -381,6 +386,8 @@ A router here, on embeddings here, with the load it produces. Open **Route the t
 #### Practice
 
 **Q. A router sends every token to one of two experts. The load fractions are 0.75 and 0.25, and the probability fractions are 0.5 and 0.5. What is the auxiliary loss for 100 tokens? — numeric *(hard)***
+
+> **Answer:** 50
 
 > **Why:** The auxiliary loss is N times the sum of the products: 100 × (0.75 × 0.5 + 0.25 × 0.5) = 100 × 0.5 = 50.
 
@@ -435,15 +442,17 @@ Speculative decoding trades a cheap model for a few steps of an expensive one. T
 **Q. What is the acceptance rule? — multiple-choice *(core)***
 
 - ✓ **A drafted token x is accepted with probability min(1, p(x)/q(x))**
-- - A drafted token is accepted when the target’s most likely token is the same
-- - A drafted token is accepted at random
-- - A drafted token is accepted when it is more likely than the target’s
+- A drafted token is accepted when the target’s most likely token is the same
+- A drafted token is accepted at random
+- A drafted token is accepted when it is more likely than the target’s
 
 > Correct.
 
 > **Why:** The rule compares the two distributions at the drafted token, and the correction on rejection is what makes the output come out as the target’s own distribution.
 
 **Q. The draft model’s distribution and the target’s differ by a total variation distance of 0.15. What is the expected acceptance rate? — numeric *(hard)***
+
+> **Answer:** 0.85 ± 0.001
 
 > **Why:** The expected acceptance is one minus the total variation: 1 − 0.15 = 0.85. The fraction of the draft’s mass the target agrees with.
 
@@ -485,9 +494,9 @@ The acceptance rate, measured by running the rule. Open **Measure the acceptance
 **Q. What does speculative decoding change about the model’s output? — multiple-choice *(core)***
 
 - ✓ **Nothing: the output distribution is the target model’s own**
-- - It makes the output more likely
-- - It makes the output less diverse
-- - It truncates the output to what the draft proposed
+- It makes the output more likely
+- It makes the output less diverse
+- It truncates the output to what the draft proposed
 
 > Correct.
 
@@ -587,7 +596,71 @@ A drafted token is accepted with probability min(1, p(x)/q(x)), where p is the t
 
 Between two discrete distributions, the total variation distance is half the sum of the absolute differences of their probabilities. It is between zero and one, and it is exactly the fraction of the draft’s mass that the target would not have produced.
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · Attention memory
+
+*The matrix you never build, the traffic that replaces it, and the wall of bytes that sizes the block.*
+
+**Delivers:**
+
+- Attention FLOPs versus attention memory
+- The IO-bound wall and tiling
+- Arithmetic intensity of an attention kernel
+
+### B · The KV cache
+
+*Why decoding is a memory problem, what paging does to the allocation, and how many sequences one card serves.*
+
+**Delivers:**
+
+- KV-cache fragmentation
+- The copy-on-write branch
+- Throughput as a function of batch size
+
+### C · Sparse capacity
+
+*A router, the auxiliary loss that biases it, and the tokens the capacity factor throws away.*
+
+**Delivers:**
+
+- Routing and load balance
+- The capacity factor and what happens when it is exceeded
+- The router and the capacity factor
+- The auxiliary loss
+- Simplified routing and the loss spike it removes
+
+### D · Eight bits, four bits
+
+*The outlier channel that ruins one grid, the scale that moves it, and the block that contains what is left.*
+
+**Delivers:**
+
+- Per-tensor versus per-channel quantisation error
+- The outlier channel and the smoothing transformation
+
+### E · Speculation
+
+*Propose cheaply, check exactly, and the tree and the extra heads that decide what to propose.*
+
+**Delivers:**
+
+- Acceptance rate and the speed-up it buys
+- The tree variant and its cost
+- Multi-head drafting and its acceptance rate
+
+### F · Fine-tuning without moving the weights
+
+*The rank and what it costs, the bytes a step needs term by term, and which of the three plans fits one card.*
+
+**Delivers:**
+
+- Rank r and the number of trainable parameters
+- Memory budget of a QLoRA fine-tune
+
+## Appendix C — Sources
 
 - **FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness** — Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, Christopher Ré (2022), arXiv:2205.14135 [cs.LG] / NeurIPS 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing..
   The efficiency course covers a KV-cache laboratory but not where the arithmetic actually goes.

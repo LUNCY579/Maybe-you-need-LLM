@@ -57,7 +57,8 @@
   - [Lesson 7. Induction heads](#lesson-7-induction-heads)
   - [Lesson 8. The IOI circuit](#lesson-8-the-ioi-circuit)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Superposition
 
@@ -94,15 +95,17 @@ When a model has fewer dimensions than the features it wants to represent, somet
 **Q. What does superposition force a model to do? — multiple-choice *(core)***
 
 - ✓ **Pack several features into one direction**
-- - Drop the features it cannot represent
-- - Make the features more important
-- - Use more dimensions
+- Drop the features it cannot represent
+- Make the features more important
+- Use more dimensions
 
 > Correct.
 
 > **Why:** With fewer dimensions than features, the columns cannot all be orthogonal, so some features share a direction and interfere with each other.
 
 **Q. Two features share a direction, and the squared projection of one onto the other is 0.25. What is the interference term in the loss? — numeric *(core)***
+
+> **Answer:** 0.25
 
 > **Why:** The cross term is (w_i·w_j)², so the interference is the square of the projection: 0.25.
 
@@ -147,9 +150,9 @@ Fit the toy model at a given number of dimensions and read the interference. Ope
 **Q. Why does a model drop some features? — multiple-choice *(hard)***
 
 - ✓ **Because hosting them would cost the host more than dropping them costs them**
-- - Because they do not fit
-- - Because they are noisy
-- - It never does
+- Because they do not fit
+- Because they are noisy
+- It never does
 
 > Correct.
 
@@ -205,6 +208,8 @@ The central observation of mechanistic interpretability: individual neurons are 
 
 **Q. A neuron in a superposed model is usually polysemantic. — boolean *(core)***
 
+> **Answer:** True
+
 > **Why:** Yes. Superposition is what makes it cheap for one neuron to respond to several things, so polysemantic neurons are the cheap option rather than a failure.
 
 #### Go and do it
@@ -246,15 +251,17 @@ Count how many features each direction is carrying. Open **How many features per
 **Q. What is the L1 penalty in a sparse autoencoder for? — multiple-choice *(core)***
 
 - ✓ **To make the code sparse**
-- - To make the reconstruction better
-- - To make the dictionary larger
-- - To make the training faster
+- To make the reconstruction better
+- To make the dictionary larger
+- To make the training faster
 
 > Correct.
 
 > **Why:** The L1 term penalises the number of active features, and the sparsity is what makes a dictionary feature correspond to one thing.
 
 **Q. A sparse autoencoder reconstructs activations with a mean squared error of 0.1, and the activations have variance 0.8. What is the explained variance? — numeric *(hard)***
+
+> **Answer:** 0.875 ± 0.001
 
 > **Why:** 1 − 0.1/0.8 = 0.875. The dictionary has kept most of the information.
 
@@ -311,15 +318,17 @@ A correlational claim about a neuron is cheap; a causal one is not. This module 
 **Q. What does activation patching establish? — multiple-choice *(core)***
 
 - ✓ **That a node is causally responsible for a change in the output**
-- - That a node responds to a particular input
-- - That the model has understood the input
-- - That a node is important
+- That a node responds to a particular input
+- That the model has understood the input
+- That a node is important
 
 > Correct.
 
 > **Why:** You run the model twice, replace one activation in one of the runs, and look at what moves. If the output changes, the node was responsible for it.
 
 **Q. A model with a perfect self-consistency score can still be wrong about what it is doing. — boolean *(hard)***
+
+> **Answer:** True
 
 > **Why:** Yes. Self-consistency is a correlational property; a model can be perfectly self-consistent and implement a mechanism that does not explain the behaviour.
 
@@ -377,9 +386,9 @@ The workflow the circuit-discovery paper lays out: choose a behaviour, divide th
 **Q. What are the four steps of the mechanistic-interpretability workflow? — multiple-choice *(core)***
 
 - ✓ **Select a behaviour, divide the model into a graph, patch to isolate the subgraph, and explain the components**
-- - Collect data, train a probe, read the probe, write it up
-- - Find the neurons, find the features, find the data, find the answer
-- - Prune, retrain, compare, publish
+- Collect data, train a probe, read the probe, write it up
+- Find the neurons, find the features, find the data, find the answer
+- Prune, retrain, compare, publish
 
 > Correct.
 
@@ -388,9 +397,9 @@ The workflow the circuit-discovery paper lays out: choose a behaviour, divide th
 **Q. In a transformer, what is the natural unit of a circuit node? — multiple-choice *(hard)***
 
 - ✓ **An attention head or a feed-forward block, reading from and writing to the residual stream**
-- - A single weight
-- - A whole layer
-- - A training example
+- A single weight
+- A whole layer
+- A training example
 
 > Correct.
 
@@ -444,15 +453,17 @@ The graph of nodes and edges, with the attribution on each. Open **The circuit**
 **Q. What does a head’s QK circuit decide, and what does its OV circuit decide? — multiple-choice *(core)***
 
 - ✓ **QK decides which positions the head looks at; OV decides what it writes once it has looked**
-- - QK decides the layer, OV decides the head
-- - QK decides what is written, OV decides what is attended to
-- - Both describe the attention pattern, in different bases
+- QK decides the layer, OV decides the head
+- QK decides what is written, OV decides what is attended to
+- Both describe the attention pattern, in different bases
 
 > Correct.
 
 > **Why:** W_Qᵀ W_K and W_O W_V are two separate d_model × d_model products that factor out of the head, and that factorisation is what lets you patch a head through one circuit input of another head instead of through the head as a whole.
 
 **Q. Splitting a last-layer head’s effect on the metric into per-position terms is an approximation that leaves a few percent unexplained. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. The head’s output is a sum over source positions and the readout is linear, so the split is an identity: in the laboratory the sum of the terms equals the ablation’s effect and the discrepancy column is driven below 1e-12 by a test. A head in an *earlier* layer has no such split, because its effect runs through the softmax of the layer above.
 
@@ -503,15 +514,17 @@ Pick a head and a position, and read the head’s whole contribution as one term
 **Q. Why does an ACDC-style search re-score every remaining edge at every step? — multiple-choice *(core)***
 
 - ✓ **Because an edge’s score is its contribution to the graph it is currently in, so deleting one edge changes what the others are worth**
-- - Because the metric is stochastic and needs averaging
-- - Because the model is retrained between steps
-- - Because scores have to increase monotonically
+- Because the metric is stochastic and needs averaging
+- Because the model is retrained between steps
+- Because scores have to increase monotonically
 
 > Correct.
 
 > **Why:** A key path and the query path that reads it only work together: each looks essential while both are present, and one becomes free the moment the other goes. A single ranking would delete the wrong edge first.
 
 **Q. A pruned graph that is faithful but not complete names every component the behaviour depends on. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. Faithfulness says the graph reproduces the behaviour on its own; completeness says nothing outside it is needed. A faithful-but-incomplete graph is an explanation that still leans on a component it has never named — which is why the two criteria are reported as a pair.
 
@@ -574,15 +587,17 @@ A single attention head can only match what is written at a position. Most of wh
 **Q. What does the previous-token head contribute to the induction circuit? — multiple-choice *(core)***
 
 - ✓ **It shifts the keys, so the second head can match the current token against what came before each position**
-- - It copies the answer token into the output
-- - It suppresses the wrong answer
-- - It decides when to stop attending
+- It copies the answer token into the output
+- It suppresses the wrong answer
+- It decides when to stop attending
 
 > Correct.
 
 > **Why:** The first head writes each token’s predecessor into the position’s key. The induction head then matches the current token against that shifted content; without the shift, it can only find the current token itself.
 
 **Q. An induction head with no previous-token head can still find the token that followed the previous occurrence. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** Without the shift, its keys are the tokens themselves, so it matches the earlier occurrence of the current token and copies that token — not the one that followed it. The laboratory’s ablation measures exactly this collapse.
 
@@ -633,15 +648,17 @@ A hand-wired two-head circuit on a repeated sequence, with both attention patter
 **Q. What does minimality measure about a proposed circuit? — multiple-choice *(core)***
 
 - ✓ **Whether every component in it is needed for the behaviour**
-- - Whether it explains the whole behaviour
-- - Whether it is smaller than a baseline circuit
-- - Whether its components are attention heads
+- Whether it explains the whole behaviour
+- Whether it is smaller than a baseline circuit
+- Whether its components are attention heads
 
 > Correct.
 
 > **Why:** Minimality removes components and checks the behaviour survives. Completeness asks how much is explained; minimality asks whether each part is doing work.
 
 **Q. A circuit that passes completeness and minimality is therefore a complete account of how the model does the task. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. The paper reports its explanation as supported by both criteria and still incomplete: the criteria constrain the circuit, they do not prove that nothing else is involved.
 
@@ -858,7 +875,71 @@ Given a metric and a behavioural gap: score every remaining node and edge by its
 
 *Conmy et al. (2023)*
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · Superposition
+
+*The interference, the threshold, and the trade-off curve between them.*
+
+**Delivers:**
+
+- Superposition in a tiny model
+- The price of a feature, computed exactly
+- The trade-off curve between interference and feature count
+
+### B · The sparse autoencoder
+
+*A dictionary, trained here — and what it does to a pair of overlapping features.*
+
+**Delivers:**
+
+- Training a sparse autoencoder on a tiny residual stream
+- L0 sparsity and reconstruction error
+- Feature splitting and absorption
+
+### C · Patching
+
+*From “responds to” to “does”.*
+
+**Delivers:**
+
+- Activation patching and the faithfulness score
+
+### D · One head, two circuits
+
+*The QK and OV circuits, and a head’s effect split exactly over its source positions.*
+
+**Delivers:**
+
+- Pathway decomposition of a single attention head
+
+### E · Composition and induction
+
+*Two heads, and the pattern one of them completes.*
+
+**Delivers:**
+
+- The two-head induction circuit, and the ablation of the previous-token head
+
+### F · Automated circuit discovery
+
+*Edge attribution scores, and ACDC pruning a graph down to the circuit.*
+
+**Delivers:**
+
+- Edge attribution scores
+
+### G · The four-step workflow
+
+*The paper’s procedure for finding a circuit, run on a model that can be checked.*
+
+**Delivers:**
+
+- The four-step workflow applied to the published IOI circuit
+
+## Appendix C — Sources
 
 - **Toy Models of Superposition** — Noah Elhage, Shan Carter, Chris Olah, Dan Hendrycks (2023), Transformer Circuits publication. Licence: Publicly readable web publication. The machine-check could not be completed from this environment (the site blocks automated clients); verify the terms on the page itself before reusing any text or figure..
   Mechanistic interpretability is only summarised in one chapter of the agentic course, and it is the fastest-moving area in the field.

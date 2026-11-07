@@ -63,7 +63,8 @@
   - [Lesson 9. Recursive training](#lesson-9-recursive-training)
   - [Lesson 10. The refinement loop](#lesson-10-the-refinement-loop)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Sources
 
@@ -99,9 +100,9 @@ A web crawl is a large, noisy, duplicated and partly hostile collection of text.
 **Q. What is the honest score of a filtering rule? — multiple-choice *(core)***
 
 - ✓ **The accuracy of the model trained on the documents that survive it**
-- - The number of documents it removes
-- - How fast it runs
-- - How many rules it replaces
+- The number of documents it removes
+- How fast it runs
+- How many rules it replaces
 
 > Correct.
 
@@ -110,9 +111,9 @@ A web crawl is a large, noisy, duplicated and partly hostile collection of text.
 **Q. Why is a crawl hard to train on? — multiple-choice *(core)***
 
 - ✓ **It is large, noisy, duplicated and partly adversarial**
-- - It is too small
-- - It is all one language
-- - It is already tokenised
+- It is too small
+- It is all one language
+- It is already tokenised
 
 > Correct.
 
@@ -158,6 +159,8 @@ Take a raw corpus through the filters and watch what each stage removes. Open **
 #### Practice
 
 **Q. A corpus holds 10 billion tokens, and deduplication shows that 40% of the documents are near-duplicates of another document. How many tokens of distinct text are there? — numeric *(hard)***
+
+> **Answer:** 6
 
 > **Why:** Ten billion tokens, of which 40% are duplicates: 10 × (1 − 0.4) = 6 billion tokens of distinct text.
 
@@ -211,15 +214,17 @@ The filtering pipeline: the structural rules, the reference model, the perplexit
 **Q. Why do the cheap structural filters run before the model-based ones? — multiple-choice *(core)***
 
 - ✓ **A filter that runs late only has to look at the documents that are left**
-- - The order does not matter
-- - Because the model-based filters are more accurate
-- - Because structural filters are easier to write
+- The order does not matter
+- Because the model-based filters are more accurate
+- Because structural filters are easier to write
 
 > Correct.
 
 > **Why:** Every stage only sees what the previous stage left. Running the cheap rules first means the expensive ones run on a small fraction of the crawl.
 
 **Q. A filter that removes a document the model would have learned from is a bug rather than a filter. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Yes. The ablation table catches it: remove the filter and the model gets better, which means the filter was removing signal.
 
@@ -260,6 +265,8 @@ The pipeline reports what each stage removed; the laboratory recomputes it from 
 #### Practice
 
 **Q. A document has 100 tokens and the model assigns it a total log-likelihood of −460. What is its perplexity? — numeric *(hard)***
+
+> **Answer:** 99.484 ± 0.01
 
 > **Why:** The mean negative log-likelihood per token is 460/100 = 4.6, and the perplexity is exp(4.6) ≈ 99.48.
 
@@ -314,15 +321,17 @@ Exact hashing, fuzzy matching by shingle overlap, the sub-quadratic search that 
 **Q. What is the Jaccard similarity of two documents that share 30 shingles and have 70 shingles between them? — multiple-choice *(core)***
 
 - ✓ **30/70**
-- - 30/100
-- - 70/30
-- - 30
+- 30/100
+- 70/30
+- 30
 
 > Correct: the intersection is 30 and the union is 70.
 
 > **Why:** The Jaccard similarity divides the size of the intersection by the size of the union: 30/70 ≈ 0.43.
 
 **Q. A MinHash signature has 128 entries. Two documents share 90 of them. What is the estimated Jaccard similarity? — numeric *(hard)***
+
+> **Answer:** 0.703125 ± 0.001
 
 > **Why:** The estimate is the fraction of positions that agree: 90/128 = 0.703125.
 
@@ -366,9 +375,9 @@ The corpus is deduplicated here, with the candidate pairs the index proposed sho
 **Q. What is the difference between deduplication and decontamination? — multiple-choice *(core)***
 
 - ✓ **Deduplication removes copies of each other; decontamination removes copies of the evaluation set**
-- - They are two names for the same procedure
-- - Deduplication is exact and decontamination is fuzzy
-- - Decontamination is applied before deduplication
+- They are two names for the same procedure
+- Deduplication is exact and decontamination is fuzzy
+- Decontamination is applied before deduplication
 
 > Correct.
 
@@ -427,9 +436,9 @@ How the proportions of a training set are chosen: the worst-domain objective, th
 **Q. What does a data mixture decide? — multiple-choice *(core)***
 
 - ✓ **The proportion of training tokens each domain receives**
-- - Which documents are duplicates
-- - The learning rate schedule
-- - The tokeniser
+- Which documents are duplicates
+- The learning rate schedule
+- The tokeniser
 
 > Correct.
 
@@ -476,15 +485,17 @@ The mixture the corpus proposes, and the per-domain loss of the model trained on
 **Q. What does group DRO optimise? — multiple-choice *(core)***
 
 - ✓ **The loss of the worst-performing group**
-- - The average loss over all the groups
-- - The size of the training set
-- - The number of groups
+- The average loss over all the groups
+- The size of the training set
+- The number of groups
 
 > Correct.
 
 > **Why:** Group DRO raises the weight of whichever group is doing worst and trains on the reweighted sample, so the model is not left behind in one domain.
 
 **Q. Two domains have losses L₁(w₁) = 2w₁ + 1 and L₂(w₂) = 3w₂ + 0.5, with w₁ + w₂ = 1. What weight minimises the worse of the two? — numeric *(hard)***
+
+> **Answer:** 0.555556 ± 0.001
 
 > **Why:** At the optimum the two losses are equal: 2w₁ + 1 = 3(1 − w₁) + 0.5, so 2w₁ + 1 = 3.5 − 3w₁, giving 5w₁ = 2.5 and w₁ = 0.5556. The common loss is 2.111.
 
@@ -540,15 +551,17 @@ The recursive training loop at toy scale: why the tail of a distribution is the 
 **Q. Which part of a distribution is lost first under recursive training? — multiple-choice *(core)***
 
 - ✓ **The tail — the rare symbols**
-- - The head — the common symbols
-- - Both equally
-- - The mean
+- The head — the common symbols
+- Both equally
+- The mean
 
 > Correct.
 
 > **Why:** The rare symbols lose their probability first, generation after generation, and the distribution becomes narrower than the one it started from.
 
 **Q. A model that can represent any symbol, with a floor under each one, still loses its tail completely under recursive training. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. The floor is the point: an unbounded model floors the tail rather than losing it. It is the bounded model — the one that cannot represent the rare outputs — whose tail disappears entirely.
 
@@ -591,9 +604,13 @@ The loop, run here, with the tail’s mass measured at every generation. Open **
 
 **Q. A refinement loop removes 25% of the corpus in total, spread over four passes. What fraction of the documents standing at the start of a pass does each pass remove, in percent? — numeric *(hard)***
 
+> **Answer:** 6.94 ± 0.06
+
 > **Why:** The removals compose, so each pass keeps the fourth root of what the whole loop keeps: (1 − 0.25)^(1/4) = 0.9306, and 1 − 0.9306 = 0.0694 — 6.94% of what is standing when the pass begins. Four passes of 25% each would remove 68%, not 25%.
 
 **Q. In the loop on this course’s toy corpus, each pass leaves a corpus of higher measured quality, and the model trained on it reaches a lower held-out loss. — boolean *(core)***
+
+> **Answer:** False
 
 > **Why:** Only the first half. The corpus does get purer at every pass, and the held-out loss on it rises rather than falls — the filter’s score of a document and the model’s loss on it are not the same quantity, and a purer corpus is a harder one to predict.
 
@@ -704,7 +721,96 @@ A bounded model has a limited output vocabulary. Because it cannot represent the
 
 A dataset’s licence decides what a project may do with it: train on it, publish statistics about it, or redistribute it. The licences differ, and a course that cites a dataset must record the one it checked, because the terms are attached to a specific version and can change.
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The pipeline
+
+*Five filters in order, what each stage leaves, and the model trained on the survivors — ablated one filter at a time.*
+
+*Route:* `/labs/pipeline`
+
+**Delivers:**
+
+- A full filtering pipeline as a benchmark
+- Per-filter ablation curves
+- Per-stage filtering ablations
+
+### F · The budget
+
+*Five ways to spend one compute budget, with a control row that has the same documents and the same steps as the filtered one.*
+
+*Route:* `/labs/budget`
+
+**Delivers:**
+
+- Quality versus quantity under a fixed compute budget
+
+### E · MIDAS and the reference model
+
+*Near-duplicates kept as clusters rather than collapsed, a perplexity cut taken at a quantile, and a two-view score against a one-view score.*
+
+*Route:* `/labs/midas`
+
+**Delivers:**
+
+- Midas and perplexity filtering
+- Why CLIP filtering works
+
+### B · Deduplication
+
+*MinHash and LSH against the exact shingle sets, and the same machinery turned on a benchmark to find what leaked into the corpus.*
+
+*Route:* `/labs/dedup`
+
+**Delivers:**
+
+- Deduplication with exact, fuzzy and MinHash methods
+- Decontamination against a benchmark
+
+### C · The mixture
+
+*Domain weights raised by group DRO, the worst domain rescued at a cost to the mean, and a closed-form solver that is degenerate on purpose.*
+
+*Route:* `/labs/mixture`
+
+**Delivers:**
+
+- Group-DRO as a data-mixture objective
+- Per-component mixture ablations
+
+### H · The proxy step
+
+*The extrapolation arithmetic that hands proxy weights to a bigger run, and the ranking transfer it depends on, tested against the run it came from.*
+
+*Route:* `/labs/proxy`
+
+**Delivers:**
+
+- The proxy-model extrapolation step
+
+### G · The loop
+
+*The perplexity reference retrained on the survivors, pass after pass, against one hard pass at the same total removal.*
+
+*Route:* `/labs/refinement`
+
+**Delivers:**
+
+- The recursive training loop at toy scale
+
+### D · Collapse
+
+*The tail of a distribution measured directly: the mass that leaves, the symbols it leaves from, and the total variation against the original.*
+
+*Route:* `/labs/collapse`
+
+**Delivers:**
+
+- The tail-mass argument, computed
+
+## Appendix C — Sources
 
 - **DataComp: In search of the next generation of multimodal datasets** — Samir Yitzhak Gadre, Gabriel Ilharco, Alex Fang, Jonathan Hayase, Georgios Smyrnis, Thao Nguyen, Ryan Marten, Mitchell Wortsman, Dhruba Ghosh, Jieyu Zhang, Eyal Orgad, Rahim Entezari, Giannis Daras, Sarah Pratt, Vivek Ramanujan, Yonatan Bitton, Kalyani Marathe, Stephen Mussmann, Richard Vencu, Mehdi Cherti, Ranjay Krishna, Pang Wei Koh, Olga Saukh, Alexander Ratner, Shuran Song, Hannaneh Hajishirzi, Ali Farhadi, Romain Beaumont, Sewoong Oh, Alex Dimakis, Jenia Jitsev, Yair Carmon, Vaishaal Shankar, Ludwig Schmidt (2023), arXiv:2304.14108 [cs.CV] / NeurIPS 2023 Datasets and Benchmarks. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing..
   Data is half the story of modern training and is entirely absent from the collection. This paper is also a full curriculum for data curation.

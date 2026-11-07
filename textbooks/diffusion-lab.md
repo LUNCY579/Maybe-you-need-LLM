@@ -66,7 +66,8 @@
 - [6. The Design Space](#6-the-design-space)
   - [Lesson 12. The design space](#lesson-12-the-design-space)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. The Forward Process
 
@@ -103,16 +104,18 @@ A diffusion model corrupts its data with a fixed Markov chain and then learns to
 
 **Q. Which part of a diffusion model has learnable parameters? — multiple-choice *(warmup)***
 
-- - The forward process
+- The forward process
 - ✓ **The reverse process**
-- - The variance schedule
-- - The prior
+- The variance schedule
+- The prior
 
 > Correct — the reverse process mean is produced by the network.
 
 > **Why:** The forward process and the schedule are fixed by hand. Everything the model learns lives in the reverse process, whose mean is a function of the noisy state and the timestep.
 
 **Q. The forward process gradually destroys the information in the data. — boolean *(warmup)***
+
+> **Answer:** True
 
 > **Why:** Yes. The signal-to-noise ratio falls monotonically, and by the last step the state is essentially the prior, carrying almost no information about the data.
 
@@ -159,15 +162,17 @@ Step a data point through the forward chain and watch the signal disappear. Open
 **Q. The closed form q(x_t | x_0) has the form x_t = √ᾱ_t · x_0 + √(1 − ᾱ_t) · ε. What is ε? — multiple-choice *(warmup)***
 
 - ✓ **A standard normal vector**
-- - The previous state x_{t−1}
-- - A learnable parameter
-- - The posterior mean
+- The previous state x_{t−1}
+- A learnable parameter
+- The posterior mean
 
 > Correct: ε ~ N(0, I), drawn fresh at every training step.
 
 > **Why:** ε is a standard normal draw, and it is the same vector that the network is trained to predict. That is the whole trick: the target of the training objective is a random vector the model never has to see.
 
 **Q. With the paper’s linear schedule, β goes from 10⁻⁴ to 0.02 over 1000 steps. What is β at the first step? — numeric *(core)***
+
+> **Answer:** 0.0001 β_1
 
 > **Why:** β_1 = 10⁻⁴ exactly. The schedule is linear in the step index, so the first and last values are the endpoints of the range.
 
@@ -210,9 +215,9 @@ Compare the two ways of reaching the same timestep. Open **Check the closed form
 **Q. Why does the paper need q(x_{t−1} | x_t, x_0) to have a closed form? — multiple-choice *(core)***
 
 - ✓ **So every KL term in the bound can be computed between two Gaussians**
-- - So the sampling can be done in one step
-- - So the model does not need a network
-- - So the data can be scaled to [−1, 1]
+- So the sampling can be done in one step
+- So the model does not need a network
+- So the data can be scaled to [−1, 1]
 
 > Correct.
 
@@ -270,16 +275,18 @@ The reverse process is a Markov chain of learned Gaussians. This module derives 
 
 **Q. With the ε-prediction parameterisation, the network is trained to predict… — multiple-choice *(core)***
 
-- - the clean sample x_0
+- the clean sample x_0
 - ✓ **the noise ε that was added**
-- - the posterior mean μ̃_t
-- - the reverse variance σ_t
+- the posterior mean μ̃_t
+- the reverse variance σ_t
 
 > Correct.
 
 > **Why:** Predicting ε makes the bound resemble denoising score matching and makes the sampler resemble Langevin dynamics. Both facts are the paper’s stated reasons for preferring it.
 
 **Q. In the simplified objective the weight on the loss is exactly what value at every timestep? — numeric *(core)***
+
+> **Answer:** 1
 
 > **Why:** Exactly 1. The true bound weights the loss by β_t² / (2 σ_t² α_t (1 − ᾱ_t)); the simplified objective replaces that whole factor with 1, which is why it down-weights small t so dramatically.
 
@@ -323,10 +330,10 @@ Compare the weight of the true bound with the flat weight of the simplified obje
 
 **Q. Which statement about the three parameterisations is true? — multiple-choice *(core)***
 
-- - They define three different reverse processes
+- They define three different reverse processes
 - ✓ **They describe the same reverse process but train the network on different targets**
-- - Only ε-prediction is mathematically valid
-- - x₀-prediction is always better
+- Only ε-prediction is mathematically valid
+- x₀-prediction is always better
 
 > Correct.
 
@@ -370,14 +377,16 @@ Take one network output and read it as ε, as x₀, and as v. Open **Convert a p
 
 **Q. Sampling with T = 1000 steps needs one network evaluation per step. How many network evaluations does a single sample cost? — numeric *(warmup)***
 
+> **Answer:** 1000
+
 > **Why:** Exactly 1000. This is the cost the paper notes it shares with earlier work, and it is the reason every later improvement in this area is about taking fewer steps.
 
 **Q. What does a deterministic sampler change? — multiple-choice *(core)***
 
 - ✓ **It removes the fresh noise, so the same start gives the same sample**
-- - It removes the network from the loop
-- - It replaces the variance schedule with a learned one
-- - It trains the model with a different objective
+- It removes the network from the loop
+- It replaces the variance schedule with a learned one
+- It trains the model with a different objective
 
 > Correct.
 
@@ -440,15 +449,17 @@ The schedule is the one set of choices in the model that is not learned. This mo
 **Q. What does the variance schedule control? — multiple-choice *(core)***
 
 - ✓ **How much noise each step adds, and therefore the whole signal-to-noise trajectory**
-- - The size of the network
-- - The learning rate
-- - The resolution of the images
+- The size of the network
+- The learning rate
+- The resolution of the images
 
 > Correct.
 
 > **Why:** The schedule determines ᾱ_t at every step, and therefore the signal-to-noise ratio, the terminal KL divergence, and the weighting of the training objective.
 
 **Q. The paper quotes a terminal KL divergence of about 10⁻⁵ bits per dimension for its linear schedule. Roughly how many bits per dimension is that, in scientific notation? — numeric *(hard)***
+
+> **Answer:** 0.00001 ± 1e-7
 
 > **Why:** 10⁻⁵ bits per dimension. The point of the number is that x_T is, for every practical purpose, indistinguishable from the prior — which is what lets the sampler start from pure noise.
 
@@ -495,9 +506,9 @@ Put the linear and cosine schedules side by side and read the signal-to-noise ra
 **Q. Dropping the weight from the true variational bound has which effect? — multiple-choice *(hard)***
 
 - ✓ **Small t are effectively ignored, because the true weight there is enormous**
-- - Large t are ignored
-- - The objective becomes a different likelihood bound
-- - Nothing changes, because the weight is constant
+- Large t are ignored
+- The objective becomes a different likelihood bound
+- Nothing changes, because the weight is constant
 
 > Correct.
 
@@ -555,15 +566,17 @@ Rombach et al. did not improve the diffusion model; they moved it into an autoen
 **Q. Why does latent diffusion use an autoencoder at all? — multiple-choice *(core)***
 
 - ✓ **The diffusion runs on far fewer elements, so it is much cheaper**
-- - The autoencoder makes the images sharper
-- - It removes the need for a variance schedule
-- - It allows the model to be trained on text
+- The autoencoder makes the images sharper
+- It removes the need for a variance schedule
+- It allows the model to be trained on text
 
 > Correct.
 
 > **Why:** Compressing by a factor f reduces the number of elements by roughly 1/f² and the attention cost by roughly 1/f⁴, because attention is quadratic in the number of tokens.
 
 **Q. An autoencoder compresses a 256×256 image with 3 channels by a factor of 8, to 4 latent channels. By what factor is the number of elements the diffusion model works on reduced? — numeric *(hard)***
+
+> **Answer:** 48
 
 > **Why:** The image has 256×256×3 = 196,608 elements; the latent has 32×32×4 = 4,096. The reduction factor is 48. The attention saving is larger still, because it is quadratic in the token count.
 
@@ -623,9 +636,9 @@ Guidance is how a diffusion model is made to obey a prompt. This module derives 
 **Q. The classifier-free guided score is s_uncond + w · (s_cond − s_uncond). What does w = 0 give? — multiple-choice *(core)***
 
 - ✓ **The unconditional score**
-- - The conditional score
-- - A score of zero
-- - The posterior mean
+- The conditional score
+- A score of zero
+- The posterior mean
 
 > Correct.
 
@@ -634,9 +647,9 @@ Guidance is how a diffusion model is made to obey a prompt. This module derives 
 **Q. What does a large guidance weight do to the samples? — multiple-choice *(core)***
 
 - ✓ **They cluster more tightly on the mode that matches the condition**
-- - They spread out to cover the tail of the distribution
-- - They become noisier
-- - They become independent of the condition
+- They spread out to cover the tail of the distribution
+- They become noisier
+- They become independent of the condition
 
 > Correct: sharper, but less diverse.
 
@@ -680,6 +693,8 @@ Measure fidelity and diversity against the guidance weight, with an exact score.
 #### Practice
 
 **Q. A guided model samples from a distribution proportional to p(x) · p(c | x)^w. For what value of w is this distribution exactly p(x | c)? — numeric *(hard)***
+
+> **Answer:** 1
 
 > **Why:** w = 1. Since p(x)·p(c|x) = p(x|c)·p(c), and p(c) is a constant, the tilted distribution is proportional to the true conditional. Any w above 1 over-shoots it.
 
@@ -730,15 +745,17 @@ The original paper fixed a dozen choices for convenience. Later work showed whic
 **Q. What is preconditioning for? — multiple-choice *(hard)***
 
 - ✓ **Deciding how the loss at one noise level counts against the others**
-- - Choosing the number of sampling steps
-- - Rescaling the data to [−1, 1]
-- - Making the network smaller
+- Choosing the number of sampling steps
+- Rescaling the data to [−1, 1]
+- Making the network smaller
 
 > Correct.
 
 > **Why:** Different noise levels have different intrinsic difficulty and different signal-to-noise ratios, so a single unweighted loss trains them badly. Preconditioning is the per-level weight that fixes this.
 
 **Q. A sampler takes 50 steps out of a chain of length 1000. How many network evaluations does one sample cost? — numeric *(core)***
+
+> **Answer:** 50
 
 > **Why:** Exactly 50. The number of steps is the only thing that matters for sampling cost, which is why deterministic samplers that can be run in few steps matter so much.
 
@@ -955,7 +972,79 @@ In x_t = √ᾱ_t x_0 + √(1−ᾱ_t) ε, the first term is the signal and the 
 
 *Course term*
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The forward process
+
+*The chain, the closed form for x_t, and the posterior.*
+
+**Delivers:**
+
+- Forward process with a closed form for x_t
+
+### B · The reverse process
+
+*A real denoiser, trained in your browser, and two samplers.*
+
+**Delivers:**
+
+- Reverse process and the learned denoiser
+- Sampling and the ancestral chain
+- Deterministic samplers
+- The deterministic step
+- The same model, sampled without noise
+
+### C · Noise schedules
+
+*Linear against cosine, and what they do to the chain.*
+
+**Delivers:**
+
+- Beta and noise schedules
+- The cosine schedule
+- The effective diffusion length
+
+### D · Latent diffusion
+
+*The autoencoder round trip, and the compression measured.*
+
+**Delivers:**
+
+- Autoencoder round trip and the reconstruction error
+- Latent space scaling factor
+- Where the compute moves
+
+### E · Guidance
+
+*The fidelity–diversity trade-off, from an exact score.*
+
+**Delivers:**
+
+- Unconditional versus conditional score
+- The guidance scale sweep
+- Why guidance reduces diversity
+- Classifier guidance and its gradient term
+
+### F · The variational bound
+
+*The weights, and the decomposition of the bound.*
+
+**Delivers:**
+
+- Variational bound and the KL term
+
+### G · Preconditioning
+
+*The σ parametrisation, the four coefficients, and a sampler.*
+
+**Delivers:**
+
+- Preconditioning functions
+- σ parametrisation versus the timestep parametrisation
+
+## Appendix C — Sources
 
 - **Denoising Diffusion Probabilistic Models** — Jonathan Ho, Ajay Jain, Pieter Abbeel (2020), arXiv:2006.11239 [cs.LG] / NeurIPS 2020. Licence: arXiv perpetual, non-exclusive distribution licence. No Creative Commons licence is shown on the record; re-check per version before redistributing..
   There is no generative or multimodal application anywhere in the collection.

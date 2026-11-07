@@ -72,7 +72,8 @@
   - [Lesson 22. A break in the trend, and what it costs to claim one](#lesson-22-a-break-in-the-trend-and-what-it-costs-to-claim-one)
   - [Lesson 23. What a trend buys, and the year it became buyable](#lesson-23-what-a-trend-buys-and-the-year-it-became-buyable)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Power Laws
 
@@ -157,15 +158,17 @@ Symbols:
 **Q. A scaling law says the loss falls as L ∝ N^(−α). What does α say? — multiple-choice *(core)***
 
 - ✓ **How much a doubling of N improves the loss**
-- - How many tokens the model has read
-- - The size of the model
-- - The floor of the loss
+- How many tokens the model has read
+- The size of the model
+- The floor of the loss
 
 > Correct — the factor is 2^(−α).
 
 > **Why:** Because the law is multiplicative, the natural unit of improvement is a doubling: 2^(−α). An exponent of 0.1 means a doubling improves the loss by about 7%.
 
 **Q. A loss falls as a power law with exponent 0.2. By what factor is the loss multiplied when the data doubles? — numeric *(core)***
+
+> **Answer:** 0.870551 ± 0.0001
 
 > **Why:** The factor is 2^(−0.2) = 0.8706, so the loss falls by about 13%.
 
@@ -257,6 +260,8 @@ Symbols:
 #### Practice
 
 **Q. A power law fitted with an R² of 0.999 over two orders of magnitude is guaranteed to hold for another order. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. R² says the points are close to a line over the range you fitted; it says nothing about a range you did not. That is why a fitted exponent is quoted together with the range it was fitted over.
 
@@ -368,9 +373,9 @@ Symbols:
 **Q. Why is the compute budget the thing that makes the allocation a decision? — multiple-choice *(core)***
 
 - ✓ **Because it fixes the product of the parameters and the tokens, so more of one means less of the other**
-- - Because it fixes the loss
-- - Because it fixes the model architecture
-- - Because it fixes the number of epochs
+- Because it fixes the loss
+- Because it fixes the model architecture
+- Because it fixes the number of epochs
 
 > Correct.
 
@@ -467,15 +472,17 @@ Symbols:
 **Q. At the compute optimum, what is true of the two terms of the loss surface? — multiple-choice *(hard)***
 
 - ✓ **They balance in a fixed ratio**
-- - They are equal
-- - The model term is zero
-- - The data term is zero
+- They are equal
+- The model term is zero
+- The data term is zero
 
 > Correct.
 
 > **Why:** At the optimum the derivative along the budget vanishes, which gives a fixed ratio between the capacity term and the data term. The ratio depends on the exponents.
 
 **Q. A loss surface is L = 0.2 + 1.0·N^(−0.5) + 2.0·D^(−0.5), and the budget allows N·D = 1e6. At the optimum the capacity term and the data term balance: 1.0·N^(−0.5) = 2.0·D^(−0.5). What is N? — numeric *(hard)***
+
+> **Answer:** 500
 
 > **Why:** The balance gives N^(−0.5) = 2·D^(−0.5), so N = D/4. With N·D = 1e6 that gives D² = 4e6, so D = 2000 and N = 500. The ratio of tokens to parameters at the optimum is 4.
 
@@ -570,9 +577,13 @@ Symbols:
 
 **Q. On a surface with α = β = 0.5 and A = B = 1, two models of size 4 and 16 are trained at the same compute. What product P = N·D makes them equally good? — numeric *(hard)***
 
+> **Answer:** 64
+
 > **Why:** P^β = B(16^β − 4^β) / A(4^(−α) − 16^(−α)) = (4−2)/(0.5−0.25) = 8, so P = 64. At that product the small model gets 16 rows and the large one 4, and both land at E + 0.75.
 
 **Q. Below the crossover point, the larger model trained on less data is the better choice. — boolean *(core)***
+
+> **Answer:** False
 
 > **Why:** It is the other way round. Below the crossover the budget cannot fill the larger model, and the smaller one trained on more data wins.
 
@@ -684,9 +695,9 @@ Symbols:
 **Q. What does the bottom of an IsoFLOP curve give? — multiple-choice *(core)***
 
 - ✓ **The compute-optimal allocation at that budget**
-- - The largest model that fits in the budget
-- - The point where the loss stops falling with compute
-- - The tokens-per-parameter rule
+- The largest model that fits in the budget
+- The point where the loss stops falling with compute
+- The tokens-per-parameter rule
 
 > Correct — the curve is the budget and the bottom is its best split.
 
@@ -694,9 +705,13 @@ Symbols:
 
 **Q. A surface has exponents α = 0.4 and β = 0.6. What is the exponent of the frontier through the IsoFLOP minima? — numeric *(core)***
 
+> **Answer:** 0.24 ± 0.0001
+
 > **Why:** γ = αβ/(α+β) = 0.24/1.0 = 0.24. It is always smaller than either single-variable exponent, which is why the compute-optimal loss falls more slowly than the data alone.
 
 **Q. The minima of a family of IsoFLOP curves are themselves a power law in the budget. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Both terms of the surface fall as C^(−αβ/(α+β)) at the optimum, so their sum does too. The laboratory measures that exponent on fitted runs rather than quoting it.
 
@@ -791,14 +806,16 @@ Symbols:
 
 **Q. On a surface with α = 0.44 and β = 0.61, what is the exponent of tokens-per-parameter against the budget? — numeric *(hard)***
 
+> **Answer:** -0.161905 ± 0.001
+
 > **Why:** (α−β)/(α+β) = −0.17/1.05 = −0.162. The ratio is constant only when the two exponents are equal, so “twenty tokens per parameter” is a rule with a budget attached to it.
 
 **Q. When is the tokens-per-parameter ratio at the optimum a constant? — multiple-choice *(core)***
 
 - ✓ **When the two exponents of the surface are equal**
-- - When the budget is large enough
-- - When the floor E is zero
-- - Always, for a transformer
+- When the budget is large enough
+- When the floor E is zero
+- Always, for a transformer
 
 > Correct — the exponent of the ratio is (α−β)/(α+β).
 
@@ -897,14 +914,16 @@ Symbols:
 
 **Q. On a loss surface whose two exponents are equal, the compute-optimal number of rows grows as the square root of the budget. A pool of 1,000 rows is exactly exhausted at one budget. By what factor does the exhausting budget change for a pool of 250 rows? — numeric *(hard)***
 
+> **Answer:** 0.0625
+
 > **Why:** D* ∝ C^(α/(α+β)), which is C^(1/2) when the exponents agree. Inverting it, the budget that makes D* equal to a given pool grows as the square of the pool: 250/1000 is a quarter, and a quarter squared is 0.0625.
 
 **Q. Past the budget at which a finite corpus stops covering the frontier’s demand, what does extra compute buy? — multiple-choice *(core)***
 
 - ✓ **Passes over rows the model has already read, so the loss falls more slowly than the frontier says**
-- - Nothing: the loss is flat from there on
-- - More data, at the same price
-- - A bigger model, with the data unchanged
+- Nothing: the loss is flat from there on
+- More data, at the same price
+- A bigger model, with the data unchanged
 
 > Correct — and the screen prices the difference.
 
@@ -1014,14 +1033,16 @@ Symbols:
 
 **Q. With the paper’s repetition constant R★ = 15.39, how many fresh passes is a pool read four times worth? — numeric *(core)***
 
+> **Answer:** 3.7257 ± 0.001
+
 > **Why:** D_eff/U = 1 + R★(1 − e^(−R/R★)) with R = 3 extra passes, which is 1 + 15.39 × 0.1771 = 3.73. The fourth epoch is worth most of a fresh one; the twentieth is worth nothing.
 
 **Q. Why is the gap between the repeated run and the fresh run exactly zero at the first epoch? — multiple-choice *(core)***
 
 - ✓ **Because the two runs have read the same rows — at epoch one they are the same run**
-- - Because the loss has not started falling yet
-- - Because the learning rate is still warming up
-- - Because the held-out set is too small to tell them apart
+- Because the loss has not started falling yet
+- Because the learning rate is still warming up
+- Because the held-out set is too small to tell them apart
 
 > Correct.
 
@@ -1093,6 +1114,8 @@ Symbols:
 #### Practice
 
 **Q. At R★ = 15.39, after how many extra passes is one more worth half a fresh epoch? — numeric *(core)***
+
+> **Answer:** 10.666 ± 0.01
 
 > **Why:** The marginal epoch is e^(−R/R★), so R = −R★·ln(0.5) = 10.67. It is the paper’s own constant answering the paper’s own question, and the measured dominance epoch on screen E is the independent check.
 
@@ -1187,9 +1210,9 @@ Symbols:
 **Q. In the third phase, the loss on the pool keeps falling while the held-out loss rises. Why? — multiple-choice *(core)***
 
 - ✓ **The pool has its own optimum — a fit to the noise in the pool — and the descent is still aimed at it**
-- - The learning rate has grown too large
-- - The held-out set is too small to be reliable
-- - The repeated run has fewer parameters
+- The learning rate has grown too large
+- The held-out set is too small to be reliable
+- The repeated run has fewer parameters
 
 > Correct. Nothing changed in the optimiser; the target it is aiming at stopped being the task.
 
@@ -1286,15 +1309,17 @@ Symbols:
 **Q. A ridge estimator is trained on a dataset in which every row is repeated four times. What happens to the solution? — multiple-choice *(core)***
 
 - ✓ **Nothing: the normal equations are homogeneous in the data**
-- - It is regularised four times as strongly
-- - It overfits four times as much
-- - It is four times as large
+- It is regularised four times as strongly
+- It overfits four times as much
+- It is four times as large
 
 > Correct.
 
 > **Why:** XᵀX and Xᵀy are both multiplied by the number of repeats, so the solution is unchanged. Repeating the data buys the same model at four times the price.
 
 **Q. A training run reads 400 billion tokens over a unique dataset of 100 billion tokens. How many repeats is that? — numeric *(core)***
+
+> **Answer:** 4
 
 > **Why:** The number of repeats is the tokens read divided by the unique tokens: 400/100 = 4.
 
@@ -1388,9 +1413,9 @@ Symbols:
 **Q. What does the comparison of a repeated run with a fresh run of the same length show? — multiple-choice *(core)***
 
 - ✓ **Fresh rows keep improving the model and repeated rows do not, so the gap is the price of repetition**
-- - They are the same, so repetition is free
-- - The repeated run is better, because it sees the data more often
-- - Nothing can be compared without a different model
+- They are the same, so repetition is free
+- The repeated run is better, because it sees the data more often
+- Nothing can be compared without a different model
 
 > Correct.
 
@@ -1483,6 +1508,8 @@ Symbols:
 #### Practice
 
 **Q. With the paper’s fitted constant R★ = 15.387756, a pool of 10 billion unique tokens is worth at most U·(1 + R★) effective tokens however many times it is read. What is that ceiling, in billions of tokens? — numeric *(core)***
+
+> **Answer:** 163.87756 ± 0.01
 
 > **Why:** 10 × (1 + 15.387756) = 163.87756 billion. The constant is a multiplier on the pool, and the ceiling is reached only in the limit of infinitely many passes.
 
@@ -1594,6 +1621,8 @@ Symbols:
 
 **Q. A pool of 400 rows has 4 tail directions and needs 3 rare rows per direction. What keep fraction does the percolation argument predict? — numeric *(core)***
 
+> **Answer:** 0.03 ± 0.001
+
 > **Why:** 12 rows out of 400 is 3%. The prediction is a count of rows, not a property of the loss; the screen compares it with the fraction at which the trained runs actually break.
 
 #### Go and do it
@@ -1664,15 +1693,17 @@ Symbols:
 **Q. On one pool, four metrics give four different cliffs. What does that establish about the threshold? — multiple-choice *(hard)***
 
 - ✓ **It is a property of the metric and the pool together**
-- - It is a property of the pool alone
-- - It is a measurement error
-- - It is set by the model’s capacity
+- It is a property of the pool alone
+- It is a measurement error
+- It is set by the model’s capacity
 
 > Correct — the ranking decides which rows go, so it decides where they stop going.
 
 > **Why:** A threshold is where the rows a metric values run out. Two metrics that rank differently run out in different places, which is the paper’s point about curation being a property of the data and the tool.
 
 **Q. A metric that ranks rows by their norm can be beaten by one that ranks them by what the labels support. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** The information a row carries is ‖x‖²/σ²: the norm sees the amplitude and not the noise. A residual-based ranking sees both, keeps the rare rows, and has a lower threshold.
 
@@ -1772,9 +1803,9 @@ Symbols:
 **Q. As a pruning metric’s own error grows far past the spread of information in the pool, what does the predicted threshold approach? — multiple-choice *(hard)***
 
 - ✓ **One: a rare row survives a cut exactly as often as a bulk row does, so there is nothing to prune**
-- - Zero: the metric gets braver as its error grows
-- - The share of the pool that is rare
-- - It does not move: the threshold is a property of the pool
+- Zero: the metric gets braver as its error grows
+- The share of the pool that is rare
+- It does not move: the threshold is a property of the pool
 
 > Correct — the ranking has become a shuffle.
 
@@ -1860,9 +1891,9 @@ Symbols:
 **Q. What does an emergent curve establish? — multiple-choice *(core)***
 
 - ✓ **That the measured score is flat and then steep**
-- - That the model’s capability is flat and then steep
-- - That the task is impossible below a size
-- - That the training run failed
+- That the model’s capability is flat and then steep
+- That the task is impossible below a size
+- That the training run failed
 
 > Correct — and that is a statement about the score.
 
@@ -1933,9 +1964,9 @@ Symbols:
 **Q. The onset of the cliff is reported as the first compute at which the score clears a chosen floor. What follows from that? — multiple-choice *(core)***
 
 - ✓ **Move the floor and the claimed discovery moves, with nothing changed in the model**
-- - The floor is arbitrary, so the whole measurement is worthless
-- - The underlying accuracy moves with the floor too
-- - A lower floor makes the ability more real
+- The floor is arbitrary, so the whole measurement is worthless
+- The underlying accuracy moves with the floor too
+- A lower floor makes the ability more real
 
 > Correct — and the screen names the floor it made the choice at.
 
@@ -2008,14 +2039,16 @@ Symbols:
 
 **Q. A model gets each token right with probability 0.95, and a task is scored only when the whole sequence of 10 tokens is right. What is the score? — numeric *(core)***
 
+> **Answer:** 0.598737 ± 0.001
+
 > **Why:** The whole-sequence score is 0.95^10 ≈ 0.5987. The model is right about 95% of tokens and scores under 60% on the task.
 
 **Q. Why does a longer task make the transition look sharper? — multiple-choice *(hard)***
 
 - ✓ **The whole-sequence score is the per-token accuracy raised to the length**
-- - Longer tasks are harder for every model
-- - The metric is noisier for long tasks
-- - The compute per token falls
+- Longer tasks are harder for every model
+- The metric is noisier for long tasks
+- The compute per token falls
 
 > Correct.
 
@@ -2121,14 +2154,16 @@ Symbols:
 
 **Q. A compute trend rises by 0.6 orders of magnitude a year. How many months per doubling does that convert to? — numeric *(core)***
 
+> **Answer:** 6.0206 ± 0.005
+
 > **Why:** A doubling is log₁₀2 = 0.3010 orders, so 0.3010/0.6 = 0.5017 years = 6.02 months. The paper reports 5.7 for the same era, and screen H prints the disagreement rather than smoothing it.
 
 **Q. Why can a trend’s slope and its reported range imply different doubling times? — multiple-choice *(hard)***
 
 - ✓ **A fitted slope describes the middle of a scattered set; a range is the distance between two extremes**
-- - One of them must be a mistake
-- - The units differ by a factor of twelve
-- - The trend is not log-linear
+- One of them must be a mistake
+- The units differ by a factor of twelve
+- The trend is not log-linear
 
 > Correct.
 
@@ -2225,6 +2260,8 @@ Symbols:
 
 **Q. Run on a series that is exactly one straight line in log space, a break detector should report a change of slope. — boolean *(hard)***
 
+> **Answer:** False
+
 > **Why:** It should report nothing. A split always improves the fit slightly, so a break only counts when the two sides disagree by more than the noise — otherwise the answer is whichever year the rounding favours.
 
 #### Go and do it
@@ -2320,9 +2357,9 @@ Symbols:
 **Q. A scaling law says a loss costs 10^23 FLOPs. What else is needed to say what year it became reachable? — multiple-choice *(core)***
 
 - ✓ **A capability trend and the wall-clock a run is allowed**
-- - Nothing: the law gives a date
-- - The number of parameters
-- - The size of the corpus
+- Nothing: the law gives a date
+- The number of parameters
+- The size of the corpus
 
 > Correct — FLOPs per second times hours is what a run can actually spend.
 
@@ -2458,7 +2495,77 @@ A break is a year at which the growth rate changes, and it is a claim about a fi
 
 A loss is not reachable because the law says it is; it is reachable because somebody could have bought the machine time to train at that budget. Multiplying the capability trend of a year by the hours a run is allowed gives the FLOPs actually available, and comparing that with the budget the frontier demands is what turns a scaling law into a date.
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The power law
+
+*Training runs, the law fitted to them, and the exponent that moves with the range.*
+
+**Delivers:**
+
+- Fitting power laws to loss curves
+
+### B · The compute optimum
+
+*One budget, many allocations, and the size at which a bigger model starts to pay.*
+
+**Delivers:**
+
+- The compute-optimal allocation
+- Crossover points between model size and data
+
+### C · The IsoFLOP frontier
+
+*The U at each budget, the line through its minima, and the day the corpus runs out.*
+
+**Delivers:**
+
+- IsoFLOP curves
+- The 20 tokens-per-parameter rule, rederived
+- What happens when the data runs out
+
+### D · The percolation threshold
+
+*Pruning a pool by four metrics, and the cliff each one breaks at.*
+
+**Delivers:**
+
+- The percolation prediction
+- Pruning metric benchmarking
+
+### E · Going round the pool
+
+*Two runs, the same tokens, different data: warmup, plateau, and the turn upward.*
+
+**Delivers:**
+
+- The three-phase scaling curve
+- How many epochs before repetition dominates
+
+### F · The effective-data law
+
+*What a repeated corpus is worth as a number of fresh rows, in closed form.*
+
+### G · The cliff
+
+*One capability, two metrics, and the difference between a sharp score and a sharp thing.*
+
+**Delivers:**
+
+- The metric-artefact effect, reproduced
+- Discontinuous metric versus continuous underlying performance
+
+### H · Hardware and the eras
+
+*A trend in FLOPs, the break inside it, and the year a target loss became buyable.*
+
+**Delivers:**
+
+- Hardware capability over time
+
+## Appendix C — Sources
 
 - **Scaling Laws for Neural Language Models** — Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, Dario Amodei (2020), arXiv:2001.08361 [cs.CL]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing..
   Scaling laws are one lesson in two courses. They are the quantitative spine of the field and deserve their own application.

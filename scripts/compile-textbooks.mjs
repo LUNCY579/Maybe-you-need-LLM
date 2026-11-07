@@ -92,6 +92,9 @@ function answerFor(question) {
   if (question.options && 'answerIndex' in question) {
     return question.options[question.answerIndex]
   }
+  if (question.options && typeof question.correct === 'number') {
+    return question.options[question.correct]
+  }
   if (question.options && question.correctOptionId) {
     return question.options.find((option) => option.id === question.correctOptionId)?.label
   }
@@ -125,9 +128,17 @@ function renderQuestion(question) {
   if (question.options) {
     const labels = question.options.map((option) => (typeof option === 'string' ? option : option.label))
     const correct = answerFor(question)
-    lines.push('', ...labels.map((label) => `- ${label === correct ? `✓ **${label}**` : `- ${label}`}`))
+    lines.push(
+      '',
+      ...labels.map((label) => (label === correct ? `- ✓ **${label}**` : `- ${label}`)),
+    )
     const feedback = question.options.find((option) => typeof option !== 'string' && option.label === correct)?.feedback
     if (feedback) lines.push('', `> ${feedback}`)
+  } else {
+    // A question without options states its answer directly: a number with its
+    // tolerance, a truth value, or the accepted phrasings.
+    const correct = answerFor(question)
+    if (correct !== undefined) lines.push('', `> **Answer:** ${correct}`)
   }
   if (question.tryIt) {
     lines.push('', `*Try it:* ${question.tryIt}`)
@@ -347,6 +358,31 @@ function renderGlossaryTerms(terms) {
   return lines
 }
 
+/**
+ * The laboratories appendix: every screen the course ships, with what it
+ * delivers. The laboratories run in the application — the book says what
+ * each one computes and where it lives, rather than pretending to be one.
+ */
+function renderLaboratories(heading, labs) {
+  if (!labs?.length) return []
+  const lines = [`## ${heading}`, '']
+  lines.push(
+    'Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.',
+    '',
+  )
+  for (const lab of labs) {
+    lines.push(`### ${lab.name ?? lab.title}`, '')
+    if (lab.blurb) lines.push(`*${lab.blurb}*`, '')
+    if (lab.description) lines.push(lab.description, '')
+    if (lab.runtime) lines.push(`*Runtime:* ${lab.runtime}`, '')
+    if (lab.route) lines.push(`*Route:* \`${lab.route}\``, '')
+    if (lab.concepts?.length) lines.push(`*Concepts:* ${lab.concepts.join(', ')}`, '')
+    if (lab.sourceChapters?.length) lines.push(`*Textbook chapters:* ${lab.sourceChapters.join(', ')}`, '')
+    if (lab.delivers?.length) lines.push('**Delivers:**', '', bullets(lab.delivers), '')
+  }
+  return lines
+}
+
 /* ------------------------------------------------- workspace-course renderer */
 
 const FORMULA_EXPORTS = ['FORMULAS', 'EQUATIONS', 'FORMULA_BANK']
@@ -363,7 +399,7 @@ function firstExport(module, names) {
 async function renderWorkspaceCourse(appId) {
   const base = join(root, appId, 'src', 'content')
   const curriculum = await bundleAndImport(join(base, 'curriculum.ts'), `${appId}-curriculum`)
-  const [formulasMod, quizMod, glossaryMod] = await Promise.all([
+  const [formulasMod, quizMod, glossaryMod, labsMod] = await Promise.all([
     existsSync(join(base, 'formulas.ts'))
       ? bundleAndImport(join(base, 'formulas.ts'), `${appId}-formulas`)
       : Promise.resolve({}),
@@ -371,6 +407,7 @@ async function renderWorkspaceCourse(appId) {
     existsSync(join(base, 'glossary.ts'))
       ? bundleAndImport(join(base, 'glossary.ts'), `${appId}-glossary`)
       : Promise.resolve({}),
+    existsSync(join(base, 'labs.ts')) ? bundleAndImport(join(base, 'labs.ts'), `${appId}-labs`) : Promise.resolve({}),
   ])
 
   const modules = curriculum.MODULES ?? []
@@ -378,6 +415,7 @@ async function renderWorkspaceCourse(appId) {
   const formulas = firstExport(formulasMod, FORMULA_EXPORTS) ?? []
   const questions = firstExport(quizMod, QUIZ_EXPORTS) ?? []
   const glossary = firstExport(glossaryMod, GLOSSARY_EXPORTS) ?? []
+  const labs = firstExport(labsMod, ['LABS', 'LAB_REGISTRY', 'LAB_DEFINITIONS']) ?? []
   const formulaById = new Map(formulas.map((entry) => [entry.id, entry]))
   const questionById = new Map(questions.map((entry) => [entry.id, entry]))
   const termById = new Map(glossary.map((entry) => [entry.id, entry]))
@@ -394,7 +432,8 @@ async function renderWorkspaceCourse(appId) {
     }
   })
   if (glossary.length) lines.push(`- [Appendix A — Glossary](${anchor('Appendix A — Glossary')})`)
-  if (sourcesByApp.get(appId)?.length) lines.push(`- [Appendix B — Sources](${anchor('Appendix B — Sources')})`)
+  if (labs.length) lines.push(`- [Appendix B — The laboratories](${anchor('Appendix B — The laboratories')})`)
+  if (sourcesByApp.get(appId)?.length) lines.push(`- [Appendix C — Sources](${anchor('Appendix C — Sources')})`)
   lines.push('')
 
   // Modules and lessons.
@@ -464,10 +503,13 @@ async function renderWorkspaceCourse(appId) {
     }
   }
 
-  // Appendix B: sources.
+  // Appendix B: the laboratories.
+  lines.push(...renderLaboratories('Appendix B — The laboratories', labs))
+
+  // Appendix C: sources.
   const courseSources = sourcesByApp.get(appId) ?? []
   if (courseSources.length) {
-    lines.push(`## Appendix B — Sources`, '')
+    lines.push(`## Appendix C — Sources`, '')
     for (const source of courseSources) {
       lines.push(
         `- **${source.title}**${source.authors?.length ? ` — ${source.authors.join(', ')}` : ''}${source.year ? ` (${source.year})` : ''}${source.venue ? `, ${source.venue}` : ''}. Licence: ${source.license ?? 'see the repository'}.`,
@@ -477,7 +519,7 @@ async function renderWorkspaceCourse(appId) {
     lines.push('')
   }
 
-  return { markdown: lines.join('\n'), stats: { modules: modules.length, lessons: lessons.length, questions: questions.length, formulas: formulas.length, glossary: glossary.length } }
+  return { markdown: lines.join('\n'), stats: { modules: modules.length, lessons: lessons.length, questions: questions.length, formulas: formulas.length, glossary: glossary.length, labs: labs.length } }
 }
 
 /* ----------------------------------------------------------- LFL renderer */
@@ -487,10 +529,11 @@ const LFL_LESSON_FILE_RE = /'([\w-]+)': \(\) => import\('\.\/([\w-]+)'\)\.then\(
 async function renderLflCourse() {
   const appId = 'llm-foundations-lab'
   const base = join(root, appId, 'src', 'content')
-  const [curriculum, quizMod, glossaryMod] = await Promise.all([
+  const [curriculum, quizMod, glossaryMod, labsMod] = await Promise.all([
     bundleAndImport(join(base, 'curriculum.ts'), `${appId}-curriculum`),
     bundleAndImport(join(base, 'quiz.ts'), `${appId}-quiz`),
     bundleAndImport(join(base, 'glossary.ts'), `${appId}-glossary`),
+    bundleAndImport(join(base, 'labs.ts'), `${appId}-labs`),
   ])
 
   const modules = curriculum.MODULES ?? []
@@ -523,6 +566,7 @@ async function renderLflCourse() {
     }
   })
   lines.push(`- [Appendix A — Glossary](${anchor('Appendix A — Glossary')})`)
+  lines.push(`- [Appendix B — The laboratories](${anchor('Appendix B — The laboratories')})`)
   lines.push('')
 
   let renderedBodies = 0
@@ -580,6 +624,8 @@ async function renderLflCourse() {
     if (term.definition) lines.push(term.definition, '')
   }
 
+  lines.push(...renderLaboratories('Appendix B — The laboratories', labsMod.LABS ?? []))
+
   return {
     markdown: lines.join('\n'),
     stats: {
@@ -589,6 +635,7 @@ async function renderLflCourse() {
       bodyFailures: bodyFailures.length,
       questions: questions.length,
       glossary: glossary.length,
+      labs: (labsMod.LABS ?? []).length,
     },
     bodyFailures,
   }
@@ -639,12 +686,16 @@ function agenticBlock(block) {
 async function renderAgenticCourse() {
   const appId = 'agentic-ai-academy'
   const base = join(root, appId, 'src', 'content')
-  const [book, lessonsMod, glossaryMod, referencesMod] = await Promise.all([
+  const [book, lessonsMod, glossaryMod, referencesMod, labsMod, labQuestionsMod] = await Promise.all([
     bundleAndImport(join(base, 'book.ts'), `${appId}-book`),
     bundleAndImport(join(base, 'lessons', 'index.ts'), `${appId}-lessons`),
     bundleAndImport(join(base, 'glossary.ts'), `${appId}-glossary`),
     existsSync(join(base, 'references.ts'))
       ? bundleAndImport(join(base, 'references.ts'), `${appId}-references`)
+      : Promise.resolve({}),
+    existsSync(join(base, 'labs.ts')) ? bundleAndImport(join(base, 'labs.ts'), `${appId}-labs`) : Promise.resolve({}),
+    existsSync(join(base, 'labQuestions.ts'))
+      ? bundleAndImport(join(base, 'labQuestions.ts'), `${appId}-lab-questions`)
       : Promise.resolve({}),
   ])
 
@@ -667,6 +718,8 @@ async function renderAgenticCourse() {
     }
   }
   lines.push(`- [Appendix A — Glossary](${anchor('Appendix A — Glossary')})`)
+  lines.push(`- [Appendix B — The laboratories](${anchor('Appendix B — The laboratories')})`)
+  lines.push(`- [Appendix C — Laboratory practice](${anchor('Appendix C — Laboratory practice')})`)
   lines.push('')
 
   for (const part of parts) {
@@ -726,9 +779,30 @@ async function renderAgenticCourse() {
     if (term.related?.length) lines.push(`*Related:* ${term.related.join(', ')}`, '')
   }
 
+  const agenticLabs = labsMod.LABS ?? []
+  lines.push(...renderLaboratories('Appendix B — The laboratories', agenticLabs))
+
+  const labQuestions = labQuestionsMod.ALL_LAB_QUESTIONS ?? []
+  if (labQuestions.length) {
+    lines.push('## Appendix C — Laboratory practice', '')
+    lines.push(
+      'The laboratories carry their own diagnostic questions. Each one names the control to change, so the reader can check the prediction against the running laboratory rather than against the text.',
+      '',
+    )
+    for (const question of labQuestions) lines.push(renderQuestion(question), '')
+  }
+
   return {
     markdown: lines.join('\n'),
-    stats: { parts: parts.length, lessons: lessons.length, questions: lessons.reduce((sum, lesson) => sum + (lesson.quiz?.length ?? 0) + (lesson.advancedQuiz?.length ?? 0), 0), glossary: glossary.length },
+    stats: {
+      parts: parts.length,
+      lessons: lessons.length,
+      questions:
+        lessons.reduce((sum, lesson) => sum + (lesson.quiz?.length ?? 0) + (lesson.advancedQuiz?.length ?? 0), 0) +
+        labQuestions.length,
+      glossary: glossary.length,
+      labs: agenticLabs.length,
+    },
   }
 }
 
@@ -756,11 +830,12 @@ function dlteBlock(block) {
 async function renderDlteCourse() {
   const appId = 'deep-learning-theory-explorer'
   const base = join(root, appId, 'src', 'content')
-  const [lessonsMod, equationsMod, quizzesMod, referencesMod] = await Promise.all([
+  const [lessonsMod, equationsMod, quizzesMod, referencesMod, labsMod] = await Promise.all([
     bundleAndImport(join(base, 'lessons.ts'), `${appId}-lessons`),
     bundleAndImport(join(base, 'equations.ts'), `${appId}-equations`),
     bundleAndImport(join(base, 'quizzes.ts'), `${appId}-quizzes`),
     bundleAndImport(join(base, 'references.ts'), `${appId}-references`),
+    existsSync(join(base, 'labs.ts')) ? bundleAndImport(join(base, 'labs.ts'), `${appId}-labs`) : Promise.resolve({}),
   ])
 
   const lessons = lessonsMod.LESSONS ?? []
@@ -781,6 +856,7 @@ async function renderDlteCourse() {
   }
   lines.push(`- [Appendix A — Equation reference](${anchor('Appendix A — Equation reference')})`)
   lines.push(`- [Appendix B — Notation](${anchor('Appendix B — Notation')})`)
+  lines.push(`- [Appendix C — The laboratories](${anchor('Appendix C — The laboratories')})`)
   lines.push('')
 
   for (const lesson of lessons) {
@@ -841,9 +917,11 @@ async function renderDlteCourse() {
     lines.push('')
   }
 
+  lines.push(...renderLaboratories('Appendix C — The laboratories', labsMod.LABS ?? []))
+
   return {
     markdown: lines.join('\n'),
-    stats: { lessons: lessons.length, equations: equations.length, questions: quiz.length },
+    stats: { lessons: lessons.length, equations: equations.length, questions: quiz.length, labs: (labsMod.LABS ?? []).length },
   }
 }
 

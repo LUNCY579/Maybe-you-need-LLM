@@ -65,7 +65,8 @@
   - [Lesson 10. The perplexity, and the number behind it](#lesson-10-the-perplexity-and-the-number-behind-it)
   - [Lesson 11. Projecting the next run](#lesson-11-projecting-the-next-run)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Tokenisation
 
@@ -102,15 +103,17 @@ A tokeniser decides what a token is, and therefore how long your corpus is, how 
 **Q. What does a byte-pair encoding start from? — multiple-choice *(core)***
 
 - ✓ **The 256 bytes of the text**
-- - A fixed list of words
-- - The most frequent words in the corpus
-- - Unicode code points
+- A fixed list of words
+- The most frequent words in the corpus
+- Unicode code points
 
 > Correct, which is why it can represent any text.
 
 > **Why:** Starting from the bytes means the tokeniser can represent any text at all, and the merges it learns are whatever the corpus supports.
 
 **Q. A corpus is 8,000,000 bytes of text and the tokeniser produces 2,000,000 tokens. How many bytes per token is that? — numeric *(core)***
+
+> **Answer:** 4 bytes per token
 
 > **Why:** Exactly 4 bytes per token. The ratio is the number that decides the training bill: a corpus of B bytes becomes B ÷ 4 tokens, and the compute follows the token count.
 
@@ -153,9 +156,9 @@ Train a byte-pair encoding on a generated corpus and watch the merges accumulate
 **Q. Why does a larger vocabulary not simply make training cheaper? — multiple-choice *(hard)***
 
 - ✓ **Because the embedding and output matrices get larger**
-- - Because the sequences get longer, so the attention cost grows
-- - Because the optimiser has more states to carry
-- - It does make training cheaper
+- Because the sequences get longer, so the attention cost grows
+- Because the optimiser has more states to carry
+- It does make training cheaper
 
 > Correct — that is half of it.
 
@@ -212,15 +215,17 @@ The decoder-only transformer is a small number of matrices. This module writes t
 **Q. Which part of a decoder block usually holds the most parameters? — multiple-choice *(core)***
 
 - ✓ **The feed-forward block**
-- - The attention projections
-- - The layer norms
-- - The residual connections
+- The attention projections
+- The layer norms
+- The residual connections
 
 > Correct: two matrices of width × dFf each.
 
 > **Why:** The feed-forward block has a width × dFf matrix and a dFf × width matrix, and with dFf usually several times the width it dominates the block.
 
 **Q. A pre-norm block normalises its input before the sub-layer rather than after it. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Yes. Normalising first keeps the residual stream unscaled, which is what makes a deep stack of blocks trainable without careful initialisation.
 
@@ -263,6 +268,8 @@ Count every parameter of a model and see which part of it dominates. Open **Coun
 #### Practice
 
 **Q. A model has a vocabulary of 32,000, a width of 768 and 12 layers, and it ties its output projection to the embedding. How many parameters does the embedding account for, in millions? — numeric *(hard)***
+
+> **Answer:** 24.576 ± 0.001 million parameters
 
 > **Why:** 32,000 × 768 = 24,576,000, which is 24.576 million. With the output tied, the vocabulary-sized parameters are paid for once instead of twice.
 
@@ -316,14 +323,16 @@ Before you train anything, you can work out what it will cost. This module count
 
 **Q. A matrix–matrix multiply of an m × k by a k × n matrix costs how many floating-point operations? — numeric *(core)***
 
+> **Answer:** 2
+
 > **Why:** Exactly 2mnk. There are mn outputs, each needing k multiplications and k additions, and the additions are counted as a second operation.
 
 **Q. Why is a training step about three forward passes? — multiple-choice *(core)***
 
 - ✓ **The backward pass costs about twice the forward pass**
-- - The optimiser needs a second pass to check the update
-- - The activations are recomputed
-- - The data is loaded twice
+- The optimiser needs a second pass to check the update
+- The activations are recomputed
+- The data is loaded twice
 
 > Correct.
 
@@ -368,9 +377,9 @@ Break a training step into its terms and watch them move with the shape. Open **
 **Q. What is the arithmetic intensity of a kernel? — multiple-choice *(core)***
 
 - ✓ **Floating-point operations per byte of memory traffic**
-- - Bytes of memory per floating-point operation
-- - The fraction of the peak rate the kernel reaches
-- - The number of arithmetic units the kernel uses
+- Bytes of memory per floating-point operation
+- The fraction of the peak rate the kernel reaches
+- The number of arithmetic units the kernel uses
 
 > Correct.
 
@@ -379,9 +388,9 @@ Break a training step into its terms and watch them move with the shape. Open **
 **Q. Why is the attention kernel memory bound even when the whole training step is not? — multiple-choice *(hard)***
 
 - ✓ **Its intensity is fixed by the head dimension, which is small**
-- - It runs on a slower processor
-- - It reads more data than the other kernels
-- - It uses more arithmetic units
+- It runs on a slower processor
+- It reads more data than the other kernels
+- It uses more arithmetic units
 
 > Correct.
 
@@ -441,15 +450,17 @@ A model that does not fit on one device has to be split. This module covers the 
 **Q. What does data parallelism split? — multiple-choice *(core)***
 
 - ✓ **The batch**
-- - The layers
-- - The individual matrices
-- - The vocabulary
+- The layers
+- The individual matrices
+- The vocabulary
 
 > Correct.
 
 > **Why:** Data parallelism gives every device the same model and a different slice of the batch, then all-reduces the gradients before the update.
 
 **Q. Data parallelism is worth it when the gradient all-reduce costs less than the arithmetic it saves. — boolean *(hard)***
+
+> **Answer:** True
 
 > **Why:** Yes. The all-reduce touches every parameter, and the saving from a larger batch is the difference in the number of steps. Past some size the communication wins.
 
@@ -506,15 +517,17 @@ The tokens are the training set, and how they are chosen is a research decision 
 **Q. What is the mixture in a data pipeline? — multiple-choice *(core)***
 
 - ✓ **The proportions in which the sources are combined**
-- - The list of filters applied to the corpus
-- - The order the documents are shuffled in
-- - The tokeniser’s merge list
+- The list of filters applied to the corpus
+- The order the documents are shuffled in
+- The tokeniser’s merge list
 
 > Correct.
 
 > **Why:** The mixture is a decision about what the model should know, and it deserves the same argument as any other hyperparameter.
 
 **Q. Deduplication only tidies the corpus up; it does not change what the model learns. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. Repeated text is a signal — the model learns differently when a document appears ten times — and removing it changes both the token count and the distribution.
 
@@ -573,15 +586,17 @@ A training run is a loop over batches, and a language model is trained to predic
 **Q. What does the cross-entropy loss measure for a language model? — multiple-choice *(core)***
 
 - ✓ **The negative log-probability the model assigned to the token that actually came next**
-- - The error in the predicted token
-- - The distance between the prediction and the label
-- - The perplexity
+- The error in the predicted token
+- The distance between the prediction and the label
+- The perplexity
 
 > Correct.
 
 > **Why:** Averaged over the tokens, the cross-entropy is the negative log-likelihood of the corpus under the model, which is exactly what the model is trying to minimise.
 
 **Q. A model reaches a cross-entropy of 2.3026. What is its perplexity? — numeric *(core)***
+
+> **Answer:** 10
 
 > **Why:** e^2.3026 = 10, so exactly 10. A perplexity of 10 means the model was as uncertain about each token as a ten-way choice.
 
@@ -625,9 +640,9 @@ Train a real transformer in the browser and watch the loss fall. Open **Run a tr
 **Q. Why is the validation loss a different measurement from the training loss? — multiple-choice *(core)***
 
 - ✓ **It is computed on data the model never trained on**
-- - It is computed with a different tokeniser
-- - It is the training loss, averaged
-- - It uses a different loss function
+- It is computed with a different tokeniser
+- It is the training loss, averaged
+- It uses a different loss function
 
 > Correct.
 
@@ -673,9 +688,9 @@ Read the perplexity alongside the loss and the validation number. Open **The num
 **Q. What does the IsoFLOP method find? — multiple-choice *(hard)***
 
 - ✓ **The model size that minimises the loss for a fixed compute budget**
-- - The largest model the hardware can hold
-- - The number of epochs before overfitting
-- - The learning rate schedule
+- The largest model the hardware can hold
+- The number of epochs before overfitting
+- The learning rate schedule
 
 > Correct.
 
@@ -925,7 +940,86 @@ Chinchilla found that the parameters and the tokens should grow together, roughl
 
 *Hoffmann et al. (2022)*
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The tokeniser
+
+*A byte-pair encoding trained here, and GPT-2’s own vocabulary on a real book.*
+
+**Delivers:**
+
+- Using a real tokeniser and a real dataset
+
+### B · The architecture
+
+*The parameter budget.*
+
+### C · Resource accounting
+
+*The FLOPs, the memory, the hierarchy, the roofline.*
+
+**Delivers:**
+
+- FLOPs and arithmetic intensity
+- Memory hierarchy arithmetic
+
+### D · The data pipeline
+
+*What the filtering costs.*
+
+**Delivers:**
+
+- Data filtering and deduplication at corpus scale
+- Data
+
+### E · The training loop
+
+*A real run, read line by line, evaluated and sampled from.*
+
+**Delivers:**
+
+- A real training loop with a loss curve
+- Reading a real training loop
+- Evaluation harnesses
+- Running a small real model
+- Basics
+- The tokeniser, the attention head, the optimiser, each built from nothing
+
+### F · The scaling frontier
+
+*The IsoFLOP picture.*
+
+**Delivers:**
+
+- Scaling
+
+### G · Systems
+
+*What the hierarchy and the interconnect cost.*
+
+**Delivers:**
+
+- Systems
+
+### H · Alignment and reasoning
+
+*SFT and RL against a verifier, computed exactly.*
+
+**Delivers:**
+
+- Alignment and reasoning
+
+### I · The companion figures
+
+*One computed figure for every lecture.*
+
+**Delivers:**
+
+- Every lecture has a computed companion figure
+
+## Appendix C — Sources
 
 - **CS336: Language Modeling from Scratch** — Stanford CS336 staff (2026), stanford-cs336.github.io — Spring 2025 and Spring 2026 offerings. Licence: Course materials are published for study. The lecture repository (stanford-cs336/spring2025-lectures) and the assignment repository (stanford-cs336/assignment1-basics) are both MIT licensed. Course slides and assignment handouts are cited, not redistributed..
   No course in the collection trains a real model, touches a real corpus, or accounts for real hardware cost. Every number in the collection comes from a toy-scale model.

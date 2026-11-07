@@ -61,7 +61,8 @@
   - [Lesson 7. Memorisation](#lesson-7-memorisation)
   - [Lesson 14. Who can tell](#lesson-14-who-can-tell)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Harmlessness from AI Feedback
 
@@ -98,15 +99,17 @@ The critique-and-revise loop, the preference data it makes, and the judge that e
 **Q. What does the critique in the critique-and-revise loop do? — multiple-choice *(core)***
 
 - ✓ **It names the principle the response broke, so the revision has something to work against**
-- - It rewrites the response
-- - It scores the response
-- - It decides whether the response is harmful
+- It rewrites the response
+- It scores the response
+- It decides whether the response is harmful
 
 > Correct.
 
 > **Why:** A revision cannot be written without something to revise against, so the critique has to name the principle.
 
 **Q. The critique-and-revise loop produces a preference dataset, which is then used for training. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Yes. The revisions become the preferred responses, and it is a dataset like any other — with whatever biases the critiquing model carried.
 
@@ -147,9 +150,9 @@ The critiques, the revisions, and the harm that is left. Open **Run the loop** i
 **Q. What is the agreement between a judge and the human labels? — multiple-choice *(core)***
 
 - ✓ **The part of a harmlessness score that makes it worth anything**
-- - An optional extra
-- - The accuracy of the model being tested
-- - The size of the preference dataset
+- An optional extra
+- The accuracy of the model being tested
+- The size of the preference dataset
 
 > Correct.
 
@@ -194,9 +197,9 @@ The agreement of a judge with the labels, and the errors it makes. Open **Check 
 **Q. What does a harmlessness score not tell you? — multiple-choice *(hard)***
 
 - ✓ **What the model does outside the sample the score was measured on**
-- - What the judge believed
-- - The size of the sample
-- - The taxonomy
+- What the judge believed
+- The size of the sample
+- The taxonomy
 
 > Correct.
 
@@ -241,15 +244,17 @@ The parts of a harmlessness claim, and the measurement behind each. Open **Read 
 **Q. What can the first round of the procedure learn that the second round cannot? — multiple-choice *(core)***
 
 - ✓ **What a good answer looks like, from the demonstrations it was given**
-- - Which of two good answers to prefer
-- - How harmful an answer is
-- - Nothing: the rounds are the same training
+- Which of two good answers to prefer
+- How harmful an answer is
+- Nothing: the rounds are the same training
 
 > Correct — and it is the round both procedures share.
 
 > **Why:** Imitation learns the shape of an answer. A trade-off between being helpful and being harmless is a statement about which answer to prefer, and only the preference signal carries it.
 
 **Q. Changing the weighting of the two objectives changes which round of training wins the argument. — boolean *(hard)***
+
+> **Answer:** True
 
 > **Why:** It does. The weighting is a choice made outside the data, and the same model is a different assistant under a different one — which is why the trade-off has to be stated as part of the result.
 
@@ -293,9 +298,9 @@ Where each round lands, how far the second one moves, and what the weighting cha
 **Q. Why does comparing a self-critic with an external critic need a third opinion? — multiple-choice *(core)***
 
 - ✓ **Because the question is which critiques were right, and neither critic can be the judge of that**
-- - Because the two critics are the same model
-- - Because the critics write different numbers of words
-- - It does not; the two rates can be compared directly
+- Because the two critics are the same model
+- Because the critics write different numbers of words
+- It does not; the two rates can be compared directly
 
 > Correct.
 
@@ -353,15 +358,17 @@ The attack, the taxonomy, and the two numbers that matter: how often the model f
 **Q. Why is the attack success rate the wrong number to report on its own? — multiple-choice *(core)***
 
 - ✓ **It says how often the model failed, and nothing about what it was never asked**
-- - It is too noisy
-- - It is too generous
-- - It ignores the cost of the attacks
+- It is too noisy
+- It is too generous
+- It ignores the cost of the attacks
 
 > Correct.
 
 > **Why:** A red-team set is a sample of the attacks that work, not a test set. The failures it has not found are the ones it cannot rule out.
 
 **Q. A model-driven red team reaches more of the taxonomy than a random one on the same budget. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Yes, and the coverage is the number that shows it. The attack success rate can be similar while the coverage is very different.
 
@@ -404,9 +411,9 @@ The attacks, the failures, and the coverage of the taxonomy. Open **Run the red 
 **Q. What is a taxonomy for? — multiple-choice *(core)***
 
 - ✓ **Turning a pile of failures into a measurement that can be compared**
-- - Listing every possible failure
-- - Deciding which failures matter
-- - Replacing the red team
+- Listing every possible failure
+- Deciding which failures matter
+- Replacing the red team
 
 > Correct.
 
@@ -449,6 +456,8 @@ A model-driven red team against a random one, on the same budget. Open **Compare
 #### Practice
 
 **Q. One attempt reaches a particular failure with probability 0.25. Spending four attempts on it, what is the chance the failure has been found at least once? — numeric *(core)***
+
+> **Answer:** 0.68359375 ± 0.001
 
 > **Why:** One minus the chance it is missed four times: 1 − 0.75⁴ = 0.6836. This is the arithmetic the ceiling curve is made of, and it is the same whether the attempts were asked for or stumbled into.
 
@@ -503,15 +512,17 @@ The safety classifier, the label sheet it was given, and the part of the behavio
 **Q. A safety classifier is given a column for one cue, and the harm rides on another. What happens to the harm that rides on the unnamed one? — multiple-choice *(core)***
 
 - ✓ **It is never counted, which is not the same as being counted wrong**
-- - It is counted as harmless
-- - It raises the false-positive rate
-- - The classifier flags it at half the usual rate
+- It is counted as harmless
+- It raises the false-positive rate
+- The classifier flags it at half the usual rate
 
 > Correct.
 
 > **Why:** This is the difference between a measurement that failed and a measurement that was never run, and it is the reason the evaluation set has to contain the cue.
 
 **Q. A classifier is fitted with a column for a cue that none of its examples carry. What weight does the fit put on that column? — numeric *(core)***
+
+> **Answer:** 0
 
 > **Why:** Exactly zero. A fit has no opinion about a mark it was never given a column for, and a reported weight of zero is a statement about the sheet the team filled in rather than about the behaviour.
 
@@ -568,15 +579,17 @@ The flip rate, the size of the effect, and the small change to the prompt that m
 **Q. What does the flip rate measure? — multiple-choice *(core)***
 
 - ✓ **The fraction of correct answers that become wrong when the user asserts a wrong one**
-- - The fraction of answers that are wrong
-- - How often the model agrees with the user
-- - How much the model’s accuracy drops under pressure
+- The fraction of answers that are wrong
+- How often the model agrees with the user
+- How much the model’s accuracy drops under pressure
 
 > Correct.
 
 > **Why:** The model is asked something it gets right, the user asserts a wrong answer, and the rate says how often the model goes along with it.
 
 **Q. Sycophancy is a quirk of the architecture rather than a consequence of the training. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. The training rewarded the answer that made the user happy, and agreement looks like that. Which is good news, because a consequence of the training can be changed by the training.
 
@@ -616,9 +629,9 @@ The answers under pressure, and the ones that flip. Open **Measure the flip rate
 **Q. What is the mitigation for sycophancy? — multiple-choice *(core)***
 
 - ✓ **Telling the model the user may be wrong, which moves the flip rate by a measurable amount**
-- - Training the model on the right answers
-- - Removing the model’s access to the user’s message
-- - There is no mitigation
+- Training the model on the right answers
+- Removing the model’s access to the user’s message
+- There is no mitigation
 
 > Correct.
 
@@ -663,15 +676,17 @@ The flip rate with and without the challenge, and the difference. Open **Try the
 **Q. What does the repeat agreement of a labeler measure? — multiple-choice *(core)***
 
 - ✓ **How often the labeler gives the same answer to the same question twice**
-- - How often the labeler is right
-- - How often two labelers agree
-- - How many questions were labelled
+- How often the labeler is right
+- How often two labelers agree
+- How many questions were labelled
 
 > Correct.
 
 > **Why:** It is a rate, and it says how much of a preference label is signal rather than a coin toss. Nothing in it says whether what the labeler means is right.
 
 **Q. Taking a majority over several looks at a question makes the label both more faithful to what the labeler means and more often correct. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** Only the first half. A majority of looks raises the rate at which the label is the one the labeler would give again; if the labeler leans toward the answer the user wanted, the majority is that lean with less noise around it.
 
@@ -727,15 +742,17 @@ Memorisation, the extraction attack, and the number that says how much of the tr
 **Q. What does the extraction attack do? — multiple-choice *(core)***
 
 - ✓ **It supplies what it knows of a training record and gets the model to fill in the rest**
-- - It asks the model for its training data
-- - It measures the model’s parameter count
-- - It compares the model with the original dataset
+- It asks the model for its training data
+- It measures the model’s parameter count
+- It compares the model with the original dataset
 
 > Correct.
 
 > **Why:** The attack gets easier the more of the record the attacker already has, and the success rate against the length of the known prefix is the measurement.
 
 **Q. An extraction attack succeeds on a third of the records. What is the exposure of the training set? — numeric *(core)***
+
+> **Answer:** 0.333333 ± 0.001
 
 > **Why:** The exposure is the fraction of the training set the attack can recover: a third of it, on this measure and by this attack.
 
@@ -777,15 +794,17 @@ The attack, the prefix, and the success rate at each length. Open **Run the extr
 **Q. What does a membership-inference attack read? — multiple-choice *(core)***
 
 - ✓ **How much more the model likes the record than a model that never saw it**
-- - Whether the record is in a list the model publishes
-- - The gradient of the model on the record
-- - The length of the record
+- Whether the record is in a list the model publishes
+- The gradient of the model on the record
+- The length of the record
 
 > Correct — the log of that ratio is the score.
 
 > **Why:** The baseline is a reference model trained without the record, and the whole shape of the result depends on it: a lower baseline makes every gap look like memorisation.
 
 **Q. A toy model chooses between 16 tokens and has never seen a record. What is the chance that one query says the record’s continuation back? — numeric *(core)***
+
+> **Answer:** 0.0625 ± 0.0001
 
 > **Why:** One in sixteen: 0.0625. An outsider is flagged exactly as often as it happens to look like a member, which is why a single query is a coin rather than a test.
 
@@ -901,7 +920,66 @@ The attacker compares what the model gives a record against what a model that ne
 
 It raises the model’s probability without having been seen, so an attack scores it like a member. A corpus with no near-duplicates gives a membership test that cannot fail; the precision of a real attack is the share of the flagged candidates that this group accounts for.
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The constitution
+
+*A model that critiques itself, the critic that sees what it cannot, and the judge that scores it.*
+
+**Delivers:**
+
+- The critique-and-revise loop
+- Self-critique versus external critique
+
+### B · The two rounds
+
+*What imitation reaches, what a preference signal moves, and what the compromise costs.*
+
+**Delivers:**
+
+- The two-round alignment procedure
+
+### C · Red teaming
+
+*The failures you found, the ones you did not, and what a longer budget buys.*
+
+**Delivers:**
+
+- The red-teaming search loop
+- Discovery rate against a search budget
+
+### D · The cued behaviour
+
+*A classifier that is exact about every harm it was told about, and silent about the rest.*
+
+**Delivers:**
+
+- Conditional behaviour that a safety classifier misses
+
+### E · The consistent labeler
+
+*What a repeat-agreement number measures, and what a majority of looks hands to the reward model.*
+
+**Delivers:**
+
+- The human-feedback consistency preference and what it rewards
+
+### F · Sycophancy
+
+*Changing the answer to agree with the person asking.*
+
+### G · Privacy
+
+*What a model can be made to give back, and who can tell that it was trained on it.*
+
+**Delivers:**
+
+- A membership-inference attack against a toy model
+- Extraction accuracy against duplication rate
+
+## Appendix C — Sources
 
 - **Constitutional AI: Harmlessness from AI Feedback** — Yuntao Bai, Saurav Kadavath, Sandipan Kundu, Amanda Askell, Jackson Kernion, Andy Jones, Anna Chen, Anna Goldie, Azalia Mirhoseini, Cameron McKinnon, Carol Chen, Catherine Olsson, Christopher Olah, Danny Hernandez, Dawn Drain, Deep Ganguli, Dustin Li, Eli Tran-Johnson, Ethan Perez, Jamie Kerr, Jared Mueller, Jeffrey Ladish, Joshua Landau, Kamal Ndousse, Kamile Lukosuite, Liane Lovitt, Michael Sellitto, Nelson Elhage, Nicholas Schiefer, Noemi Mercado, Nova DasSarma, Robert Lasenby, Robin Larson, Sam Ringer, Scott Johnston, Shauna Kravec, Sheer El Showk, Stanislav Fort, Tamera Lanham, Timothy Telleen-Lawton, Tom Conerly, Tom Henighan, Tristan Hume, Samuel R. Bowman, Zac Hatfield-Dodds, Ben Mann, Dario Amodei, Nicholas Joseph, Sam McCandlish, Tom Brown, Jared Kaplan (2022), arXiv:2212.08073 [cs.CL] / Anthropic. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing..
   The alignment module in the foundations course is two lessons wide. This is the method the rest of the field cites when it says 'principled'.

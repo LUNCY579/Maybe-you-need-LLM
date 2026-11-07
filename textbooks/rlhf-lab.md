@@ -53,7 +53,8 @@
   - [Lesson 10. The functional forms](#lesson-10-the-functional-forms)
   - [Lesson 11. The operational lesson](#lesson-11-the-operational-lesson)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Policy Gradients
 
@@ -90,15 +91,17 @@ RLHF optimises a policy, not a function. This module introduces the objective �
 **Q. What does an RLHF policy stage maximise? — multiple-choice *(core)***
 
 - ✓ **The expected reward under the policy, minus a KL penalty**
-- - The reward of the single best response
-- - The likelihood of the reference responses
-- - The log-probability of the policy’s samples
+- The reward of the single best response
+- The likelihood of the reference responses
+- The log-probability of the policy’s samples
 
 > Correct.
 
 > **Why:** The objective is an expectation over the actions the policy samples, minus a penalty for moving away from the reference. The penalty is part of the objective, not a regulariser bolted on afterwards.
 
 **Q. The gradient of an expectation is the expectation of the gradient. — boolean *(core)***
+
+> **Answer:** False
 
 > **Why:** No — and this is the whole reason the score-function estimator exists. The distribution is being moved, so the derivative has to account for that. The score-function estimator is the identity that makes it possible without differentiating through the model.
 
@@ -140,9 +143,9 @@ Compute the expected reward of a policy and check its gradient against a finite 
 **Q. What does the score-function estimator replace? — multiple-choice *(core)***
 
 - ✓ **The derivative of the model, with its own log-probability**
-- - The reward, with the value function
-- - The expectation, with a sample
-- - The KL penalty, with a constraint
+- The reward, with the value function
+- The expectation, with a sample
+- The KL penalty, with a constraint
 
 > Correct.
 
@@ -199,9 +202,9 @@ Taking a large step in the space of policies destroys the policy: the samples th
 **Q. What is the purpose of the trust-region constraint? — multiple-choice *(core)***
 
 - ✓ **To keep the samples that justified the old estimate valid**
-- - To stop the policy from producing low-probability text
-- - To make the reward model more accurate
-- - To keep the loss from diverging
+- To stop the policy from producing low-probability text
+- To make the reward model more accurate
+- To keep the loss from diverging
 
 > Correct.
 
@@ -210,9 +213,9 @@ Taking a large step in the space of policies destroys the policy: the samples th
 **Q. How is a KL penalty different from a KL constraint? — multiple-choice *(hard)***
 
 - ✓ **A penalty is a soft term in the objective; a constraint is a boundary the optimiser respects**
-- - They are the same thing with different names
-- - A penalty is computed exactly and a constraint is estimated
-- - A constraint is a regulariser and a penalty is a hyperparameter
+- They are the same thing with different names
+- A penalty is computed exactly and a constraint is estimated
+- A constraint is a regulariser and a penalty is a hyperparameter
 
 > Correct.
 
@@ -270,15 +273,17 @@ PPO replaces the hard constraint with a clip: once the importance ratio passes a
 **Q. What happens to the gradient of the clipped objective when the clip is active? — multiple-choice *(core)***
 
 - ✓ **It becomes exactly zero**
-- - It becomes smaller but stays non-zero
-- - It is clipped to a small value
-- - It is rescaled by the clip factor
+- It becomes smaller but stays non-zero
+- It is clipped to a small value
+- It is rescaled by the clip factor
 
 > Correct.
 
 > **Why:** Where the clip is active the objective is min(clipped, unclipped) and the clipped branch is the smaller one — and it is a constant. The gradient is therefore exactly zero, not merely small. That is the mechanism: the step is discarded, not shrunk.
 
 **Q. With ε = 0.2, what is the clipped objective when the importance ratio is 2.0 and the advantage is 1? — numeric *(core)***
+
+> **Answer:** 1.2
 
 > **Why:** Exactly 1.2. The ratio is clipped to 1 + ε = 1.2, and the minimum of the two branches is the clipped one, because the advantage is positive.
 
@@ -325,9 +330,9 @@ Sweep the importance ratio and watch the objective and its gradient change. Open
 **Q. What does λ = 1 in generalised advantage estimation give? — multiple-choice *(core)***
 
 - ✓ **The Monte Carlo return, minus the baseline**
-- - The one-step temporal-difference residual
-- - The importance ratio
-- - Zero
+- The one-step temporal-difference residual
+- The importance ratio
+- Zero
 
 > Correct: unbiased, high variance.
 
@@ -384,15 +389,17 @@ The penalty term is the KL divergence from the supervised reference policy, and 
 **Q. Which of the three KL estimators is unbiased for the KL divergence? — multiple-choice *(hard)***
 
 - ✓ **The log-ratio, k1**
-- - The squared log-ratio, k2
-- - r − 1 − log r, k3
-- - None of them
+- The squared log-ratio, k2
+- r − 1 − log r, k3
+- None of them
 
 > Correct — but it can be negative, which is why it is not used as a penalty.
 
 > **Why:** E_π[log(π/π_ref)] is exactly the KL. The other two are used for different reasons: k2 because it is positive, k3 because it is positive and has lower variance — not because it is unbiased for the KL.
 
 **Q. A policy puts probability 0.5 on an action and the reference puts 0.25 on it. What is the log-ratio, in nats? — numeric *(core)***
+
+> **Answer:** 0.6931472 ± 0.0001
 
 > **Why:** log(0.5/0.25) = log 2 ≈ 0.693 nats. The k3 estimator on the same sample would be 2 − 1 − log 2 ≈ 0.307.
 
@@ -447,9 +454,9 @@ The primary source’s contribution is an enumeration: twenty implementation det
 **Q. Which stage of the RLHF pipeline produces the reference policy? — multiple-choice *(core)***
 
 - ✓ **Supervised fine-tuning**
-- - Reward modelling
-- - Policy optimisation
-- - Evaluation
+- Reward modelling
+- Policy optimisation
+- Evaluation
 
 > Correct.
 
@@ -458,9 +465,9 @@ The primary source’s contribution is an enumeration: twenty implementation det
 **Q. What does the reward model produce? — multiple-choice *(core)***
 
 - ✓ **A scalar score for a response**
-- - A new policy
-- - A preference between two responses
-- - A dataset
+- A new policy
+- A preference between two responses
+- A dataset
 
 > Correct, and the score is wrong in a way that matters.
 
@@ -504,6 +511,8 @@ Walk the three stages and see what each one contributes to the final behaviour. 
 #### Practice
 
 **Q. The primary source’s main contribution is a new algorithm. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. Its contribution is an enumeration and a reproduction: twenty implementation details that the reported behaviour depended on, and a demonstration that most of them had to be in place for the pipeline to train at all.
 
@@ -559,9 +568,9 @@ A reward model is a proxy, and a proxy that is optimised past its accuracy stops
 **Q. What is the overoptimisation result? — multiple-choice *(core)***
 
 - ✓ **Optimising a proxy reward harder eventually makes the true reward worse**
-- - A bigger reward model always gives a better policy
-- - Reward models cannot be trained at all
-- - The KL penalty should be removed
+- A bigger reward model always gives a better policy
+- Reward models cannot be trained at all
+- The KL penalty should be removed
 
 > Correct.
 
@@ -570,9 +579,9 @@ A reward model is a proxy, and a proxy that is optimised past its accuracy stops
 **Q. Why is a fixed-size reward-model error enough to cause overoptimisation? — multiple-choice *(hard)***
 
 - ✓ **Because the error does not grow as the policy is pushed, so the gap between proxy and truth opens up**
-- - Because the error is random and noise is always harmful
-- - Because a fixed error makes the reward model worse over time
-- - Because the KL penalty grows with the error
+- Because the error is random and noise is always harmful
+- Because a fixed error makes the reward model worse over time
+- Because the KL penalty grows with the error
 
 > Correct.
 
@@ -621,9 +630,9 @@ Push the policy further and watch the proxy rise while the true reward turns ove
 **Q. Which functional form does the overoptimisation paper fit for best-of-n? — multiple-choice *(hard)***
 
 - ✓ **R(d) = d(α − β d)**
-- - R(d) = d(α − β log d)
-- - R(d) = α e^(−β d)
-- - R(d) = α d² + β
+- R(d) = d(α − β log d)
+- R(d) = α e^(−β d)
+- R(d) = α d² + β
 
 > Correct.
 
@@ -668,9 +677,9 @@ Fit both functional forms to the measured curve and compare the two methods. Ope
 **Q. What does the turning point of the overoptimisation curve tell an practitioner? — multiple-choice *(hard)***
 
 - ✓ **The distance at which the marginal proxy reward equals the marginal true reward**
-- - The point at which the reward model stops working
-- - The number of training steps to stop at
-- - That the KL penalty should be removed
+- The point at which the reward model stops working
+- The number of training steps to stop at
+- That the KL penalty should be removed
 
 > Correct.
 
@@ -883,7 +892,65 @@ Another variance reduction, applied to the value targets rather than the advanta
 
 *Course term*
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The policy gradient
+
+*The objective, the estimator, the ruler it is measured with, and the trust region.*
+
+**Delivers:**
+
+- Natural gradient and the KL constraint
+- Fisher-vector product by finite differences
+
+### B · The clipped objective
+
+*Where the clip bites, what the surrogate is worth, and what normalising does.*
+
+**Delivers:**
+
+- The PPO clipped surrogate objective
+- The probability-ratio clip and why it bounds the gradient
+- Advantage normalisation
+
+### C · Advantages and GAE
+
+*The bias–variance trade-off in λ, on a chain that can be enumerated.*
+
+**Delivers:**
+
+- Value head and generalised advantage estimation
+
+### D · The KL penalty
+
+*Three estimators of the same distance, and the penalty they hold a policy to.*
+
+**Delivers:**
+
+- KL penalty and the reference model
+
+### E · The pipeline
+
+*The three stages run end to end, and what a weak reward model does to the last one.*
+
+**Delivers:**
+
+- Reward hacking under a weak reward model
+- The SFT stage, the reward model, the PPO stage, each as a runnable file
+
+### F · Reward overoptimisation
+
+*The curve, the two fits against one KL budget, and where to stop.*
+
+**Delivers:**
+
+- Reward overoptimisation against a gold reward model
+- Best-of-n versus reinforcement learning against the same KL budget
+- The α and β coefficients as the reward model grows
+
+## Appendix C — Sources
 
 - **The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization** — Shengyi Huang, Michael Noukhovitch, Arian Hosseini, Kashif Rasul, Weixun Wang, Lewis Tunstall (2024), arXiv:2403.17031 [cs.LG] / COLM 2024. Licence: CC BY 4.0 on the OpenReview record (https://openreview.net/forum?id=kHO2ZTa8e3). arXiv carries the perpetual non-exclusive distribution licence..
   The alignment course covers Bradley–Terry reward models and DPO but never the policy optimisation that the method is named after.

@@ -107,7 +107,14 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <a class="l2" href="#lesson-7-proposing-and-checking">Lesson 7. Proposing and checking</a>
 <a class="l2" href="#lesson-8-when-speculation-pays">Lesson 8. When speculation pays</a>
 <a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
-<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+<a class="" href="#appendix-b-the-laboratories">Appendix B — The laboratories</a>
+<a class="l2" href="#a-attention-memory">A · Attention memory</a>
+<a class="l2" href="#b-the-kv-cache">B · The KV cache</a>
+<a class="l2" href="#c-sparse-capacity">C · Sparse capacity</a>
+<a class="l2" href="#d-eight-bits-four-bits">D · Eight bits, four bits</a>
+<a class="l2" href="#e-speculation">E · Speculation</a>
+<a class="l2" href="#f-fine-tuning-without-moving-the-weights">F · Fine-tuning without moving the weights</a>
+<a class="" href="#appendix-c-sources">Appendix C — Sources</a></nav>
   <main class="book"><h1 id="systems-lab">Systems Lab</h1>
 <p><strong>Source:</strong> FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness — Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, Christopher Ré (2022)</p>
 <p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
@@ -141,7 +148,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p><strong>Why this course exists:</strong> Combining quantisation with low-rank adaptation, which is how a single GPU fine-tunes a large model.</p>
 <hr>
 <h2 id="contents">Contents</h2>
-<ul><li><a href="#1-attention-memory">1. Attention Memory</a> - <a href="#lesson-1-the-matrix-you-never-build">Lesson 1. The matrix you never build</a> - <a href="#lesson-2-the-running-softmax">Lesson 2. The running softmax</a></li><li><a href="#2-the-kv-cache">2. The KV Cache</a> - <a href="#lesson-3-decoding-is-memory-bound">Lesson 3. Decoding is memory-bound</a> - <a href="#lesson-4-the-page-table">Lesson 4. The page table</a></li><li><a href="#3-sparse-capacity">3. Sparse Capacity</a> - <a href="#lesson-5-the-router">Lesson 5. The router</a> - <a href="#lesson-6-the-auxiliary-loss">Lesson 6. The auxiliary loss</a></li><li><a href="#4-speculation">4. Speculation</a> - <a href="#lesson-7-proposing-and-checking">Lesson 7. Proposing and checking</a> - <a href="#lesson-8-when-speculation-pays">Lesson 8. When speculation pays</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<ul><li><a href="#1-attention-memory">1. Attention Memory</a> - <a href="#lesson-1-the-matrix-you-never-build">Lesson 1. The matrix you never build</a> - <a href="#lesson-2-the-running-softmax">Lesson 2. The running softmax</a></li><li><a href="#2-the-kv-cache">2. The KV Cache</a> - <a href="#lesson-3-decoding-is-memory-bound">Lesson 3. Decoding is memory-bound</a> - <a href="#lesson-4-the-page-table">Lesson 4. The page table</a></li><li><a href="#3-sparse-capacity">3. Sparse Capacity</a> - <a href="#lesson-5-the-router">Lesson 5. The router</a> - <a href="#lesson-6-the-auxiliary-loss">Lesson 6. The auxiliary loss</a></li><li><a href="#4-speculation">4. Speculation</a> - <a href="#lesson-7-proposing-and-checking">Lesson 7. Proposing and checking</a> - <a href="#lesson-8-when-speculation-pays">Lesson 8. When speculation pays</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-the-laboratories">Appendix B — The laboratories</a></li><li><a href="#appendix-c-sources">Appendix C — Sources</a></li></ul>
 <h2 id="1-attention-memory">1. Attention Memory</h2>
 <p><em>The matrix you never have to build</em></p>
 <p>The naive attention builds an N×N matrix that it needs once. This module is about what that costs, and about the algorithm that does not build it — and is still exact.</p>
@@ -156,10 +163,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The score matrix is N by N, and it dwarfs everything else at a long context.</li><li>It is written once and read once, and then it is thrown away.</li><li>The training run is worse than the forward pass, because the backward pass needs the matrix kept.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Why is the score matrix the problem in a long context? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>It has N squared entries, so it grows faster than anything else in the program</strong></li><li>- It is the largest matrix the model can represent</li><li>- It is hard to compute</li><li>- It is not differentiable</li></ul>
+<ul><li>✓ <strong>It has N squared entries, so it grows faster than anything else in the program</strong></li><li>It is the largest matrix the model can represent</li><li>It is hard to compute</li><li>It is not differentiable</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The table has one entry per pair of positions, so it grows with the square of the context while everything else grows with the context itself.</p></blockquote>
 <p>*<em>Q. A context of 8192 tokens produces a score matrix in four-byte floats. How many bytes is it? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 268435456</p></blockquote>
 <blockquote><p><strong>Why:</strong> 8192 squared is 67,108,864 entries, and four bytes each is 268,435,456 bytes — two hundred and fifty-six megabytes for one layer, one head.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The naive attention, run here, with the memory and the traffic it uses. Open <strong>Build the matrix</strong> in the systems-lab application.</p>
@@ -176,7 +184,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The softmax of a row can be accumulated as a running maximum and a running sum.</li><li>When the maximum moves, the accumulator is rescaled — and that rescaling is what keeps it exact.</li><li>The answer is identical; only the memory and the traffic differ.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What makes the tiled attention exact rather than an approximation? — multiple-choice </em>(hard)***</p>
-<ul><li>✓ <strong>The running maximum and sum are rescaled whenever the maximum moves</strong></li><li>- The blocks are small enough to be exact in floating point</li><li>- The computation is done in a higher precision</li><li>- The last block is computed again</li></ul>
+<ul><li>✓ <strong>The running maximum and sum are rescaled whenever the maximum moves</strong></li><li>The blocks are small enough to be exact in floating point</li><li>The computation is done in a higher precision</li><li>The last block is computed again</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> When a larger value arrives, everything accumulated so far is divided by the factor by which the maximum grew. The rescaling is what keeps the sum exact, and it is why the tiled answer equals the naive one.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -200,10 +208,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A decode step is a matrix-vector product: two operations per byte of weights.</li><li>The weights are read once for the batch; the cache is read once per sequence.</li><li>So the batch amortises the weights and nothing else — and the intensity saturates.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Why is a decode step memory-bound? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>It is a matrix-vector product: two operations for every byte of weight read</strong></li><li>- The arithmetic is too difficult</li><li>- The cache is too large</li><li>- The model has too many layers</li></ul>
+<ul><li>✓ <strong>It is a matrix-vector product: two operations for every byte of weight read</strong></li><li>The arithmetic is too difficult</li><li>The cache is too large</li><li>The model has too many layers</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> At two operations per byte, the arithmetic intensity of a matrix-vector product is about one, and a machine whose balance point is tens of operations per byte is waiting for memory.</p></blockquote>
 <p>*<em>Q. The arithmetic intensity of a decode step rises without limit as the batch size grows. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. The weights are read once for the whole batch, so that part of the intensity rises with the batch; but the cache is read once per sequence, and its intensity is fixed. So the total rises and then saturates.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The arithmetic intensity of a decode step, as the batch size and the context grow. Open <strong>Measure the intensity</strong> in the systems-lab application.</p>
@@ -221,7 +230,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A straightforward implementation gives every sequence a buffer as long as the longest one.</li><li>Paging replaces the buffer with fixed-size blocks that can live anywhere.</li><li>The waste becomes a fraction of a block per sequence rather than a fraction of the batch.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does the paged allocation waste? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The tail of the last block of each sequence</strong></li><li>- Nothing at all</li><li>- The difference between the longest and the shortest sequence, for every sequence</li><li>- A whole block for every sequence</li></ul>
+<ul><li>✓ <strong>The tail of the last block of each sequence</strong></li><li>Nothing at all</li><li>The difference between the longest and the shortest sequence, for every sequence</li><li>A whole block for every sequence</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Paging replaces a per-sequence buffer as long as the longest sequence with whole blocks, so the waste is a fraction of a block per sequence rather than a fraction of the whole batch.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -245,7 +254,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The router sends each token to the few experts with the highest scores.</li><li>The load is what the experts actually got; the probability is what the router wanted.</li><li>When they disagree, some experts are trained more than others — and the ones trained less are worse.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Why does an unbalanced router hurt the model? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The experts that get fewer tokens are trained on less, and stay worse</strong></li><li>- The router itself becomes the bottleneck</li><li>- The tokens are dropped</li><li>- The model loses capacity</li></ul>
+<ul><li>✓ <strong>The experts that get fewer tokens are trained on less, and stay worse</strong></li><li>The router itself becomes the bottleneck</li><li>The tokens are dropped</li><li>The model loses capacity</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> An expert that sees a tenth of the tokens sees a tenth of the updates, so it stays closer to its initialisation than its neighbours do, and the model is carrying experts that are worse than useless.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -263,6 +272,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The auxiliary loss is the number of tokens times the sum of the products of the two fractions.</li><li>It is smallest when the load and the probability agree, and it pushes the router there.</li><li>The capacity factor is the other half of the bargain: a hard limit, and the tokens it drops.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. A router sends every token to one of two experts. The load fractions are 0.75 and 0.25, and the probability fractions are 0.5 and 0.5. What is the auxiliary loss for 100 tokens? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 50</p></blockquote>
 <blockquote><p><strong>Why:</strong> The auxiliary loss is N times the sum of the products: 100 × (0.75 × 0.5 + 0.25 × 0.5) = 100 × 0.5 = 50.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>A biased router, the auxiliary loss it produces, and the tokens that overflow. Open <strong>Break the balance</strong> in the systems-lab application.</p>
@@ -285,10 +295,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A drafted token is accepted with probability min(1, p(x)/q(x)).</li><li>The expected acceptance is one minus the total variation between the two distributions.</li><li>The two terms of the output distribution — the accepted and the corrected — add up to the target’s.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What is the acceptance rule? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>A drafted token x is accepted with probability min(1, p(x)/q(x))</strong></li><li>- A drafted token is accepted when the target’s most likely token is the same</li><li>- A drafted token is accepted at random</li><li>- A drafted token is accepted when it is more likely than the target’s</li></ul>
+<ul><li>✓ <strong>A drafted token x is accepted with probability min(1, p(x)/q(x))</strong></li><li>A drafted token is accepted when the target’s most likely token is the same</li><li>A drafted token is accepted at random</li><li>A drafted token is accepted when it is more likely than the target’s</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The rule compares the two distributions at the drafted token, and the correction on rejection is what makes the output come out as the target’s own distribution.</p></blockquote>
 <p>*<em>Q. The draft model’s distribution and the target’s differ by a total variation distance of 0.15. What is the expected acceptance rate? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 0.85 ± 0.001</p></blockquote>
 <blockquote><p><strong>Why:</strong> The expected acceptance is one minus the total variation: 1 − 0.15 = 0.85. The fraction of the draft’s mass the target agrees with.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The acceptance rate, measured by running the rule. Open <strong>Measure the acceptance</strong> in the systems-lab application.</p>
@@ -305,7 +316,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The speed-up is the tokens per step, divided by the cost of the drafting.</li><li>A draft that is close to the target is worth more than a long run of a bad one.</li><li>The output is unchanged: the method buys time, not a different answer.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does speculative decoding change about the model’s output? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>Nothing: the output distribution is the target model’s own</strong></li><li>- It makes the output more likely</li><li>- It makes the output less diverse</li><li>- It truncates the output to what the draft proposed</li></ul>
+<ul><li>✓ <strong>Nothing: the output distribution is the target model’s own</strong></li><li>It makes the output more likely</li><li>It makes the output less diverse</li><li>It truncates the output to what the draft proposed</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The accepted and the corrected tokens together give exactly the target’s distribution. The method buys time and nothing else, which is why it is safe to use.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -354,7 +365,33 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>A drafted token is accepted with probability min(1, p(x)/q(x)), where p is the target’s distribution and q the draft’s. The expected acceptance is one minus the total variation between them: the fraction of the draft’s mass that the target agrees with.</p>
 <p><strong>Total variation</strong> — The largest difference between two distributions, and half the sum of the differences.</p>
 <p>Between two discrete distributions, the total variation distance is half the sum of the absolute differences of their probabilities. It is between zero and one, and it is exactly the fraction of the draft’s mass that the target would not have produced.</p>
-<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<h2 id="appendix-b-the-laboratories">Appendix B — The laboratories</h2>
+<p>Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.</p>
+<h3 id="a-attention-memory">A · Attention memory</h3>
+<p><em>The matrix you never build, the traffic that replaces it, and the wall of bytes that sizes the block.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Attention FLOPs versus attention memory</li><li>The IO-bound wall and tiling</li><li>Arithmetic intensity of an attention kernel</li></ul>
+<h3 id="b-the-kv-cache">B · The KV cache</h3>
+<p><em>Why decoding is a memory problem, what paging does to the allocation, and how many sequences one card serves.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>KV-cache fragmentation</li><li>The copy-on-write branch</li><li>Throughput as a function of batch size</li></ul>
+<h3 id="c-sparse-capacity">C · Sparse capacity</h3>
+<p><em>A router, the auxiliary loss that biases it, and the tokens the capacity factor throws away.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Routing and load balance</li><li>The capacity factor and what happens when it is exceeded</li><li>The router and the capacity factor</li><li>The auxiliary loss</li><li>Simplified routing and the loss spike it removes</li></ul>
+<h3 id="d-eight-bits-four-bits">D · Eight bits, four bits</h3>
+<p><em>The outlier channel that ruins one grid, the scale that moves it, and the block that contains what is left.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Per-tensor versus per-channel quantisation error</li><li>The outlier channel and the smoothing transformation</li></ul>
+<h3 id="e-speculation">E · Speculation</h3>
+<p><em>Propose cheaply, check exactly, and the tree and the extra heads that decide what to propose.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Acceptance rate and the speed-up it buys</li><li>The tree variant and its cost</li><li>Multi-head drafting and its acceptance rate</li></ul>
+<h3 id="f-fine-tuning-without-moving-the-weights">F · Fine-tuning without moving the weights</h3>
+<p><em>The rank and what it costs, the bytes a step needs term by term, and which of the three plans fits one card.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Rank r and the number of trainable parameters</li><li>Memory budget of a QLoRA fine-tune</li></ul>
+<h2 id="appendix-c-sources">Appendix C — Sources</h2>
 <ul><li><strong>FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness</strong> — Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, Christopher Ré (2022), arXiv:2205.14135 [cs.LG] / NeurIPS 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The efficiency course covers a KV-cache laboratory but not where the arithmetic actually goes.</li><li><strong>Efficient Memory Management for Large Language Model Serving with PagedAttention</strong> — Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, Ion Stoica (2023), arXiv:2309.06180 [cs.DC] / SOSP 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Serving is a memory-allocation problem, and the page-table trick is the standard answer.</li><li><strong>Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer</strong> — Noam Shazeer, Azalia Mirhoseini, Krzysztof Maziarz, Andy Davis, Quoc Le, Geoffrey Hinton, Jeff Dean (2017), arXiv:1701.06538 [cs.LG] / ICLR 2017. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Sparse capacity is the main reason parameter counts stopped predicting quality.</li><li><strong>GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding</strong> — Dmitry Lepikhin, HyoukJoong Lee, Yuanzhong Xu, Dehao Chen, Orhan Firat, Yanping Huang, Maxim Krikun, Noam Shazeer, Zhifeng Chen (2020), arXiv:2006.16668 [cs.LG] / ICLR 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Sparse capacity: the top-k router, the capacity factor that bounds it, the tokens that overflow it, and the auxiliary loss that keeps the experts evenly used.</li><li><strong>Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity</strong> — William Fedus, Barret Zoph, Noam Shazeer (2021), arXiv:2101.03961 [cs.LG] / JMLR 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The simplification of MoE routing that made it trainable at scale.</li><li><strong>SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models</strong> — Guangxuan Xiao, Ji Lin, Mickael Seznec, Hao Wu, Julien Demouth, Song Han (2023), arXiv:2211.10438 [cs.LG] / ICML 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Quantisation is the standard memory saving and the reason activations, not weights, are the hard part.</li><li><strong>SpecInfer: Accelerating Generative Large Language Model Serving with Tree-based Speculative Inference and Verification</strong> — Xupeng Miao, Gabriele Oliaro, Zhihao Zhang, Xinhao Cheng, Zeyu Wang, Zhengxin Zhang, Rae Ying Yee Wong, Alan Zhu, Lijie Yang, Xiaoxiang Shi, Chunan Shi, Zhuoming Chen, Daiyaan Arfeen, Reyna Abhyankar, Zhihao Jia (2023), arXiv:2305.09781 [cs.DC] / ICASSP 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Speculative decoding turns a memory-bound decode loop into a batched verification, and the acceptance rate is a computable quantity.</li><li><strong>Medusa: Simple LLM Inference Acceleration Framework with Multiple Decoding Heads</strong> — Tianle Cai, Yuhong Li, Zhengyang Geng, Hongwu Peng, Jason D. Lee, Deming Chen, Tri Dao (2024), arXiv:2401.10774 [cs.CL] / ICML 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Draft-model-free speculation: the acceptance test is a set of heads, not a second model.</li><li><strong>LoRA: Low-Rank Adaptation of Large Language Models</strong> — Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu Chen (2021), arXiv:2106.09685 [cs.CL] / ICLR 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The adaptation method every fine-tuning course now teaches.</li><li><strong>QLoRA: Efficient Finetuning of Quantized LLMs</strong> — Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, Luke Zettlemoyer (2023), arXiv:2305.14314 [cs.CL] / NeurIPS 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Combining quantisation with low-rank adaptation, which is how a single GPU fine-tunes a large model.</li></ul></main>
 </div>
 <footer class="pager">

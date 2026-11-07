@@ -112,7 +112,14 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <a class="l2" href="#lesson-10-the-functional-forms">Lesson 10. The functional forms</a>
 <a class="l2" href="#lesson-11-the-operational-lesson">Lesson 11. The operational lesson</a>
 <a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
-<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+<a class="" href="#appendix-b-the-laboratories">Appendix B — The laboratories</a>
+<a class="l2" href="#a-the-policy-gradient">A · The policy gradient</a>
+<a class="l2" href="#b-the-clipped-objective">B · The clipped objective</a>
+<a class="l2" href="#c-advantages-and-gae">C · Advantages and GAE</a>
+<a class="l2" href="#d-the-kl-penalty">D · The KL penalty</a>
+<a class="l2" href="#e-the-pipeline">E · The pipeline</a>
+<a class="l2" href="#f-reward-overoptimisation">F · Reward overoptimisation</a>
+<a class="" href="#appendix-c-sources">Appendix C — Sources</a></nav>
   <main class="book"><h1 id="rlhf-lab">RLHF Lab</h1>
 <p><strong>Source:</strong> The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization — Shengyi Huang, Michael Noukhovitch, Arian Hosseini, Kashif Rasul, Weixun Wang, Lewis Tunstall (2024)</p>
 <p><strong>Licence:</strong> CC BY 4.0 on the OpenReview record (https://openreview.net/forum?id=kHO2ZTa8e3). arXiv carries the perpetual non-exclusive distribution licence.</p>
@@ -131,7 +138,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p><strong>Why this course exists:</strong> A complete, small-scale RLHF pipeline to read alongside the paper.</p>
 <hr>
 <h2 id="contents">Contents</h2>
-<ul><li><a href="#1-policy-gradients">1. Policy Gradients</a> - <a href="#lesson-1-the-objective">Lesson 1. The objective</a> - <a href="#lesson-2-the-estimator">Lesson 2. The estimator</a></li><li><a href="#2-trust-regions">2. Trust Regions</a> - <a href="#lesson-3-the-trust-region">Lesson 3. The trust region</a></li><li><a href="#3-proximal-policy-optimization">3. Proximal Policy Optimization</a> - <a href="#lesson-5-the-clipped-objective">Lesson 5. The clipped objective</a> - <a href="#lesson-6-advantages-and-gae">Lesson 6. Advantages and GAE</a></li><li><a href="#4-the-kl-penalty">4. The KL Penalty</a> - <a href="#lesson-4-the-kl-penalty">Lesson 4. The KL penalty</a></li><li><a href="#5-the-n-details">5. The N+ Details</a> - <a href="#lesson-7-the-three-stages">Lesson 7. The three stages</a> - <a href="#lesson-8-the-checklist">Lesson 8. The checklist</a></li><li><a href="#6-reward-overoptimisation">6. Reward Overoptimisation</a> - <a href="#lesson-9-the-overoptimisation-result">Lesson 9. The overoptimisation result</a> - <a href="#lesson-10-the-functional-forms">Lesson 10. The functional forms</a> - <a href="#lesson-11-the-operational-lesson">Lesson 11. The operational lesson</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<ul><li><a href="#1-policy-gradients">1. Policy Gradients</a> - <a href="#lesson-1-the-objective">Lesson 1. The objective</a> - <a href="#lesson-2-the-estimator">Lesson 2. The estimator</a></li><li><a href="#2-trust-regions">2. Trust Regions</a> - <a href="#lesson-3-the-trust-region">Lesson 3. The trust region</a></li><li><a href="#3-proximal-policy-optimization">3. Proximal Policy Optimization</a> - <a href="#lesson-5-the-clipped-objective">Lesson 5. The clipped objective</a> - <a href="#lesson-6-advantages-and-gae">Lesson 6. Advantages and GAE</a></li><li><a href="#4-the-kl-penalty">4. The KL Penalty</a> - <a href="#lesson-4-the-kl-penalty">Lesson 4. The KL penalty</a></li><li><a href="#5-the-n-details">5. The N+ Details</a> - <a href="#lesson-7-the-three-stages">Lesson 7. The three stages</a> - <a href="#lesson-8-the-checklist">Lesson 8. The checklist</a></li><li><a href="#6-reward-overoptimisation">6. Reward Overoptimisation</a> - <a href="#lesson-9-the-overoptimisation-result">Lesson 9. The overoptimisation result</a> - <a href="#lesson-10-the-functional-forms">Lesson 10. The functional forms</a> - <a href="#lesson-11-the-operational-lesson">Lesson 11. The operational lesson</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-the-laboratories">Appendix B — The laboratories</a></li><li><a href="#appendix-c-sources">Appendix C — Sources</a></li></ul>
 <h2 id="1-policy-gradients">1. Policy Gradients</h2>
 <p><em>Optimising a distribution by moving its log-probabilities</em></p>
 <p>RLHF optimises a policy, not a function. This module introduces the objective — the expected reward of the policy — and the estimator that makes it tractable: the score-function trick, which replaces a derivative through the model with a weighted log-probability.</p>
@@ -146,10 +153,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The objective is E_{a~π}[r(a)] — a number that depends on the whole distribution.</li><li>Moving the policy changes which actions are sampled, so the derivative has to account for that.</li><li>On a finite problem the expectation is a finite sum, and its gradient is available exactly.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does an RLHF policy stage maximise? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The expected reward under the policy, minus a KL penalty</strong></li><li>- The reward of the single best response</li><li>- The likelihood of the reference responses</li><li>- The log-probability of the policy’s samples</li></ul>
+<ul><li>✓ <strong>The expected reward under the policy, minus a KL penalty</strong></li><li>The reward of the single best response</li><li>The likelihood of the reference responses</li><li>The log-probability of the policy’s samples</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The objective is an expectation over the actions the policy samples, minus a penalty for moving away from the reference. The penalty is part of the objective, not a regulariser bolted on afterwards.</p></blockquote>
 <p>*<em>Q. The gradient of an expectation is the expectation of the gradient. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No — and this is the whole reason the score-function estimator exists. The distribution is being moved, so the derivative has to account for that. The score-function estimator is the identity that makes it possible without differentiating through the model.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Compute the expected reward of a policy and check its gradient against a finite difference. Open <strong>The expected reward and its gradient</strong> in the rlhf-lab application.</p>
@@ -166,7 +174,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>∇E_π[r] = E_π[r · ∇log π] — the model’s own log-probability replaces its derivative.</li><li>The trick needs the support of π to be unchanged as the parameters move.</li><li>The estimator is unbiased but high-variance, which is what the value function is for.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does the score-function estimator replace? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The derivative of the model, with its own log-probability</strong></li><li>- The reward, with the value function</li><li>- The expectation, with a sample</li><li>- The KL penalty, with a constraint</li></ul>
+<ul><li>✓ <strong>The derivative of the model, with its own log-probability</strong></li><li>The reward, with the value function</li><li>The expectation, with a sample</li><li>The KL penalty, with a constraint</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> ∇E_π[r] = E_π[r · ∇log π]. The model’s own log-probability stands in for the model’s derivative, which is what makes the estimator possible for a language model whose output layer is enormous.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -190,11 +198,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The constraint is on the KL between the old and new policies, not on the objective.</li><li>A KL <em>penalty</em> is a soft nudge; a KL <em>constraint</em> is a hard boundary that the optimiser respects.</li><li>The bound is what makes the importance ratio a usable estimate of the new policy.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What is the purpose of the trust-region constraint? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>To keep the samples that justified the old estimate valid</strong></li><li>- To stop the policy from producing low-probability text</li><li>- To make the reward model more accurate</li><li>- To keep the loss from diverging</li></ul>
+<ul><li>✓ <strong>To keep the samples that justified the old estimate valid</strong></li><li>To stop the policy from producing low-probability text</li><li>To make the reward model more accurate</li><li>To keep the loss from diverging</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The importance ratio is only a usable correction while the two policies are close. A large step makes the collected samples a poor description of the new policy, and the estimate silently becomes wrong.</p></blockquote>
 <p>*<em>Q. How is a KL penalty different from a KL constraint? — multiple-choice </em>(hard)***</p>
-<ul><li>✓ <strong>A penalty is a soft term in the objective; a constraint is a boundary the optimiser respects</strong></li><li>- They are the same thing with different names</li><li>- A penalty is computed exactly and a constraint is estimated</li><li>- A constraint is a regulariser and a penalty is a hyperparameter</li></ul>
+<ul><li>✓ <strong>A penalty is a soft term in the objective; a constraint is a boundary the optimiser respects</strong></li><li>They are the same thing with different names</li><li>A penalty is computed exactly and a constraint is estimated</li><li>A constraint is a regulariser and a penalty is a hyperparameter</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A penalty trades reward against distance at whatever ratio the coefficient sets. A constraint says the distance may not exceed δ, and the optimiser adjusts the step to respect it.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -218,10 +226,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The objective takes the minimum of the clipped and unclipped terms.</li><li>When the clip is active the objective is flat, so its gradient is exactly zero.</li><li>The clip fraction is the diagnostic: it should fall as training goes well.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What happens to the gradient of the clipped objective when the clip is active? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>It becomes exactly zero</strong></li><li>- It becomes smaller but stays non-zero</li><li>- It is clipped to a small value</li><li>- It is rescaled by the clip factor</li></ul>
+<ul><li>✓ <strong>It becomes exactly zero</strong></li><li>It becomes smaller but stays non-zero</li><li>It is clipped to a small value</li><li>It is rescaled by the clip factor</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Where the clip is active the objective is min(clipped, unclipped) and the clipped branch is the smaller one — and it is a constant. The gradient is therefore exactly zero, not merely small. That is the mechanism: the step is discarded, not shrunk.</p></blockquote>
 <p>*<em>Q. With ε = 0.2, what is the clipped objective when the importance ratio is 2.0 and the advantage is 1? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 1.2</p></blockquote>
 <blockquote><p><strong>Why:</strong> Exactly 1.2. The ratio is clipped to 1 + ε = 1.2, and the minimum of the two branches is the clipped one, because the advantage is positive.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Sweep the importance ratio and watch the objective and its gradient change. Open <strong>Where the clip bites</strong> in the rlhf-lab application.</p>
@@ -241,7 +250,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>δ_t = r_t + γV(s_{t+1}) − V(s_t) is the one-step surprise.</li><li>GAE sums the residuals with a geometric discount, and λ sets how far it looks.</li><li>λ = 0 is the one-step estimate; λ = 1 is the Monte Carlo return.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does λ = 1 in generalised advantage estimation give? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The Monte Carlo return, minus the baseline</strong></li><li>- The one-step temporal-difference residual</li><li>- The importance ratio</li><li>- Zero</li></ul>
+<ul><li>✓ <strong>The Monte Carlo return, minus the baseline</strong></li><li>The one-step temporal-difference residual</li><li>The importance ratio</li><li>Zero</li></ul>
 <blockquote><p>Correct: unbiased, high variance.</p></blockquote>
 <blockquote><p><strong>Why:</strong> λ = 1 makes the geometric sum telescope into the discounted return. It is unbiased and noisy; λ = 0 is the one-step residual, which is tight and biased.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -265,10 +274,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The penalty is the KL from the reference policy, and it is a <em>sample</em> estimate.</li><li>The naive estimator is unbiased but can be negative; the squared one is positive but biased.</li><li>The third estimator is positive, and its expectation is the chi-square divergence minus the KL — a detail most write-ups leave out.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Which of the three KL estimators is unbiased for the KL divergence? — multiple-choice </em>(hard)***</p>
-<ul><li>✓ <strong>The log-ratio, k1</strong></li><li>- The squared log-ratio, k2</li><li>- r − 1 − log r, k3</li><li>- None of them</li></ul>
+<ul><li>✓ <strong>The log-ratio, k1</strong></li><li>The squared log-ratio, k2</li><li>r − 1 − log r, k3</li><li>None of them</li></ul>
 <blockquote><p>Correct — but it can be negative, which is why it is not used as a penalty.</p></blockquote>
 <blockquote><p><strong>Why:</strong> E_π[log(π/π_ref)] is exactly the KL. The other two are used for different reasons: k2 because it is positive, k3 because it is positive and has lower variance — not because it is unbiased for the KL.</p></blockquote>
 <p>*<em>Q. A policy puts probability 0.5 on an action and the reference puts 0.25 on it. What is the log-ratio, in nats? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 0.6931472 ± 0.0001</p></blockquote>
 <blockquote><p><strong>Why:</strong> log(0.5/0.25) = log 2 ≈ 0.693 nats. The k3 estimator on the same sample would be 2 − 1 − log 2 ≈ 0.307.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Estimate the KL three ways and compare each against the quantity it is actually unbiased for. Open <strong>The three estimators, measured</strong> in the rlhf-lab application.</p>
@@ -291,11 +301,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The supervised stage produces the reference policy that the penalty is measured against.</li><li>The reward stage produces a <em>ranking</em> of responses, which is what the third stage consumes.</li><li>The third stage optimises a policy against a proxy, and that is where the danger is.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Which stage of the RLHF pipeline produces the reference policy? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>Supervised fine-tuning</strong></li><li>- Reward modelling</li><li>- Policy optimisation</li><li>- Evaluation</li></ul>
+<ul><li>✓ <strong>Supervised fine-tuning</strong></li><li>Reward modelling</li><li>Policy optimisation</li><li>Evaluation</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The reference policy is the supervised model. The KL penalty is measured against it, so the reference decides both the direction and the size of the movement the third stage is allowed.</p></blockquote>
 <p>*<em>Q. What does the reward model produce? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>A scalar score for a response</strong></li><li>- A new policy</li><li>- A preference between two responses</li><li>- A dataset</li></ul>
+<ul><li>✓ <strong>A scalar score for a response</strong></li><li>A new policy</li><li>A preference between two responses</li><li>A dataset</li></ul>
 <blockquote><p>Correct, and the score is wrong in a way that matters.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A scalar per response, trained from pairwise preferences. The third stage then maximises the expected score — and the error in that score is what makes overoptimisation possible.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -314,6 +324,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The primary source’s contribution is an enumeration, not a new algorithm.</li><li>Most of the details are about scale: the reward model’s noise, the learning rate, the number of epochs.</li><li>A result that omits them cannot be reproduced, and cannot be believed.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. The primary source’s main contribution is a new algorithm. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. Its contribution is an enumeration and a reproduction: twenty implementation details that the reported behaviour depended on, and a demonstration that most of them had to be in place for the pipeline to train at all.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The failure modes of each stage, and which detail guards against each one. Open <strong>The checklist</strong> in the rlhf-lab application.</p>
@@ -336,11 +347,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The proxy error does not grow as you push harder, so the gap between the proxy and the truth opens up.</li><li>The true reward is maximised at a finite distance from the reference, not at infinity.</li><li>Past that point, every unit of proxy reward costs more true reward than it gains.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What is the overoptimisation result? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>Optimising a proxy reward harder eventually makes the true reward worse</strong></li><li>- A bigger reward model always gives a better policy</li><li>- Reward models cannot be trained at all</li><li>- The KL penalty should be removed</li></ul>
+<ul><li>✓ <strong>Optimising a proxy reward harder eventually makes the true reward worse</strong></li><li>A bigger reward model always gives a better policy</li><li>Reward models cannot be trained at all</li><li>The KL penalty should be removed</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The true reward is maximised at a finite distance from the reference. Past that point every unit of proxy reward costs more true reward than it gains — which is Goodhart’s law with a curve attached.</p></blockquote>
 <p>*<em>Q. Why is a fixed-size reward-model error enough to cause overoptimisation? — multiple-choice </em>(hard)***</p>
-<ul><li>✓ <strong>Because the error does not grow as the policy is pushed, so the gap between proxy and truth opens up</strong></li><li>- Because the error is random and noise is always harmful</li><li>- Because a fixed error makes the reward model worse over time</li><li>- Because the KL penalty grows with the error</li></ul>
+<ul><li>✓ <strong>Because the error does not grow as the policy is pushed, so the gap between proxy and truth opens up</strong></li><li>Because the error is random and noise is always harmful</li><li>Because a fixed error makes the reward model worse over time</li><li>Because the KL penalty grows with the error</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The proxy’s error is a fixed landscape. Pushing the policy further finds the high spots in that landscape, and the further you go the more the proxy is rewarding its own noise rather than the truth.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -361,7 +372,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>For best-of-n: R(d) = d(α − β d), a downward parabola through the origin.</li><li>For reinforcement learning: R(d) = d(α − β log d), which turns over more slowly.</li><li>Best-of-n optimises the <em>sample</em>; reinforcement learning optimises the <em>policy</em>, and the two behave differently.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Which functional form does the overoptimisation paper fit for best-of-n? — multiple-choice </em>(hard)***</p>
-<ul><li>✓ <strong>R(d) = d(α − β d)</strong></li><li>- R(d) = d(α − β log d)</li><li>- R(d) = α e^(−β d)</li><li>- R(d) = α d² + β</li></ul>
+<ul><li>✓ <strong>R(d) = d(α − β d)</strong></li><li>R(d) = d(α − β log d)</li><li>R(d) = α e^(−β d)</li><li>R(d) = α d² + β</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Best-of-n: a downward parabola through the origin, R(d) = d(α − βd). Reinforcement learning: R(d) = d(α − β log d), which turns over more slowly because the policy moves rather than the sample.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -380,7 +391,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The KL coefficient is the dial that decides how far the policy is allowed to travel.</li><li>The turning point is where the marginal proxy reward equals the marginal true reward.</li><li>A report that gives a score without the distance travelled cannot be compared with another one.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does the turning point of the overoptimisation curve tell an practitioner? — multiple-choice </em>(hard)***</p>
-<ul><li>✓ <strong>The distance at which the marginal proxy reward equals the marginal true reward</strong></li><li>- The point at which the reward model stops working</li><li>- The number of training steps to stop at</li><li>- That the KL penalty should be removed</li></ul>
+<ul><li>✓ <strong>The distance at which the marginal proxy reward equals the marginal true reward</strong></li><li>The point at which the reward model stops working</li><li>The number of training steps to stop at</li><li>That the KL penalty should be removed</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is the optimal stopping point for a fixed budget, and it is what the KL coefficient is set to reach. Past it, the run is spending compute to make the true outcome worse.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -486,7 +497,33 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p><strong>Whitening</strong> — Rescaling the returns so that they have mean zero and unit variance.</p>
 <p>Another variance reduction, applied to the value targets rather than the advantages. It makes the critic’s job better conditioned, and the learning rate more transferable.</p>
 <p><em>Course term</em></p>
-<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<h2 id="appendix-b-the-laboratories">Appendix B — The laboratories</h2>
+<p>Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.</p>
+<h3 id="a-the-policy-gradient">A · The policy gradient</h3>
+<p><em>The objective, the estimator, the ruler it is measured with, and the trust region.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Natural gradient and the KL constraint</li><li>Fisher-vector product by finite differences</li></ul>
+<h3 id="b-the-clipped-objective">B · The clipped objective</h3>
+<p><em>Where the clip bites, what the surrogate is worth, and what normalising does.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>The PPO clipped surrogate objective</li><li>The probability-ratio clip and why it bounds the gradient</li><li>Advantage normalisation</li></ul>
+<h3 id="c-advantages-and-gae">C · Advantages and GAE</h3>
+<p><em>The bias–variance trade-off in λ, on a chain that can be enumerated.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Value head and generalised advantage estimation</li></ul>
+<h3 id="d-the-kl-penalty">D · The KL penalty</h3>
+<p><em>Three estimators of the same distance, and the penalty they hold a policy to.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>KL penalty and the reference model</li></ul>
+<h3 id="e-the-pipeline">E · The pipeline</h3>
+<p><em>The three stages run end to end, and what a weak reward model does to the last one.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Reward hacking under a weak reward model</li><li>The SFT stage, the reward model, the PPO stage, each as a runnable file</li></ul>
+<h3 id="f-reward-overoptimisation">F · Reward overoptimisation</h3>
+<p><em>The curve, the two fits against one KL budget, and where to stop.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Reward overoptimisation against a gold reward model</li><li>Best-of-n versus reinforcement learning against the same KL budget</li><li>The α and β coefficients as the reward model grows</li></ul>
+<h2 id="appendix-c-sources">Appendix C — Sources</h2>
 <ul><li><strong>The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization</strong> — Shengyi Huang, Michael Noukhovitch, Arian Hosseini, Kashif Rasul, Weixun Wang, Lewis Tunstall (2024), arXiv:2403.17031 [cs.LG] / COLM 2024. Licence: CC BY 4.0 on the OpenReview record (https://openreview.net/forum?id=kHO2ZTa8e3). arXiv carries the perpetual non-exclusive distribution licence.. The alignment course covers Bradley–Terry reward models and DPO but never the policy optimisation that the method is named after.</li><li><strong>Proximal Policy Optimization Algorithms</strong> — John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, Oleg Klimov (2017), arXiv:1707.06347 [cs.LG]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The clipped objective that makes RLHF stable in practice.</li><li><strong>Trust Region Policy Optimization</strong> — John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, Pieter Abbeel (2015), arXiv:1502.05477 [cs.LG] / ICML 2015. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The theory PPO approximates: the KL constraint and the conjugate gradient step.</li><li><strong>Scaling Laws for Reward Model Overoptimization</strong> — Leo Gao, John Schulman, Jacob Hilton (2022), arXiv:2210.10760 [cs.LG] / ICLR 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The Goodhart effect, measured. Both functional forms are plottable at toy scale.</li><li><strong>The N+ implementation details: code and checkpoints</strong> — Shengyi Huang, Michael Noukhovitch (2024), GitHub repository. Licence: MIT (verified via the GitHub API, 2026-10-19). A complete, small-scale RLHF pipeline to read alongside the paper.</li></ul></main>
 </div>
 <footer class="pager">

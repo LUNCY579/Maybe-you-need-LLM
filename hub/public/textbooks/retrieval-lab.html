@@ -107,7 +107,12 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <a class="l2" href="#lesson-7-lost-in-the-middle">Lesson 7. Lost in the middle</a>
 <a class="l2" href="#lesson-8-what-retrieval-is-for">Lesson 8. What retrieval is for</a>
 <a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
-<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+<a class="" href="#appendix-b-the-laboratories">Appendix B — The laboratories</a>
+<a class="l2" href="#a-the-sparse-index">A · The sparse index</a>
+<a class="l2" href="#b-the-dense-retriever">B · The dense retriever</a>
+<a class="l2" href="#c-the-late-interaction">C · The late interaction</a>
+<a class="l2" href="#d-the-long-context">D · The long context</a>
+<a class="" href="#appendix-c-sources">Appendix C — Sources</a></nav>
   <main class="book"><h1 id="retrieval-lab">Retrieval Lab</h1>
 <p><strong>Source:</strong> Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks — Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela (2020)</p>
 <p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
@@ -123,7 +128,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p><strong>Why this course exists:</strong> Long context is treated as a capacity problem in the foundations course. It is also a position problem.</p>
 <hr>
 <h2 id="contents">Contents</h2>
-<ul><li><a href="#1-sparse-retrieval">1. Sparse Retrieval</a> - <a href="#lesson-1-the-lexical-index">Lesson 1. The lexical index</a> - <a href="#lesson-2-bm25">Lesson 2. BM25</a></li><li><a href="#2-dense-retrieval">2. Dense Retrieval</a> - <a href="#lesson-3-the-learned-embedding">Lesson 3. The learned embedding</a> - <a href="#lesson-4-the-contrastive-objective">Lesson 4. The contrastive objective</a></li><li><a href="#3-late-interaction">3. Late Interaction</a> - <a href="#lesson-5-the-maxsim-score">Lesson 5. The MaxSim score</a></li><li><a href="#4-the-long-context">4. The Long Context</a> - <a href="#lesson-6-the-retrieval-augmented-reader">Lesson 6. The retrieval-augmented reader</a> - <a href="#lesson-7-lost-in-the-middle">Lesson 7. Lost in the middle</a> - <a href="#lesson-8-what-retrieval-is-for">Lesson 8. What retrieval is for</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<ul><li><a href="#1-sparse-retrieval">1. Sparse Retrieval</a> - <a href="#lesson-1-the-lexical-index">Lesson 1. The lexical index</a> - <a href="#lesson-2-bm25">Lesson 2. BM25</a></li><li><a href="#2-dense-retrieval">2. Dense Retrieval</a> - <a href="#lesson-3-the-learned-embedding">Lesson 3. The learned embedding</a> - <a href="#lesson-4-the-contrastive-objective">Lesson 4. The contrastive objective</a></li><li><a href="#3-late-interaction">3. Late Interaction</a> - <a href="#lesson-5-the-maxsim-score">Lesson 5. The MaxSim score</a></li><li><a href="#4-the-long-context">4. The Long Context</a> - <a href="#lesson-6-the-retrieval-augmented-reader">Lesson 6. The retrieval-augmented reader</a> - <a href="#lesson-7-lost-in-the-middle">Lesson 7. Lost in the middle</a> - <a href="#lesson-8-what-retrieval-is-for">Lesson 8. What retrieval is for</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-the-laboratories">Appendix B — The laboratories</a></li><li><a href="#appendix-c-sources">Appendix C — Sources</a></li></ul>
 <h2 id="1-sparse-retrieval">1. Sparse Retrieval</h2>
 <p><em>Matching the words, exactly</em></p>
 <p>The lexical index: what it stores, what it scores, and where it fails when the question and the answer use different words.</p>
@@ -138,7 +143,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The index maps each word to the documents that contain it.</li><li>The size of the index is the number of postings, and that is what a lexical search really spends.</li><li>A lexical retriever matches words, and it is blind to everything else.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does an inverted index store? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>For each word, the documents that contain it</strong></li><li>- For each document, its words</li><li>- A vector for each document</li><li>- The answer to every question</li></ul>
+<ul><li>✓ <strong>For each word, the documents that contain it</strong></li><li>For each document, its words</li><li>A vector for each document</li><li>The answer to every question</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The postings are the whole of the index, and their number is what a lexical search really costs.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -156,10 +161,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The inverse document frequency says how rare a word is; the saturation says how much of a match is coincidence.</li><li>The length normalisation says how much of a document had to be read to get the match.</li><li>A lexical retriever cannot find an answer that uses different words — and most answers do.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does the inverse document frequency do in BM25? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>It says how rare the word is, so a common word does not dominate the score</strong></li><li>- It normalises for the length of the document</li><li>- It saturates the term frequency</li><li>- It counts the postings</li></ul>
+<ul><li>✓ <strong>It says how rare the word is, so a common word does not dominate the score</strong></li><li>It normalises for the length of the document</li><li>It saturates the term frequency</li><li>It counts the postings</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A word in every document tells you nothing. The logarithm of the inverse of its document frequency is what stops it from dominating.</p></blockquote>
 <p>*<em>Q. A lexical retriever can find an answer that uses different words from the question. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. It matches words, and it is blind to everything else. That blind spot is the whole reason the dense retriever exists.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The BM25 score of every document, and the recall it achieves. Open <strong>Score the documents</strong> in the retrieval-lab application.</p>
@@ -182,7 +188,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The retriever embeds the question and the document separately and compares the two vectors.</li><li>The document vectors never change, so the index is a matrix and the search is a matrix product.</li><li>One vector per document is cheap; one vector per token is not.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Why does the dual encoder let the document vectors be precomputed? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>Because the document is embedded without the question</strong></li><li>- Because the embedding is low-dimensional</li><li>- Because the documents are shorter than the questions</li><li>- Because the index is stored on disk</li></ul>
+<ul><li>✓ <strong>Because the document is embedded without the question</strong></li><li>Because the embedding is low-dimensional</li><li>Because the documents are shorter than the questions</li><li>Because the index is stored on disk</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The document’s vector does not depend on what is being asked, so it can be computed once, and the search becomes a matrix product.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -201,7 +207,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The objective is that a question should be closer to its own answer than to the other answers in the batch.</li><li>The other answers in the batch are free negatives, and they are what makes the training cheap.</li><li>The learned retriever beats the lexical one exactly where the lexical one is blind: the mismatch of words.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What are the in-batch negatives for? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>They make one batch of questions into many training examples, almost for free</strong></li><li>- They make the loss unbiased</li><li>- They replace the positive examples</li><li>- They reduce the size of the index</li></ul>
+<ul><li>✓ <strong>They make one batch of questions into many training examples, almost for free</strong></li><li>They make the loss unbiased</li><li>They replace the positive examples</li><li>They reduce the size of the index</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A batch of B questions gives B×B pairs, of which B are correct. The other B²−B are negatives that cost nothing to obtain.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -225,10 +231,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The score is the sum, over the question’s words, of the best-matching word of the document.</li><li>The document’s vectors can still be precomputed, so the search is still cheap — but there are far more of them.</li><li>The maximum is taken over more candidates in a longer document, and the score inherits that bias.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does the MaxSim score compare? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>Each word of the question with the best-matching word of the document</strong></li><li>- One vector of the question with one vector of the document</li><li>- The words of the question with the words of the document, in order</li><li>- The topics of the question and the document</li></ul>
+<ul><li>✓ <strong>Each word of the question with the best-matching word of the document</strong></li><li>One vector of the question with one vector of the document</li><li>The words of the question with the words of the document, in order</li><li>The topics of the question and the document</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The sum, over the question’s words, of the maximum similarity to any word of the document. It rewards a document for containing something that matches each part of the question.</p></blockquote>
 <p>*<em>Q. The MaxSim score is larger for a longer document, all else equal. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. The maximum is taken over more candidates in a longer document, and the score inherits that. It is a real bias, it is measurable, and the laboratory measures it.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The MaxSim score of every document, and the length bias it carries. Open <strong>Compare word by word</strong> in the retrieval-lab application.</p>
@@ -251,7 +258,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The retriever supplies the facts and the reader supplies the reasoning.</li><li>More passages help until the noise in them starts to cost more than the facts are worth.</li><li>The evidence has to be used, not merely present.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What is the division of labour in a retrieval-augmented system? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The retriever supplies the facts and the reader does the reasoning</strong></li><li>- The retriever does the reasoning and the reader supplies the facts</li><li>- Both do both</li><li>- The retriever trains the reader</li></ul>
+<ul><li>✓ <strong>The retriever supplies the facts and the reader does the reasoning</strong></li><li>The retriever does the reasoning and the reader supplies the facts</li><li>Both do both</li><li>The retriever trains the reader</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The facts come from the retriever, so that the parameters do not have to contain them, and the reader does what the parameters are good at.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -270,10 +277,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The evidence near the beginning and near the end of a context is used well; the evidence in the middle is not.</li><li>So a long context is not a substitute for retrieval: it is a place where retrieved evidence can be lost.</li><li>Putting the evidence where the reader looks is a design decision, and it is measurable.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does the position effect say? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>The evidence in the middle of a long context is used worse than the evidence at the ends</strong></li><li>- A model can only read the first page of a context</li><li>- Long contexts are useless</li><li>- The middle of a context is corrupted</li></ul>
+<ul><li>✓ <strong>The evidence in the middle of a long context is used worse than the evidence at the ends</strong></li><li>A model can only read the first page of a context</li><li>Long contexts are useless</li><li>The middle of a context is corrupted</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The effect is measurable with a needle in a haystack, and it is a property of how models attend rather than of the content.</p></blockquote>
 <p>*<em>Q. Putting the retrieved passages at the start of the context is a meaningful design decision. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. The reader looks at the beginning and the end, so where the retriever puts the evidence decides whether the evidence is used.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>A document in a context, moved from the beginning to the end, and the attention it receives. Open <strong>Move the needle</strong> in the retrieval-lab application.</p>
@@ -291,7 +299,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A long context raises the ceiling on what can be answered and lowers the floor on what is answered well.</li><li>Retrieval is what puts the evidence where the reader will look at it.</li><li>The two are not alternatives: the retriever decides what is in the context, and the reader decides whether it is used.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Is a long context a substitute for a good retriever? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>No: a long context raises the ceiling, and the position effect lowers the floor</strong></li><li>- Yes: put everything in and the model will find it</li><li>- Yes, for tasks with a single document</li><li>- No, because retrieval is always cheaper</li></ul>
+<ul><li>✓ <strong>No: a long context raises the ceiling, and the position effect lowers the floor</strong></li><li>Yes: put everything in and the model will find it</li><li>Yes, for tasks with a single document</li><li>No, because retrieval is always cheaper</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Everything can be present in a long context and a good deal of it can still be ignored. Retrieval is what puts the evidence where the reader will look.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -350,7 +358,23 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>Before a model looks at anything, it already has a preference: the beginning of the context, the most recent tokens, and the attention sinks at the very start. The prior is what the position effect rides on.</p>
 <p><strong>A long context</strong> — A window big enough to hold the documents — and what the model does with them.</p>
 <p>A long context raises the ceiling on what can be answered, because everything can be present at once. It does not follow that everything is used: the position effect says a good deal of a long context is ignored.</p>
-<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<h2 id="appendix-b-the-laboratories">Appendix B — The laboratories</h2>
+<p>Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.</p>
+<h3 id="a-the-sparse-index">A · The sparse index</h3>
+<p><em>Matching the words, exactly.</em></p>
+<h3 id="b-the-dense-retriever">B · The dense retriever</h3>
+<p><em>Matching the meaning, approximately.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>A bi-encoder over a toy corpus</li><li>The three query and document encoders</li><li>Recall as a function of embedding dimension</li></ul>
+<h3 id="c-the-late-interaction">C · The late interaction</h3>
+<p><em>Word by word, and the index it costs.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>MaxSim scoring</li><li>Why late interaction beats both endpoints on multi-hop questions</li></ul>
+<h3 id="d-the-long-context">D · The long context</h3>
+<p><em>Where the evidence is put, and whether it is used.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Parametric versus non-parametric memory</li><li>Accuracy as a function of the position of the evidence</li></ul>
+<h2 id="appendix-c-sources">Appendix C — Sources</h2>
 <ul><li><strong>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</strong> — Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela (2020), arXiv:2005.11401 [cs.CL] / NeurIPS 2020. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Retrieval is one laboratory in the agentic course. The retrieval stack has four distinct layers, each with its own failure mode.</li><li><strong>Dense Passage Retrieval for Open-Domain Question Answering</strong> — Vladimir Karpukhin, Barlas Oğuz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, Wen-tau Yih (2020), arXiv:2004.04906 [cs.CL] / EMNLP 2020. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Dense retrieval is the mechanism that replaced exact lexical matching, and its failure mode is different.</li><li><strong>ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT</strong> — Omar Khattab, Matei Zaharia (2020), arXiv:2004.12832 [cs.IR] / SIGIR 2020. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Late interaction is the third way to score a query against a document, and it sits between lexical and dense.</li><li><strong>Lost in the Middle: How Language Models Use Long Contexts</strong> — Nelson F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, Percy Liang (2023), arXiv:2307.03172 [cs.CL] / TACL 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Long context is treated as a capacity problem in the foundations course. It is also a position problem.</li></ul></main>
 </div>
 <footer class="pager">

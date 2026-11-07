@@ -137,6 +137,8 @@
 - [Conclusion](#conclusion) (1 lessons)
   - Chapter 23: Future Directions for Agentic LLMs
 - [Appendix A — Glossary](#appendix-a-glossary)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Laboratory practice](#appendix-c-laboratory-practice)
 
 ## Language Modeling
 
@@ -238,28 +240,28 @@ Historically, almost all learning in LLM engineering happened during training. A
 
 **Q. According to the definition used in the textbook, which property is essential for calling a system an agent? *(core)***
 
-- - It produces fluent natural language.
-- - It acts, observes effects, and adapts its policy from the feedback.
-- - It runs on dedicated hardware rather than in a browser.
-- - It never makes mistakes.
+- It produces fluent natural language.
+- ✓ **It acts, observes effects, and adapts its policy from the feedback.**
+- It runs on dedicated hardware rather than in a browser.
+- It never makes mistakes.
 
 > **Why:** The book defines agents by the act → observe → adapt loop. Fluency is a property of the model, not what makes a system an agent, and the book is explicit that agents do make mistakes.
 
 **Q. In the equation "Agentic LLM = LLM + Harness", what does the harness NOT typically do? *(core)***
 
-- - Construct prompts and manage the system prompt
-- - Execute tool calls and feed observations back
-- - Provide the pretrained language capability itself
-- - Keep state between model invocations
+- Construct prompts and manage the system prompt
+- Execute tool calls and feed observations back
+- ✓ **Provide the pretrained language capability itself**
+- Keep state between model invocations
 
 > **Why:** Language capability comes from the model. The harness is the surrounding code: prompt construction, answer processing, tool calling, state and skill management (Ch. 1, §1.2.2).
 
 **Q. Why does the textbook describe learning at inference time as a paradigm shift for agentic LLMs? *(core)***
 
-- - Because pretrained models cannot answer questions at all.
-- - Because agents can generate new interaction data, which can later be used for training.
-- - Because inference is always cheaper than training.
-- - Because finetuning is no longer needed anywhere.
+- Because pretrained models cannot answer questions at all.
+- ✓ **Because agents can generate new interaction data, which can later be used for training.**
+- Because inference is always cheaper than training.
+- Because finetuning is no longer needed anywhere.
 
 > **Why:** Interaction produces data: agents try things in an environment and the resulting traces can be used for further training, closing a recursive self-improvement loop (Ch. 1, §1.2.4 and Figure 1.1).
 
@@ -286,19 +288,19 @@ The recursive self-improvement cycle in Figure 1.1 closes the loop the same way.
 
 **Q. An agent returns a wrong answer. The trace shows the model was called once with a context that never contained the file the task needed. Which half of the system is at fault? *(advanced)***
 
-- - The model (f), because it should have inferred the file contents.
-- - The harness (g), because the state it constructed for the model was incomplete.
-- - Neither: the answer is simply beyond the model.
-- - The training data, which should have contained the file.
+- The model (f), because it should have inferred the file contents.
+- ✓ **The harness (g), because the state it constructed for the model was incomplete.**
+- Neither: the answer is simply beyond the model.
+- The training data, which should have contained the file.
 
 > **Why:** The model can only act on the state it is given. If the needed file was never placed in the context, the failure is in the state update rule g — the retrieval or state-management half of the harness. This is the distinction introduced in Ch. 1, §1.2.2 and formalised above.
 
 **Q. Which pair of changes corresponds to chain of thought (C) and reinforcement finetuning (E) in the interaction-style taxonomy of Chapter 9? *(advanced)***
 
-- - C changes g; E changes f.
-- - C changes f; E changes g.
-- - Both change only the context window.
-- - Both change only the model weights.
+- ✓ **C changes g; E changes f.**
+- C changes f; E changes g.
+- Both change only the context window.
+- Both change only the model weights.
 
 > **Why:** Chain of thought leaves the weights untouched and works by changing the harness: the prompt now elicits and stores intermediate reasoning steps, which changes how state is updated (g). Reinforcement finetuning changes the parameters themselves, i.e. the model function f (Ch. 9, §9.2.1; Ch. 6, §6.2.4.3).
 
@@ -415,28 +417,28 @@ Almost everything agentic you build in this course sits on the decoder side, bec
 
 **Q. Why is the tokenizer a modelling decision rather than a preprocessing detail? *(core)***
 
-- - Because it decides the units the model can treat as symbols, and therefore dataset size, context limits and cost.
-- - Because it removes all ambiguity from natural language.
-- - Because it makes models deterministic.
-- - Because it is trained with reinforcement learning.
+- ✓ **Because it decides the units the model can treat as symbols, and therefore dataset size, context limits and cost.**
+- Because it removes all ambiguity from natural language.
+- Because it makes models deterministic.
+- Because it is trained with reinforcement learning.
 
 > **Why:** The same corpus yields different token counts under different tokenizers; every downstream quantity (context windows, training tokens, cost) inherits that choice (Ch. 2, §2.1.4).
 
 **Q. In scaled dot-product attention, what role does the softmax play? *(core)***
 
-- - It normalises the value vectors to unit length.
-- - It converts query–key compatibility scores into weights that determine how much of each value is mixed in.
-- - It removes tokens that exceed the context window.
-- - It makes the layer recurrent.
+- It normalises the value vectors to unit length.
+- ✓ **It converts query–key compatibility scores into weights that determine how much of each value is mixed in.**
+- It removes tokens that exceed the context window.
+- It makes the layer recurrent.
 
 > **Why:** Attention(Q,K,V) = softmax(QKᵗ/√dₖ)V: the softmax turns compatibility scores into a distribution over values, giving each token content-dependent connections (Ch. 2, §2.3.4).
 
 **Q. Which statement about LLMs is emphasised in Chapter 2 and explains why memory architectures exist? *(core)***
 
-- - LLMs are memory-less functions at inference; post-training information must arrive through the input.
-- - LLMs store the conversation in their weights as they talk.
-- - LLMs cannot be used for classification tasks.
-- - LLMs recompute their tokenizer at every call.
+- ✓ **LLMs are memory-less functions at inference; post-training information must arrive through the input.**
+- LLMs store the conversation in their weights as they talk.
+- LLMs cannot be used for classification tasks.
+- LLMs recompute their tokenizer at every call.
 
 > **Why:** An LLM estimates an output from its input; new information must be supplied via the context. Chapter 9 then studies architectures that supply it (finetuning, long context, explicit memory management).
 
@@ -463,19 +465,19 @@ Now connect this to the agentic setting. An agent's context is not fixed text: i
 
 **Q. A transformer doubles its context length from 2k to 4k tokens. Which statement best describes the change in the attention computation? *(advanced)***
 
-- - It doubles, because the projection cost is linear in sequence length.
-- - It quadruples, because the attention matrix has n² entries while the projections grow only linearly in n.
-- - It is unchanged, because attention is linear in the number of tokens.
-- - It halves, because each token attends to half as many others.
+- It doubles, because the projection cost is linear in sequence length.
+- ✓ **It quadruples, because the attention matrix has n² entries while the projections grow only linearly in n.**
+- It is unchanged, because attention is linear in the number of tokens.
+- It halves, because each token attends to half as many others.
 
 > **Why:** The n²d term of the attention product dominates at long n, so doubling the sequence length quadruples the attention work while the O(nd²) projections merely double. This is the computational reason agent harnesses must compress history (Ch. 2, §2.3.4–2.3.5; Ch. 9, §9.3.2.2).
 
 **Q. Why is the softmax argument scaled by 1/√d_k in scaled dot-product attention? *(advanced)***
 
-- - To make the computation faster in wall-clock terms.
-- - To keep the logits at unit variance so the softmax does not saturate and gradients survive.
-- - To normalise the output values to sum to one.
-- - To reduce the memory needed to store the attention weights.
+- To make the computation faster in wall-clock terms.
+- ✓ **To keep the logits at unit variance so the softmax does not saturate and gradients survive.**
+- To normalise the output values to sum to one.
+- To reduce the memory needed to store the attention weights.
 
 > **Why:** Dot products of independent random projections grow like √d_k in magnitude. Without the scaling the softmax saturates, the output becomes near one-hot, and learning stalls. The scaling keeps the logit variance around one (Ch. 2, §2.3.4).
 
@@ -582,28 +584,28 @@ Chapter 5 grounds the theory in code. Its tasks walk through a Byte Pair Encodin
 
 **Q. Which stage first gives a base model the ability to follow instructions? *(core)***
 
-- - Pretraining on web text
-- - Supervised finetuning on instruction/response pairs
-- - Preference tuning
-- - Tokenizer training
+- Pretraining on web text
+- ✓ **Supervised finetuning on instruction/response pairs**
+- Preference tuning
+- Tokenizer training
 
 > **Why:** Pretraining produces language knowledge; supervised finetuning on instruction/response pairs teaches the model to act on requests. Preference tuning then aligns the instructed model (Ch. 3, §3.2.3–3.2.4).
 
 **Q. In the from-scratch case study, what is the purpose of the tokenizer task? *(core)***
 
-- - To train a BPE tokenizer and reason about vocabulary-size trade-offs before any modelling.
-- - To deploy the model to a server.
-- - To evaluate the model on GSM8K.
-- - To collect preference labels.
+- ✓ **To train a BPE tokenizer and reason about vocabulary-size trade-offs before any modelling.**
+- To deploy the model to a server.
+- To evaluate the model on GSM8K.
+- To collect preference labels.
 
 > **Why:** Task 1 configures and trains a Byte Pair Encoding tokenizer, including the trade-offs in choosing vocabulary size — the units that every later stage depends on (Ch. 5, §5.5).
 
 **Q. Why can a low benchmark score not be read directly as "the model lacks the capability"? *(core)***
 
-- - Because benchmarks are always randomly generated.
-- - Because performance also depends on factors such as prompt format, tokenization, context length and output constraints.
-- - Because all benchmarks are saturated.
-- - Because models are deterministic.
+- Because benchmarks are always randomly generated.
+- ✓ **Because performance also depends on factors such as prompt format, tokenization, context length and output constraints.**
+- Because all benchmarks are saturated.
+- Because models are deterministic.
 
 > **Why:** Chapter 22 §22.1.2 formalises this as the competence/performance distinction: the underlying capacity and its expression on one particular occasion are different things.
 
@@ -632,19 +634,19 @@ This creates a sharp asymmetry that runs through the whole book: environments th
 
 **Q. A research assistant agent is to be improved with reinforcement learning on verifiable rewards. Why is this harder than for a code agent? *(advanced)***
 
-- - Research tasks have more tokens, so the reward signal is noisier.
-- - Verifiable rewards require a programmatic checker, and research quality usually cannot be checked automatically.
-- - Code agents are trained on more data, so their reward function generalises better.
-- - It is not harder: any task can be verified with a string comparison.
+- Research tasks have more tokens, so the reward signal is noisier.
+- ✓ **Verifiable rewards require a programmatic checker, and research quality usually cannot be checked automatically.**
+- Code agents are trained on more data, so their reward function generalises better.
+- It is not harder: any task can be verified with a string comparison.
 
 > **Why:** A verifiable reward needs an automatic checker of the outcome. Test suites and win conditions provide that; judgements of research quality usually do not. This is why agentic RL has concentrated on verifiable domains (Ch. 3, §3.2.4; Ch. 6, §6.2.4.3; Ch. 10, §10.1).
 
 **Q. Which observation would most strongly support the claim that "the model rarely uses tools because it was never rewarded for using them"? *(advanced)***
 
-- - The model emits tool calls when the system prompt explicitly demands them.
-- - The model produces long answers instead of tool calls, and the training mix contains many demonstrations of long answers with few tool-use traces.
-- - The model has a high perplexity on the tool-schema token sequence.
-- - The model refuses tool use only in multilingual settings.
+- The model emits tool calls when the system prompt explicitly demands them.
+- ✓ **The model produces long answers instead of tool calls, and the training mix contains many demonstrations of long answers with few tool-use traces.**
+- The model has a high perplexity on the tool-schema token sequence.
+- The model refuses tool use only in multilingual settings.
 
 > **Why:** The claim is about the training distribution, so the strongest evidence is the distribution itself: many long-answer demonstrations and few tool-use traces predict exactly that behaviour. The other options either do not test the claim (perplexity) or test something different (multilingual behaviour).
 
@@ -758,28 +760,28 @@ This is the point where Part I meets agent engineering. An agentic system makes 
 
 **Q. What is the Chinchilla rule of thumb for compute-optimal training? *(core)***
 
-- - Train on ~20 tokens per parameter, increasing model size and tokens in roughly equal proportion with budget.
-- - Always train the largest model you can afford, regardless of tokens.
-- - Train for exactly one epoch on the whole internet.
-- - Use at most 5 tokens per parameter.
+- ✓ **Train on ~20 tokens per parameter, increasing model size and tokens in roughly equal proportion with budget.**
+- Always train the largest model you can afford, regardless of tokens.
+- Train for exactly one epoch on the whole internet.
+- Use at most 5 tokens per parameter.
 
 > **Why:** Chinchilla found N* ∝ C^0.45 and D* ∝ C^0.55, keeping D/N near 20 — the compute-optimal allocation for minimising training loss (Ch. 4, §4.1.2).
 
 **Q. Why is a model such as LLaMA-3 8B trained on roughly 1900 tokens per parameter? *(core)***
 
-- - Because the tokenizer is broken.
-- - Because it deliberately trades extra training compute for a smaller, cheaper-to-serve model.
-- - Because Chinchilla requires at least 1000 tokens per parameter.
-- - Because larger models cannot be pretrained.
+- Because the tokenizer is broken.
+- ✓ **Because it deliberately trades extra training compute for a smaller, cheaper-to-serve model.**
+- Because Chinchilla requires at least 1000 tokens per parameter.
+- Because larger models cannot be pretrained.
 
 > **Why:** The ≈20 ratio is optimal only for minimising training loss. When inference volume is high, overtraining produces a small model with low loss that is cheap to run (Ch. 4, §4.1.2).
 
 **Q. In the IsoFLOP method, why is the loss curve U-shaped as a function of model size at fixed compute? *(core)***
 
-- - Small models underfit, while very large models are forced to train on too few tokens.
-- - Learning rates are random.
-- - Because datasets contain noise by definition.
-- - Because loss is measured on the training set only.
+- ✓ **Small models underfit, while very large models are forced to train on too few tokens.**
+- Learning rates are random.
+- Because datasets contain noise by definition.
+- Because loss is measured on the training set only.
 
 > **Why:** With C ≈ 6ND fixed, increasing N forces D down. Too-small models underfit; too-large models are data-starved. The minimum of the U identifies N* for that budget (Ch. 4, §4.1.3).
 
@@ -806,19 +808,19 @@ For an engineer the frontier has a second use: it tells you which knob to turn w
 
 **Q. You have a fixed compute budget and a model that is small relative to the data available. According to the compute-optimal frontier, which change most reduces loss? *(advanced)***
 
-- - Increase the number of parameters and keep the token count fixed.
-- - Increase the token count, since the loss is data-limited on the current side of the frontier.
-- - Increase both proportionally and change nothing else.
-- - Reduce the learning rate, which frees compute for more tokens.
+- Increase the number of parameters and keep the token count fixed.
+- ✓ **Increase the token count, since the loss is data-limited on the current side of the frontier.**
+- Increase both proportionally and change nothing else.
+- Reduce the learning rate, which frees compute for more tokens.
 
 > **Why:** On the data-limited side, the data term of the loss dominates, so more tokens at fixed compute is the cheaper improvement; on the model-limited side more parameters is. Chinchilla showed that the earlier large-model/small-data recipe sat on the wrong side of this frontier (Ch. 4, §4.1.2–4.1.3).
 
 **Q. Why does the textbook treat emergent-ability claims with caution? *(advanced)***
 
-- - Because emergent abilities were shown not to exist in any model.
-- - Because a metric that is continuous can appear to jump when the evaluation discretises it, so the discontinuity may be an artefact of the metric rather than the model.
-- - Because emergent abilities only occur in models above 100 billion parameters.
-- - Because the authors failed to replicate the original results.
+- Because emergent abilities were shown not to exist in any model.
+- ✓ **Because a metric that is continuous can appear to jump when the evaluation discretises it, so the discontinuity may be an artefact of the metric rather than the model.**
+- Because emergent abilities only occur in models above 100 billion parameters.
+- Because the authors failed to replicate the original results.
 
 > **Why:** Discretising a smooth underlying capability (for example exact-match accuracy) can turn a gradual improvement into what looks like a sudden phase transition. The textbook flags this as a measurement caveat, which is why the section is framed as a caution rather than a claim (Ch. 4, §4.1.4 Emergent Abilities).
 
@@ -951,28 +953,28 @@ return fallback_response(state)
 
 **Q. What distinguishes chain of thought prompting from ordinary few-shot prompting? *(core)***
 
-- - The examples demonstrate intermediate reasoning steps rather than only input–output pairs.
-- - It finetunes the model weights.
-- - It removes the need for a tokenizer.
-- - It requires a reinforcement learning reward model.
+- ✓ **The examples demonstrate intermediate reasoning steps rather than only input–output pairs.**
+- It finetunes the model weights.
+- It removes the need for a tokenizer.
+- It requires a reinforcement learning reward model.
 
 > **Why:** Style C prompting supplies examples of the *steps* to take, so the model conditions its answer on a reasoning chain (Ch. 6, §6.1.3; Ch. 9, §9.2.1.3).
 
 **Q. Why does the chapter call an LLM a "memory-less function" when it is used in an agent? *(core)***
 
-- - Because it forgets its pretraining when tools are used.
-- - Because its output depends on the input it is given; state that persists must be held outside the model and re-supplied.
-- - Because it cannot produce more than one token.
-- - Because attention removes earlier tokens.
+- Because it forgets its pretraining when tools are used.
+- ✓ **Because its output depends on the input it is given; state that persists must be held outside the model and re-supplied.**
+- Because it cannot produce more than one token.
+- Because attention removes earlier tokens.
 
 > **Why:** The model estimates an output from its input. Any persistent state — plan, scratchpad, history — lives in the harness and is re-injected, which is what styles D and E formalise (Ch. 6, §6.2.1; Ch. 9, §9.3.1).
 
 **Q. In the self-reflection harness, what is the role of the evaluator prompt? *(advanced)***
 
-- - To rewrite the system prompt of the host application.
-- - To score or verify a generated step or answer, producing feedback the harness can act on.
-- - To execute tool calls on behalf of the user.
-- - To compress the tokenizer vocabulary.
+- To rewrite the system prompt of the host application.
+- ✓ **To score or verify a generated step or answer, producing feedback the harness can act on.**
+- To execute tool calls on behalf of the user.
+- To compress the tokenizer vocabulary.
 
 > **Why:** The harness calls the same model with different prompts: generation, evaluation, and prompt improvement. Evaluation supplies the feedback that drives search or RL (Ch. 6, §6.2.4; Ch. 9, Figure 9.7).
 
@@ -996,19 +998,19 @@ The last two points are why Chapter 6, §6.2.4.3 prefers reinforcement with veri
 
 **Q. Why can a self-critique pass be more effective at fixing a solution than the original generation pass? *(advanced)***
 
-- - Because the critique pass uses a different model with more parameters.
-- - Because the distribution over complete solutions is more sharply peaked than the distribution over next tokens, so re-reading a trajectory conditions on more of the answer.
-- - Because the critique pass removes the tool outputs from the context.
-- - Because the critique pass is given more temperature.
+- Because the critique pass uses a different model with more parameters.
+- ✓ **Because the distribution over complete solutions is more sharply peaked than the distribution over next tokens, so re-reading a trajectory conditions on more of the answer.**
+- Because the critique pass removes the tool outputs from the context.
+- Because the critique pass is given more temperature.
 
 > **Why:** A single generation samples one path through a high-entropy next-token process. The distribution over complete, correct solutions is much more concentrated, so a second pass that re-reads the trajectory with the goal in mind is sampling from a better-conditioned distribution (Ch. 6, §6.1.3.1, §6.2.4.2).
 
 **Q. A task has a programmatic checker. Which reflection design does Chapter 6 favour, and why? *(advanced)***
 
-- - Model self-critique, because it is cheaper than running the checker.
-- - Using the checker as the critic, because programmatic verification is stronger evidence than the model's own judgement.
-- - Sampling more candidates without any critique.
-- - Asking the model to role-play a stricter reviewer persona.
+- Model self-critique, because it is cheaper than running the checker.
+- ✓ **Using the checker as the critic, because programmatic verification is stronger evidence than the model's own judgement.**
+- Sampling more candidates without any critique.
+- Asking the model to role-play a stricter reviewer persona.
 
 > **Why:** Where a verifier exists, the verifier should be the critic. A model self-critique inherits the model's assumptions and can polish a wrong answer; a checker provides independent evidence (Ch. 6, §6.2.4.3; Ch. 10, §10.4).
 
@@ -1110,28 +1112,28 @@ The book's examples span three design choices. **WorldGPT** learns a world-VLM f
 
 **Q. What architectural problem does a vision-language model have to solve first? *(core)***
 
-- - Aligning 2-D image grids with the transformer's 1-D sequence of tokens via an encoder and a projection.
-- - Removing the attention mechanism entirely.
-- - Replacing tokenization with character-level dictionaries.
-- - Making images deterministic.
+- ✓ **Aligning 2-D image grids with the transformer's 1-D sequence of tokens via an encoder and a projection.**
+- Removing the attention mechanism entirely.
+- Replacing tokenization with character-level dictionaries.
+- Making images deterministic.
 
 > **Why:** The two fields use different architectures — convolutional processing of pixel grids and sequential transformers. VLMs encode the image, project the features, and treat them as context tokens (Ch. 7, §7.1.2).
 
 **Q. Why do vision-language-action models require robotic trajectory data? *(core)***
 
-- - Because actions must be grounded in physical sequences, and that interaction data is what teaches the model how movements follow perception.
-- - Because images cannot be tokenized without a robot.
-- - Because it is cheaper than collecting text.
-- - Because VLA models do not use attention.
+- ✓ **Because actions must be grounded in physical sequences, and that interaction data is what teaches the model how movements follow perception.**
+- Because images cannot be tokenized without a robot.
+- Because it is cheaper than collecting text.
+- Because VLA models do not use attention.
 
 > **Why:** VLA models extend VLM outputs with actions trained on robotic trajectories, which is the book's central example of an interaction-data loop, and improves generality of robot behaviour (Ch. 7, §7.2; Ch. 1, §1.2.4).
 
 **Q. What is the main advantage of planning with a world model in model-based reinforcement learning? *(core)***
 
-- - It guarantees optimal actions.
-- - It improves sample efficiency by replacing expensive real-environment interaction with simulated roll-outs.
-- - It removes the need for a reward function.
-- - It makes the environment deterministic.
+- It guarantees optimal actions.
+- ✓ **It improves sample efficiency by replacing expensive real-environment interaction with simulated roll-outs.**
+- It removes the need for a reward function.
+- It makes the environment deterministic.
 
 > **Why:** The world model allows the agent to plan inside a learned, compressed representation, which is valuable when interacting with the real environment is more expensive than simulating it (Ch. 7, §7.3.1 and §7.3.5).
 
@@ -1156,19 +1158,19 @@ The catch is model error. The planner is optimal *with respect to \(\hat{P}\)*, 
 
 **Q. A model-based agent has learned an inaccurate transition model. Why can it perform *worse* than a model-free agent? *(advanced)***
 
-- - Because model-based agents use more memory.
-- - Because the planner is optimal with respect to the wrong model, so it can commit confidently to an action sequence the real environment contradicts.
-- - Because model-free agents always explore uniformly.
-- - Because the reward model is shared between both.
+- Because model-based agents use more memory.
+- ✓ **Because the planner is optimal with respect to the wrong model, so it can commit confidently to an action sequence the real environment contradicts.**
+- Because model-free agents always explore uniformly.
+- Because the reward model is shared between both.
 
 > **Why:** Planning inside an inaccurate model optimises the wrong objective. The agent may avoid the states where it would learn the model is wrong, so it never corrects the error — the regime Lab C reproduces when model accuracy is dialled down (Ch. 7, §7.3.5; Ch. 22, §22.3.2).
 
 **Q. Chapter 22 argues that an LLM agent can act competently without an internal world model. What is the alternative mechanism it describes? *(advanced)***
 
-- - The model runs a hidden simulator in its forward pass.
-- - The agent infers the relevant structure online, from the observations it receives, as it acts.
-- - The harness queries an external physics engine between steps.
-- - The model memorises the environment during pretraining.
+- The model runs a hidden simulator in its forward pass.
+- ✓ **The agent infers the relevant structure online, from the observations it receives, as it acts.**
+- The harness queries an external physics engine between steps.
+- The model memorises the environment during pretraining.
 
 > **Why:** The agentic perspective in Ch. 22, §22.3.3 is that competence can come from online inference over observations rather than from a stored, explicit world model. The lesson: do not require an internal model, and do not trust a learned one off-distribution.
 
@@ -1303,28 +1305,28 @@ Three lessons follow from the demonstration, and they are the ones a reviewer of
 
 **Q. In the textbook's five interaction styles, what changes in Style E relative to Style D? *(core)***
 
-- - The prompt becomes static again.
-- - The model parameters are finetuned using rewards collected from interaction, in addition to policy learning.
-- - The environment is removed from the loop.
-- - The LLM is replaced by a search algorithm.
+- The prompt becomes static again.
+- ✓ **The model parameters are finetuned using rewards collected from interaction, in addition to policy learning.**
+- The environment is removed from the loop.
+- The LLM is replaced by a search algorithm.
 
 > **Why:** Style D learns in context; Style E (reinforcement finetuning) also updates the model parameters θ from rewards generated during interaction, blurring the inference/finetuning boundary (Ch. 9, §9.2.1.5).
 
 **Q. Which of the following is NOT listed as a motivation for agent memory? *(core)***
 
-- - Coherent conversation
-- - Adaptation to a changed environment
-- - Removing the need for a tokenizer
-- - Continual learning without catastrophic forgetting
+- Coherent conversation
+- Adaptation to a changed environment
+- ✓ **Removing the need for a tokenizer**
+- Continual learning without catastrophic forgetting
 
 > **Why:** Chapter 9 §9.3.1 motivates memory with coherent conversation, adaptation, identity and continual learning. Tokenization is a fixed property of the model, not a memory problem.
 
 **Q. Why is the moving-target problem specifically hard for dynamic metalearning? *(advanced)***
 
-- - Because the inner task changes while the outer loop is training, so the objective never settles and learning can fail to converge.
-- - Because reinforcement learning cannot handle language.
-- - Because memory is always infinite.
-- - Because prompts cannot be searched.
+- ✓ **Because the inner task changes while the outer loop is training, so the objective never settles and learning can fail to converge.**
+- Because reinforcement learning cannot handle language.
+- Because memory is always infinite.
+- Because prompts cannot be searched.
 
 > **Why:** When training targets keep changing, convergence is not guaranteed; Chapter 8 discusses stabilizing dynamic metalearning and Chapter 9 §9.2.1.4 notes that predictable self-reflection performance is still an active research area.
 
@@ -1350,19 +1352,19 @@ The retrieval policy is the part students most often over-engineer. The lesson's
 
 **Q. Why does the lesson argue that a memory system with a badly calibrated salience signal cannot be rescued by a cleverer eviction rule? *(advanced)***
 
-- - Because eviction rules are computationally expensive.
-- - Because eviction can only remove items; it cannot add information the store never captured, so a store full of wrongly-ranked items stays wrong.
-- - Because eviction rules only work on episodic memory.
-- - Because the write policy is irrelevant to retrieval.
+- Because eviction rules are computationally expensive.
+- ✓ **Because eviction can only remove items; it cannot add information the store never captured, so a store full of wrongly-ranked items stays wrong.**
+- Because eviction rules only work on episodic memory.
+- Because the write policy is irrelevant to retrieval.
 
 > **Why:** Eviction is subtractive. If the write policy admits many irrelevant items and ranks them highly, no subtractive rule can restore a store that never contained the useful information, and a larger capacity makes the problem worse. Calibrate salience first (Ch. 9, §9.3.2.3; Ch. 8, §8.2).
 
 **Q. A retrieval policy scores items purely by recency. What failure does this produce in a long agentic session? *(advanced)***
 
-- - It retrieves the most semantically relevant item reliably.
-- - It retrieves the most recent items regardless of relevance, so an old but decisive fact is lost as soon as unrelated activity occurs.
-- - It guarantees that the store never overflows.
-- - It increases the diversity of retrieved context.
+- It retrieves the most semantically relevant item reliably.
+- ✓ **It retrieves the most recent items regardless of relevance, so an old but decisive fact is lost as soon as unrelated activity occurs.**
+- It guarantees that the store never overflows.
+- It increases the diversity of retrieved context.
 
 > **Why:** Pure recency is a buffer, not a memory: relevance decays with time rather than with use, and a decisive fact from earlier in the session is dropped by unrelated later activity. The hybrid score in Lab B is the fix (Ch. 9, §9.3.2.3; Ch. 12, §12.3).
 
@@ -1529,28 +1531,28 @@ The last clause is the one with a design decision inside it. **Asking and abstai
 
 **Q. In the Planner–Caller–Summarizer architecture, which failure does the Summarizer own? *(core)***
 
-- - Choosing the wrong tool
-- - Producing an unfaithful or incomplete answer from the tool's raw output
-- - Malformed tool arguments
-- - Expiring API credentials
+- Choosing the wrong tool
+- ✓ **Producing an unfaithful or incomplete answer from the tool's raw output**
+- Malformed tool arguments
+- Expiring API credentials
 
 > **Why:** The planner chooses tools, the caller writes the concrete request, and the summarizer turns the result into a user-facing answer — so faithfulness and completeness of that answer are its responsibility (Ch. 11, §11.3, Figure 11.1).
 
 **Q. What does the Model Context Protocol standardise, and what does it deliberately leave to the host? *(core)***
 
-- - It standardises model weights; it leaves tokenization to the host.
-- - It standardises how clients connect to servers and exchange tools/resources/prompts; context and state management remain the host's job.
-- - It standardises reward functions; it leaves data collection to the host.
-- - It standardises GPUs; it leaves cooling to the host.
+- It standardises model weights; it leaves tokenization to the host.
+- ✓ **It standardises how clients connect to servers and exchange tools/resources/prompts; context and state management remain the host's job.**
+- It standardises reward functions; it leaves data collection to the host.
+- It standardises GPUs; it leaves cooling to the host.
 
 > **Why:** MCP defines JSON-RPC data-layer primitives and transport-layer behaviour. Servers are mostly stateless, so summarisation, state management and prioritised retrieval are still the host application's responsibility (Ch. 11, §11.4).
 
 **Q. What is the most basic reactive error-handling pattern for agent tool use? *(core)***
 
-- - Silently retry forever.
-- - Return the error message to the model as an observation so it can correct course.
-- - Abort the whole session on any error.
-- - Hide errors from the user and invent a plausible answer.
+- Silently retry forever.
+- ✓ **Return the error message to the model as an observation so it can correct course.**
+- Abort the whole session on any error.
+- Hide errors from the user and invent a plausible answer.
 
 > **Why:** Feeding the error back as an observation creates the observe–reflect–retry loop: the model can fix arguments, switch tools, or inform the user (Ch. 11, §11.5).
 
@@ -1574,19 +1576,19 @@ Safety follows from the same design logic. Chapter 11, §11.6 is concerned with 
 
 **Q. Two tools have descriptions that differ only in wording but perform different operations. What is the most likely failure mode? *(advanced)***
 
-- - The model will never call either tool.
-- - The model will choose between them close to arbitrarily, because the descriptions do not provide discriminative features.
-- - The harness will crash on a type error.
-- - The context will overflow.
+- The model will never call either tool.
+- ✓ **The model will choose between them close to arbitrarily, because the descriptions do not provide discriminative features.**
+- The harness will crash on a type error.
+- The context will overflow.
 
 > **Why:** Tool selection is driven by the description the model reads. Near-identical descriptions leave the choice underdetermined, so the model falls back on surface features that do not correlate with the right tool. Discriminability is a property of the interface (Ch. 11, §11.2–11.3; Ch. 12, §12.5.2).
 
 **Q. Why is "tool output is data, never an instruction" a security requirement rather than a stylistic convention? *(advanced)***
 
-- - Because instructions are usually longer than data.
-- - Because the tool result is the channel through which an injected instruction from external content would arrive.
-- - Because models cannot read instructions embedded in tool results.
-- - Because it makes the context smaller.
+- Because instructions are usually longer than data.
+- ✓ **Because the tool result is the channel through which an injected instruction from external content would arrive.**
+- Because models cannot read instructions embedded in tool results.
+- Because it makes the context smaller.
 
 > **Why:** Tool outputs frequently contain content the model did not author — web pages, files, database rows. Treating those bytes as instructions rather than as data is exactly the prompt-injection surface that Ch. 11, §11.6 and Ch. 17, §17.5 are about. Delimiting and distrusting tool output is a control, not a convention.
 
@@ -1699,28 +1701,28 @@ $$\mathrm{MRR} = \frac{1}{|Q|}\sum_{i=1}^{|Q|} \frac{1}{\mathrm{rank}_i}$$
 
 **Q. What distinguishes agentic RAG from simple one-shot retrieval? *(core)***
 
-- - Agentic RAG always uses a larger embedding model.
-- - The agent decides whether, when and what to retrieve, and can iterate — decomposing queries and reacting to insufficient results.
-- - Agentic RAG does not use an index.
-- - Agentic RAG works only on code.
+- Agentic RAG always uses a larger embedding model.
+- ✓ **The agent decides whether, when and what to retrieve, and can iterate — decomposing queries and reacting to insufficient results.**
+- Agentic RAG does not use an index.
+- Agentic RAG works only on code.
 
 > **Why:** Chapter 12 §12.6 contrasts a fixed retrieve-then-generate pipeline with model-driven retrieval control: adaptive decision-making, multi-hop querying and recovery when retrieval is insufficient.
 
 **Q. Which metric tells you whether the first relevant document appears near the top of the ranking? *(core)***
 
-- - Recall@k
-- - Mean Reciprocal Rank
-- - Perplexity
-- - Exact match
+- Recall@k
+- ✓ **Mean Reciprocal Rank**
+- Perplexity
+- Exact match
 
 > **Why:** MRR averages the reciprocal rank of the first relevant result, so a relevant document at rank 1 scores 1.0 while rank 10 scores 0.1 (Ch. 12, §12.7).
 
 **Q. Why can dense embeddings fail where a sparse lexical method succeeds? *(advanced)***
 
-- - Dense embeddings cannot represent rare words at all.
-- - Dense embeddings capture topical similarity and may miss exact identifiers or rare terms, which lexical matching handles directly.
-- - Sparse methods always rank semantically better.
-- - Because sparse methods do not need an index.
+- Dense embeddings cannot represent rare words at all.
+- ✓ **Dense embeddings capture topical similarity and may miss exact identifiers or rare terms, which lexical matching handles directly.**
+- Sparse methods always rank semantically better.
+- Because sparse methods do not need an index.
 
 > **Why:** Semantic proximity is not exact match: identifiers, error codes and rare names are often better served by lexical signals, which is the argument for hybrid retrieval (Ch. 12, §12.1–12.3).
 
@@ -1743,19 +1745,19 @@ The measurable consequence is that retrieval quality is not a property of the re
 
 **Q. A dense retriever performs well on paraphrased questions but fails on a question asking for an exact error code that appears verbatim in only one document. Why? *(advanced)***
 
-- - Because the embedding is lossy, and rare specific strings are exactly what the compression removes.
-- - Because dense retrievers cannot be indexed.
-- - Because error codes are not natural language.
-- - Because the cosine similarity is undefined for short strings.
+- ✓ **Because the embedding is lossy, and rare specific strings are exactly what the compression removes.**
+- Because dense retrievers cannot be indexed.
+- Because error codes are not natural language.
+- Because the cosine similarity is undefined for short strings.
 
 > **Why:** Embedding compresses text into a fixed-size vector, and compression is lossy precisely for rare, high-specificity tokens. Dense retrieval buys paraphrase robustness at the cost of exact-match recall, which is why hybrid sparse+dense retrieval is the usual answer (Ch. 12, §12.1.2–12.1.3).
 
 **Q. Why must a retrieval evaluation state whether queries are human-written or agent-generated? *(advanced)***
 
-- - Because agent-generated queries are always longer.
-- - Because an agent can rewrite and decompose its queries, so agent-written queries are easier to retrieve for, and a retriever tuned on human queries will be misjudged in the agentic setting.
-- - Because retrieval is not used by agents.
-- - Because human queries are never in the corpus distribution.
+- Because agent-generated queries are always longer.
+- ✓ **Because an agent can rewrite and decompose its queries, so agent-written queries are easier to retrieve for, and a retriever tuned on human queries will be misjudged in the agentic setting.**
+- Because retrieval is not used by agents.
+- Because human queries are never in the corpus distribution.
 
 > **Why:** An agent that can rewrite its query can make retrieval easier for itself. Evaluating only on human-written queries therefore misestimates the agentic setting, and evaluating only on agent-written queries misestimates the user-facing setting (Ch. 12, §12.4 Adaptive Retrieval; §12.6 Agentic RAG).
 
@@ -1884,28 +1886,28 @@ Chapter 18 is the case study that turns all of this into an experiment. The **Ge
 
 **Q. Which finding does the textbook report for LLMs in coordination games such as Bach or Stravinsky? *(core)***
 
-- - They converge faster than humans.
-- - They often fail to converge on the alternating turn-taking pattern, even when able to predict it: the knowing–doing gap.
-- - They refuse to play.
-- - They always defect.
+- They converge faster than humans.
+- ✓ **They often fail to converge on the alternating turn-taking pattern, even when able to predict it: the knowing–doing gap.**
+- They refuse to play.
+- They always defect.
 
 > **Why:** Chapter 15 §15.4.1 reports stubborn preference-aligned play and failure to adopt turn-taking, while the models can predict the pattern when asked — the dissociation that Social Chain-of-Thought prompting partially bridges.
 
 **Q. What is the key difference between Chapter 16 and Chapter 17 multi-agent settings? *(core)***
 
-- - Chapter 16 uses roles assigned by the system; Chapter 17 studies open-ended emergence without assigned roles.
-- - Chapter 16 uses no LLMs; Chapter 17 uses only LLMs.
-- - Chapter 16 studies humans; Chapter 17 studies machines.
-- - There is no difference.
+- ✓ **Chapter 16 uses roles assigned by the system; Chapter 17 studies open-ended emergence without assigned roles.**
+- Chapter 16 uses no LLMs; Chapter 17 uses only LLMs.
+- Chapter 16 studies humans; Chapter 17 studies machines.
+- There is no difference.
 
 > **Why:** Role-based interaction (Ch. 16) assigns complementary roles, debate or team structures; emergent simulation (Ch. 17) removes roles to study conventions and norms that arise from local interaction (Ch. 16 §16.1, Ch. 17 §17.1).
 
 **Q. Why does the book warn about claims of emergence in LLM societies? *(advanced)***
 
-- - Because emergence cannot be simulated.
-- - Because evidence is behavioural, and results are sensitive to prompt fragility and model dependence, so borrowed human concepts may not transfer.
-- - Because agents never communicate.
-- - Because simulation data cannot be reused.
+- Because emergence cannot be simulated.
+- ✓ **Because evidence is behavioural, and results are sensitive to prompt fragility and model dependence, so borrowed human concepts may not transfer.**
+- Because agents never communicate.
+- Because simulation data cannot be reused.
 
 > **Why:** Chapter 17 §17.1.2 and §17.6 call for methodological caution: local-scale interactions produce patterns at scale, but the validity of terms like emergence and collective intelligence depends on how robustly they are measured.
 
@@ -1930,19 +1932,19 @@ The productive framing is the one the textbook uses in Chapter 15, §15.1: probi
 
 **Q. A model cooperates in a one-shot prisoner's dilemma and in a 20-round repeated game. Which statement is correct? *(advanced)***
 
-- - The model is irrational in the one-shot game, because defect–defect is the unique Nash equilibrium.
-- - The one-shot cooperation is arguably suboptimal against a rational opponent, while the repeated-game cooperation can be a subgame-perfect equilibrium, so the horizon must be stated.
-- - Both results indicate the model failed, because LLM agents should always defect.
-- - Repeated games have no Nash equilibria.
+- The model is irrational in the one-shot game, because defect–defect is the unique Nash equilibrium.
+- ✓ **The one-shot cooperation is arguably suboptimal against a rational opponent, while the repeated-game cooperation can be a subgame-perfect equilibrium, so the horizon must be stated.**
+- Both results indicate the model failed, because LLM agents should always defect.
+- Repeated games have no Nash equilibria.
 
 > **Why:** In a one-shot dilemma, cooperation is strictly dominated; in a repeated game with grim trigger, cooperation is sustainable as a subgame-perfect equilibrium. Reporting a dilemma score without stating the horizon is therefore uninterpretable (Ch. 15, §15.4.1–15.4.2).
 
 **Q. Why does Chapter 22 argue that behavioural results characterise a system rather than a model? *(advanced)***
 
-- - Because behaviour is random.
-- - Because the same weights behave differently under different prompts, tool sets and partners, and the harness is part of what is being measured.
-- - Because models cannot be tested repeatedly.
-- - Because benchmarks are usually mis-implemented.
+- Because behaviour is random.
+- ✓ **Because the same weights behave differently under different prompts, tool sets and partners, and the harness is part of what is being measured.**
+- Because models cannot be tested repeatedly.
+- Because benchmarks are usually mis-implemented.
 
 > **Why:** Competence and performance come apart: the same model can behave differently depending on the prompt and harness it is embedded in, so the unit of analysis for behavioural claims must include the system (Ch. 22, §22.1.2–22.1.3; Ch. 15, §15.1).
 
@@ -2060,46 +2062,46 @@ The second is that **filtering is itself a distribution shift**. Chapter 19 sepa
 
 **Q. What problem does a distillation loop address, and what is its central risk? *(core)***
 
-- - It reduces inference cost by training a small student on a large teacher’s outputs; the central risk is model collapse when synthetic data is generated without enough real data.
-- - It increases model size by duplicating weights.
-- - It replaces the pretraining corpus with a single document.
-- - It removes the need for a teacher model.
+- ✓ **It reduces inference cost by training a small student on a large teacher’s outputs; the central risk is model collapse when synthetic data is generated without enough real data.**
+- It increases model size by duplicating weights.
+- It replaces the pretraining corpus with a single document.
+- It removes the need for a teacher model.
 
 > **Why:** Distillation transfers capability from a teacher to a cheaper student, which is one of the main routes to lower inference cost. The risk is that training repeatedly on model-generated text, with too little real data, narrows the distribution and degrades the model over generations (Ch. 19, §19.2 Distillation Loop; §19.5.1 Model Collapse).
 
 **Q. According to the textbook’s levels of evidence, what is the difference between representational evidence and mechanistic evidence? *(core)***
 
-- - They are the same thing described at different levels of detail.
-- - Representational evidence concerns what state the system holds; mechanistic evidence concerns which internal component is causally responsible for a behaviour.
-- - Representational evidence is quantitative and mechanistic evidence is qualitative.
-- - Mechanistic evidence is a subset of behavioural evidence.
+- They are the same thing described at different levels of detail.
+- ✓ **Representational evidence concerns what state the system holds; mechanistic evidence concerns which internal component is causally responsible for a behaviour.**
+- Representational evidence is quantitative and mechanistic evidence is qualitative.
+- Mechanistic evidence is a subset of behavioural evidence.
 
 > **Why:** The three levels are behavioural (what the system does), representational (what state it holds internally) and mechanistic (which component caused the behaviour, established by causal intervention). Only mechanistic evidence supports a claim about the architecture itself (Ch. 22, §22.1.1).
 
 **Q. What is in-context reinforcement learning (ICRL)? *(advanced)***
 
-- - Finetuning the model on rewards collected offline.
-- - Improving the policy by conditioning the model on a growing history of state–action–reward triples, without changing parameters.
-- - A search algorithm that replaces the policy network.
-- - Training a reward model from human preferences.
+- Finetuning the model on rewards collected offline.
+- ✓ **Improving the policy by conditioning the model on a growing history of state–action–reward triples, without changing parameters.**
+- A search algorithm that replaces the policy network.
+- Training a reward model from human preferences.
 
 > **Why:** ICRL uses the LLM as a policy improver: the harness supplies the history of interactions and the model chooses better actions from it, so learning happens in context (Ch. 20, §20.2.1; Ch. 9, §9.1.2).
 
 **Q. What does the logit lens let you see? *(advanced)***
 
-- - The final answer of the model only.
-- - What the model would predict if decoding stopped at an intermediate layer, exposing how the prediction evolves.
-- - The training data of the model.
-- - The tool calls available to an agent.
+- The final answer of the model only.
+- ✓ **What the model would predict if decoding stopped at an intermediate layer, exposing how the prediction evolves.**
+- The training data of the model.
+- The tool calls available to an agent.
 
 > **Why:** The logit lens projects intermediate residual-stream states to the vocabulary, giving a layer-by-layer view of the prediction; the tuned lens improves this with trained per-layer translators (Ch. 21, §21.5).
 
 **Q. Why are individual neurons described as poor units of interpretation? *(advanced)***
 
-- - Because they have no weights.
-- - Because polysemanticity and superposition mean one neuron responds to many unrelated features.
-- - Because neurons are not used by transformers.
-- - Because neurons only encode syntax.
+- Because they have no weights.
+- ✓ **Because polysemanticity and superposition mean one neuron responds to many unrelated features.**
+- Because neurons are not used by transformers.
+- Because neurons only encode syntax.
 
 > **Why:** Models represent more features than they have dimensions, so features are superimposed and neurons become polysemantic. Sparse autoencoders learn sparser dictionary features as an alternative (Ch. 21, §21.4, §21.8).
 
@@ -2123,19 +2125,19 @@ For agentic systems specifically, the payoff of these methods is a sharper kind 
 
 **Q. Why is activation patching a stronger form of evidence than measuring a component's correlation with the output? *(advanced)***
 
-- - Because it is cheaper to run.
-- - Because it intervenes: if substituting the component's activation changes the behaviour as the hypothesis predicts, and does not change it otherwise, that discriminates between hypotheses that correlate equally well.
-- - Because correlation cannot be computed on transformer activations.
-- - Because patching removes the need for a hypothesis.
+- Because it is cheaper to run.
+- ✓ **Because it intervenes: if substituting the component's activation changes the behaviour as the hypothesis predicts, and does not change it otherwise, that discriminates between hypotheses that correlate equally well.**
+- Because correlation cannot be computed on transformer activations.
+- Because patching removes the need for a hypothesis.
 
 > **Why:** Patching is an intervention, so it can rule out alternative explanations that predict the same correlation. It also carries its own caveat: a null result is only informative if the intervention is faithful and actually replaced the activation (Ch. 21, §21.7; Ch. 22, §22.1.1).
 
 **Q. What does the tuned lens (§21.5.2) correct, and what does it still not give you? *(advanced)***
 
-- - It corrects the mismatch between intermediate residual-stream states and the final unembedding, but it still does not reveal the model's actual computation at that layer.
-- - It recovers the model's original training data.
-- - It makes the model fully interpretable.
-- - It identifies every circuit in the network.
+- ✓ **It corrects the mismatch between intermediate residual-stream states and the final unembedding, but it still does not reveal the model's actual computation at that layer.**
+- It recovers the model's original training data.
+- It makes the model fully interpretable.
+- It identifies every circuit in the network.
 
 > **Why:** The tuned lens trains a per-layer translator so that decoding an intermediate state matches what the model would actually produce if it stopped there. It is a better probe, not a readout the model performs, so surprising findings still need causal validation (Ch. 21, §21.5.1–21.5.2).
 
@@ -2269,46 +2271,46 @@ Two chapters repay a second reading, because the book backs them with evidence r
 
 **Q. Which of these is presented as an open problem rather than an established result? *(core)***
 
-- - Chain-of-thought prompting can improve multi-step reasoning.
-- - Tools let agents fetch information beyond training data.
-- - Stable dynamic metalearning with predictable convergence is still an active research area.
-- - Memory can be managed explicitly by a harness.
+- Chain-of-thought prompting can improve multi-step reasoning.
+- Tools let agents fetch information beyond training data.
+- ✓ **Stable dynamic metalearning with predictable convergence is still an active research area.**
+- Memory can be managed explicitly by a harness.
 
 > **Why:** Chapters 8, 9 and 20 all note that convergence and stability of dynamic learning loops remain open; the other three are presented as established techniques.
 
 **Q. In the case studies' evaluation method, why separate routing errors from execution errors? *(core)***
 
-- - Because it is required by law.
-- - Because different components own different root causes, so attributing failures tells you what to fix.
-- - Because execution errors are always larger.
-- - Because routing errors cannot be measured.
+- Because it is required by law.
+- ✓ **Because different components own different root causes, so attributing failures tells you what to fix.**
+- Because execution errors are always larger.
+- Because routing errors cannot be measured.
 
 > **Why:** Chapter 14 §14.4 evaluates planning and execution separately so that planner errors are not confused with executor errors — the same separation recommended for the summarizer in Chapter 11.
 
 **Q. Which practice is the most defensible way to present an agent you built? *(core)***
 
-- - Describe it as an autonomous AI with human-level reasoning.
-- - State what it is simulated or scaffolded behaviour, report the scenario set and metrics, and name the limitations.
-- - Report only the best run.
-- - Omit the harness details to protect the design.
+- Describe it as an autonomous AI with human-level reasoning.
+- ✓ **State what it is simulated or scaffolded behaviour, report the scenario set and metrics, and name the limitations.**
+- Report only the best run.
+- Omit the harness details to protect the design.
 
 > **Why:** The course standard is honesty about mechanism and measurement: report the environment, metrics and limitations, and never present simulated agents as deployed model behaviour.
 
 **Q. The book connects its three pillars in a cycle. Which statement describes it correctly? *(core)***
 
-- - Reasoning, acting and interacting are independent lines of work, and the book treats them separately.
-- - Reasoning enables better acting and interacting, and the data agents generate by acting and interacting can then be used to train better reasoning models.
-- - Interacting agents are the foundation, and reasoning is derived from them.
-- - The cycle runs from acting to reasoning only, and never back again.
+- Reasoning, acting and interacting are independent lines of work, and the book treats them separately.
+- ✓ **Reasoning enables better acting and interacting, and the data agents generate by acting and interacting can then be used to train better reasoning models.**
+- Interacting agents are the foundation, and reasoning is derived from them.
+- The cycle runs from acting to reasoning only, and never back again.
 
 > **Why:** Ch. 23 §23.3 is explicit: the three pillars form a cycle in which reasoning enables better acting and interacting, and the data generated by agents that act and interact becomes training material for better reasoning models. The book offers the cycle as a route past the plateaus in scaling, because an agent that acts produces a training signal that pretraining data does not reproduce exactly.
 
 **Q. A team says an agent failed because "the model was not good enough". Which diagnosis does the book's account of agentic LLMs support? *(advanced)***
 
-- - That is the most likely cause, since the model is the only component that was not changed.
-- - That is not a diagnosis: the model is one component, and the harness, the tool interfaces and the context budget are all design decisions that can be wrong independently of it.
-- - That is correct, because harness failures are always downstream of model quality.
-- - That is only true for long-horizon tasks; for short ones the model is everything.
+- That is the most likely cause, since the model is the only component that was not changed.
+- ✓ **That is not a diagnosis: the model is one component, and the harness, the tool interfaces and the context budget are all design decisions that can be wrong independently of it.**
+- That is correct, because harness failures are always downstream of model quality.
+- That is only true for long-horizon tasks; for short ones the model is everything.
 
 > **Why:** Ch. 1 §1.2.2 splits the system into a model and a harness, and the whole of Part III is about harness design: prompt construction, tool interfaces, state management and termination. Ch. 9 §9.3.2.2 adds that the harness is bounded by a context window, so a failure can be a budgeting failure rather than a capability failure. Ch. 10 §10.3 then insists that failures be attributed to a component rather than to "the agent", and the eight recurring ideas in this lesson are eight named places where that attribution usually lands.
 
@@ -2332,19 +2334,19 @@ The same care applies to the simulations in this course. Every lab here is deter
 
 **Q. An agent succeeds on one run of a task. Why is this not, on its own, evidence that the agent can do the task? *(advanced)***
 
-- - Because one run is usually a mistake.
-- - Because agent behaviour is stochastic in the environment, so a single run is not a measurement; you need repeated runs across seeds and a task distribution.
-- - Because success rate is not a valid metric.
-- - Because the model changes between runs.
+- Because one run is usually a mistake.
+- ✓ **Because agent behaviour is stochastic in the environment, so a single run is not a measurement; you need repeated runs across seeds and a task distribution.**
+- Because success rate is not a valid metric.
+- Because the model changes between runs.
 
 > **Why:** The same agent can take different paths on re-runs, so a single success cannot be distinguished from luck. Evaluation needs repeated runs, a task distribution, and process metrics recorded alongside outcome metrics (Ch. 15, §15.2; Ch. 14, §14.4; Ch. 10, §10.3).
 
 **Q. Why is recording the harness configuration (prompt template, tool set, step budget, model version) alongside a result a requirement rather than good hygiene? *(advanced)***
 
-- - Because it makes the result look more professional.
-- - Because a result without it is not reproducible, and the harness is part of the system being evaluated.
-- - Because models cannot be versioned.
-- - Because the step budget is the only metric that matters.
+- Because it makes the result look more professional.
+- ✓ **Because a result without it is not reproducible, and the harness is part of the system being evaluated.**
+- Because models cannot be versioned.
+- Because the step budget is the only metric that matters.
 
 > **Why:** The unit of analysis for agentic behaviour is the system, and the harness is a large part of it. Without the configuration, a result cannot be reproduced or attributed, so the claim is not a scientific claim (Ch. 22, §22.1.3; Ch. 5, §5.8).
 
@@ -3066,3 +3068,364 @@ The same care applies to the simulations in this course. Every lab here is deter
 *Source:* Ch. 12, §12.7 Evaluation
 
 *Related:* Recall@k, Mean reciprocal rank (MRR), Faithfulness, Levels of evidence, Evaluation
+
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### Visual Agent Workflow Builder
+
+A node-based editor with ten node types, a deterministic execution engine, step-by-step control, an execution trace, tool input/output inspection, success scoring and explicit error states. Four learning scenarios are included.
+
+*Runtime:* Deterministic simulator · seeded scenarios · no model calls
+
+*Route:* `/builder`
+
+*Concepts:* Harness, ReAct, Branching, Error recovery, Evaluation
+
+*Textbook chapters:* 1, 6, 9, 11
+
+**Delivers:**
+
+- Visual agent workflow builder
+- Ch. 6, Ch. 9 and Ch. 11: the reason–act–observe loop.
+
+### Lab A · Agent Planning
+
+A grid environment with a locked door and a key. Four planners run the same world so their step counts, failures and goal completions can be compared directly.
+
+*Runtime:* Deterministic grid world · BFS planner · no randomness
+
+*Route:* `/labs/planning`
+
+*Concepts:* Planning, Backtracking, Replanning, Error recovery
+
+*Textbook chapters:* 6, 9
+
+**Delivers:**
+
+- Planning
+
+### Lab B · Agent Memory
+
+An event stream is stored, evicted and retrieved under your settings, then the agent makes a decision. See exactly what was remembered, retrieved, omitted and how that changes the answer.
+
+*Runtime:* Deterministic memory simulation · salience-based eviction
+
+*Route:* `/labs/memory`
+
+*Concepts:* Short-term memory, Episodic memory, Retrieval, Eviction
+
+*Textbook chapters:* 9, 12
+
+**Delivers:**
+
+- Ch. 9 §9.3.2.3: explicit memory management with read/write operations.
+- Memory
+
+### Lab C · World Model & Decision Making
+
+A grid world with slip dynamics. A Q-learning agent explores it; a planning agent learns an approximate model and plans inside it. Predicted transitions are compared with what actually happened.
+
+*Runtime:* Seeded Q-learning + value iteration · reproducible per seed
+
+*Route:* `/labs/world-model`
+
+*Concepts:* World model, Model-based RL, Model error, Sample efficiency
+
+*Textbook chapters:* 7, 9
+
+**Delivers:**
+
+- World model
+- Model-free versus model-based planning
+
+### Lab D · Multi-Agent Collaboration
+
+Five roles work a shared diagnosis task over a lossy channel. Inspect handoffs, dropped messages, defects caught in review and defects that reach the final answer.
+
+*Runtime:* Deterministic message-passing simulation · seeded channel loss
+
+*Route:* `/labs/multi-agent`
+
+*Concepts:* Role-based multi-agent system, Verification, Coordination failure, Handoff
+
+*Textbook chapters:* 14, 16, 17
+
+**Delivers:**
+
+- Multi-agent
+
+### Lab E · Robot Policies: Priors and Own Data
+
+Two measurements on the same slip grid. First, one learned Q-table is transferred to three new task families and the interaction cost of each is measured against learning from scratch. Second, a model-based policy is retrained generation after generation on its own rollouts, and the learned model is scored against a fixed probe of the real dynamics.
+
+*Runtime:* Seeded tabular Q-learning + fitted transition counts · reward from the environment, not a learned model
+
+*Route:* `/labs/policy-priors`
+
+*Concepts:* Vision-language-action model (VLA), Transfer, Negative transfer, Self-generated data, Compounding model error
+
+*Textbook chapters:* 3, 7, 23
+
+**Delivers:**
+
+- Ch. 7 and Ch. 23: the earliest of the vision-language-action models, and the clearest statement of what web-scale pretraining buys a robot.
+- Ch. 23 §23.2.2: a generalist robot policy trained on self-generated action data — the open-problem version of the world-model lesson.
+- Ch. 3 and Ch. 23 §23.2.2: reinforcement learning with verifiable rewards, and the case for training on the agent's own interaction data.
+
+### Lab F · Memory Durability and a Learned Write Policy
+
+The event stream of Lab B, seen from two questions it cannot answer. Below the working store sits a durable layer of traces, session summaries and a rolling profile, each item decaying as R = exp(-t/S) and recovering when it is rehearsed; the lab counts which facts the curve takes and which the summary budget takes. Then writing becomes an action — ADD, UPDATE, DELETE, NONE — learned against the retrieval that happens later, and compared with the hand-written rule.
+
+*Runtime:* Deterministic decay curve + seeded tabular softmax REINFORCE · no model calls
+
+*Route:* `/labs/memory-longevity`
+
+*Concepts:* Forgetting curve, Hierarchical memory, Consolidation, Write policy, Policy gradient
+
+*Textbook chapters:* 9
+
+**Delivers:**
+
+- Ch. 9 §9.3.2.3: hierarchical summaries of a user's interactions, and memory that is forgotten and reinforced on an Ebbinghaus curve.
+- Ch. 9 §9.3.2.3: the learned counterpart to explicit memory management — the agent decides what to remember, trained by reinforcement learning.
+- Ch. 9 §9.3.2.3: a compact state that is updated after every interaction, so the state does not run out of the context window.
+
+### Lab G · Reasoning Depth and the Frontier Audit
+
+Chain of thought run as the book defines it — interaction style C, a reasoner whose own steps are never answered by the world — beside style A (one step) and style B (a step that reads an external check) over a hand-authored battery in five task families, at one shared per-step error rate and one shared seed schedule. The sweep reports where each family peaks, in accuracy and in tokens. Then the frontier: a rule-based stand-in scored against this course's own question bank, printed next to a reported column that is text with citations and is refused outright if a cell contains a digit.
+
+*Runtime:* Deterministic battery · seeded per-step error · no model calls
+
+*Route:* `/labs/reasoning`
+
+*Concepts:* Chain of thought, Decomposable work, Overthinking, External verification, Provenance
+
+*Textbook chapters:* 6, 9, 23
+
+**Delivers:**
+
+- Ch. 6 and Ch. 9: chain-of-thought prompting as interaction style C.
+- Ch. 23 §23.2.2: the measurement behind the chapter's warning that more thinking is not always better.
+- Ch. 23: the frontier the chapter measures itself against, and a rare honest account of what a large model does and does not do.
+
+### Lab H · Agentic Retrieval: gate, decompose, compare
+
+Chapter 12 teaches the retrieve-then-generate pipeline and then says it is not an agent. Three measurable claims carry that transition. First the gate and the critic: the same six questions run by a pipeline that always retrieves top-k and one that judges, retrieves, grades each passage and answers, rewrites or abstains — with the decoys it waved through and the ones it turned away counted separately. Then decomposition: a four-hop question against one flat query, hop by hop, including the hop where a wrong intermediate answer was fed forward. Then the four pipeline shapes of the survey, run over one case set and one budget model, so the price of each shape is in the same units.
+
+*Runtime:* Deterministic scoring over a hand-authored corpus · no model calls
+
+*Route:* `/labs/retrieval`
+
+*Concepts:* Adaptive retrieval, Query critique, Abstention, Question decomposition, Multi-hop retrieval, Agentic RAG
+
+*Textbook chapters:* 12
+
+**Delivers:**
+
+- Ch. 12 §12.4: adaptive retrieval with critique.
+- Ch. 12 §12.4: question decomposition for multi-hop retrieval.
+- Ch. 12 §12.6: the survey that maps agentic RAG onto the single-shot pipeline the chapter teaches.
+
+## Appendix C — Laboratory practice
+
+The laboratories carry their own diagnostic questions. Each one names the control to change, so the reader can check the prediction against the running laboratory rather than against the text.
+
+**Q. You switch from the greedy planner to the search-based planner. What changes, and why is it not simply that the search planner "tries harder"? *(core)***
+
+- The search planner takes more steps because it explores more of the grid.
+- ✓ **The search planner has a model of the state — position, key and door — so it can plan a route that respects the lock, while the greedy planner has no model and walks into it.**
+- The search planner gets a larger action budget.
+- The greedy planner is deliberately handicapped so the comparison is interesting.
+
+*Try it:* Try it: run all four planners from the Strategy comparison tab and watch which one reaches the goal.
+
+> **Why:** The difference is the model, not the effort. Breadth-first search over the full state space includes "has the key" and "is the door open" in the state, so a path through the door is only reachable once the key is held. The greedy planner has no such notion and repeats the same blocked move. Step between the two in the laboratory and watch the failure count change (Ch. 6, §6.1; Ch. 9, §9.2).
+
+**Q. You raise the slip probability so that the world sometimes does something other than what the plan said. Which planner should suffer most, and why? *(core)***
+
+- ✓ **The search planner, because its plan assumed the world was deterministic.**
+- The greedy planner, because it already fails in a deterministic world.
+- All of them equally, because a slip invalidates any plan.
+- None, because a slip is just another blocked move.
+
+*Try it:* Try it: set the slip probability to 0.2 and compare the step counts across the strategies.
+
+> **Why:** The search planner is the one whose plan is worth something, and it is the one a slip undermines: it planned a route that is no longer the route the world will take. The greedy planner was already failing, so a slip changes little. This is the model-error case from Ch. 7, §7.3.5 — planning inside a model is only as good as the model, and a planner with no model has nothing to lose.
+
+**Q. You shrink the store so that only two items fit. Which fact is most likely to be evicted, and what is the eviction rule? *(core)***
+
+- The most recent fact, because a store is a queue and the newest is the least useful.
+- ✓ **The lowest-salience fact, because eviction is salience-based rather than recency-based.**
+- A random one, because there is no principled rule without a trained model.
+- The most important one, because important facts are written first and are therefore oldest.
+
+*Try it:* Try it: set the capacity to 2 and read the eviction log.
+
+> **Why:** The store evicts by salience, not by age. That is the whole point of the design: a fact that matters survives, and a fact that merely happened recently does not. The interesting failure is not that the wrong fact was evicted but that the *salience signal itself* was wrong — the item was rated low because nothing yet had demonstrated that it mattered (Ch. 9, §9.3.2.3).
+
+**Q. The store is large enough to hold everything, and the agent still answers the question wrongly. Which policy is now the suspect? *(core)***
+
+- The write policy, because the fact was never written down.
+- The eviction policy, because something was removed too early.
+- ✓ **The retrieval policy, because the fact is in the store but the query did not surface it.**
+- None of them: with everything stored, the answer must be right.
+
+*Try it:* Try it: set the capacity to 12, then switch the strategy between recency and relevance.
+
+> **Why:** Once the write and eviction policies are exonerated, the retrieval policy is the only one left. A larger store does not guarantee a better answer — it can make it worse, because retrieval has to select from more candidates and the ranking is what decides. This is why the laboratory lets you change the strategy and the relevance weight separately (Ch. 9, §9.3.2.3; Ch. 12, §12.7).
+
+**Q. The model-based agent reaches the goal but is slower per episode than the model-free agent. Why is that not a contradiction? *(core)***
+
+- Because the model-based agent is doing a harder task.
+- ✓ **Because planning costs computation at every step, while the model-free agent amortises its learning over many episodes. The trade is sample efficiency against per-step cost.**
+- Because the model-based agent has a smaller action space.
+- Because the model-free agent is measured over fewer episodes.
+
+*Try it:* Try it: set the learned-model accuracy to 0.8 and compare the two policies on steps taken.
+
+> **Why:** The two agents are optimised for different things. The model-based agent learns a model once and then plans inside it, which is why it needs far fewer *environment* interactions; but every one of its steps pays for the planning search. The model-free agent pays nothing per step and pays everything per episode. Sample efficiency and per-step cost are different currencies (Ch. 7, §7.3.5.1–7.3.5.2).
+
+**Q. You make the learned model less accurate. The model-based agent's performance falls below the model-free agent's. What has gone wrong? *(core)***
+
+- The model-free agent got better by accident.
+- ✓ **The planner is optimising a model that is not the world, and it acts on the error with full confidence.**
+- The episodes are too short to learn anything.
+- The reward function is broken.
+
+*Try it:* Try it: set the learned-model accuracy to 0.0 and watch the model-based policy.
+
+> **Why:** This is the failure mode that makes model-based learning delicate. The planner is optimal *with respect to the model*, and a wrong model produces a confidently wrong plan — often worse than no model, because a model-free agent at least reacts to reality as it unfolds. A useful mitigation the textbook names is to act on the world and check the outcome rather than trusting the simulation (Ch. 7, §7.3.5).
+
+**Q. You add a second executor to the team, and the final answer gets *worse*. How is that possible? *(core)***
+
+- ✓ **Two executors can disagree, and a disagreement that is not resolved becomes a defect in the answer.**
+- Two executors always take twice as long, and the channel drops the extra messages.
+- The planner can only assign work to one role.
+- A critic cannot judge two answers.
+
+*Try it:* Try it: remove the critic and the verifier in turn, and compare the defects that reach the answer.
+
+> **Why:** Adding a role is not free. Two executors that disagree do not average out — the conflict has to be resolved, and if it is not, a defect reaches the answer. The textbook's point is that multi-agent designs pay off when the roles need *genuinely different contexts or tools*, and when failures must be attributable to a role. Otherwise the coordination cost dominates (Ch. 16, §16.3.1).
+
+**Q. You switch the verifier on. Some defects now reach the final answer that previously did not, and the success rate rises. What does that tell you? *(core)***
+
+- The verifier introduces errors but catches more of them.
+- ✓ **The verifier catches some defects and lets others through, so the defect count falls even though the count of *detected* defects rises.**
+- The channel loss changed.
+- The executor roles became redundant.
+
+*Try it:* Try it: switch the verifier off and on, and compare both the defects caught and the defects that got through.
+
+> **Why:** This is the distinction between a defect that reaches the answer and a defect that is *caught*, and conflating them makes verification look useless. A verifier raises the number of defects you can see and lowers the number that get through, and the second number is the one that matters. It is also why the textbook insists on reporting the two separately (Ch. 14, §14.3–14.4).
+
+**Q. A tool call fails and the agent immediately repeats the identical call. What is missing from the graph? *(core)***
+
+- A second tool with a different name.
+- ✓ **A route from the observation back into the planner, so the failure is fed forward instead of being retried blindly.**
+- A final response node.
+- A larger step budget.
+
+*Try it:* Try it: open the broken-pipeline scenario and run it; the trace shows the repeated call.
+
+> **Why:** A failed call is an observation, and an observation that goes nowhere changes nothing: the model has not been shown the error, so repeating the call is rational. The graph needs the observation to reach a node that can act on it — the planner, or an evaluator that routes to a different branch. This is the same point as Ch. 6, §6.2.4.2, and the broken-pipeline scenario in the builder exists to show it.
+
+**Q. Your graph has a decision node whose two branches both lead to the same node. What does that mean for the execution? *(core)***
+
+- ✓ **Nothing: the branch taken is recorded in the trace, and the engine follows the edge that matches it.**
+- The run is invalid and the engine will refuse to start.
+- Both branches are executed in sequence.
+- The decision node is ignored.
+
+*Try it:* Try it: add a decision node whose two branches lead to the same node, and read the trace.
+
+> **Why:** A decision is about *which* edge is taken, not about where the edges go. Two branches to the same node is a perfectly good design: it is how a "yes" and a "no" converge on the same next step, with the branch recorded in the trace. The engine follows the edge whose label matches the decision, and labels are what make the trace readable afterwards (Ch. 11, §11.2).
+
+**Q. On the mirrored family, where the pretraining task put its reward in the opposite corner, you move prior strength from 0 to 1.5. What happens to the interactions needed to reach the success threshold? *(core)***
+
+- ✓ **It goes up: a stronger table is a stronger opinion about a task that opinion is wrong for, and every interaction has to undo it.**
+- It goes down: a larger starting table is always a larger head start.
+- Nothing: the transferred table only shapes the pretraining family, not the transfer families.
+- It goes down, but only once the success threshold is lowered to match it.
+
+*Try it:* Try it: choose the mirrored south-west dock family and drag prior strength from 0 to 1.5.
+
+> **Why:** The transferred Q-table is a belief, not a capability. Where the belief matches the new task it is the cheapest thing in the experiment; where it does not, it has to be overwritten cell by cell, and the bigger the mass it arrives with the more interactions that take. This is the negative-transfer half of what pretraining buys a robot (Ch. 7, §7.3.5; Ch. 23, §23.2), and the screen reports it as a cost rather than dropping it.
+
+**Q. In the second tab you set the external share to 0, so each generation is trained purely on the policy's own rollouts. What does the fixed probe of the real dynamics show as the generations pass? *(core)***
+
+- Model error falls, because the data a policy generates is exactly the data that policy needs.
+- ✓ **Model error grows and coverage falls together: the policy stops visiting the pairs its own data could have corrected, and those pairs stay on the naive belief that an action always works.**
+- Nothing changes, because the fit is deterministic and the seeds are shared.
+- Coverage rises, because every generation adds rollouts on top of the ones it already had.
+
+*Try it:* Try it: set the external share to 0 and read the coverage line against the error line.
+
+> **Why:** The probe is drawn once, from the real dynamics, and neither arm can influence it, so a rising error against it is a disagreement with the world rather than with the model's own memory. The mechanism is the loop itself: the policy plans inside the model, so it acts where the model says the reward is, so the transitions it collects are the transitions its current belief already predicted. Coverage of the state-action space is what collapses first. Keeping a fixed pool of external transitions in the training set holds the coverage up, which is why the two arms are shown on the same axes (Ch. 23, §23.2).
+
+**Q. On the durability tab you cut topics per summary from 8 down to 1, leaving the forgetting curve exactly as it was. Which causes of fact loss does that change the count of? *(advanced)***
+
+- ✓ **The ones labelled abstraction: the summary can no longer carry the keywords a fact needs, so those facts are missing even in the replay with no decay at all.**
+- The ones labelled decay: a thinner summary decays faster, because it has fewer keywords to be rehearsed by.
+- Neither: the labels are a property of the curve, and only the curve settings move them.
+- Both equally, because the two causes are the same event described twice.
+
+*Try it:* Try it: drop topics per summary to 1 and watch the cause badges move from decay to abstraction.
+
+> **Why:** The cause is measured, not asserted: the identical stream is replayed with the consolidation threshold at zero, so nothing can be forgotten by decay, and whatever is still missing in that run was dropped by the summary topic budget. Cutting the topics widens exactly that second set, and the screen re-labels the facts accordingly (Ch. 9, §9.3.2.3).
+
+**Q. On the write-policy tab you leave the store at capacity 6 but hand the decision only one stored item instead of four. What happens to the comparison between the learned policy and the hand-written rule? *(core)***
+
+- Both go wrong: one item cannot carry six facts, whichever policy wrote it.
+- ✓ **The rule goes wrong and the learned policy does not: it wrote fewer, denser items, so the one item it hands over still carries what the question needs.**
+- Nothing changes, because the retrieval strategy is the same in both arms.
+- The learned policy goes wrong first, because it was trained at a larger budget.
+
+*Try it:* Try it: set the items the decision sees to 1 and read the two bars of the budget sweep.
+
+> **Why:** This is the whole argument for treating a write as an action. The rule writes everything and evicts by salience, so its six items are six fragments and a budget of one picks one of them. The learned policy is rewarded for the retrieval that happens later, so it merges, and the sweep of budgets on the screen is where that difference shows up. It costs a store that is smaller, not one that is bigger (Ch. 9, §9.3.2.3).
+
+**Q. On the battery you set the per-step error rate to 0, leaving the tasks, the families and the three policies exactly as they were. What happens to the crossover — the chain length at which each family peaks? *(advanced)***
+
+- Every family peaks at the longest chain, because with no errors an extra step can never hurt.
+- ✓ **The gain is exactly zero in all five families: no step can fail, so an extra step changes neither accuracy nor the verdict, and the battery reports flat.**
+- Knowledge and writing start to gain, because those are the families that need more thinking steps.
+- The aggregate peak moves to four steps, because the two decomposable families now outweigh the other three.
+
+*Try it:* Try it: drag the per-step error rate to 0 and read the Δ vs A column.
+
+> **Why:** At a per-step error rate of 0 the verdict column reads flat for all five families and the difference against one step is exactly 0.0 pt — measured, not asserted, by running the identical battery twice. The crossover is therefore not a property of a family on its own: it is read off the sweep at whatever error rate is in force. Arithmetic peaks at 2 steps and symbolic at 4 at the shipped rate, while knowledge, commonsense and writing peak at 1, because for those three every extra step still has to carry the whole problem. Raise the error rate and only the first two keep gaining (Ch. 6, §6.1; Ch. 23, §23.2).
+
+**Q. In the frontier audit you move every slider in the battery section and then look at the right-hand column of the audit table. Why does that column not change? *(core)***
+
+- ✓ **Because it is reported text with a citation, stored with a provenance label and checked for digits: no policy has any purchase on it.**
+- Because the audit recomputes only when the seed changes, and the sliders do not touch the seed.
+- Because it measures the same battery as the left columns, so it moves by construction and only looks still.
+- Because the stand-in policy is fixed at one step, so nothing in the page can be moved.
+
+*Try it:* Try it: switch the stand-in policy and watch the measured accuracy move while the reported column stays put.
+
+> **Why:** The two columns are different kinds of thing, and the page says so: the measured columns are recomputed from the sliders, while each reported cell is a number-free sentence with a chapter-and-section citation, labelled reported-not-measured-here, and the engine refuses any cell that contains a digit. Only the stand-in policy switches, and it switches what the rule runs — the reported column is text. The third figure on that tab is a count over this repository: 7 of the 8 limitations Ch. 23 records appear somewhere in this course's own lesson text, and the §23.2.7 entry does not (Ch. 23, §23.2).
+
+**Q. On the critique tab you take the rewrite budget down to 0, leaving the gate, the critic and the threshold exactly as they were. What does the case set do? *(core)***
+
+- Nothing changes, because a rewrite only costs tokens and can never change an answer.
+- ✓ **Abstentions rise to four and wrong answers fall to zero, and correct answers fall too: two of the four right answers came from the rewrite.**
+- Correct answers rise, because a passage the critic rejects can only have been a decoy.
+- The gate closes on every case, because the critic no longer gets a second look at the question.
+
+*Try it:* Try it: set the rewrite budget to 0 and read the abstentions and correct counts against the default run.
+
+> **Why:** Measured over the same six cases: with one rewrite the gated arm issues 8 retrievals, answers 4 correctly and 2 wrongly, and spends 1020 tokens; with no rewrite it issues 4, abstains 4 times, answers 2 correctly and none wrongly, at 570 tokens. The rewrite re-queries with the keywords the first window lacked, so the decisive passage arrives where the original ranking missed it — and the same rejection rule is what makes the one case the critic gets wrong confidently wrong rather than silent. The knob trades being wrong against being useful (Ch. 12, §12.4).
+
+**Q. On the decomposition tab you raise the hop-margin threshold until every close call is distrusted. What happens to each of the two arms? *(advanced)***
+
+- Both arms improve, because a hop that was a close call was a hop about to be wrong.
+- ✓ **The decomposed arm loses answers it already had; the single-shot arm does not move at all, because a flat query never reads an intermediate answer and so cannot be hurt by a rule about them.**
+- The decomposed arm is unaffected, because the margin only decides what is written to the trace.
+- Both arms fall to zero, because the store holds two near-identical supplier records.
+
+*Try it:* Try it: set the hop margin to 0, then to 0.2, and watch which curves move.
+
+> **Why:** Trust every hop (margin 0) and decomposition recovers all four answers with hop coverage 1.0. Distrust a close call from 0.02 upward and two recovered answers are lost — exactly the two questions that run over the stale supplier record — and at 0.2 the coverage is 0.7. The single-shot arm sits at one recovered answer and coverage 0.4 whatever the knob says. That is the cost side of decomposing: reading your own intermediate answer is what lets the chain close, and what lets one bad hop poison the hops after it (Ch. 12, §12.4).

@@ -54,7 +54,8 @@
   - [Lesson 11. How many questions](#lesson-11-how-many-questions)
   - [Lesson 12. What to publish](#lesson-12-what-to-publish)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Judging with a Model
 
@@ -91,16 +92,18 @@ The central idea of model-based evaluation: instead of writing a reference answe
 
 **Q. What is an LLM-as-a-judge asked to do? — multiple-choice *(warmup)***
 
-- - Score an answer against a reference answer
+- Score an answer against a reference answer
 - ✓ **Choose between two candidate answers**
-- - Rewrite the answer to improve it
-- - Check the answer against the ground truth
+- Rewrite the answer to improve it
+- Check the answer against the ground truth
 
 > Correct.
 
 > **Why:** The judge sees a question and two answers and names the better one. The advantage over scoring against a reference is that no single phrasing has to be declared correct.
 
 **Q. The judge’s preferences are the judge model’s preferences. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Yes. A judge is a model, and whatever it has come to prefer — position, length, its own family’s style — comes through into every judgement it makes.
 
@@ -142,10 +145,10 @@ Measure how often a judge agrees with the human, and how often it agrees with it
 
 **Q. What does the position-swap test measure? — multiple-choice *(core)***
 
-- - How often the judge agrees with a human
+- How often the judge agrees with a human
 - ✓ **How often the judge gives the same answer when the order is changed**
-- - How good the judge is at explaining itself
-- - How expensive the judge is to run
+- How good the judge is at explaining itself
+- How expensive the judge is to run
 
 > Correct.
 
@@ -202,15 +205,17 @@ A judge is a model, and models have preferences that have nothing to do with qua
 **Q. How is position bias usually fixed? — multiple-choice *(core)***
 
 - ✓ **By presenting each pair in both orders and taking the majority**
-- - By making the judge stronger
-- - By using a longer prompt
-- - By scoring against a reference answer instead
+- By making the judge stronger
+- By using a longer prompt
+- By scoring against a reference answer instead
 
 > Correct, at the cost of double the votes.
 
 > **Why:** Presenting both orders and taking the majority cancels a first-position preference exactly, because the bias then favours each answer equally often. It doubles the cost, which is why it is often skipped.
 
 **Q. A judge prefers the first position in 62% of 1000 comparisons where the two answers are equally good. What is the excess preference, in percentage points? — numeric *(hard)***
+
+> **Answer:** 12 percentage points
 
 > **Why:** Exactly 12 percentage points above the 50% that a fair judge would show. That excess is the position bias, and it is what the swap test is for.
 
@@ -251,16 +256,18 @@ Count how often the judge prefers the answer in the first position. Open **Measu
 
 **Q. Which of these does the position-swap protocol NOT fix? — multiple-choice *(hard)***
 
-- - Position bias
+- Position bias
 - ✓ **Verbosity bias**
-- - The order effect on the wording
-- - A first-answer recency effect
+- The order effect on the wording
+- A first-answer recency effect
 
 > Correct — swapping positions does nothing about a preference for length.
 
 > **Why:** The swap cancels anything that depends on *position*. A preference for longer answers does not depend on position, so it survives the swap intact and has to be measured separately.
 
 **Q. Making the judge model stronger removes its verbosity bias. — boolean *(hard)***
+
+> **Answer:** False
 
 > **Why:** No. The primary source reports that a stronger judge does not remove the bias. Scaling the judge does not scale away its preferences.
 
@@ -314,10 +321,10 @@ An agreement rate of 80% sounds good and is often quoted without context. This m
 
 **Q. Why does an agreement rate fall when the question set gets harder? — multiple-choice *(core)***
 
-- - The judge becomes less accurate
+- The judge becomes less accurate
 - ✓ **The answers get closer, so both the judge and the human are near a coin flip**
-- - Harder questions are longer, which activates the verbosity bias
-- - Human annotators get tired
+- Harder questions are longer, which activates the verbosity bias
+- Human annotators get tired
 
 > Correct.
 
@@ -325,10 +332,10 @@ An agreement rate of 80% sounds good and is often quoted without context. This m
 
 **Q. What is the right number to compare a judge’s agreement rate against? — multiple-choice *(core)***
 
-- - 100%
+- 100%
 - ✓ **The agreement of two humans on the same question set**
-- - 50%
-- - The judge’s score on a different benchmark
+- 50%
+- The judge’s score on a different benchmark
 
 > Correct.
 
@@ -385,16 +392,18 @@ An arena collects votes and produces a ranking. This module covers the Bradley�
 
 **Q. In the Bradley–Terry model, what does the strength θ_i represent? — multiple-choice *(core)***
 
-- - The number of votes model i received
+- The number of votes model i received
 - ✓ **A number such that the chance of i beating j depends on θ_i − θ_j**
-- - The accuracy of model i on the benchmark
-- - The cost of one vote for model i
+- The accuracy of model i on the benchmark
+- The cost of one vote for model i
 
 > Correct.
 
 > **Why:** Pr(i beats j) = σ(θ_i − θ_j). The strength is not a count of votes; it is the parameter of the difference, and the model says a pair of votes for i and one for j is worth more than a tie.
 
 **Q. In a Bradley–Terry model with strengths θ_A = 1 and θ_B = 0, what is the probability that A beats B? — numeric *(hard)***
+
+> **Answer:** 0.7310586 ± 0.0001
 
 > **Why:** σ(1 − 0) = 1/(1 + e⁻¹) ≈ 0.731. Note that it is not 0.5: a strength difference of one already gives a clear favourite.
 
@@ -437,10 +446,10 @@ Collect the votes and fit a Bradley–Terry model to them. Open **Fit a ranking 
 
 **Q. Why is an Elo rating not a confidence interval? — multiple-choice *(hard)***
 
-- - Elo ratings are not computed from votes
+- Elo ratings are not computed from votes
 - ✓ **Elo is an online update, so its result depends on the order the votes arrived in**
-- - Elo assumes the models are equally good to start
-- - Elo cannot handle draws
+- Elo assumes the models are equally good to start
+- Elo cannot handle draws
 
 > Correct.
 
@@ -498,14 +507,16 @@ A benchmark is a measurement instrument, and instruments have design decisions. 
 
 **Q. A benchmark has 200 questions and a model scores 60% on them. 10% of the questions are contaminated and on those the model scores 90% instead of 60%. What is the reported score? — numeric *(hard)***
 
+> **Answer:** 63 percent
+
 > **Why:** Exactly 63%. Twenty contaminated questions at 90% contribute 18 successes where 12 were expected, and 180 clean ones at 60% contribute 108: (18 + 108) / 200 = 0.63. The inflation is 3 percentage points.
 
 **Q. Why can contamination move a ranking more than it moves any single score? — multiple-choice *(hard)***
 
-- - Because contamination inflates every model equally
+- Because contamination inflates every model equally
 - ✓ **Because contamination is usually differential: one model has seen the benchmark and the others have not**
-- - Because the error bars shrink under contamination
-- - Because rankings are computed from fewer votes
+- Because the error bars shrink under contamination
+- Because rankings are computed from fewer votes
 
 > Correct.
 
@@ -551,10 +562,10 @@ Sweep the contaminated fraction and watch the reported score drift. Open **What 
 
 **Q. Which of these are design decisions a benchmark author makes? — multi-select *(core)***
 
-- - Which questions to ask
-- - How the answers are scored
-- - What the score is called
-- - Which models are evaluated
+- Which questions to ask
+- How the answers are scored
+- What the score is called
+- Which models are evaluated
 
 > **Why:** The question set, the scoring procedure and the set of models under test are all choices. Each one is a claim about what matters, and each one can be argued for.
 
@@ -608,14 +619,16 @@ A score from N questions is a proportion, and a proportion has a standard error.
 
 **Q. A model scores 50% on a benchmark of 400 questions. What is the standard error of that score? — numeric *(hard)***
 
+> **Answer:** 0.0125 ± 0.0001
+
 > **Why:** √(0.5 × 0.5 / 400) = √(0.000625) = 0.0125. The 95% interval is therefore roughly 50% ± 2.5 percentage points.
 
 **Q. To halve the width of a confidence interval, how many times more questions are needed? — multiple-choice *(core)***
 
-- - Twice as many
+- Twice as many
 - ✓ **Four times as many**
-- - Ten times as many
-- - Half as many
+- Ten times as many
+- Half as many
 
 > Correct.
 
@@ -660,6 +673,8 @@ Plot the width of the confidence interval against the number of questions. Open 
 
 **Q. A benchmark with very low power will report real differences as ties. — boolean *(core)***
 
+> **Answer:** True
+
 > **Why:** Yes. If the test cannot detect the difference, the difference does not appear — and a leaderboard that reports a tie there is reporting an artefact of the question count.
 
 #### Go and do it
@@ -695,10 +710,10 @@ Compute how many questions a given difference needs, and watch the curve. Open *
 
 **Q. What should a leaderboard print next to every score? — multi-select *(hard)***
 
-- - A confidence interval
-- - The number of questions used
-- - The provider of the model
-- - The logo of the organisation that ran it
+- A confidence interval
+- The number of questions used
+- The provider of the model
+- The logo of the organisation that ran it
 
 > **Why:** An interval, the question count, and enough about the protocol to reproduce it. The newest criticism of the field is that the last of these is often missing, and that the leaderboard has become the thing being optimised.
 
@@ -901,7 +916,59 @@ The score inflation it produces is the fraction times the per-question inflation
 
 *Course term*
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The judge and the human
+
+*Agreement with a human, the swap test, and how the question set decides both.*
+
+**Delivers:**
+
+- Judge against human agreement
+- Consistency under permutation
+
+### B · The biases of a judge
+
+*One bias at a time: position, verbosity, self-enhancement.*
+
+**Delivers:**
+
+- Position bias
+- Verbosity bias
+- Self-enhancement bias
+
+### C · The arena
+
+*Votes in, a Bradley–Terry ranking out, an interval on it, and a check on the question set.*
+
+**Delivers:**
+
+- Bradley–Terry from pairwise votes
+- Bootstrap confidence intervals on rankings
+- The cost of a good arena sample
+- Rating bias from a fixed evaluation set
+
+### D · Benchmark design
+
+*Contamination, the difficulty mix, multi-metric surfaces, and selecting on a public set.*
+
+**Delivers:**
+
+- Multi-metric trade-off surfaces
+- Standardisation and coverage
+- Private testing versus public testing
+
+### E · Measurement
+
+*The error bar, the power, the cost, and the decoder that moves the score.*
+
+**Delivers:**
+
+- How much a decoding change moves a score
+
+## Appendix C — Sources
 
 - **Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena** — Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric P. Xing, Hao Zhang, Joseph E. Gonzalez, Ion Stoica (2023), arXiv:2306.05685 [cs.CL] / NeurIPS 2023 Datasets and Benchmarks. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing..
   Evaluation appears as a single lesson in the foundations course. Judging a model with a model is now a primary evaluation method and its biases are measurable.

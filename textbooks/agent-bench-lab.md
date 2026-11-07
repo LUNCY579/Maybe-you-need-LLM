@@ -48,7 +48,8 @@
   - [Lesson 7. One run or many](#lesson-7-one-run-or-many)
   - [Lesson 8. Has the model seen it?](#lesson-8-has-the-model-seen-it)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. Task Design
 
@@ -85,9 +86,9 @@ The tasks, the difficulty mix, and the number of them. What a score on a task se
 **Q. What is a benchmark, exactly? — multiple-choice *(core)***
 
 - ✓ **A set of tasks and a rule that decides whether each was solved**
-- - A dataset of problems with reference answers
-- - A metric
-- - A leaderboard
+- A dataset of problems with reference answers
+- A metric
+- A leaderboard
 
 > Correct.
 
@@ -96,9 +97,9 @@ The tasks, the difficulty mix, and the number of them. What a score on a task se
 **Q. What does the difficulty mix of a task set decide? — multiple-choice *(core)***
 
 - ✓ **What the score means: a set of easy tasks and a set of hard ones measure different things**
-- - How long the benchmark takes to run
-- - Whether the tasks are verified
-- - The interval on the score
+- How long the benchmark takes to run
+- Whether the tasks are verified
+- The interval on the score
 
 > Correct.
 
@@ -140,6 +141,8 @@ The task set, its difficulty mix, and the interval on its score. Open **Look at 
 #### Practice
 
 **Q. A solver solves 12 of 200 tasks. Using the Wilson interval, is the score of 6% more likely to be near 6% or near 0%? — numeric *(hard)***
+
+> **Answer:** 0
 
 > **Why:** The answer is zero for the normal approximation being useless: with twelve successes the interval is asymmetric, and the normal approximation would give a lower bound below zero. The Wilson interval keeps it inside the unit interval.
 
@@ -194,15 +197,17 @@ The two conditions a solution must satisfy, the failure mode a criterion has to 
 **Q. What are the two conditions a solution must satisfy? — multiple-choice *(core)***
 
 - ✓ **The failing test must start failing and end passing, and the passing tests must keep passing**
-- - The failing test must pass, and the patch must be small
-- - The tests must pass, and the agent must have finished
-- - The failing test must pass, and no test file may be changed
+- The failing test must pass, and the patch must be small
+- The tests must pass, and the agent must have finished
+- The failing test must pass, and no test file may be changed
 
 > Correct.
 
 > **Why:** The first condition makes it a task; the second is what makes the first condition mean something.
 
 **Q. A patch that changes the failing test satisfies the first condition and nothing else. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Yes. The failing test now passes, so the transition holds — and the task is no harder than it was, which is why the second condition and the distrust of patches that touch tests are both needed.
 
@@ -245,9 +250,9 @@ The four kinds of patch, and the verdict each one gets. Open **Check the criteri
 **Q. What does a benchmark with a weak verifier measure? — multiple-choice *(hard)***
 
 - ✓ **The solver’s ability to satisfy the verifier, which may not be the ability the benchmark claims to measure**
-- - Nothing at all
-- - The verifier’s quality
-- - The task set
+- Nothing at all
+- The verifier’s quality
+- The task set
 
 > Correct.
 
@@ -303,9 +308,9 @@ The agentless baseline, the agent that tries several times, and the arithmetic o
 **Q. Why is the agentless baseline the number to beat? — multiple-choice *(core)***
 
 - ✓ **Because it is cheap, and an agent that cannot beat a cheap baseline is not earning its cost**
-- - Because it is stronger
-- - Because it is the state of the art
-- - Because it does not use a model
+- Because it is stronger
+- Because it is the state of the art
+- Because it does not use a model
 
 > Correct.
 
@@ -349,9 +354,9 @@ The agentless baseline, its score, and the interval on it. Open **Run the baseli
 **Q. What does an agent spend that the baseline does not? — multiple-choice *(core)***
 
 - ✓ **Attempts, which are model calls**
-- - Nothing
-- - Only the score
-- - The verifier
+- Nothing
+- Only the score
+- The verifier
 
 > Correct.
 
@@ -406,14 +411,16 @@ The variance of a score, the difference between one run and many, and the overla
 
 **Q. A single run of a stochastic solver is one sample of a distribution, not a measurement of it. — boolean *(core)***
 
+> **Answer:** True
+
 > **Why:** Yes. The spread across runs is the noise in every comparison made from single runs, and it is what a reported score leaves out.
 
 **Q. Why is the naive estimate of pass@k biased upwards? — multiple-choice *(hard)***
 
 - ✓ **Because the samples that succeeded are more likely to be the ones counted, so the estimate overstates the chance of at least one success**
-- - Because the tasks are hard
-- - Because k is usually too small
-- - It is not biased
+- Because the tasks are hard
+- Because k is usually too small
+- It is not biased
 
 > Correct.
 
@@ -459,9 +466,9 @@ The score across repeated runs, and the interval it implies. Open **Measure the 
 **Q. What does contamination do to a benchmark? — multiple-choice *(core)***
 
 - ✓ **It flatters the systems that were trained on the leaked data, and makes the score meaningless for them**
-- - It lowers every score equally
-- - It makes the benchmark harder
-- - Nothing, if the tasks are verified
+- It lowers every score equally
+- It makes the benchmark harder
+- Nothing, if the tasks are verified
 
 > Correct.
 
@@ -470,9 +477,9 @@ The score across repeated runs, and the interval it implies. Open **Measure the 
 **Q. What does the length of the n-gram decide in the overlap test? — multiple-choice *(hard)***
 
 - ✓ **Whether an edited copy is caught: a short n-gram survives the edit, a long one does not**
-- - How fast the test runs
-- - Whether the tasks are contaminated
-- - The score
+- How fast the test runs
+- Whether the tasks are contaminated
+- The score
 
 > Correct.
 
@@ -564,7 +571,52 @@ A task whose solution is in the training data is not a measurement of the solver
 
 A passage that shares a long run of n-grams with the corpus is probably in it. The length of the n-gram is a decision: short n-grams catch ordinary text as well as copies, and long ones miss a copy that was lightly edited.
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The task set
+
+*What a score on a task set means, how large a task is, and what GAIA’s levels ask for.*
+
+**Delivers:**
+
+- Resolution rate as a function of file size
+- The three question levels
+- Question difficulty versus tool count
+
+### B · The verifier
+
+*The criterion and the cheat, and what each half of the harness decides.*
+
+**Delivers:**
+
+- The test-based verification harness
+
+### C · The baselines
+
+*What a score has to beat, what the beating costs, and whether it repeats.*
+
+**Delivers:**
+
+- The agentless baseline
+- Pass^k: reliability across repeated trials rather than a single pass rate
+
+### D · Contamination
+
+*Whether the model has seen it.*
+
+### E · The environments
+
+*Eight worlds, one average, and whether the world can be replayed.*
+
+**Delivers:**
+
+- Cross-environment score profiles
+- Why a single average hides the failure modes
+- Reproducibility as a benchmark property
+
+## Appendix C — Sources
 
 - **SWE-bench: Can Language Models Resolve Real-World GitHub Issues?** — Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, Karthik Narasimhan (2023), arXiv:2310.06770 [cs.SE] / ICLR 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing..
   The agentic course has a case study but no benchmark-design lesson, and benchmark design is where most agent claims are won or lost.

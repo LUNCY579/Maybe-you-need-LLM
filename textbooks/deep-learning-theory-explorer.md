@@ -29,6 +29,7 @@
 - [Lesson 10. Representation learning at finite width](#lesson-10-representation-learning-at-finite-width) *(advanced, Chapters 10-11)*
 - [Appendix A — Equation reference](#appendix-a-equation-reference)
 - [Appendix B — Notation](#appendix-b-notation)
+- [Appendix C — The laboratories](#appendix-c-the-laboratories)
 
 ### Lesson 1. Gaussians, Wick contraction and why the Gaussian world is not enough
 
@@ -75,19 +76,19 @@ Use Laboratory C to measure the seed-to-seed variance of the layer-wise kernel a
 
 **Q. For $z \sim \mathcal{N}(0, K)$, what is $\mathbb{E}[z^4]$? *(warmup)***
 
-- - $K^2$
+- $K^2$
 - ✓ **$3K^2$**
-- - $K^4$
-- - $\sqrt{3}K$
+- $K^4$
+- $\sqrt{3}K$
 
 > **Why:** Wick contraction gives three pairings, each contributing K², so E[z⁴] = 3K².
 
 **Q. A deep linear network has depth ℓ = 21 and width n = 100. Using the leading finite-width result, what is $G^{(4)} - (G^{(2)})^2$ in units of $(G^{(2)})^2$? *(core)***
 
-- - 0.2
+- 0.2
 - ✓ **0.4**
-- - 0.02
-- - 2.0
+- 0.02
+- 2.0
 
 > **Why:** 2(ℓ−1)/n = 2·20/100 = 0.4. The depth-to-width ratio sets the size of the deviation from Gaussianity.
 
@@ -157,19 +158,19 @@ $$W^{(\ell)}_{ij} \sim \mathcal{N}\!\left(0, \frac{C_W}{n_{\ell-1}}\right) , \qq
 
 **Q. Which initialization variance makes a deep linear network preserve its covariance exactly? *(warmup)***
 
-- - $C_W = 0$
+- $C_W = 0$
 - ✓ **$C_W = 1$**
-- - $C_W = 2$
-- - $C_W = 1/2$
+- $C_W = 2$
+- $C_W = 1/2$
 
 > **Why:** For σ(z) = z, g(K) = K, so the recursion is G^(ℓ+1) = C_W G^(ℓ) and only C_W = 1 has a nontrivial fixed point.
 
 **Q. What is the critical rescaled weight variance for the ReLU activation? *(core)***
 
-- - $1$
-- - $\sqrt{2}$
+- $1$
+- $\sqrt{2}$
 - ✓ **$2$**
-- - $4$
+- $4$
 
 > **Why:** A² = (a₊² + a₋²)/2 = (1 + 0)/2 = 1/2, hence C_W^crit = 1/A² = 2 (Kaiming/He initialization).
 
@@ -231,19 +232,19 @@ Laboratory A lets you set C_W = 1, C_W = 0.8 and C_W = 1.2 on a deep linear netw
 
 **Q. A deep linear network has $C_W = 0.95$ and depth 100. Roughly what happens to the kernel? *(core)***
 
-- - It stays constant
+- It stays constant
 - ✓ **It decays roughly as $0.95^{\ell}$ — exponential death of the signal**
-- - It grows linearly with depth
-- - It oscillates
+- It grows linearly with depth
+- It oscillates
 
 > **Why:** Below C_W = 1 the covariance is multiplied by C_W each layer, so after 100 layers it has fallen by 0.95⁹⁹ ≈ 0.006. This is the vanishing-signal problem in its simplest form.
 
 **Q. Why does the 1/n factor in the weight variance cancel in the linear-network covariance recursion? *(warmup)***
 
-- - Because the activation is odd
+- Because the activation is odd
 - ✓ **Because the sum over the n input neurons exactly compensates the 1/n in each variance**
-- - Because the biases vanish
-- - It does not cancel; the covariance scales with n
+- Because the biases vanish
+- It does not cancel; the covariance scales with n
 
 > **Why:** Each of the n terms contributes (C_W/n)·G, so the sum is n·(C_W/n)G = C_W G. This is the whole reason the rescaling is the right one.
 
@@ -299,19 +300,19 @@ Depth brings two opposing effects: deeper networks can develop nontrivial correl
 
 **Q. Depth 50, width 512, critical linear network with $G^{(2)} = 1$. Estimate the standard deviation of the layer observable $O^{(50)}$ across seeds. *(hard)***
 
-- - ≈ 0.014
-- - ≈ 0.14
+- ≈ 0.014
+- ≈ 0.14
 - ✓ **≈ 0.44**
-- - ≈ 1.0
+- ≈ 1.0
 
 > **Why:** Var = 2ℓ/n = 2·50/512 ≈ 0.195, so the standard deviation is √0.195 ≈ 0.44. A 44% deviation from the mean of the layer observable is not unusual for L/n ≈ 0.1.
 
 **Q. What makes the perturbative effective theory accurate? *(core)***
 
-- - Large depth
+- Large depth
 - ✓ **Small depth-to-width ratio $L/n$**
-- - Zero bias variance
-- - A linear activation
+- Zero bias variance
+- A linear activation
 
 > **Why:** All leading finite-width corrections scale with L/n, so the expansion is controlled when the network is short and fat.
 
@@ -376,19 +377,19 @@ Then open Laboratory C and look at the depth-to-width ratio panel: it is the qua
 
 **Q. For $\sigma(z) = z^2$, which relationship does the two-input kernel recursion satisfy? *(core)***
 
-- - $K^{(\ell+1)}_{12} = C_b + C_W K^{(\ell)}_{12}$
+- $K^{(\ell+1)}_{12} = C_b + C_W K^{(\ell)}_{12}$
 - ✓ **$K^{(\ell+1)}_{12} = C_b + C_W (K_{11}K_{22} + 2K_{12}^2)$**
-- - $K^{(\ell+1)}_{12} = C_b + C_W (K_{11} + K_{22})$
-- - The recursion closes on the diagonal only
+- $K^{(\ell+1)}_{12} = C_b + C_W (K_{11} + K_{22})$
+- The recursion closes on the diagonal only
 
 > **Why:** E[z²z′²] = E[z²]E[z′²] + 2E[zz′]² for jointly Gaussian variables, which mixes diagonal and off-diagonal kernel entries. Nonlinear activations always do this; the linear one does not.
 
 **Q. What is the "representation group flow"? *(warmup)***
 
-- - Backpropagation through time
+- Backpropagation through time
 - ✓ **The layer-by-layer evolution of the preactivation distribution as the network is coarsened**
-- - A group-theoretic symmetry of the loss
-- - The flow of gradients between layers
+- A group-theoretic symmetry of the loss
+- The flow of gradients between layers
 
 > **Why:** Marginalizing one layer at a time defines a flow of distributions (and of their couplings) along depth — a renormalization-group flow for the representations.
 
@@ -457,28 +458,28 @@ $$(C_b, C_W)^{\text{critical}} = \left(0,\; \frac{1}{A^2}\right), \qquad A^2 = \
 
 **Q. What does the perpendicular susceptibility $\chi_\perp$ control? *(core)***
 
-- - The growth of the input magnitude
+- The growth of the input magnitude
 - ✓ **The growth of angular perturbations — differences between inputs at equal magnitude**
-- - The effective learning rate
-- - The bias variance
+- The effective learning rate
+- The bias variance
 
 > **Why:** Perpendicular perturbations are same-norm differences between two inputs, measured by D^(ℓ). If χ⊥ ≠ 1, the network either loses its ability to distinguish inputs or amplifies noise without bound.
 
 **Q. Which activation has $\chi_\parallel = \chi_\perp$ for all $K$? *(hard)***
 
-- - tanh
-- - sigmoid
+- tanh
+- sigmoid
 - ✓ **A scale-invariant activation**
-- - GELU
+- GELU
 
 > **Why:** Scale-invariant activations have g(K) = A²K, giving both susceptibilities equal to the K-independent constant A²C_W. For the K = 0 class equality holds only at K* = 0.
 
 **Q. A leaky ReLU has negative slope 0.25. What is its critical weight variance? *(core)***
 
 - ✓ **$1.88$**
-- - $2.00$
-- - $1.60$
-- - $2.13$
+- $2.00$
+- $1.60$
+- $2.13$
 
 > **Why:** A² = (1 + 0.25²)/2 = (1 + 0.0625)/2 = 0.53125, so C_W^crit = 1/0.53125 ≈ 1.882.
 
@@ -554,19 +555,19 @@ $$K^{(\ell)} = \frac{1}{(-a_1)\,\ell} + \cdots , \qquad a_1 = \gamma_1\gamma_3 +
 
 **Q. At criticality, how does the kernel of a tanh network behave with depth? *(hard)***
 
-- - It is exactly constant
-- - It decays exponentially
+- It is exactly constant
+- It decays exponentially
 - ✓ **It decays as a power law, $K^{(\ell)} \sim 1/((-a_1)\ell)$ with $a_1 = -2$**
-- - It grows logarithmically
+- It grows logarithmically
 
 > **Why:** tanh belongs to the K = 0 class with a₁ = −2, so the kernel follows a benign 1/ℓ power law. The exponent 1 is universal; the coefficient depends on the activation.
 
 **Q. Why does the softplus activation fail to be critical? *(core)***
 
-- - Its derivative vanishes at the origin
+- Its derivative vanishes at the origin
 - ✓ **The criticality ratio never reaches one for K* ≥ 0**
-- - It is not differentiable
-- - Its C_W would be zero
+- It is not differentiable
+- Its C_W would be zero
 
 > **Why:** The ratio 2K*²E[σ′²]/E[σ²(z²−K*)] stays below one for all K* ≥ 0, so there is no nontrivial fixed point at all.
 
@@ -632,10 +633,10 @@ Two structural facts follow. Correlation functions are delta-correlated across n
 
 **Q. In the infinite-width Bayesian picture, why can the network not learn a new representation? *(core)***
 
-- - The learning rate is too small
+- The learning rate is too small
 - ✓ **The posterior depends on the data only through a kernel fixed at initialization**
-- - The loss is convex
-- - The biases are frozen
+- The loss is convex
+- The biases are frozen
 
 > **Why:** The Gaussian-process posterior is a kernel regression: the covariance does not change with the data. Feature learning is a 1/n effect.
 
@@ -694,19 +695,19 @@ $$\upsilon^{(W)}_{\ell} = \frac{\eta\, \lambda^{(W)}_{\ell}}{n_{\ell-1}} , \qqua
 
 **Q. The NTK is $\Theta(x,x') = \sum_\theta \partial f(x)/\partial\theta \cdot \partial f(x')/\partial\theta$. For a single-layer linear network $f = w\cdot x + b$, what is $\Theta(x,x')$? *(core)***
 
-- - $x\cdot x'$
+- $x\cdot x'$
 - ✓ **$x\cdot x' + 1$**
-- - $3$
-- - $\|x\|\|x'\|$
+- $3$
+- $\|x\|\|x'\|$
 
 > **Why:** The weight gradients give Σ_k x_k x′_k and the bias gradient contributes 1·1. The bias contribution is easy to forget and shows up in the app's test suite.
 
 **Q. How does the raw empirical NTK of a two-layer network scale with hidden width $n_1$? *(hard)***
 
-- - independent of $n_1$
+- independent of $n_1$
 - ✓ **linearly**
-- - as $1/n_1$
-- - as $\sqrt{n_1}$
+- as $1/n_1$
+- as $\sqrt{n_1}$
 
 > **Why:** The read-out term accumulates n₁ independent contributions of O(1), so the trace grows linearly with width. This is why the book scales weight learning rates by 1/n per layer (eqs. (8.6)-(8.7)).
 
@@ -770,19 +771,19 @@ A kernel method has no representation learning; a network has it. The infinite-w
 
 **Q. The differential of the NTK (dNTK) is *(core)***
 
-- - always zero, since the NTK is frozen in time
+- always zero, since the NTK is frozen in time
 - ✓ **nonzero in general and proportional to finite-width corrections**
-- - a second-order derivative of the loss
-- - the Hessian of the network output
+- a second-order derivative of the loss
+- the Hessian of the network output
 
 > **Why:** The dNTK measures how the NTK changes under training. It vanishes at infinite width, and its size tracks 1/n corrections — the quantitative signature of representation learning.
 
 **Q. You train the same network at widths 8, 64 and 512 for a fixed number of steps. What should happen to the measured feature drift? *(hard)***
 
-- - It increases with width
-- - It stays the same
+- It increases with width
+- It stays the same
 - ✓ **It decreases with width, approaching the frozen-kernel limit**
-- - It is random and unrelated to width
+- It is random and unrelated to width
 
 > **Why:** Feature drift is a 1/n effect: wider networks behave more like kernel machines on the same training budget, so the representation moves less.
 
@@ -1213,3 +1214,77 @@ Symbols:
 | Θ | neural tangent kernel | sum of parameter-gradient inner products, governing GD dynamics |
 | η | learning rate | step size of the gradient update |
 | ℓ | layer index | used interchangeably with l for the layer position |
+
+## Appendix C — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### Physics lab
+
+*Build and train a network in the browser and watch every signal quantity move.*
+
+*Route:* `/labs/physics`
+
+**Delivers:**
+
+- Physics lab
+
+### A · Initialization
+
+*Signal propagation, the fixed points of the kernel recursion, and criticality.*
+
+*Route:* `/labs/initialization`
+
+**Delivers:**
+
+- Initialisation and criticality
+
+### B · Optimization
+
+*Loss landscapes, the stability threshold, and what each optimizer does about it.*
+
+*Route:* `/labs/landscape`
+
+**Delivers:**
+
+- Loss landscapes
+
+### C · Width & depth
+
+*The finite-width corrections: seed-to-seed variance against depth and against width.*
+
+*Route:* `/labs/width-depth`
+
+**Delivers:**
+
+- Width and depth
+
+### D · Neural tangent kernel
+
+*Jacobians, the NTK as a Gram matrix, its width scaling, and defrosting under training.*
+
+*Route:* `/labs/ntk`
+
+**Delivers:**
+
+- Neural tangent kernel
+
+### E · Representation
+
+*What training does to the hidden features, and how the answer depends on width.*
+
+*Route:* `/labs/representation`
+
+**Delivers:**
+
+- Representation learning
+
+### F · Prerequisite drills
+
+*The eight tools the theory rests on, each graded against a live computation.*
+
+*Route:* `/labs/drills`
+
+**Delivers:**
+
+- Prerequisite drills for the theory course

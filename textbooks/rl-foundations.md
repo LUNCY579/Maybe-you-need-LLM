@@ -36,7 +36,8 @@
   - [Lesson 6. The λ-return](#lesson-6-the--return)
   - [Lesson 7. The actor–critic loop](#lesson-7-the-actorcritic-loop)
 - [Appendix A — Glossary](#appendix-a-glossary)
-- [Appendix B — Sources](#appendix-b-sources)
+- [Appendix B — The laboratories](#appendix-b-the-laboratories)
+- [Appendix C — Sources](#appendix-c-sources)
 
 ## 1. The MDP
 
@@ -73,15 +74,17 @@ States, actions, rewards, transitions and returns. The Markov property, the disc
 **Q. What does the Markov property say? — multiple-choice *(core)***
 
 - ✓ **The next state depends only on the present state**
-- - The states arrive in a random order
-- - The reward depends only on the state
-- - The process never revisits a state
+- The states arrive in a random order
+- The reward depends only on the state
+- The process never revisits a state
 
 > Correct.
 
 > **Why:** The whole history is irrelevant to the future. That is what makes the value function a function of the state alone, and the problem finite.
 
 **Q. A trajectory collects rewards 2, 1, 1 with a discount of 0.5. What is the return from the first step? — numeric *(core)***
+
+> **Answer:** 2.75 ± 0.001
 
 > **Why:** 2 + 0.5×1 + 0.25×1 = 2.75. Each reward is weighted by a power of the discount.
 
@@ -136,9 +139,9 @@ The value of a state under a policy, the value of the best policy, and the two s
 **Q. What does the Bellman equation say? — multiple-choice *(core)***
 
 - ✓ **The value of a state is the reward plus the discounted value of the next state**
-- - The value of a state is the average reward from it
-- - The value of a state is the value of the best action
-- - The value of a state is the reward of the best action
+- The value of a state is the average reward from it
+- The value of a state is the value of the best action
+- The value of a state is the reward of the best action
 
 > Correct.
 
@@ -181,6 +184,8 @@ The value iteration, sweep by sweep, and the policy it produces. Open **Sweep th
 #### Practice
 
 **Q. Value iteration finds the optimal policy without ever evaluating a policy. — boolean *(core)***
+
+> **Answer:** True
 
 > **Why:** Yes. One sweep of the optimality operator gives the greedy policy with respect to the current values, and repeating the sweep converges to the optimal pair. A policy evaluation is not needed anywhere in it.
 
@@ -236,15 +241,17 @@ The likelihood-ratio trick, the policy gradient theorem, and the estimator that 
 **Q. What does the likelihood-ratio trick do? — multiple-choice *(core)***
 
 - ✓ **It turns an expectation under one distribution into one under another**
-- - It makes the estimator unbiased
-- - It reduces the variance of the estimate
-- - It removes the discount
+- It makes the estimator unbiased
+- It reduces the variance of the estimate
+- It removes the discount
 
 > Correct.
 
 > **Why:** Multiplying by the ratio of the two densities does it, and the ratio does not depend on the parameters being differentiated — which is what lets the terms that do not depend on them drop out.
 
 **Q. A policy gives an action probability of 0.25 in a state. What is the gradient of its log-probability with respect to a logit that only that action has? — numeric *(hard)***
+
+> **Answer:** 0.75 ± 0.001
 
 > **Why:** The derivative of log p with respect to its own logit is 1 − p, so it is 1 − 0.25 = 0.75.
 
@@ -304,9 +311,9 @@ The baseline that removes the variance, the λ-return and the general advantage 
 **Q. Why does subtracting a baseline leave the expected gradient unchanged? — multiple-choice *(hard)***
 
 - ✓ **The baseline does not depend on the action, so its expectation is zero**
-- - The baseline is a constant
-- - The gradient of the baseline is zero
-- - The baseline is unbiased
+- The baseline is a constant
+- The gradient of the baseline is zero
+- The baseline is unbiased
 
 > Correct.
 
@@ -351,9 +358,9 @@ One estimator, two weights: the rewards still to come, and the whole episode’s
 **Q. Which end of the n-step range is biased? — multiple-choice *(core)***
 
 - ✓ **Both, in opposite ways: the one-step return is biased and the Monte Carlo return is noisy**
-- - Neither
-- - Only the one-step return
-- - Only the Monte Carlo return
+- Neither
+- Only the one-step return
+- Only the Monte Carlo return
 
 > Correct.
 
@@ -398,6 +405,8 @@ The n-step returns of a real trajectory, and the truth they are aiming at. Open 
 
 **Q. The best λ for an advantage estimate depends on how long the episodes are. — boolean *(hard)***
 
+> **Answer:** True
+
 > **Why:** Yes. The bias comes from the truncation of the episode, so a short horizon wants a small λ and a long one can afford a large λ. The right λ is a function of the horizon you actually have.
 
 #### Go and do it
@@ -438,9 +447,9 @@ The bias and the variance of the estimator, measured, as λ moves. Open **Sweep 
 **Q. What does the critic contribute to the actor–critic loop? — multiple-choice *(core)***
 
 - ✓ **An estimate of the value, and through it the advantage the actor follows**
-- - The parameters the actor starts from
-- - The reward function
-- - The discount
+- The parameters the actor starts from
+- The reward function
+- The discount
 
 > Correct.
 
@@ -552,7 +561,45 @@ The error is what the critic is trying to predict and the actor is trying to exp
 
 The actor is the policy and the critic is the value estimate. The critic supplies the advantage, which is a smaller and less noisy signal than the return, and the actor follows it. The two halves have separate learning rates, and the difference between them is a real parameter.
 
-## Appendix B — Sources
+## Appendix B — The laboratories
+
+Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.
+
+### A · The gridworld
+
+*The problem, and the exact answers.*
+
+**Delivers:**
+
+- A tabular gridworld with exact value iteration
+
+### B · The policy gradient
+
+*The derivation, the estimator, and the exact gradient.*
+
+**Delivers:**
+
+- Deriving the simplest policy gradient
+- Policy gradients checked against finite differences
+
+### C · The returns
+
+*Bias against noise, and reward-to-go against the whole return.*
+
+**Delivers:**
+
+- Reward-to-go and the variance it removes
+- The bias and variance of the λ-return as a function of λ
+
+### D · The actor–critic loop
+
+*Two halves, learning together.*
+
+**Delivers:**
+
+- The actor-critic loop
+
+## Appendix C — Sources
 
 - **Reinforcement Learning: An Introduction (second edition)** — Richard S. Sutton, Andrew G. Barto (2018), MIT Press; the authors publish the complete PDF free. Licence: The book is distributed free of charge by the authors for personal use. The machine-check could not be completed from this environment (TLS trust failure on the host); the canonical page is incompleteideas.net/book/the-book-2nd.html..
   The agentic course uses reinforcement learning loosely. Nothing in the collection defines an MDP, a value function or a policy gradient.

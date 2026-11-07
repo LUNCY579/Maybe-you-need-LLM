@@ -113,7 +113,13 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <a class="l2" href="#lesson-11-how-many-questions">Lesson 11. How many questions</a>
 <a class="l2" href="#lesson-12-what-to-publish">Lesson 12. What to publish</a>
 <a class="" href="#appendix-a-glossary">Appendix A — Glossary</a>
-<a class="" href="#appendix-b-sources">Appendix B — Sources</a></nav>
+<a class="" href="#appendix-b-the-laboratories">Appendix B — The laboratories</a>
+<a class="l2" href="#a-the-judge-and-the-human">A · The judge and the human</a>
+<a class="l2" href="#b-the-biases-of-a-judge">B · The biases of a judge</a>
+<a class="l2" href="#c-the-arena">C · The arena</a>
+<a class="l2" href="#d-benchmark-design">D · Benchmark design</a>
+<a class="l2" href="#e-measurement">E · Measurement</a>
+<a class="" href="#appendix-c-sources">Appendix C — Sources</a></nav>
   <main class="book"><h1 id="evaluation-lab">Evaluation Lab</h1>
 <p><strong>Source:</strong> Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena — Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric P. Xing, Hao Zhang, Joseph E. Gonzalez, Ion Stoica (2023)</p>
 <p><strong>Licence:</strong> arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.</p>
@@ -132,7 +138,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p><strong>Why this course exists:</strong> The practical failure modes of evaluation harnesses: seeds, decoders, prompts, chat templates.</p>
 <hr>
 <h2 id="contents">Contents</h2>
-<ul><li><a href="#1-judging-with-a-model">1. Judging with a Model</a> - <a href="#lesson-1-what-a-judge-is-asked-to-do">Lesson 1. What a judge is asked to do</a> - <a href="#lesson-2-agreement-and-consistency">Lesson 2. Agreement and consistency</a></li><li><a href="#2-the-biases-of-a-judge">2. The Biases of a Judge</a> - <a href="#lesson-3-position-bias">Lesson 3. Position bias</a> - <a href="#lesson-4-verbosity-and-self-enhancement">Lesson 4. Verbosity and self-enhancement</a></li><li><a href="#3-human-agreement">3. Human Agreement</a> - <a href="#lesson-5-what-an-agreement-rate-means">Lesson 5. What an agreement rate means</a></li><li><a href="#4-arena-rankings">4. Arena Rankings</a> - <a href="#lesson-6-from-votes-to-a-ranking">Lesson 6. From votes to a ranking</a> - <a href="#lesson-7-the-interval-and-the-cost">Lesson 7. The interval and the cost</a></li><li><a href="#5-benchmark-design">5. Benchmark Design</a> - <a href="#lesson-8-contamination">Lesson 8. Contamination</a> - <a href="#lesson-9-what-a-benchmark-is-for">Lesson 9. What a benchmark is for</a></li><li><a href="#6-measurement">6. Measurement</a> - <a href="#lesson-10-the-standard-error">Lesson 10. The standard error</a> - <a href="#lesson-11-how-many-questions">Lesson 11. How many questions</a> - <a href="#lesson-12-what-to-publish">Lesson 12. What to publish</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-sources">Appendix B — Sources</a></li></ul>
+<ul><li><a href="#1-judging-with-a-model">1. Judging with a Model</a> - <a href="#lesson-1-what-a-judge-is-asked-to-do">Lesson 1. What a judge is asked to do</a> - <a href="#lesson-2-agreement-and-consistency">Lesson 2. Agreement and consistency</a></li><li><a href="#2-the-biases-of-a-judge">2. The Biases of a Judge</a> - <a href="#lesson-3-position-bias">Lesson 3. Position bias</a> - <a href="#lesson-4-verbosity-and-self-enhancement">Lesson 4. Verbosity and self-enhancement</a></li><li><a href="#3-human-agreement">3. Human Agreement</a> - <a href="#lesson-5-what-an-agreement-rate-means">Lesson 5. What an agreement rate means</a></li><li><a href="#4-arena-rankings">4. Arena Rankings</a> - <a href="#lesson-6-from-votes-to-a-ranking">Lesson 6. From votes to a ranking</a> - <a href="#lesson-7-the-interval-and-the-cost">Lesson 7. The interval and the cost</a></li><li><a href="#5-benchmark-design">5. Benchmark Design</a> - <a href="#lesson-8-contamination">Lesson 8. Contamination</a> - <a href="#lesson-9-what-a-benchmark-is-for">Lesson 9. What a benchmark is for</a></li><li><a href="#6-measurement">6. Measurement</a> - <a href="#lesson-10-the-standard-error">Lesson 10. The standard error</a> - <a href="#lesson-11-how-many-questions">Lesson 11. How many questions</a> - <a href="#lesson-12-what-to-publish">Lesson 12. What to publish</a></li><li><a href="#appendix-a-glossary">Appendix A — Glossary</a></li><li><a href="#appendix-b-the-laboratories">Appendix B — The laboratories</a></li><li><a href="#appendix-c-sources">Appendix C — Sources</a></li></ul>
 <h2 id="1-judging-with-a-model">1. Judging with a Model</h2>
 <p><em>A strong model asked to pick the better of two answers</em></p>
 <p>The central idea of model-based evaluation: instead of writing a reference answer, show a judge model two candidate answers and ask which is better. This module sets out the method, the measurement of how often it agrees with a human, and the consistency check that most people do not run.</p>
@@ -147,10 +153,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The judge sees two answers to the same question and names the better one.</li><li>Pairwise comparison avoids writing a reference answer, which is where most benchmarks go wrong.</li><li>The judge is a model, so its preferences are the model’s preferences.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What is an LLM-as-a-judge asked to do? — multiple-choice </em>(warmup)***</p>
-<ul><li>- Score an answer against a reference answer</li><li>✓ <strong>Choose between two candidate answers</strong></li><li>- Rewrite the answer to improve it</li><li>- Check the answer against the ground truth</li></ul>
+<ul><li>Score an answer against a reference answer</li><li>✓ <strong>Choose between two candidate answers</strong></li><li>Rewrite the answer to improve it</li><li>Check the answer against the ground truth</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The judge sees a question and two answers and names the better one. The advantage over scoring against a reference is that no single phrasing has to be declared correct.</p></blockquote>
 <p>*<em>Q. The judge’s preferences are the judge model’s preferences. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. A judge is a model, and whatever it has come to prefer — position, length, its own family’s style — comes through into every judgement it makes.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Measure how often a judge agrees with the human, and how often it agrees with itself. Open <strong>The judge against the human</strong> in the evaluation-lab application.</p>
@@ -167,7 +174,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Agreement is measured against a human; consistency is measured against the judge itself.</li><li>Swapping the two answers must not change the preference — and if it does, the judge is answering a different question.</li><li>A judge can be consistent and still be systematically wrong.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What does the position-swap test measure? — multiple-choice </em>(core)***</p>
-<ul><li>- How often the judge agrees with a human</li><li>✓ <strong>How often the judge gives the same answer when the order is changed</strong></li><li>- How good the judge is at explaining itself</li><li>- How expensive the judge is to run</li></ul>
+<ul><li>How often the judge agrees with a human</li><li>✓ <strong>How often the judge gives the same answer when the order is changed</strong></li><li>How good the judge is at explaining itself</li><li>How expensive the judge is to run</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Consistency is measured against the judge itself: the same pair, presented in both orders, should produce the same preference. A failure to do so means the judge answered a different question.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -191,10 +198,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A judge asked the same question twice, with the answers swapped, should answer differently.</li><li>A fair protocol presents each pair in both orders and takes the majority.</li><li>The cost is double the votes, which is why arenas that skip it look cheap.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. How is position bias usually fixed? — multiple-choice </em>(core)***</p>
-<ul><li>✓ <strong>By presenting each pair in both orders and taking the majority</strong></li><li>- By making the judge stronger</li><li>- By using a longer prompt</li><li>- By scoring against a reference answer instead</li></ul>
+<ul><li>✓ <strong>By presenting each pair in both orders and taking the majority</strong></li><li>By making the judge stronger</li><li>By using a longer prompt</li><li>By scoring against a reference answer instead</li></ul>
 <blockquote><p>Correct, at the cost of double the votes.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Presenting both orders and taking the majority cancels a first-position preference exactly, because the bias then favours each answer equally often. It doubles the cost, which is why it is often skipped.</p></blockquote>
 <p>*<em>Q. A judge prefers the first position in 62% of 1000 comparisons where the two answers are equally good. What is the excess preference, in percentage points? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 12 percentage points</p></blockquote>
 <blockquote><p><strong>Why:</strong> Exactly 12 percentage points above the 50% that a fair judge would show. That excess is the position bias, and it is what the swap test is for.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Count how often the judge prefers the answer in the first position. Open <strong>Measure the position preference</strong> in the evaluation-lab application.</p>
@@ -212,10 +220,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A judge prefers the longer answer even when the shorter one is better.</li><li>A judge prefers answers from models similar to itself.</li><li>Neither bias is fixed by swapping positions; both have to be measured.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Which of these does the position-swap protocol NOT fix? — multiple-choice </em>(hard)***</p>
-<ul><li>- Position bias</li><li>✓ <strong>Verbosity bias</strong></li><li>- The order effect on the wording</li><li>- A first-answer recency effect</li></ul>
+<ul><li>Position bias</li><li>✓ <strong>Verbosity bias</strong></li><li>The order effect on the wording</li><li>A first-answer recency effect</li></ul>
 <blockquote><p>Correct — swapping positions does nothing about a preference for length.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The swap cancels anything that depends on <em>position</em>. A preference for longer answers does not depend on position, so it survives the swap intact and has to be measured separately.</p></blockquote>
 <p>*<em>Q. Making the judge model stronger removes its verbosity bias. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. The primary source reports that a stronger judge does not remove the bias. Scaling the judge does not scale away its preferences.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Hold the quality fixed, vary the length, and count the preference. Open <strong>Isolate the verbosity bias</strong> in the evaluation-lab application.</p>
@@ -238,11 +247,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>An agreement rate is a measurement with a denominator, and the denominator is a design decision.</li><li>On a question set where the answers are close, the judge will disagree with the human a lot — correctly.</li><li>The number to compare against is the agreement of two humans, not 100%.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Why does an agreement rate fall when the question set gets harder? — multiple-choice </em>(core)***</p>
-<ul><li>- The judge becomes less accurate</li><li>✓ <strong>The answers get closer, so both the judge and the human are near a coin flip</strong></li><li>- Harder questions are longer, which activates the verbosity bias</li><li>- Human annotators get tired</li></ul>
+<ul><li>The judge becomes less accurate</li><li>✓ <strong>The answers get closer, so both the judge and the human are near a coin flip</strong></li><li>Harder questions are longer, which activates the verbosity bias</li><li>Human annotators get tired</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> When the two answers are close in quality, the true preference is genuinely ambiguous, so a correct judge will often differ from a correct human. A low agreement on a hard set can mean the judge is right.</p></blockquote>
 <p>*<em>Q. What is the right number to compare a judge’s agreement rate against? — multiple-choice </em>(core)***</p>
-<ul><li>- 100%</li><li>✓ <strong>The agreement of two humans on the same question set</strong></li><li>- 50%</li><li>- The judge’s score on a different benchmark</li></ul>
+<ul><li>100%</li><li>✓ <strong>The agreement of two humans on the same question set</strong></li><li>50%</li><li>The judge’s score on a different benchmark</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The inter-annotator agreement is the ceiling. A judge at 80% where humans agree with each other 85% is close to the best available measurement, not three-quarters of the way to perfect.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -266,10 +275,11 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Pr(i beats j) = σ(θ_i − θ_j): one number per model, one difference per comparison.</li><li>The likelihood is a sum of logarithms, and it can be maximised directly.</li><li>The model is fitted by maximum likelihood, not by an update rule.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. In the Bradley–Terry model, what does the strength θ_i represent? — multiple-choice </em>(core)***</p>
-<ul><li>- The number of votes model i received</li><li>✓ <strong>A number such that the chance of i beating j depends on θ_i − θ_j</strong></li><li>- The accuracy of model i on the benchmark</li><li>- The cost of one vote for model i</li></ul>
+<ul><li>The number of votes model i received</li><li>✓ <strong>A number such that the chance of i beating j depends on θ_i − θ_j</strong></li><li>The accuracy of model i on the benchmark</li><li>The cost of one vote for model i</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Pr(i beats j) = σ(θ_i − θ_j). The strength is not a count of votes; it is the parameter of the difference, and the model says a pair of votes for i and one for j is worth more than a tie.</p></blockquote>
 <p>*<em>Q. In a Bradley–Terry model with strengths θ_A = 1 and θ_B = 0, what is the probability that A beats B? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 0.7310586 ± 0.0001</p></blockquote>
 <blockquote><p><strong>Why:</strong> σ(1 − 0) = 1/(1 + e⁻¹) ≈ 0.731. Note that it is not 0.5: a strength difference of one already gives a clear favourite.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Collect the votes and fit a Bradley–Terry model to them. Open <strong>Fit a ranking to the votes</strong> in the evaluation-lab application.</p>
@@ -287,7 +297,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Resampling the votes and refitting gives an interval on the ranking.</li><li>Elo is an online update rule, so its result depends on the order the votes arrived in.</li><li>Votes are not free, and the price of precision is the thing that limits a leaderboard.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Why is an Elo rating not a confidence interval? — multiple-choice </em>(hard)***</p>
-<ul><li>- Elo ratings are not computed from votes</li><li>✓ <strong>Elo is an online update, so its result depends on the order the votes arrived in</strong></li><li>- Elo assumes the models are equally good to start</li><li>- Elo cannot handle draws</li></ul>
+<ul><li>Elo ratings are not computed from votes</li><li>✓ <strong>Elo is an online update, so its result depends on the order the votes arrived in</strong></li><li>Elo assumes the models are equally good to start</li><li>Elo cannot handle draws</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A bootstrap interval resamples the votes and refits, and it means the same thing whatever order they arrived in. An online rating carries the path with it.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -311,9 +321,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A contaminated question is answered from memory rather than from capability.</li><li>The score inflation is proportional to the contaminated fraction.</li><li>When only some models are contaminated, the ranking moves more than any single score.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. A benchmark has 200 questions and a model scores 60% on them. 10% of the questions are contaminated and on those the model scores 90% instead of 60%. What is the reported score? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 63 percent</p></blockquote>
 <blockquote><p><strong>Why:</strong> Exactly 63%. Twenty contaminated questions at 90% contribute 18 successes where 12 were expected, and 180 clean ones at 60% contribute 108: (18 + 108) / 200 = 0.63. The inflation is 3 percentage points.</p></blockquote>
 <p>*<em>Q. Why can contamination move a ranking more than it moves any single score? — multiple-choice </em>(hard)***</p>
-<ul><li>- Because contamination inflates every model equally</li><li>✓ <strong>Because contamination is usually differential: one model has seen the benchmark and the others have not</strong></li><li>- Because the error bars shrink under contamination</li><li>- Because rankings are computed from fewer votes</li></ul>
+<ul><li>Because contamination inflates every model equally</li><li>✓ <strong>Because contamination is usually differential: one model has seen the benchmark and the others have not</strong></li><li>Because the error bars shrink under contamination</li><li>Because rankings are computed from fewer votes</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A common shift changes every model’s score by the same amount and leaves the order alone. A differential shift — one model contaminated, the others not — is precisely a change in the order.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -333,7 +344,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A benchmark has to be hard enough to separate models and easy enough to run.</li><li>A single number hides the trade-offs; a set of numbers shows them.</li><li>The question set is a claim about what matters, and it should be argued for.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Which of these are design decisions a benchmark author makes? — multi-select </em>(core)***</p>
-<ul><li>- Which questions to ask</li><li>- How the answers are scored</li><li>- What the score is called</li><li>- Which models are evaluated</li></ul>
+<ul><li>Which questions to ask</li><li>How the answers are scored</li><li>What the score is called</li><li>Which models are evaluated</li></ul>
 <blockquote><p><strong>Why:</strong> The question set, the scoring procedure and the set of models under test are all choices. Each one is a claim about what matters, and each one can be argued for.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>See how the difficulty mix of a question set changes what the score measures. Open <strong>Build a question set</strong> in the evaluation-lab application.</p>
@@ -356,9 +367,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A score from N binary outcomes is a proportion, with variance p(1−p)/N.</li><li>To halve the interval you need four times as many questions.</li><li>A difference smaller than the interval is not a difference.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. A model scores 50% on a benchmark of 400 questions. What is the standard error of that score? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 0.0125 ± 0.0001</p></blockquote>
 <blockquote><p><strong>Why:</strong> √(0.5 × 0.5 / 400) = √(0.000625) = 0.0125. The 95% interval is therefore roughly 50% ± 2.5 percentage points.</p></blockquote>
 <p>*<em>Q. To halve the width of a confidence interval, how many times more questions are needed? — multiple-choice </em>(core)***</p>
-<ul><li>- Twice as many</li><li>✓ <strong>Four times as many</strong></li><li>- Ten times as many</li><li>- Half as many</li></ul>
+<ul><li>Twice as many</li><li>✓ <strong>Four times as many</strong></li><li>Ten times as many</li><li>Half as many</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The width goes as 1/√N, so halving it needs N to grow by a factor of four. This is the arithmetic behind why large benchmarks are expensive.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
@@ -378,6 +390,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>The number of questions needed grows as the square of the inverse of the difference.</li><li>A benchmark that cannot detect the difference you care about is not measuring it.</li><li>Halving the effect size quadruples the cost.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. A benchmark with very low power will report real differences as ties. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. If the test cannot detect the difference, the difference does not appear — and a leaderboard that reports a tie there is reporting an artefact of the question count.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Compute how many questions a given difference needs, and watch the curve. Open <strong>The cost of detecting a small difference</strong> in the evaluation-lab application.</p>
@@ -393,7 +406,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A score without an interval is a claim, not a measurement.</li><li>A score without a question count cannot be compared with anything.</li><li>A score without the protocol cannot be reproduced.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What should a leaderboard print next to every score? — multi-select </em>(hard)***</p>
-<ul><li>- A confidence interval</li><li>- The number of questions used</li><li>- The provider of the model</li><li>- The logo of the organisation that ran it</li></ul>
+<ul><li>A confidence interval</li><li>The number of questions used</li><li>The provider of the model</li><li>The logo of the organisation that ran it</li></ul>
 <blockquote><p><strong>Why:</strong> An interval, the question count, and enough about the protocol to reproduce it. The newest criticism of the field is that the last of these is often missing, and that the leaderboard has become the thing being optimised.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The same score, with and without its interval, and what a reader can conclude from each. Open <strong>What the interval looks like</strong> in the evaluation-lab application.</p>
@@ -494,7 +507,29 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p><strong>Contamination fraction</strong> — The proportion of a benchmark that appears in the training data.</p>
 <p>The score inflation it produces is the fraction times the per-question inflation. Nobody knows this number, which is exactly why a contaminated score cannot be trusted.</p>
 <p><em>Course term</em></p>
-<h2 id="appendix-b-sources">Appendix B — Sources</h2>
+<h2 id="appendix-b-the-laboratories">Appendix B — The laboratories</h2>
+<p>Every laboratory the course ships. Each one runs in the application and computes everything it shows in the browser; this appendix is the catalogue of what exists and what it is for.</p>
+<h3 id="a-the-judge-and-the-human">A · The judge and the human</h3>
+<p><em>Agreement with a human, the swap test, and how the question set decides both.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Judge against human agreement</li><li>Consistency under permutation</li></ul>
+<h3 id="b-the-biases-of-a-judge">B · The biases of a judge</h3>
+<p><em>One bias at a time: position, verbosity, self-enhancement.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Position bias</li><li>Verbosity bias</li><li>Self-enhancement bias</li></ul>
+<h3 id="c-the-arena">C · The arena</h3>
+<p><em>Votes in, a Bradley–Terry ranking out, an interval on it, and a check on the question set.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Bradley–Terry from pairwise votes</li><li>Bootstrap confidence intervals on rankings</li><li>The cost of a good arena sample</li><li>Rating bias from a fixed evaluation set</li></ul>
+<h3 id="d-benchmark-design">D · Benchmark design</h3>
+<p><em>Contamination, the difficulty mix, multi-metric surfaces, and selecting on a public set.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>Multi-metric trade-off surfaces</li><li>Standardisation and coverage</li><li>Private testing versus public testing</li></ul>
+<h3 id="e-measurement">E · Measurement</h3>
+<p><em>The error bar, the power, the cost, and the decoder that moves the score.</em></p>
+<p><strong>Delivers:</strong></p>
+<ul><li>How much a decoding change moves a score</li></ul>
+<h2 id="appendix-c-sources">Appendix C — Sources</h2>
 <ul><li><strong>Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena</strong> — Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric P. Xing, Hao Zhang, Joseph E. Gonzalez, Ion Stoica (2023), arXiv:2306.05685 [cs.CL] / NeurIPS 2023 Datasets and Benchmarks. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Evaluation appears as a single lesson in the foundations course. Judging a model with a model is now a primary evaluation method and its biases are measurable.</li><li><strong>Holistic Evaluation of Language Models</strong> — Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu, Michihiro Yasunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar, Benjamin Newman, Binhang Yuan, Bobby Yan, Ce Zhang, Christian Cosgrove, Christopher D. Manning, Christopher Ré, Diana Acosta-Navas, Drew A. Hudson, Eric Zelikman, Esin Durmus, Faisal Ladhak, Frieda Rong, Hongyu Ren, Huaxiu Yao, Jue Wang, Keshav Santhanam, Laurel Orr, Lucia Zheng, Mert Yuksekgonul, Mirac Suzgun, Nathan Kim, Neel Guha, Niladri Chatterji, Omar Khattab, Peter Henderson, Qian Huang, Ryan Chi, Sang Michael Xie, Shibani Santurkar, Surya Ganguli, Tatsunori Hashimoto, Thomas Icard, Tianyi Zhang, Vishrav Chaudhary, William Wang, Xuechen Li, Yifan Mai, Yuhui Zhang, Yuta Koreeda (2022), arXiv:2211.09110 [cs.CL] / TMLR 2023. The paper is known as HELM. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. A single score hides the trade-offs; the holistic framing is the counter-argument.</li><li><strong>Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference</strong> — Wei-Lin Chiang, Lianmin Zheng, Ying Sheng, Anastasios Nikolas Angelopoulos, Tianle Li, Dacheng Li, Hao Zhang, Banghua Zhu, Michael Jordan, Joseph E. Gonzalez, Ion Stoica (2024), arXiv:2403.04132 [cs.CL] / ICML 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Where real human preference votes come from, and the confidence interval a leaderboard should print.</li><li><strong>The Leaderboard Illusion</strong> — Shivalika Singh, Yiyang Nan, Alex Wang, Daniel D'Souza, Sayash Kapoor, Ahmet Üstün, Sanmi Koyejo, Yuntian Deng, Shayne Longpre, Noah A. Smith, Beyza Ermis, Marzieh Fadaee, Sara Hooker (2025), arXiv:2504.20879 [cs.LG]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The newest and sharpest criticism of the evaluation ecosystem, and it is reproducible at small scale.</li><li><strong>Lessons from the Trenches on Reproducible Evaluation of Language Models</strong> — Stella Biderman, Hailey Schoelkopf, Lintang Sutawika, Leo Gao, Jonathan Tow, Baber Abbasi, Alham Fikri Aji, Pawan Sasanka Ammanamanchi, Sidney Black, Jordan Clive, Anthony DiPofi, Julen Etxaniz, Benjamin Fattori, Jessica Zosa Forde, Charles Foster, Jeffrey Hsu, Mimansa Jaiswal, Wilson Y. Lee, Haonan Li, Charles Lovering, Niklas Muennighoff, Ellie Pavlick, Jason Phang, Aviya Skowron, Samson Tan, Xiangru Tang, Kevin A. Wang, Genta Indra Winata, François Yvon, Andy Zou (2024), arXiv:2405.14782 [cs.LG]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The practical failure modes of evaluation harnesses: seeds, decoders, prompts, chat templates.</li></ul></main>
 </div>
 <footer class="pager">
