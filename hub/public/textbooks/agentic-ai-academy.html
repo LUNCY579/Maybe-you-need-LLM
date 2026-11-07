@@ -59,8 +59,11 @@ header.book button { font: inherit; color: var(--text); background: var(--surfac
 nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
   overflow: auto; font-size: .88rem; }
 nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l1 { margin-top: .6rem; color: var(--text); }
 nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a.l3 { padding-left: 1.8rem; font-size: .84rem; }
 nav.toc a:hover { color: var(--accent); }
+section.volume { border-top: 2px solid var(--border); margin-top: 3rem; padding-top: 2rem; }
 main.book { max-width: var(--measure); }
 main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
 main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
@@ -1557,7 +1560,7 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <blockquote><p><strong>Why:</strong> Trust every hop (margin 0) and decomposition recovers all four answers with hop coverage 1.0. Distrust a close call from 0.02 upward and two recovered answers are lost — exactly the two questions that run over the stale supplier record — and at 0.2 the coverage is 0.7. The single-shot arm sits at one recovered answer and coverage 0.4 whatever the knob says. That is the cost side of decomposing: reading your own intermediate answer is what lets the chain close, and what lets one bad hop poison the hops after it (Ch. 12, §12.4).</p></blockquote></main>
 </div>
 <footer class="pager">
-  <div><a href="llm-foundations-lab.html">← LLM Foundations Lab</a></div>
+  <div><a href="rlhf-lab.html">← RLHF Lab</a></div>
   <div><a href="deep-learning-theory-explorer.html">Deep Learning Theory Explorer →</a></div>
 </footer>
 </body>

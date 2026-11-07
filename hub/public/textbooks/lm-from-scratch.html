@@ -59,8 +59,11 @@ header.book button { font: inherit; color: var(--text); background: var(--surfac
 nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
   overflow: auto; font-size: .88rem; }
 nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l1 { margin-top: .6rem; color: var(--text); }
 nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a.l3 { padding-left: 1.8rem; font-size: .84rem; }
 nav.toc a:hover { color: var(--accent); }
+section.volume { border-top: 2px solid var(--border); margin-top: 3rem; padding-top: 2rem; }
 main.book { max-width: var(--measure); }
 main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
 main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
@@ -560,8 +563,8 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li><strong>CS336: Language Modeling from Scratch</strong> — Stanford CS336 staff (2026), stanford-cs336.github.io — Spring 2025 and Spring 2026 offerings. Licence: Course materials are published for study. The lecture repository (stanford-cs336/spring2025-lectures) and the assignment repository (stanford-cs336/assignment1-basics) are both MIT licensed. Course slides and assignment handouts are cited, not redistributed.. No course in the collection trains a real model, touches a real corpus, or accounts for real hardware cost. Every number in the collection comes from a toy-scale model.</li><li><strong>nanoGPT</strong> — Andrej Karpathy (2023), GitHub repository. Licence: MIT (verified via the GitHub API, 2026-10-19). The smallest honest implementation of a modern decoder-only language model.</li><li><strong>CS336 spring 2025 lecture materials</strong> — Stanford CS336 staff (2025), GitHub repository. Licence: MIT (verified via the GitHub API, 2026-10-19). The lecture sequence itself: tokenisation, PyTorch and resource accounting, architectures, mixture of experts, GPUs, kernels, parallelism, scaling laws, inference, evaluation, data, and post-training.</li><li><strong>CS336 assignment handouts and code</strong> — Stanford CS336 staff (2025), GitHub repository. Licence: MIT (verified via the GitHub API, 2026-10-19). The five assignments map one-to-one onto the planned modules.</li><li><strong>Neural Networks: Zero to Hero</strong> — Andrej Karpathy (2023), Video series and companion notes. Licence: MIT (verified via the GitHub API, 2026-10-19). The build-up from a single neuron to a GPT, which is the pedagogical spine the other courses assume.</li><li><strong>Hugging Face LLM Course</strong> — Hugging Face (2025), Online course. Licence: Published under CC BY-NC 4.0. Cited and linked; not redistributed.. The practical library layer: tokenisers, datasets, generation, and the huggingface pipeline API.</li><li><strong>Transformers</strong> — Hugging Face (2025), GitHub repository and Python package. Licence: Apache-2.0 (verified via the GitHub API, 2026-10-19). The library every applied course in this field assumes.</li></ul></main>
 </div>
 <footer class="pager">
-  <div><a href="rlhf-lab.html">← RLHF Lab</a></div>
-  <div><a href="mech-interp-lab.html">Mechanistic Interpretability Lab →</a></div>
+  <div><a href="llm-foundations-lab.html">← LLM Foundations Lab</a></div>
+  <div><a href="scaling-lab.html">Scaling Lab →</a></div>
 </footer>
 </body>
 </html>

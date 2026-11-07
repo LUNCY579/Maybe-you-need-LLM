@@ -59,8 +59,11 @@ header.book button { font: inherit; color: var(--text); background: var(--surfac
 nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
   overflow: auto; font-size: .88rem; }
 nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l1 { margin-top: .6rem; color: var(--text); }
 nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a.l3 { padding-left: 1.8rem; font-size: .84rem; }
 nav.toc a:hover { color: var(--accent); }
+section.volume { border-top: 2px solid var(--border); margin-top: 3rem; padding-top: 2rem; }
 main.book { max-width: var(--measure); }
 main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
 main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
@@ -417,7 +420,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 </div>
 <footer class="pager">
   <div><a href="safety-lab.html">← Safety and Alignment Lab</a></div>
-  <div><a href="llm-foundations-lab.html">LLM Foundations Lab →</a></div>
+  <div></div>
 </footer>
 </body>
 </html>

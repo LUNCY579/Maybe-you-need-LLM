@@ -59,8 +59,11 @@ header.book button { font: inherit; color: var(--text); background: var(--surfac
 nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
   overflow: auto; font-size: .88rem; }
 nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l1 { margin-top: .6rem; color: var(--text); }
 nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a.l3 { padding-left: 1.8rem; font-size: .84rem; }
 nav.toc a:hover { color: var(--accent); }
+section.volume { border-top: 2px solid var(--border); margin-top: 3rem; padding-top: 2rem; }
 main.book { max-width: var(--measure); }
 main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
 main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
@@ -519,8 +522,8 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li><strong>Toy Models of Superposition</strong> — Noah Elhage, Shan Carter, Chris Olah, Dan Hendrycks (2023), Transformer Circuits publication. Licence: Publicly readable web publication. The machine-check could not be completed from this environment (the site blocks automated clients); verify the terms on the page itself before reusing any text or figure.. Mechanistic interpretability is only summarised in one chapter of the agentic course, and it is the fastest-moving area in the field.</li><li><strong>A Mathematical Framework for Transformer Circuits</strong> — Noah Elhage, Tristan Hume, Shan Carter, Scott Ostheim, Scott Linderman, Gabe, Dianne Hudon, Chris Olah (2021), Transformer Circuits publication. Licence: Publicly readable web publication. The machine-check could not be completed from this environment (the site blocks automated clients); verify the terms before reuse.. The vocabulary of weights, activations, pathways and nodes that the rest of the interpretability literature assumes.</li><li><strong>Towards Automated Circuit Discovery for Mechanistic Interpretability</strong> — Arthur Conmy, Augustine N. Mavor-Parker, Aengus Lynch, Stefan Heimersheim, Adrià Garriga-Alonso (2023), arXiv:2304.14997 [cs.LG]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The activation-patching algorithm, which is the causal test that distinguishes an explanation from a correlation.</li><li><strong>Sparse Autoencoders Find Highly Interpretable Features in Language Models</strong> — Hoagy Cunningham, Aidan Ewart, Logan Riggs, Robert Huben, Lee Sharkey (2023), arXiv:2309.08600 [cs.LG] / ICLR 2024. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. How superposition is resolved in practice: a sparse dictionary over activations.</li><li><strong>In-context Learning and Induction Heads</strong> — Catherine Olsson, Nelson Elhage, Neel Nanda, Nicholas Joseph, Nova DasSarma, Tom Henighan, Ben Mann, Amanda Askell, Yuntao Bai, Anna Chen, Tom Conerly, Dawn Drain, Deep Ganguli, Zac Hatfield-Dodds, Danny Hernandez, Scott Johnston, Andy Jones, Jackson Kernion, Liane Lovitt, Kamal Ndousse, Dario Amodei, Tom Brown, Jack Clark, Jared Kaplan, Sam McCandlish, Chris Olah (2022), arXiv:2209.11895 [cs.LG]. Licence: CC BY 4.0 (as stated on the arXiv record).. The residual-stream framework was described but the composition of two heads into a circuit was never built.</li><li><strong>Interpretability in the Wild: a Circuit for Indirect Object Identification in GPT-2 small</strong> — Kevin Wang, Alexandre Variengien, Arthur Conmy, Buck Shlegeris, Jacob Steinhardt (2022), arXiv:2211.00593 [cs.LG] / ICLR 2023. Licence: CC BY 4.0 (as stated on the arXiv record).. Patching was taught on a toy graph; the name-mover circuit is the published case the procedure generalises to.</li></ul></main>
 </div>
 <footer class="pager">
-  <div><a href="lm-from-scratch.html">← Language Model from Scratch</a></div>
-  <div><a href="data-lab.html">Data Lab →</a></div>
+  <div><a href="diffusion-lab.html">← Diffusion Lab</a></div>
+  <div><a href="evaluation-lab.html">Evaluation Lab →</a></div>
 </footer>
 </body>
 </html>

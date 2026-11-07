@@ -59,8 +59,11 @@ header.book button { font: inherit; color: var(--text); background: var(--surfac
 nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
   overflow: auto; font-size: .88rem; }
 nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l1 { margin-top: .6rem; color: var(--text); }
 nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a.l3 { padding-left: 1.8rem; font-size: .84rem; }
 nav.toc a:hover { color: var(--accent); }
+section.volume { border-top: 2px solid var(--border); margin-top: 3rem; padding-top: 2rem; }
 main.book { max-width: var(--measure); }
 main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
 main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
@@ -1185,8 +1188,8 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li><strong>Scaling Laws for Neural Language Models</strong> — Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, Dario Amodei (2020), arXiv:2001.08361 [cs.CL]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Scaling laws are one lesson in two courses. They are the quantitative spine of the field and deserve their own application.</li><li><strong>Training Compute-Optimal Large Language Models</strong> — Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch, Elena Buchatskaya, Trevor Cai, Eliza Rutherford, Diego de Las Casas, Lisa Anne Hendricks, Johannes Welbl, Aidan Clark, Tom Hennigan, Eric Noland, Katie Millican, George van den Driessche, Bogdan Damoc, Aurelia Guy, Simon Osindero, Karen Simonyan, Erich Elsen, Jack W. Rae, Oriol Vinyals, Laurent Sifre (2022), arXiv:2203.15556 [cs.CL] / NeurIPS 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The compute-optimal result and the IsoFLOP methodology that produced it.</li><li><strong>Beyond neural scaling laws: beating power law scaling via data pruning</strong> — Ben Sorscher, Robert Geirhos, Shashank Shekhar, Surya Ganguli, Ari S. Morcos (2022), arXiv:2206.14486 [cs.LG] / NeurIPS 2022 Outstanding Paper. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The result that breaks the power law, with a theory that can be checked on real data.</li><li><strong>Scaling Data-Constrained Language Models</strong> — Niklas Muennighoff, Alexander M. Rush, Boaz Barak, Teven Le Scao, Aleksandra Piktus, Nouamane Tazi, Sampo Pyysalo, Thomas Wolf, Colin Raffel (2023), arXiv:2305.16264 [cs.CL] / NeurIPS 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The regime the field is actually in: repeated epochs over a fixed corpus.</li><li><strong>Are Emergent Abilities of Large Language Models a Mirage?</strong> — Rylan Schaeffer, Brando Miranda, Sanmi Koyejo (2023), arXiv:2304.15004 [cs.CL] / NeurIPS 2023. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Whether abilities appear discontinuously is a measurement question, and this shows it is often an artefact of the metric.</li><li><strong>Compute Trends Across Three Eras of Machine Learning</strong> — Jaime Sevilla, Lennart Heim, Anson Ho, Tamay Besiroglu, Marius Hobbhahn, Pablo Villalobos (2022), arXiv:2202.05924 [cs.LG] / ICLR 2022 Workshop on ML for Systems. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The hardware trend that makes the compute curves mean something.</li></ul></main>
 </div>
 <footer class="pager">
-  <div><a href="data-lab.html">← Data Lab</a></div>
-  <div><a href="systems-lab.html">Systems Lab →</a></div>
+  <div><a href="lm-from-scratch.html">← Language Model from Scratch</a></div>
+  <div><a href="data-lab.html">Data Lab →</a></div>
 </footer>
 </body>
 </html>

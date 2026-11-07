@@ -1,5 +1,6 @@
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
+import esbuild from 'esbuild'
 
 /**
  * Render the compiled textbooks as a reading edition.
@@ -21,6 +22,19 @@ const outDir = join(booksDir, 'html')
  * are written by this one script, so they cannot drift apart.
  */
 const hubPublic = join(root, 'hub', 'public', 'textbooks')
+
+/* The learning path, from the same source the hub reads. */
+const pathsBuild = await esbuild.build({
+  entryPoints: [join(root, 'packages', 'course-catalogue', 'src', 'paths.ts')],
+  bundle: true,
+  format: 'esm',
+  platform: 'node',
+  write: false,
+  logLevel: 'silent',
+})
+const { LEARNING_PATH, layersOf } = await import(
+  `data:text/javascript;base64,${Buffer.from(pathsBuild.outputFiles[0].text).toString('base64')}`
+)
 
 /* --------------------------------------------------------- inline formatting */
 
@@ -208,8 +222,11 @@ header.book button { font: inherit; color: var(--text); background: var(--surfac
 nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
   overflow: auto; font-size: .88rem; }
 nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l1 { margin-top: .6rem; color: var(--text); }
 nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a.l3 { padding-left: 1.8rem; font-size: .84rem; }
 nav.toc a:hover { color: var(--accent); }
+section.volume { border-top: 2px solid var(--border); margin-top: 3rem; padding-top: 2rem; }
 main.book { max-width: var(--measure); }
 main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
 main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
@@ -312,13 +329,14 @@ function bookPage(course, body, toc, previous, next) {
 
 /* ----------------------------------------------------------------------- main */
 
-const bookFiles = (await readdir(booksDir)).filter((name) => name.endsWith('.md') && name !== 'README.md').sort()
+const bookFiles = (await readdir(booksDir)).filter(
+  (name) => name.endsWith('.md') && name !== 'README.md' && name !== 'complete.md',
+).sort()
 await mkdir(outDir, { recursive: true })
 await mkdir(hubPublic, { recursive: true })
 
-// Course order follows the reading path of the collection, which the index lists.
-const indexMarkdown = await readFile(join(booksDir, 'README.md'), 'utf8')
-const order = [...indexMarkdown.matchAll(/\]\(([\w-]+)\.md\)/g)].map((match) => match[1])
+// The books are read in the order of the learning path, not alphabetically.
+const pathOrder = LEARNING_PATH.courses.map((course) => course.id)
 
 const courses = []
 for (const file of bookFiles) {
@@ -328,8 +346,8 @@ for (const file of bookFiles) {
   courses.push({ id, title, markdown })
 }
 courses.sort((a, b) => {
-  const ia = order.indexOf(a.id)
-  const ib = order.indexOf(b.id)
+  const ia = pathOrder.indexOf(a.id)
+  const ib = pathOrder.indexOf(b.id)
   return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib)
 })
 
@@ -351,7 +369,57 @@ for (const course of courses) {
   process.stdout.write(`${course.id}.html `)
 }
 
+// The complete edition: every volume, in reading order, one page.
+const completeFront = `# LLM Materials — the complete edition
+
+All sixteen courses, in the order of the collection's learning path. Each part is one course's full textbook: the lesson prose, the mathematics with derivations, the practice questions with their answer key, the laboratory work, and the glossary. The same content is also rendered as one navigable page at \`html/complete.html\`.
+`
+const completeMarkdown = completeFront + courses.map((course) => `\n\n---\n\n` + course.markdown).join('')
+await writeFile(join(booksDir, 'complete.md'), completeMarkdown)
+
+const completeSections = courses
+  .map((course) => {
+    // The books reuse heading ids between them, so the complete edition
+    // prefixes every id and in-page anchor with the course it belongs to.
+    const body = renderBlocks(course.markdown)
+      .replace(/href="#/g, `href="#${course.id}--`)
+      .replace(/id="/g, `id="${course.id}--`)
+    return `\n<section class="volume" id="${course.id}">\n${body}\n</section>\n`
+  })
+  .join('\n')
+
+const completeToc = courses
+  .map((course) => {
+    const entries = [...course.markdown.matchAll(/^(#{2,3})\s+(.*)$/gm)].map((match) => ({
+      level: match[1].length,
+      text: match[2].replace(/\*+/g, ''),
+      slug: slug(match[2].replace(/\*+/g, '')),
+    }))
+    return [
+      `<a class="l1" href="#${course.id}"><strong>${escapeHtml(course.title)}</strong></a>`,
+      ...entries.map((entry) => `<a class="l${entry.level}" href="#${course.id}--${entry.slug}">${escapeHtml(entry.text)}</a>`),
+    ].join('\n')
+  })
+  .join('\n')
+
+const completeBody = `<header class="book"><div class="inner">
+  <a class="home" href="index.html">LLM Materials — textbooks</a>
+  <div class="tools"><button type="button" onclick="window.print()">Print</button>${themeToggle()}</div>
+</div></header>
+<div class="layout">
+  <nav class="toc" aria-label="Table of contents">${completeToc}</nav>
+  <main class="book">${completeFront ? renderBlocks(completeFront) : ''}${completeSections}</main>
+</div>`
+await writeFile(join(outDir, 'complete.html'), page('LLM Materials — the complete edition', completeBody))
+await writeFile(join(hubPublic, 'complete.html'), page('LLM Materials — the complete edition', completeBody))
+
 // The index page.
+const completeCard = `<a class="card" href="complete.html" style="text-decoration:none;color:inherit;grid-column:1/-1;border-left:4px solid var(--accent)">
+  <h3>The complete edition</h3>
+  <p>All sixteen volumes in the order of the learning path — every lesson, every derivation, every answer key — on one navigable page.</p>
+  <p>${courses.length} courses · one page</p>
+</a>`
+
 const cards = courses
   .map((course) => {
     const words = course.markdown.split(/\s+/).length
@@ -360,9 +428,23 @@ const cards = courses
     return `<a class="card" href="${course.id}.html" style="text-decoration:none;color:inherit">
   <h3>${escapeHtml(course.title)}</h3>
   <p>${escapeHtml(source)}</p>
-  <p>${lessons} lessons · ${words.toLocaleString()} words</p>
+  <p>${lessons} lessons and labs · ${words.toLocaleString()} words</p>
 </a>`
   })
+  .join('\n')
+
+// The suggested order is the learning path the courses themselves cite.
+const builtIds = new Set(courses.map((course) => course.id))
+const titleOf = new Map(LEARNING_PATH.courses.map((course) => [course.id, course.title]))
+const suggestedOrder = layersOf(LEARNING_PATH)
+  .map((layer, index) => {
+    const ids = layer.filter((id) => builtIds.has(id))
+    if (ids.length === 0) return ''
+    return `<li><strong>Level ${index + 1}</strong> — ${ids
+      .map((id) => `<a href="${id}.html">${escapeHtml(titleOf.get(id) ?? id)}</a>`)
+      .join(' · ')}</li>`
+  })
+  .filter(Boolean)
   .join('\n')
 
 const indexBody = `<header class="book"><div class="inner">
@@ -372,7 +454,10 @@ const indexBody = `<header class="book"><div class="inner">
 <div style="max-width:72rem;margin:0 auto;padding:2.5rem 1.25rem 4rem">
   <h1>The collection, as textbooks</h1>
   <p style="max-width:60ch;color:var(--muted)">Every course, compiled end-to-end into one readable volume — the lesson prose, the mathematics with derivations, the practice questions with their answer key, the laboratory work, and the glossary. The math renders with KaTeX; the courses themselves remain the primary artefact, because the laboratories run in the browser.</p>
-  <div class="index-grid">${cards}</div>
+  <h2>A suggested order</h2>
+  <p style="max-width:60ch;color:var(--muted)">The levels are positions on the learning path, not difficulty ratings: a course at level 2 assumes one thing the level-1 courses teach. Any course can be read on its own.</p>
+  <ol>${suggestedOrder}</ol>
+  <div class="index-grid">${completeCard}\n${cards}</div>
 </div>`
 await writeFile(join(outDir, 'index.html'), page('LLM Materials — textbooks', indexBody))
 await writeFile(join(hubPublic, 'index.html'), page('LLM Materials — textbooks', indexBody))

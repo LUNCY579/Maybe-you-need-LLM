@@ -59,8 +59,11 @@ header.book button { font: inherit; color: var(--text); background: var(--surfac
 nav.toc { position: sticky; top: 4rem; align-self: start; max-height: calc(100vh - 5rem);
   overflow: auto; font-size: .88rem; }
 nav.toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav.toc a.l1 { margin-top: .6rem; color: var(--text); }
 nav.toc a.l2 { padding-left: .9rem; }
+nav.toc a.l3 { padding-left: 1.8rem; font-size: .84rem; }
 nav.toc a:hover { color: var(--accent); }
+section.volume { border-top: 2px solid var(--border); margin-top: 3rem; padding-top: 2rem; }
 main.book { max-width: var(--measure); }
 main.book h1 { font-size: 2rem; letter-spacing: -.02em; line-height: 1.2; }
 main.book h2 { font-size: 1.4rem; margin-top: 2.4rem; border-top: 1px solid var(--border); padding-top: 1.4rem; }
@@ -567,8 +570,8 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li><strong>Denoising Diffusion Probabilistic Models</strong> — Jonathan Ho, Ajay Jain, Pieter Abbeel (2020), arXiv:2006.11239 [cs.LG] / NeurIPS 2020. Licence: arXiv perpetual, non-exclusive distribution licence. No Creative Commons licence is shown on the record; re-check per version before redistributing.. There is no generative or multimodal application anywhere in the collection.</li><li><strong>High-Resolution Image Synthesis with Latent Diffusion Models</strong> — Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer (2022), arXiv:2112.10752 [cs.CV] / CVPR 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Diffusion is what made high-resolution generation practical; the latent step is the missing half of the story.</li><li><strong>Elucidating the Design Space of Diffusion-Based Generative Models</strong> — Tero Karras, Miika Aittala, Timo Aila, Samuli Laine (2022), arXiv:2206.00364 [cs.CV] / NeurIPS 2022. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The pre-conditioning and σ parametrisation that later samplers use; without it, the schedule choice looks arbitrary.</li><li><strong>Classifier-Free Diffusion Guidance</strong> — Jonathan Ho, Tim Salimans (2022), arXiv:2207.12598 [cs.LG]. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. Guidance is how a text-conditioned model is steered, and it is a single interpolation in the score.</li><li><strong>Diffusion Models Beat GANs on Image Synthesis</strong> — Prafulla Dhariwal, Alex Nichol (2021), arXiv:2105.05233 [cs.CV] / NeurIPS 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The classifier-guidance recipe that made diffusion competitive, for comparison with classifier-free guidance.</li><li><strong>Denoising Diffusion Implicit Models</strong> — Jiaming Song, Chenlin Meng, Stefano Ermon (2020), arXiv:2010.02502 [cs.LG] / ICLR 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The deterministic sampler, and therefore the reason a diffusion model can be sampled in a few dozen steps instead of a thousand.</li><li><strong>Improved Denoising Diffusion Probabilistic Models</strong> — Alex Nichol, Prafulla Dhariwal (2021), arXiv:2102.09672 [cs.LG] / ICML 2021. Licence: arXiv perpetual, non-exclusive distribution licence. Re-check per version before redistributing.. The cosine schedule and the learned variances, which is what the schedules module compares against the original linear schedule.</li></ul></main>
 </div>
 <footer class="pager">
-  <div></div>
-  <div><a href="evaluation-lab.html">Evaluation Lab →</a></div>
+  <div><a href="data-lab.html">← Data Lab</a></div>
+  <div><a href="mech-interp-lab.html">Mechanistic Interpretability Lab →</a></div>
 </footer>
 </body>
 </html>

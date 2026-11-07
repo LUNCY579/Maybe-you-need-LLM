@@ -968,6 +968,8 @@ const indexLines = [
   '',
   'The textbooks are a *reading* copy. The courses themselves remain the primary artefact — the laboratories run in the browser and are what turn each lesson into skill. Use these to read on a train, print, or search the whole collection at once.',
   '',
+  'The same books are also rendered as a navigable HTML edition with the mathematics drawn — `html/` — and a single complete edition in the order of the learning path: `complete.md` and `html/complete.html`. `npm run textbooks` produces all of them.',
+  '',
   '| Course | Lessons | Words | Source |',
   '| --- | --- | --- | --- |',
 ]
