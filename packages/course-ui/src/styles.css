@@ -203,6 +203,28 @@ code {
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* The compiled textbook of this course, one click from the header. */
+
+.textbook-link {
+  background: var(--surface-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-small);
+  padding: 0.45rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.textbook-link:hover,
+.textbook-link:focus-visible {
+  border-color: var(--accent-indigo);
+  color: var(--accent-indigo);
 }
 
 .search-button kbd {
@@ -1298,6 +1320,11 @@ input[type='range'] {
 
 .search-results a:hover {
   background: var(--surface-raised);
+}
+
+.search-hit-active > a {
+  background: var(--surface-raised);
+  outline: 1px solid var(--border-strong);
 }
 
 .search-kind {

@@ -82,6 +82,7 @@ export default function App() {
     <ProgressProvider storageKey={STORAGE_KEY} moduleLessonIds={moduleLessonIds(MODULES, LESSONS)}>
       <HashRouter>
         <AppShell
+          textbookHref="../textbooks/multimodal-lab.html"
           title="Multimodal Lab"
           subtitle="two modalities, one space"
           nav={NAV}

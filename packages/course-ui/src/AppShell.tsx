@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
-import type { ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
 import { buildSearchIndex, search } from '@llm-materials/course-core'
 import type { SearchDocument } from '@llm-materials/course-core'
 
@@ -46,6 +46,12 @@ export interface AppShellProps {
   footer: ReactNode
   /** The footer's second paragraph. */
   footerMeta?: ReactNode
+  /**
+   * Where this course's compiled textbook lives, when it has one — relative to
+   * the course, which is how the collection's cross-links already work. The
+   * header renders a link to it when the prop is present.
+   */
+  textbookHref?: string
   /** The localStorage key the theme is stored under. */
   storageKey: string
   children: ReactNode
@@ -59,6 +65,7 @@ export function AppShell({
   searchKindWeights,
   footer,
   footerMeta,
+  textbookHref,
   storageKey,
   children,
 }: AppShellProps) {
@@ -68,8 +75,10 @@ export function AppShell({
   })
   const [query, setQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
+  const [active, setActive] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     document.documentElement.classList.toggle('light', theme === 'light')
@@ -84,6 +93,16 @@ export function AppShell({
   useEffect(() => {
     setMenuOpen(false)
   }, [location.pathname])
+
+  useEffect(() => {
+    setActive(0)
+  }, [query])
+
+  /* The arrow keys move through the hits; the list keeps the active one visible. */
+  useEffect(() => {
+    if (!searchOpen) return
+    document.getElementById(`search-hit-${active}`)?.scrollIntoView({ block: 'nearest' })
+  }, [active, searchOpen])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -103,6 +122,38 @@ export function AppShell({
     () => search(documents, query, { limit: 12, kindWeights: searchKindWeights }),
     [documents, query, searchKindWeights],
   )
+
+  /*
+   * Opening a hit. A hit inside this course is a hash route, so the router
+   * takes it without a reload; a hit that lives elsewhere in the collection
+   * is a real navigation and gets one.
+   */
+  const inputRef = useRef<HTMLInputElement>(null)
+  const openHit = (hit: SearchDocument) => {
+    setSearchOpen(false)
+    setQuery('')
+    if (hit.href.startsWith('#')) {
+      navigate(hit.href.slice(1))
+      return
+    }
+    window.location.assign(hit.href)
+  }
+  const onSearchKeyDown = (event: ReactKeyboardEvent) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setActive((value) => Math.min(value + 1, hits.length - 1))
+      return
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      setActive((value) => Math.max(value - 1, 0))
+      return
+    }
+    if (event.key === 'Enter' && hits[active]) {
+      event.preventDefault()
+      openHit(hits[active].document)
+    }
+  }
 
   return (
     <div className="app-shell">
@@ -135,6 +186,12 @@ export function AppShell({
         <button type="button" className="search-button" onClick={() => setSearchOpen(true)}>
           <span aria-hidden="true">⌕</span> Search <kbd>/</kbd>
         </button>
+
+        {textbookHref ? (
+          <a className="textbook-link" href={textbookHref}>
+            Textbook
+          </a>
+        ) : null}
 
         <button
           type="button"
@@ -169,7 +226,18 @@ export function AppShell({
       </footer>
 
       {searchOpen ? (
-        <div className="search-overlay" role="dialog" aria-modal="true" aria-label="Search the course">
+        <div
+          className="search-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Search the course"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setSearchOpen(false)
+              setQuery('')
+            }
+          }}
+        >
           <div className="search-panel">
             <label className="sr-only" htmlFor="course-search">
               Search the course
@@ -179,22 +247,30 @@ export function AppShell({
               className="search-input"
               type="search"
               autoFocus
+              ref={inputRef}
               value={query}
               placeholder="Search lessons, terms, equations and questions"
               onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={onSearchKeyDown}
+              aria-activedescendant={hits.length > 0 ? `search-hit-${active}` : undefined}
             />
             {query ? (
               <ul className="search-results">
                 {hits.length === 0 ? (
                   <li className="search-empty">Nothing matched “{query}”.</li>
                 ) : (
-                  hits.map((hit) => (
-                    <li key={hit.document.id + hit.document.kind}>
+                  hits.map((hit, index) => (
+                    <li
+                      key={hit.document.id + hit.document.kind}
+                      id={`search-hit-${index}`}
+                      className={index === active ? 'search-hit-active' : undefined}
+                      onMouseEnter={() => setActive(index)}
+                    >
                       <a
                         href={hit.document.href}
-                        onClick={() => {
-                          setSearchOpen(false)
-                          setQuery('')
+                        onClick={(event) => {
+                          event.preventDefault()
+                          openHit(hit.document)
                         }}
                       >
                         <span className="search-kind">{hit.document.kind}</span>
@@ -206,7 +282,7 @@ export function AppShell({
                 )}
               </ul>
             ) : (
-              <p className="search-hint">Type to search. Press Escape to close.</p>
+              <p className="search-hint">Type to search. ↑ ↓ to move, Enter to open, Escape to close.</p>
             )}
             <button type="button" className="btn btn-ghost" onClick={() => setSearchOpen(false)}>
               Close

@@ -82,6 +82,7 @@ export default function App() {
     <ProgressProvider storageKey={STORAGE_KEY} moduleLessonIds={moduleLessonIds(MODULES, LESSONS)}>
       <HashRouter>
         <AppShell
+          textbookHref="../textbooks/safety-lab.html"
           title="Safety and Alignment Lab"
           subtitle="what a claim is worth"
           nav={NAV}

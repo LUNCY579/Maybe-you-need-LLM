@@ -82,6 +82,7 @@ export default function App() {
     <ProgressProvider storageKey={STORAGE_KEY} moduleLessonIds={moduleLessonIds(MODULES, LESSONS)}>
       <HashRouter>
         <AppShell
+          textbookHref="../textbooks/agent-bench-lab.html"
           title="Agent Benchmark Lab"
           subtitle="what a benchmark measures"
           nav={NAV}

@@ -83,6 +83,7 @@ export default function App() {
     <ProgressProvider storageKey={STORAGE_KEY} moduleLessonIds={moduleLessonIds(MODULES, LESSONS)}>
       <HashRouter>
         <AppShell
+          textbookHref="../textbooks/evaluation-lab.html"
           title="Evaluation Lab"
           subtitle="what does a benchmark number mean?"
           nav={NAV}

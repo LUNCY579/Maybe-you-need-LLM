@@ -83,6 +83,7 @@ export default function App() {
     <ProgressProvider storageKey={STORAGE_KEY} moduleLessonIds={moduleLessonIds(MODULES, LESSONS)}>
       <HashRouter>
         <AppShell
+          textbookHref="../textbooks/lm-from-scratch.html"
           title="Language Model from Scratch"
           subtitle="from the tokeniser to the bill"
           nav={NAV}

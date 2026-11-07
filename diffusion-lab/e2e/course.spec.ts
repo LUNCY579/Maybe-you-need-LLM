@@ -115,6 +115,25 @@ test.describe('the student journey', () => {
     await expect(page).toHaveURL(/closed-form/)
   })
 
+  test('the search takes the keyboard: arrows move, Enter opens', async ({ page }) => {
+    await page.goto('/#')
+    await page.getByRole('button', { name: /Search/ }).click()
+    await page.locator('#course-search').fill('closed form')
+    await expect(page.locator('.search-results a').first()).toBeVisible()
+    await page.locator('#course-search').press('ArrowDown')
+    await page.locator('#course-search').press('Enter')
+    await expect(page.locator('.search-results')).not.toBeVisible()
+    await expect(page).not.toHaveURL(/#$/)
+  })
+
+  test('the header links to the reading edition', async ({ page }) => {
+    await page.goto('/#')
+    const link = page.getByRole('link', { name: 'Textbook' })
+    await expect(link).toBeVisible()
+    const href = await link.getAttribute('href')
+    expect(href).toContain('textbooks/diffusion-lab.html')
+  })
+
   test('the equations page shows a derivation', async ({ page }) => {
     await page.goto('/#/equations')
     await page.getByRole('button', { name: 'The symbols, the derivation and an example' }).first().click()
