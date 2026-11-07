@@ -87,7 +87,7 @@ export default function App() {
     <ProgressProvider storageKey={STORAGE_KEY} moduleLessonIds={moduleLessonIds(MODULES, LESSONS)}>
       <HashRouter>
         <AppShell
-          textbookHref="../textbooks/diffusion-lab.html"
+          textbookHref="../hub/textbooks/diffusion-lab.html"
           title="Diffusion Lab"
           subtitle="every number computed in front of you"
           nav={NAV}

@@ -134,6 +134,14 @@ test.describe('the student journey', () => {
     expect(href).toContain('textbooks/diffusion-lab.html')
   })
 
+  test('a lesson links to its own section in the book', async ({ page }) => {
+    await page.goto('/#/lessons/the-closed-form')
+    const link = page.locator('.lesson-textbook a').first()
+    await expect(link).toBeVisible()
+    const href = await link.getAttribute('href')
+    expect(href).toMatch(/^\.\.\/hub\/textbooks\/diffusion-lab\.html#lesson-\d+-[\w-]+$/)
+  })
+
   test('the equations page shows a derivation', async ({ page }) => {
     await page.goto('/#/equations')
     await page.getByRole('button', { name: 'The symbols, the derivation and an example' }).first().click()

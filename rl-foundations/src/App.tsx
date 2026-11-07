@@ -82,7 +82,7 @@ export default function App() {
     <ProgressProvider storageKey={STORAGE_KEY} moduleLessonIds={moduleLessonIds(MODULES, LESSONS)}>
       <HashRouter>
         <AppShell
-          textbookHref="../textbooks/rl-foundations.html"
+          textbookHref="../hub/textbooks/rl-foundations.html"
           title="Reinforcement Learning Foundations"
           subtitle="what an agent is trying to do"
           nav={NAV}

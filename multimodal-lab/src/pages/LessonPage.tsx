@@ -9,6 +9,7 @@ import { guideFor } from '../content/guides'
 import { useProgress } from '@llm-materials/course-ui'
 import { Button, Callout, Checkpoint, Panel, Stat } from '@llm-materials/course-ui'
 import { MathBlock } from '@llm-materials/course-ui'
+import { TextbookLink } from '@llm-materials/course-ui'
 
 /**
  * The equations a module is about. The lesson page shows these instead of a
@@ -74,6 +75,7 @@ export function LessonPage() {
       <p className="eyebrow">{module ? module.title : ''}</p>
       <h1 className="page-title">{lesson.title}</h1>
       <p className="page-lede">{lesson.subtitle}</p>
+      <TextbookLink appId="multimodal-lab" lesson={lesson} />
 
       <div className="stat-row">
         <Stat label="Reading time" value={`${lesson.minutes} min`} />

@@ -83,7 +83,7 @@ export default function App() {
     <ProgressProvider storageKey={STORAGE_KEY} moduleLessonIds={moduleLessonIds(MODULES, LESSONS)}>
       <HashRouter>
         <AppShell
-          textbookHref="../textbooks/rlhf-lab.html"
+          textbookHref="../hub/textbooks/rlhf-lab.html"
           title="RLHF Lab"
           subtitle="and where it breaks"
           nav={NAV}

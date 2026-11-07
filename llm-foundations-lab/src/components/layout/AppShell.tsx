@@ -400,7 +400,7 @@ export function AppShell() {
               />
             </div>
             <a
-              href="../textbooks/llm-foundations-lab.html"
+              href="../hub/textbooks/llm-foundations-lab.html"
               className="rounded-lg border border-line px-3 py-1.5 text-sm text-fg no-underline hover:border-indigo/60"
             >
               Textbook

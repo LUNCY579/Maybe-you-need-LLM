@@ -82,7 +82,7 @@ export default function App() {
     <ProgressProvider storageKey={STORAGE_KEY} moduleLessonIds={moduleLessonIds(MODULES, LESSONS)}>
       <HashRouter>
         <AppShell
-          textbookHref="../textbooks/mech-interp-lab.html"
+          textbookHref="../hub/textbooks/mech-interp-lab.html"
           title="Mechanistic Interpretability Lab"
           subtitle="what a model computes"
           nav={NAV}

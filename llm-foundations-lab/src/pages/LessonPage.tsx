@@ -57,6 +57,22 @@ export function LessonPage() {
         </div>
         <h1 className="font-display text-2xl font-semibold tracking-tight text-fg sm:text-3xl">{lesson.title}</h1>
         <p className="max-w-3xl text-sm text-muted sm:text-base">{lesson.subtitle}</p>
+        {/*
+          The compiled textbook of this course ships beside the hub. The slug
+          below is the same rule the textbook compiler applies to its headings.
+        */}
+        <p className="mt-1 text-sm">
+          <a
+            className="text-teal no-underline hover:underline"
+            href={`../hub/textbooks/llm-foundations-lab.html#lesson-${lesson.number}-${lesson.title
+              .toLowerCase()
+              .replace(/[^\w\s-]/g, '')
+              .trim()
+              .replace(/\s+/g, '-')}`}
+          >
+            This lesson in the textbook →
+          </a>
+        </p>
         <div className="flex flex-wrap items-center gap-2">
           <CompletionBar lesson={lesson} />
           <Button size="sm" variant="ghost" onClick={() => bookmark(lesson.id)}>

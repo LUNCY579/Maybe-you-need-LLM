@@ -199,6 +199,22 @@ export function LessonReader() {
         </div>
         <h1 className="mt-2 text-[20px] font-semibold leading-snug text-lab-100">{lesson.title}</h1>
         <p className="mt-2 max-w-3xl text-[13.5px] leading-relaxed text-lab-300">{lesson.summary}</p>
+        {/*
+          The compiled textbook ships beside the hub; the slug is the same rule
+          the textbook compiler applies to its headings.
+        */}
+        <p className="mt-1 text-[12.5px]">
+          <a
+            className="text-signal-blue no-underline hover:underline"
+            href={`../hub/textbooks/deep-learning-theory-explorer.html#lesson-${lesson.order}-${lesson.title
+              .toLowerCase()
+              .replace(/[^\w\s-]/g, '')
+              .trim()
+              .replace(/\s+/g, '-')}`}
+          >
+            This lesson in the textbook →
+          </a>
+        </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button variant="ghost" onClick={() => setLesson(lesson.id, { completed: !state?.completed })}>
             {state?.completed ? 'completed ✓' : 'mark completed'}

@@ -300,12 +300,15 @@ function themeToggle() {
   return `<button type="button" onclick="var d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('llm-materials:theme',d.dataset.theme)}catch(e){}">Theme</button>`
 }
 
-function page(title, body, extraHead) {
+function page(title, body, extraHead, description) {
+  const meta = description
+    ? `\n    <meta name="description" content="${escapeHtml(description)}">\n    <meta property="og:title" content="${escapeHtml(title)}">\n    <meta property="og:description" content="${escapeHtml(description)}">`
+    : ''
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">${meta}
 <title>${escapeHtml(title)}</title>
 ${THEME_SCRIPT}${KATEX_HEAD}${extraHead ?? ''}
 <style>${STYLE}</style>
@@ -318,6 +321,9 @@ ${body}
 }
 
 function bookPage(course, body, toc, previous, next) {
+  const description =
+    course.markdown.match(/\*\*Source:\*\* (.+)$/m)?.[1] ??
+    `The complete textbook of the ${course.title} course, compiled end-to-end.`
   const tocHtml = toc
     .map((entry) => `<a class="${entry.level > 2 ? 'l2' : ''}" href="#${entry.slug}">${escapeHtml(entry.text)}</a>`)
     .join('\n')
@@ -336,6 +342,8 @@ function bookPage(course, body, toc, previous, next) {
   <nav class="toc" aria-label="Table of contents">${tocHtml}</nav>
   <main class="book">${body}</main>
 </div>${pager}`,
+    undefined,
+    description,
   )
 }
 
@@ -422,8 +430,16 @@ const completeBody = `<header class="book"><div class="inner">
   <nav class="toc" aria-label="Table of contents">${completeToc}</nav>
   <main class="book">${completeFront ? renderBlocks(completeFront) : ''}${completeSections}</main>
 </div>`
-await writeFile(join(outDir, 'complete.html'), page('LLM Materials — the complete edition', completeBody))
-await writeFile(join(hubPublic, 'complete.html'), page('LLM Materials — the complete edition', completeBody))
+const COMPLETE_DESCRIPTION =
+  'The complete edition: all sixteen courses of the LLM Materials collection in the order of the learning path — every lesson, derivation and answer key on one page.'
+await writeFile(
+  join(outDir, 'complete.html'),
+  page('LLM Materials — the complete edition', completeBody, undefined, COMPLETE_DESCRIPTION),
+)
+await writeFile(
+  join(hubPublic, 'complete.html'),
+  page('LLM Materials — the complete edition', completeBody, undefined, COMPLETE_DESCRIPTION),
+)
 
 // The index page.
 const completeCard = `<a class="card" href="complete.html" style="text-decoration:none;color:inherit;grid-column:1/-1;border-left:4px solid var(--accent)">
@@ -471,6 +487,14 @@ const indexBody = `<header class="book"><div class="inner">
   <ol>${suggestedOrder}</ol>
   <div class="index-grid">${completeCard}\n${cards}</div>
 </div>`
-await writeFile(join(outDir, 'index.html'), page('LLM Materials — textbooks', indexBody))
-await writeFile(join(hubPublic, 'index.html'), page('LLM Materials — textbooks', indexBody))
+const INDEX_DESCRIPTION =
+  'Every course of the LLM Materials collection, compiled end-to-end into readable textbooks: the lesson prose, the mathematics, the practice questions with their answer key, and the glossary.'
+await writeFile(
+  join(outDir, 'index.html'),
+  page('LLM Materials — textbooks', indexBody, undefined, INDEX_DESCRIPTION),
+)
+await writeFile(
+  join(hubPublic, 'index.html'),
+  page('LLM Materials — textbooks', indexBody, undefined, INDEX_DESCRIPTION),
+)
 process.stdout.write(`\n${courses.length} books rendered to textbooks/html/\n`)

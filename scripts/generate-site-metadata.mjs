@@ -1,4 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
@@ -92,6 +93,13 @@ for (const site of sites) {
   if (site.id === 'hub') {
     for (const section of ['courses', 'path', 'sources', 'glossary', 'progress']) {
       urls.push({ loc: `${base}/hub/#${section}`, priority: '0.6' })
+    }
+    // The compiled textbooks ship with the hub; a search engine should find them.
+    const booksDirectory = join(publicDirectory, 'textbooks')
+    if (existsSync(booksDirectory)) {
+      for (const entry of readdirSync(booksDirectory).filter((name) => name.endsWith('.html')).sort()) {
+        urls.push({ loc: `${base}/hub/textbooks/${entry}`, priority: '0.5' })
+      }
     }
   }
   await emit(

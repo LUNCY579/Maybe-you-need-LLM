@@ -7,6 +7,7 @@ import { FORMULAS } from '../content/formulas'
 import { useProgress } from '@llm-materials/course-ui'
 import { Button, Callout, Panel, Stat } from '@llm-materials/course-ui'
 import { MathBlock } from '@llm-materials/course-ui'
+import { TextbookLink } from '@llm-materials/course-ui'
 
 export function LessonPage() {
   const { lessonId } = useParams<{ lessonId: string }>()
@@ -54,6 +55,7 @@ export function LessonPage() {
       <p className="eyebrow">{module ? module.title : ''}</p>
       <h1 className="page-title">{lesson.title}</h1>
       <p className="page-lede">{lesson.subtitle}</p>
+      <TextbookLink appId="scaling-lab" lesson={lesson} />
 
       <div className="stat-row">
         <Stat label="Reading time" value={`${lesson.minutes} min`} />

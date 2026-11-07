@@ -1556,3 +1556,19 @@ input[type='range'] {
     color: #333;
   }
 }
+
+/* The link from a lesson to its own section in the compiled textbook. */
+.lesson-textbook {
+  margin: 0.2rem 0 1.1rem;
+  font-size: 0.9rem;
+}
+
+.lesson-textbook a {
+  color: var(--accent-indigo);
+  text-decoration: none;
+}
+
+.lesson-textbook a:hover,
+.lesson-textbook a:focus-visible {
+  text-decoration: underline;
+}

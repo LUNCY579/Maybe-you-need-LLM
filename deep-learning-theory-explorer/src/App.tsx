@@ -157,7 +157,7 @@ export function App() {
         </p>
         <div className="mt-3 flex items-center gap-2">
           <a
-            href="../textbooks/deep-learning-theory-explorer.html"
+            href="../hub/textbooks/deep-learning-theory-explorer.html"
             className="shrink-0 rounded border border-lab-700 bg-lab-900/70 px-2 py-1 text-[11px] text-lab-300 no-underline transition-colors hover:border-signal-blue hover:text-signal-blue"
           >
             Textbook

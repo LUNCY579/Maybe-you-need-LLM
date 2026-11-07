@@ -114,6 +114,24 @@ export function LessonPage({ slug }: { slug: string }) {
         </div>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{lesson.title}</h1>
         <p className="text-muted max-w-3xl text-sm leading-relaxed">{lesson.summary}</p>
+        {/*
+          The compiled textbook ships beside the hub; the slug is the same rule
+          the textbook compiler applies to its headings. The agentic book names
+          its lesson headings by title alone.
+        */}
+        <p className="mt-1 text-sm">
+          <a
+            className="no-underline hover:underline"
+            style={{ color: 'var(--accent)' }}
+            href={`../hub/textbooks/agentic-ai-academy.html#${lesson.title
+              .toLowerCase()
+              .replace(/[^\w\s-]/g, '')
+              .trim()
+              .replace(/\s+/g, '-')}`}
+          >
+            This lesson in the textbook →
+          </a>
+        </p>
         <div className="flex flex-wrap gap-2">
           <Button variant="primary" size="sm" onClick={() => (completed ? progress.uncompleteLesson(lesson.slug) : progress.completeLesson(lesson.slug))}>
             {completed ? 'Mark as not complete' : 'Mark lesson complete'}
