@@ -562,10 +562,10 @@ Sweep the contaminated fraction and watch the reported score drift. Open **What 
 
 **Q. Which of these are design decisions a benchmark author makes? — multi-select *(core)***
 
-- Which questions to ask
-- How the answers are scored
+- ✓ **Which questions to ask**
+- ✓ **How the answers are scored**
 - What the score is called
-- Which models are evaluated
+- ✓ **Which models are evaluated**
 
 > **Why:** The question set, the scoring procedure and the set of models under test are all choices. Each one is a claim about what matters, and each one can be argued for.
 
@@ -710,9 +710,9 @@ Compute how many questions a given difference needs, and watch the curve. Open *
 
 **Q. What should a leaderboard print next to every score? — multi-select *(hard)***
 
-- A confidence interval
-- The number of questions used
-- The provider of the model
+- ✓ **A confidence interval**
+- ✓ **The number of questions used**
+- ✓ **The provider of the model**
 - The logo of the organisation that ran it
 
 > **Why:** An interval, the question count, and enough about the protocol to reproduce it. The newest criticism of the field is that the last of these is often missing, and that the leaderboard has become the thing being optimised.

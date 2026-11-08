@@ -218,7 +218,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-objective'],
     glossaryTerms: ['score-function-estimator', 'baseline', 'variance'],
-    quizIds: ['q-gradients-3'],
+    quizIds: ['q-gradients-3', 'q-estimator-support'],
     sourceRefs: [],
     furtherReading: [
       {
@@ -291,7 +291,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['trust-regions'],
     glossaryTerms: ['kl-penalty', 'reference-policy', 'k3-estimator'],
-    quizIds: ['q-kl-1', 'q-kl-2'],
+    quizIds: ['q-kl-1', 'q-kl-2', 'q-kl-third'],
     sourceRefs: [
       {
         chapter: 4,
@@ -330,7 +330,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-estimator'],
     glossaryTerms: ['clipped-surrogate', 'clip-fraction', 'importance-ratio'],
-    quizIds: ['q-ppo-1', 'q-ppo-2'],
+    quizIds: ['q-ppo-1', 'q-ppo-2', 'q-clip-zero'],
     sourceRefs: [
       {
         chapter: 2,
@@ -373,7 +373,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-clipped-objective'],
     glossaryTerms: ['advantage', 'gae', 'value-function'],
-    quizIds: ['q-ppo-3'],
+    quizIds: ['q-ppo-3', 'q-gae-lambda'],
     sourceRefs: [
       {
         chapter: 4,
@@ -449,7 +449,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-pipeline'],
     glossaryTerms: ['reproducibility', 'reward-model'],
-    quizIds: ['q-details-3'],
+    quizIds: ['q-details-3', 'q-checklist-scope'],
     sourceRefs: [
       {
         chapter: 4,

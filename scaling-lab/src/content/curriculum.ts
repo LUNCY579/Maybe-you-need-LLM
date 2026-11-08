@@ -262,7 +262,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['scaling-law', 'doubling-factor'],
     prerequisites: [],
     glossaryTerms: ['scaling-law', 'exponent', 'compute-budget'],
-    quizIds: ['q-power-1', 'q-power-2'],
+    quizIds: ['q-power-1', 'q-power-2', 'q-power-4'],
     sourceRefs: [
       {
         chapter: 1,
@@ -391,7 +391,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['optimal-allocation', 'isoflop-curve'],
     prerequisites: ['the-compute-budget'],
     glossaryTerms: ['allocation', 'loss-surface', 'tokens-per-parameter'],
-    quizIds: ['q-compute-2', 'q-compute-3'],
+    quizIds: ['q-compute-2', 'q-compute-3', 'q-optimal-ratio-1'],
     sourceRefs: [
       {
         chapter: 3,
@@ -606,7 +606,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['repetition-law', 'effective-data'],
     prerequisites: ['the-compute-budget'],
     glossaryTerms: ['epoch', 'unique-pool', 'repeats', 'effective-data'],
-    quizIds: ['q-epoch-1', 'q-epoch-3'],
+    quizIds: ['q-epoch-1', 'q-epoch-3', 'q-repetition-4'],
     sourceRefs: [
       {
         chapter: 1,
@@ -1067,7 +1067,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['whole-sequence-score'],
     prerequisites: ['what-emergence-looks-like'],
     glossaryTerms: ['emergence', 'metric', 'per-token-accuracy'],
-    quizIds: ['q-emergence-2', 'q-emergence-3'],
+    quizIds: ['q-emergence-2', 'q-emergence-3', 'q-mirage-1'],
     sourceRefs: [
       {
         chapter: 3,
@@ -1110,7 +1110,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['compute-trend', 'doubling-factor'],
     prerequisites: ['how-the-exponent-is-measured'],
     glossaryTerms: ['log-linear-trend', 'doubling', 'trend-break'],
-    quizIds: ['q-hardware-1', 'q-hardware-2'],
+    quizIds: ['q-hardware-1', 'q-hardware-2', 'q-era-1'],
     sourceRefs: [
       {
         chapter: 1,

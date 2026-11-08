@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Scaling Laws for Neural Language Models — Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, Dario Amodei (2020)">
+    <meta property="og:title" content="Scaling Lab — textbook">
+    <meta property="og:description" content="Scaling Laws for Neural Language Models — Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, Dario Amodei (2020)">
 <title>Scaling Lab — textbook</title>
 
 <script>
@@ -213,6 +216,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A loss falls as a power law with exponent 0.2. By what factor is the loss multiplied when the data doubles? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 0.870551 ± 0.0001</p></blockquote>
 <blockquote><p><strong>Why:</strong> The factor is 2^(−0.2) = 0.8706, so the loss falls by about 13%.</p></blockquote>
+<p>*<em>Q. A loss follows L(N) = (N_c / N)^α with α = 0.34. When the parameter count grows by a factor of 10, what fraction of its previous value does the loss reach? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 0.46 ± 0.03</p></blockquote>
+<blockquote><p><strong>Why:</strong> Scaling N by 10 multiplies the loss by 10^(−α) = 10^(−0.34) ≈ 0.457. The exponent is the answer to “how much does ten times more buy” — which is why the fitted exponent, and the range it was fitted over, are the whole story.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Training runs here, a power law fitted to them here, and the factor a doubling buys. Open <strong>Fit the law</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -341,6 +347,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A loss surface is L = 0.2 + 1.0·N^(−0.5) + 2.0·D^(−0.5), and the budget allows N·D = 1e6. At the optimum the capacity term and the data term balance: 1.0·N^(−0.5) = 2.0·D^(−0.5). What is N? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 500</p></blockquote>
 <blockquote><p><strong>Why:</strong> The balance gives N^(−0.5) = 2·D^(−0.5), so N = D/4. With N·D = 1e6 that gives D² = 4e6, so D = 2000 and N = 500. The ratio of tokens to parameters at the optimum is 4.</p></blockquote>
+<p>*<em>Q. In the compute-optimal allocation for a language model, roughly how many training tokens does the rule spend per parameter? — multiple-choice </em>(core)***</p>
+<ul><li>About 2</li><li>✓ <strong>About 20</strong></li><li>About 200</li><li>About 2000</li></ul>
+<blockquote><p>Correct — the rule the IsoFLOP study supports, once the older models’ underspending is corrected for.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Reading the loss off the IsoFLOP frontier at each compute budget gives roughly twenty tokens per parameter. The older models sat far from that rule, which is exactly what re-reading their curves with the right accounting shows.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The fitted surface, the budget, and the allocation that minimises the loss. Open <strong>Find the optimum</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -568,6 +578,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Because the two runs have read the same rows — at epoch one they are the same run</strong></li><li>Because the loss has not started falling yet</li><li>Because the learning rate is still warming up</li><li>Because the held-out set is too small to tell them apart</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The repeated run has nothing to repeat until it has seen the pool once. That is what makes the warmup phase arithmetic rather than an assertion about behaviour.</p></blockquote>
+<p>*<em>Q. Over a fixed data pool, a repeated epoch keeps adding as much value as an epoch of fresh data would have. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
+<blockquote><p><strong>Why:</strong> The repeated runs fall into phases: for a while a repeat behaves like fresh data, then its value decays, and eventually the loss turns upward. The effective data the model sees grows more slowly than the epoch count — repetition is a discount, not a substitute.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Two SGD runs over the same tokens, one on repeats and one on fresh rows, epoch by epoch. Open <strong>Watch the phases</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -974,6 +987,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The whole-sequence score is the per-token accuracy raised to the length</strong></li><li>Longer tasks are harder for every model</li><li>The metric is noisier for long tasks</li><li>The compute per token falls</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Raising a number below one to a higher power pushes it down and makes the transition steeper. Nothing about the model changed; the length of the task did.</p></blockquote>
+<p>*<em>Q. A benchmark shows a capability switching on abruptly between two scales. Before calling it emergent, what should be checked first? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Whether the metric itself hides smooth progress — exact match, for instance, scores nothing until a threshold</strong></li><li>Whether the learning-rate schedule was tuned</li><li>Whether the tokenizer changed between scales</li><li>Whether the random seed was lucky</li></ul>
+<blockquote><p>Correct — the discontinuity can live in the measurement rather than in the model.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A nonlinear metric turns a smooth underlying curve into a step. Measured with a continuous metric, the same capability frequently replaces the cliff with a slope — which is the check the mirage result names.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The same capability, scored with a threshold that moves. Open <strong>Move the metric</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -1022,6 +1039,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>A fitted slope describes the middle of a scattered set; a range is the distance between two extremes</strong></li><li>One of them must be a mistake</li><li>The units differ by a factor of twelve</li><li>The trend is not log-linear</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Extremes are single runs; the slope is a least-squares line through dozens. In an era with a lot of scatter they disagree, and that is a fact about trend lines rather than about this course.</p></blockquote>
+<p>*<em>Q. What distinguished the most recent era of the compute trend from the growth Moore’s law describes? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The growth came from spending more, not from hardware getting faster at the same price</strong></li><li>The growth came from cheaper memory</li><li>The growth came from better algorithms alone</li><li>The growth came from longer training runs of the same-sized models</li></ul>
+<blockquote><p>Correct — the doubling time of compute spent is far shorter than the doubling time of FLOP/s per dollar.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The three eras separate by what drives the compute: before deep learning, the available hardware; in the deep-learning era, hardware at Moore’s-law pace; in the large-scale era, spending — compute doubling roughly every six months, against hardware’s few years.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Each era’s three readings of its own growth, and the rate the whole fixture’s trend gives back. Open <strong>Read the eras</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>

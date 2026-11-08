@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Denoising Diffusion Probabilistic Models — Jonathan Ho, Ajay Jain, Pieter Abbeel (2020)">
+    <meta property="og:title" content="Diffusion Lab — textbook">
+    <meta property="og:description" content="Denoising Diffusion Probabilistic Models — Jonathan Ho, Ajay Jain, Pieter Abbeel (2020)">
 <title>Diffusion Lab — textbook</title>
 
 <script>
@@ -205,6 +208,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. With the paper’s linear schedule, β goes from 10⁻⁴ to 0.02 over 1000 steps. What is β at the first step? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 0.0001 β_1</p></blockquote>
 <blockquote><p><strong>Why:</strong> β_1 = 10⁻⁴ exactly. The schedule is linear in the step index, so the first and last values are the endpoints of the range.</p></blockquote>
+<p>*<em>Q. At some step t the cumulative product is ᾱ_t = 0.64. Given x_0, what is the standard deviation of the noise term in x_t? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 0.6</p></blockquote>
+<blockquote><p><strong>Why:</strong> The closed form writes x_t = √ᾱ_t · x_0 + √(1 − ᾱ_t) · ε with ε ~ N(0, I), so the noise term is a standard normal scaled by √(1 − ᾱ_t) = √0.36 = 0.6.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Compare the two ways of reaching the same timestep. Open <strong>Check the closed form against the chain</strong> in the diffusion-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -224,6 +230,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>So every KL term in the bound can be computed between two Gaussians</strong></li><li>So the sampling can be done in one step</li><li>So the model does not need a network</li><li>So the data can be scaled to [−1, 1]</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The variational bound is a sum of KL divergences between the true posterior and the model’s reverse transition. If both are Gaussian, each term has a closed form instead of a high-variance Monte Carlo estimate.</p></blockquote>
+<p>*<em>Q. The mean of the posterior q(x_{t−1} | x_t, x_0) weighs x_t against x_0, and the weights are fixed by the schedule alone. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
+<blockquote><p><strong>Why:</strong> The posterior coefficients are functions of ᾱ_t, β_t and ᾱ_{t−1} — quantities the schedule fixes before training begins. Nothing learned decides where the weight sits; the network only has to reach the mean the posterior names.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>See the posterior shift its weight from x_0 to x_t as the noise grows. Open <strong>Move the posterior weight</strong> in the diffusion-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -292,6 +301,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>It removes the fresh noise, so the same start gives the same sample</strong></li><li>It removes the network from the loop</li><li>It replaces the variance schedule with a learned one</li><li>It trains the model with a different objective</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> DDIM removes the fresh noise at each step, turning the reverse chain into a probability-flow ODE. The same latent then always gives the same sample, which is what allows the number of steps to be cut without collapsing diversity.</p></blockquote>
+<p>*<em>Q. One ancestral sample is being drawn. Which of these does the procedure never touch? — multiple-choice </em>(core)***</p>
+<ul><li>The trained reverse-process network</li><li>The variance schedule β_t</li><li>A fresh random noise vector</li><li>✓ <strong>The training data</strong></li></ul>
+<blockquote><p>Correct — sampling starts from pure noise and never consults the dataset.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Ancestral sampling starts from the standard normal prior and iterates the learned reverse step under the fixed schedule, drawing fresh noise as it goes. The training data was needed to train the network, not to sample from it.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Sample from a trained model and watch the trajectory back to the data. Open <strong>Run the reverse chain</strong> in the diffusion-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -369,6 +382,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. An autoencoder compresses a 256×256 image with 3 channels by a factor of 8, to 4 latent channels. By what factor is the number of elements the diffusion model works on reduced? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 48</p></blockquote>
 <blockquote><p><strong>Why:</strong> The image has 256×256×3 = 196,608 elements; the latent has 32×32×4 = 4,096. The reduction factor is 48. The attention saving is larger still, because it is quadratic in the token count.</p></blockquote>
+<p>*<em>Q. Why does latent diffusion run the diffusion process in an autoencoder’s latent space? — multiple-choice </em>(core)***</p>
+<ul><li>To make the noise schedule linear</li><li>✓ <strong>Because perceptual detail compresses away, so the diffusion spends its capacity on semantics</strong></li><li>Because pixels cannot be noised</li><li>To avoid the variational bound</li></ul>
+<blockquote><p>Correct — the autoencoder removes what the eye cannot resolve before the diffusion begins.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Most of a natural image’s bits describe detail the eye cannot resolve. The autoencoder discards that detail up front, so the expensive diffusion process operates on the semantic content rather than on high-frequency pixels.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Train a real autoencoder and watch the reconstruction error against the compression ratio. Open <strong>Measure the compression</strong> in the diffusion-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -399,6 +416,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>They cluster more tightly on the mode that matches the condition</strong></li><li>They spread out to cover the tail of the distribution</li><li>They become noisier</li><li>They become independent of the condition</li></ul>
 <blockquote><p>Correct: sharper, but less diverse.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Guidance tilts the distribution by p(c|x)^w, which sharpens the conditional but suppresses everything else. The result is better prompt adherence and worse coverage — the classic fidelity–diversity trade-off.</p></blockquote>
+<p>*<em>Q. With guidance weight w = 3, how many network forward passes does one guided step cost, counting the conditional and unconditional evaluations separately? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 2</p></blockquote>
+<blockquote><p><strong>Why:</strong> The guided score is s_uncond + w·(s_cond − s_uncond). Both scores are needed at the same input, and the unconditional term is shared between them — so two evaluations, not three, however they are batched.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Measure fidelity and diversity against the guidance weight, with an exact score. Open <strong>Sweep the guidance weight</strong> in the diffusion-lab application.</p>
 <p><strong>Further reading</strong></p>
@@ -442,6 +462,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A sampler takes 50 steps out of a chain of length 1000. How many network evaluations does one sample cost? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 50</p></blockquote>
 <blockquote><p><strong>Why:</strong> Exactly 50. The number of steps is the only thing that matters for sampling cost, which is why deterministic samplers that can be run in few steps matter so much.</p></blockquote>
+<p>*<em>Q. Which of these are choices the original paper leaves fixed rather than learned? — multi-select </em>(hard)***</p>
+<ul><li>✓ <strong>The variance schedule β</strong></li><li>✓ <strong>The reverse process variance σ_t</strong></li><li>The reverse process mean</li><li>✓ <strong>The number of steps T</strong></li></ul>
+<blockquote><p><strong>Why:</strong> Only the reverse mean is learned. The paper fixes the schedule, the reverse variance and the chain length, and its ablation shows that learning the variance makes training unstable and samples worse.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Add up what a sample costs, in network evaluations and in memory. Open <strong>Count the cost</strong> in the diffusion-lab application.</p>
 <p><strong>Further reading</strong></p>

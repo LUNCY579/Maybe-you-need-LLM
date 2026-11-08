@@ -172,6 +172,12 @@ Symbols:
 
 > **Why:** The factor is 2^(−0.2) = 0.8706, so the loss falls by about 13%.
 
+**Q. A loss follows L(N) = (N_c / N)^α with α = 0.34. When the parameter count grows by a factor of 10, what fraction of its previous value does the loss reach? — numeric *(core)***
+
+> **Answer:** 0.46 ± 0.03
+
+> **Why:** Scaling N by 10 multiplies the loss by 10^(−α) = 10^(−0.34) ≈ 0.457. The exponent is the answer to “how much does ten times more buy” — which is why the fitted exponent, and the range it was fitted over, are the whole story.
+
 #### Go and do it
 
 Training runs here, a power law fitted to them here, and the factor a doubling buys. Open **Fit the law** in the scaling-lab application.
@@ -485,6 +491,17 @@ Symbols:
 > **Answer:** 500
 
 > **Why:** The balance gives N^(−0.5) = 2·D^(−0.5), so N = D/4. With N·D = 1e6 that gives D² = 4e6, so D = 2000 and N = 500. The ratio of tokens to parameters at the optimum is 4.
+
+**Q. In the compute-optimal allocation for a language model, roughly how many training tokens does the rule spend per parameter? — multiple-choice *(core)***
+
+- About 2
+- ✓ **About 20**
+- About 200
+- About 2000
+
+> Correct — the rule the IsoFLOP study supports, once the older models’ underspending is corrected for.
+
+> **Why:** Reading the loss off the IsoFLOP frontier at each compute budget gives roughly twenty tokens per parameter. The older models sat far from that rule, which is exactly what re-reading their curves with the right accounting shows.
 
 #### Go and do it
 
@@ -1047,6 +1064,12 @@ Symbols:
 > Correct.
 
 > **Why:** The repeated run has nothing to repeat until it has seen the pool once. That is what makes the warmup phase arithmetic rather than an assertion about behaviour.
+
+**Q. Over a fixed data pool, a repeated epoch keeps adding as much value as an epoch of fresh data would have. — boolean *(core)***
+
+> **Answer:** False
+
+> **Why:** The repeated runs fall into phases: for a while a repeat behaves like fresh data, then its value decays, and eventually the loss turns upward. The effective data the model sees grows more slowly than the epoch count — repetition is a discount, not a substitute.
 
 #### Go and do it
 
@@ -2054,6 +2077,17 @@ Symbols:
 
 > **Why:** Raising a number below one to a higher power pushes it down and makes the transition steeper. Nothing about the model changed; the length of the task did.
 
+**Q. A benchmark shows a capability switching on abruptly between two scales. Before calling it emergent, what should be checked first? — multiple-choice *(core)***
+
+- ✓ **Whether the metric itself hides smooth progress — exact match, for instance, scores nothing until a threshold**
+- Whether the learning-rate schedule was tuned
+- Whether the tokenizer changed between scales
+- Whether the random seed was lucky
+
+> Correct — the discontinuity can live in the measurement rather than in the model.
+
+> **Why:** A nonlinear metric turns a smooth underlying curve into a step. Measured with a continuous metric, the same capability frequently replaces the cliff with a slope — which is the check the mirage result names.
+
 #### Go and do it
 
 The same capability, scored with a threshold that moves. Open **Move the metric** in the scaling-lab application.
@@ -2168,6 +2202,17 @@ Symbols:
 > Correct.
 
 > **Why:** Extremes are single runs; the slope is a least-squares line through dozens. In an era with a lot of scatter they disagree, and that is a fact about trend lines rather than about this course.
+
+**Q. What distinguished the most recent era of the compute trend from the growth Moore’s law describes? — multiple-choice *(core)***
+
+- ✓ **The growth came from spending more, not from hardware getting faster at the same price**
+- The growth came from cheaper memory
+- The growth came from better algorithms alone
+- The growth came from longer training runs of the same-sized models
+
+> Correct — the doubling time of compute spent is far shorter than the doubling time of FLOP/s per dollar.
+
+> **Why:** The three eras separate by what drives the compute: before deep learning, the available hardware; in the deep-learning era, hardware at Moore’s-law pace; in the large-scale era, spending — compute doubling roughly every six months, against hardware’s few years.
 
 #### Go and do it
 

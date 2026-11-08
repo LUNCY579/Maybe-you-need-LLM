@@ -128,9 +128,24 @@ function renderQuestion(question) {
   if (question.options) {
     const labels = question.options.map((option) => (typeof option === 'string' ? option : option.label))
     const correct = answerFor(question)
+    const correctSet = question.correctOptionIds
+      ? new Set(
+          question.options
+            .filter((option) => typeof option !== 'string' && question.correctOptionIds.includes(option.id))
+            .map((option) => option.label),
+        )
+      : null
     lines.push(
       '',
-      ...labels.map((label) => (label === correct ? `- ✓ **${label}**` : `- ${label}`)),
+      ...labels.map((label) =>
+        correctSet
+          ? correctSet.has(label)
+            ? `- ✓ **${label}**`
+            : `- ${label}`
+          : label === correct
+            ? `- ✓ **${label}**`
+            : `- ${label}`,
+      ),
     )
     const feedback = question.options.find((option) => typeof option !== 'string' && option.label === correct)?.feedback
     if (feedback) lines.push('', `> ${feedback}`)

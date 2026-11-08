@@ -151,6 +151,17 @@ Compute the expected reward of a policy and check its gradient against a finite 
 
 > **Why:** ∇E_π[r] = E_π[r · ∇log π]. The model’s own log-probability stands in for the model’s derivative, which is what makes the estimator possible for a language model whose output layer is enormous.
 
+**Q. The score-function estimator needs the support of the policy to stay unchanged. What goes wrong for an action the policy would never sample? — multiple-choice *(core)***
+
+- ✓ **Its log-probability is undefined, so the action can never be sampled and never be credited**
+- The reward becomes negative
+- The variance doubles
+- The KL penalty stops applying
+
+> Correct — the estimator reweights what was actually drawn; an unsampled action contributes nothing, however good it is.
+
+> **Why:** The gradient identity ∇E_π[r] = E_π[r · ∇log π] reweights the actions the policy actually drew. Where π(a) = 0, ∇log π(a) does not exist, and no amount of training can move probability onto an action the estimator has never seen — which is why exploration has to come from somewhere else.
+
 #### Go and do it
 
 Compare the score-function estimator with the exact gradient of a finite problem. Open **The estimator against the exact gradient** in the rlhf-lab application.
@@ -287,6 +298,12 @@ PPO replaces the hard constraint with a clip: once the importance ratio passes a
 
 > **Why:** Exactly 1.2. The ratio is clipped to 1 + ε = 1.2, and the minimum of the two branches is the clipped one, because the advantage is positive.
 
+**Q. When the PPO clip is active, the gradient of the objective with respect to the policy is exactly zero. — boolean *(core)***
+
+> **Answer:** True
+
+> **Why:** The objective takes the minimum of the clipped and unclipped terms. On the segment where the clip is doing the work, the objective is locally constant, so its gradient vanishes — the policy is simply not pushed further in that direction, which is how the clip acts as a trust region.
+
 #### Go and do it
 
 Sweep the importance ratio and watch the objective and its gradient change. Open **Where the clip bites** in the rlhf-lab application.
@@ -337,6 +354,17 @@ Sweep the importance ratio and watch the objective and its gradient change. Open
 > Correct: unbiased, high variance.
 
 > **Why:** λ = 1 makes the geometric sum telescope into the discounted return. It is unbiased and noisy; λ = 0 is the one-step residual, which is tight and biased.
+
+**Q. In GAE, what does the estimator at λ = 1 recover? — multiple-choice *(warmup)***
+
+- The one-step TD error
+- ✓ **The Monte Carlo return**
+- The reward model’s raw score
+- Zero, whatever the data says
+
+> Correct — full lookahead, high variance, no bias from the value function.
+
+> **Why:** GAE sums the one-step residuals with a geometric discount. λ = 0 trusts the value function alone; λ = 1 trusts the sampled returns alone — the Monte Carlo estimate, with its variance.
 
 #### Go and do it
 
@@ -402,6 +430,17 @@ The penalty term is the KL divergence from the supervised reference policy, and 
 > **Answer:** 0.6931472 ± 0.0001
 
 > **Why:** log(0.5/0.25) = log 2 ≈ 0.693 nats. The k3 estimator on the same sample would be 2 − 1 − log 2 ≈ 0.307.
+
+**Q. The sample estimator of the KL that practitioners actually record is the third one. What is true of it? — multiple-choice *(hard)***
+
+- It is negative at almost every sample
+- ✓ **It is pointwise positive, and its expectation is the chi-square divergence minus the KL**
+- It equals the KL exactly, sample by sample
+- It needs the reward model to evaluate
+
+> Correct — a detail most write-ups leave out.
+
+> **Why:** The naive estimator can be negative sample by sample, and the squared replacement is positive but biased. The third estimator is pointwise positive, and its expectation is the chi-square divergence minus the KL — which is why curves drawn with it need that caveat read before them.
 
 #### Go and do it
 
@@ -515,6 +554,15 @@ Walk the three stages and see what each one contributes to the final behaviour. 
 > **Answer:** False
 
 > **Why:** No. Its contribution is an enumeration and a reproduction: twenty implementation details that the reported behaviour depended on, and a demonstration that most of them had to be in place for the pipeline to train at all.
+
+**Q. Which of these does the primary source’s enumeration treat as implementation details that a reproducible result must state? — multi-select *(core)***
+
+- ✓ **The reward model’s noise scale**
+- ✓ **The number of PPO epochs run per batch**
+- ✓ **How the KL penalty is managed while training proceeds**
+- Whether RLHF is the right paradigm at all
+
+> **Why:** The paper’s contribution is an enumeration, and most of it is about scale: the reward model’s noise, the learning rates, the epochs, the KL management. Whether the paradigm is right is not a detail of the pipeline — it is a different paper.
 
 #### Go and do it
 

@@ -71,7 +71,7 @@ test suite refuses a lesson that cites a section which is not in the source map.
 
 ### The rest of the course
 
-- **Practice** — 25 questions with per-option feedback, worked explanations and source
+- **Practice** — 26 questions with per-option feedback, worked explanations and source
   citations. The numeric questions have tolerances tight enough that a plausible guess
   fails.
 - **Glossary** — 32 terms, each with a plain-language definition and the terms that

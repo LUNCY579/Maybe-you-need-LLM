@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Principles of Deep Learning Theory — Daniel A. Roberts, Sho Yaida, Boris Hanin (2022)">
+    <meta property="og:title" content="Deep Learning Theory Explorer — textbook">
+    <meta property="og:description" content="The Principles of Deep Learning Theory — Daniel A. Roberts, Sho Yaida, Boris Hanin (2022)">
 <title>Deep Learning Theory Explorer — textbook</title>
 
 <script>
@@ -164,6 +167,18 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A deep linear network has depth ℓ = 21 and width n = 100. Using the leading finite-width result, what is <span class="math-inline">$G^{(4)} - (G^{(2)})^2$</span> in units of <span class="math-inline">$(G^{(2)})^2$</span>? </em>(core)***</p>
 <ul><li>0.2</li><li>✓ <strong>0.4</strong></li><li>0.02</li><li>2.0</li></ul>
 <blockquote><p><strong>Why:</strong> 2(ℓ−1)/n = 2·20/100 = 0.4. The depth-to-width ratio sets the size of the deviation from Gaussianity.</p></blockquote>
+<p>*<em>Q. How many distinct Wick pairings does the six-point function <span class="math-inline">$\mathbb{E}[z_1 z_2 z_3 z_4 z_5 z_6]$</span> have? </em>(core)***</p>
+<ul><li><span class="math-inline">$9$</span></li><li>✓ <strong><span class="math-inline">$15$</span></strong></li><li><span class="math-inline">$12$</span></li><li><span class="math-inline">$45$</span></li></ul>
+<blockquote><p><strong>Why:</strong> Pair the first field with one of the five remaining, then pair the rest recursively: the count of pairings of 2n fields is (2n − 1)!!, which for six fields is 5 · 3 · 1 = 15. Every one of them is a product of three covariances.</p></blockquote>
+<p>*<em>Q. For <span class="math-inline">$z \sim \mathcal{N}(0, K)$</span> with <span class="math-inline">$K = 4$</span>, what is <span class="math-inline">$\mathbb{E}[z^4]$</span>? </em>(warmup)***</p>
+<ul><li><span class="math-inline">$12$</span></li><li><span class="math-inline">$36$</span></li><li>✓ <strong><span class="math-inline">$48$</span></strong></li><li><span class="math-inline">$81$</span></li></ul>
+<blockquote><p><strong>Why:</strong> The fourth moment of a centred Gaussian is 3K², so 3 · 16 = 48. The Wick contraction of four fields gives three pairings, each contributing K.</p></blockquote>
+<p>*<em>Q. For an exactly Gaussian distribution, what is the connected four-point function <span class="math-inline">$G^{(4)} - 3\,(G^{(2)})^2$</span>? </em>(core)***</p>
+<ul><li>✓ <strong><span class="math-inline">$0$</span></strong></li><li><span class="math-inline">$K^2$</span></li><li><span class="math-inline">$3K^2$</span></li><li>It depends on <span class="math-inline">$K$</span></li></ul>
+<blockquote><p><strong>Why:</strong> The connected part is what survives after every Wick pairing is subtracted. A Gaussian factorises exactly, so nothing survives — the connected four-point function vanishes identically, at every value of K.</p></blockquote>
+<p>*<em>Q. A distribution of network outputs has the same two-point function as a Gaussian, but a positive connected four-point correlator. What follows? </em>(hard)***</p>
+<ul><li>It is a Gaussian in a different parametrisation</li><li>✓ <strong>It is not Gaussian: the connected part measures interactions beyond Wick factorisation</strong></li><li>Its fourth moment does not exist</li><li>Its variance must be negative somewhere</li></ul>
+<blockquote><p><strong>Why:</strong> The two-point function fixes only Gaussian expectations. A nonzero connected four-point correlator is the signature that the fourth moment refuses to factorise — the direct measurement of interactions between neurons that the Gaussian approximation cannot see.</p></blockquote>
 <h4 id="exercises">Exercises</h4>
 <p><strong>For z ~ N(0, 2), compute E[z⁴] using Wick contraction.</strong> <em>(numerical)</em></p>
 <p><em>Hint:</em> There are three ways to pair four fields.</p>

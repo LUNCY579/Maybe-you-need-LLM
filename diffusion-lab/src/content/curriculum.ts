@@ -268,7 +268,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['what-is-a-diffusion'],
     glossaryTerms: ['alpha-bar', 'signal-to-noise-ratio', 'marginal'],
-    quizIds: ['q-forward-3', 'q-forward-4'],
+    quizIds: ['q-forward-3', 'q-forward-4', 'q-closed-form-4'],
     sourceRefs: [
       {
         chapter: 2,
@@ -305,7 +305,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-closed-form'],
     glossaryTerms: ['posterior', 'variational-bound', 'kl-divergence'],
-    quizIds: ['q-forward-5'],
+    quizIds: ['q-forward-5', 'q-posterior-4'],
     sourceRefs: [
       {
         chapter: 2,
@@ -439,7 +439,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['parameterisations'],
     glossaryTerms: ['ancestral-sampling', 'ddim', 'deterministic-sampler'],
-    quizIds: ['q-reverse-4', 'q-reverse-5'],
+    quizIds: ['q-reverse-4', 'q-reverse-5', 'q-sampling-4'],
     sourceRefs: [
       {
         chapter: 3,
@@ -587,7 +587,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-closed-form'],
     glossaryTerms: ['latent-diffusion', 'autoencoder', 'scaling-factor'],
-    quizIds: ['q-latent-1', 'q-latent-2'],
+    quizIds: ['q-latent-1', 'q-latent-2', 'q-latent-4'],
     sourceRefs: [
       {
         chapter: 2,
@@ -632,7 +632,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-objective'],
     glossaryTerms: ['guidance', 'classifier-free-guidance', 'score', 'mode-collapse'],
-    quizIds: ['q-guidance-1', 'q-guidance-2'],
+    quizIds: ['q-guidance-1', 'q-guidance-2', 'q-guidance-5'],
     sourceRefs: [],
     furtherReading: [
       {
@@ -698,7 +698,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['sampling', 'the-schedule'],
     glossaryTerms: ['preconditioning', 'sigma-parametrisation'],
-    quizIds: ['q-design-1', 'q-design-2'],
+    quizIds: ['q-design-1', 'q-design-2', 'q-design-3'],
     sourceRefs: [],
     furtherReading: [
       {

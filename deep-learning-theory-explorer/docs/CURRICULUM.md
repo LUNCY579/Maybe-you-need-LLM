@@ -190,7 +190,7 @@ expect. The recipes are in [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md).
 
 ---
 
-## The twenty assessment questions
+## The twenty-four assessment questions
 
 | # | id | Difficulty | Lesson | Kind |
 | --- | --- | --- | --- | --- |

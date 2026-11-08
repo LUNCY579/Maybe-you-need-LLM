@@ -5201,6 +5201,12 @@ Symbols:
 
 > **Why:** The factor is 2^(−0.2) = 0.8706, so the loss falls by about 13%.
 
+**Q. A loss follows L(N) = (N_c / N)^α with α = 0.34. When the parameter count grows by a factor of 10, what fraction of its previous value does the loss reach? — numeric *(core)***
+
+> **Answer:** 0.46 ± 0.03
+
+> **Why:** Scaling N by 10 multiplies the loss by 10^(−α) = 10^(−0.34) ≈ 0.457. The exponent is the answer to “how much does ten times more buy” — which is why the fitted exponent, and the range it was fitted over, are the whole story.
+
 #### Go and do it
 
 Training runs here, a power law fitted to them here, and the factor a doubling buys. Open **Fit the law** in the scaling-lab application.
@@ -5514,6 +5520,17 @@ Symbols:
 > **Answer:** 500
 
 > **Why:** The balance gives N^(−0.5) = 2·D^(−0.5), so N = D/4. With N·D = 1e6 that gives D² = 4e6, so D = 2000 and N = 500. The ratio of tokens to parameters at the optimum is 4.
+
+**Q. In the compute-optimal allocation for a language model, roughly how many training tokens does the rule spend per parameter? — multiple-choice *(core)***
+
+- About 2
+- ✓ **About 20**
+- About 200
+- About 2000
+
+> Correct — the rule the IsoFLOP study supports, once the older models’ underspending is corrected for.
+
+> **Why:** Reading the loss off the IsoFLOP frontier at each compute budget gives roughly twenty tokens per parameter. The older models sat far from that rule, which is exactly what re-reading their curves with the right accounting shows.
 
 #### Go and do it
 
@@ -6076,6 +6093,12 @@ Symbols:
 > Correct.
 
 > **Why:** The repeated run has nothing to repeat until it has seen the pool once. That is what makes the warmup phase arithmetic rather than an assertion about behaviour.
+
+**Q. Over a fixed data pool, a repeated epoch keeps adding as much value as an epoch of fresh data would have. — boolean *(core)***
+
+> **Answer:** False
+
+> **Why:** The repeated runs fall into phases: for a while a repeat behaves like fresh data, then its value decays, and eventually the loss turns upward. The effective data the model sees grows more slowly than the epoch count — repetition is a discount, not a substitute.
 
 #### Go and do it
 
@@ -7083,6 +7106,17 @@ Symbols:
 
 > **Why:** Raising a number below one to a higher power pushes it down and makes the transition steeper. Nothing about the model changed; the length of the task did.
 
+**Q. A benchmark shows a capability switching on abruptly between two scales. Before calling it emergent, what should be checked first? — multiple-choice *(core)***
+
+- ✓ **Whether the metric itself hides smooth progress — exact match, for instance, scores nothing until a threshold**
+- Whether the learning-rate schedule was tuned
+- Whether the tokenizer changed between scales
+- Whether the random seed was lucky
+
+> Correct — the discontinuity can live in the measurement rather than in the model.
+
+> **Why:** A nonlinear metric turns a smooth underlying curve into a step. Measured with a continuous metric, the same capability frequently replaces the cliff with a slope — which is the check the mirage result names.
+
 #### Go and do it
 
 The same capability, scored with a threshold that moves. Open **Move the metric** in the scaling-lab application.
@@ -7197,6 +7231,17 @@ Symbols:
 > Correct.
 
 > **Why:** Extremes are single runs; the slope is a least-squares line through dozens. In an era with a lot of scatter they disagree, and that is a fact about trend lines rather than about this course.
+
+**Q. What distinguished the most recent era of the compute trend from the growth Moore’s law describes? — multiple-choice *(core)***
+
+- ✓ **The growth came from spending more, not from hardware getting faster at the same price**
+- The growth came from cheaper memory
+- The growth came from better algorithms alone
+- The growth came from longer training runs of the same-sized models
+
+> Correct — the doubling time of compute spent is far shorter than the doubling time of FLOP/s per dollar.
+
+> **Why:** The three eras separate by what drives the compute: before deep learning, the available hardware; in the deep-learning era, hardware at Moore’s-law pace; in the large-scale era, spending — compute doubling roughly every six months, against hardware’s few years.
 
 #### Go and do it
 
@@ -8622,6 +8667,12 @@ Step a data point through the forward chain and watch the signal disappear. Open
 
 > **Why:** β_1 = 10⁻⁴ exactly. The schedule is linear in the step index, so the first and last values are the endpoints of the range.
 
+**Q. At some step t the cumulative product is ᾱ_t = 0.64. Given x_0, what is the standard deviation of the noise term in x_t? — numeric *(core)***
+
+> **Answer:** 0.6
+
+> **Why:** The closed form writes x_t = √ᾱ_t · x_0 + √(1 − ᾱ_t) · ε with ε ~ N(0, I), so the noise term is a standard normal scaled by √(1 − ᾱ_t) = √0.36 = 0.6.
+
 #### Go and do it
 
 Compare the two ways of reaching the same timestep. Open **Check the closed form against the chain** in the diffusion-lab application.
@@ -8668,6 +8719,12 @@ Compare the two ways of reaching the same timestep. Open **Check the closed form
 > Correct.
 
 > **Why:** The variational bound is a sum of KL divergences between the true posterior and the model’s reverse transition. If both are Gaussian, each term has a closed form instead of a high-variance Monte Carlo estimate.
+
+**Q. The mean of the posterior q(x_{t−1} | x_t, x_0) weighs x_t against x_0, and the weights are fixed by the schedule alone. — boolean *(core)***
+
+> **Answer:** True
+
+> **Why:** The posterior coefficients are functions of ᾱ_t, β_t and ᾱ_{t−1} — quantities the schedule fixes before training begins. Nothing learned decides where the weight sits; the network only has to reach the mean the posterior names.
 
 #### Go and do it
 
@@ -8837,6 +8894,17 @@ Take one network output and read it as ε, as x₀, and as v. Open **Convert a p
 > Correct.
 
 > **Why:** DDIM removes the fresh noise at each step, turning the reverse chain into a probability-flow ODE. The same latent then always gives the same sample, which is what allows the number of steps to be cut without collapsing diversity.
+
+**Q. One ancestral sample is being drawn. Which of these does the procedure never touch? — multiple-choice *(core)***
+
+- The trained reverse-process network
+- The variance schedule β_t
+- A fresh random noise vector
+- ✓ **The training data**
+
+> Correct — sampling starts from pure noise and never consults the dataset.
+
+> **Why:** Ancestral sampling starts from the standard normal prior and iterates the learned reverse step under the fixed schedule, drawing fresh noise as it goes. The training data was needed to train the network, not to sample from it.
 
 #### Go and do it
 
@@ -9026,6 +9094,17 @@ Rombach et al. did not improve the diffusion model; they moved it into an autoen
 
 > **Why:** The image has 256×256×3 = 196,608 elements; the latent has 32×32×4 = 4,096. The reduction factor is 48. The attention saving is larger still, because it is quadratic in the token count.
 
+**Q. Why does latent diffusion run the diffusion process in an autoencoder’s latent space? — multiple-choice *(core)***
+
+- To make the noise schedule linear
+- ✓ **Because perceptual detail compresses away, so the diffusion spends its capacity on semantics**
+- Because pixels cannot be noised
+- To avoid the variational bound
+
+> Correct — the autoencoder removes what the eye cannot resolve before the diffusion begins.
+
+> **Why:** Most of a natural image’s bits describe detail the eye cannot resolve. The autoencoder discards that detail up front, so the expensive diffusion process operates on the semantic content rather than on high-frequency pixels.
+
 #### Go and do it
 
 Train a real autoencoder and watch the reconstruction error against the compression ratio. Open **Measure the compression** in the diffusion-lab application.
@@ -9100,6 +9179,12 @@ Guidance is how a diffusion model is made to obey a prompt. This module derives 
 > Correct: sharper, but less diverse.
 
 > **Why:** Guidance tilts the distribution by p(c|x)^w, which sharpens the conditional but suppresses everything else. The result is better prompt adherence and worse coverage — the classic fidelity–diversity trade-off.
+
+**Q. With guidance weight w = 3, how many network forward passes does one guided step cost, counting the conditional and unconditional evaluations separately? — numeric *(core)***
+
+> **Answer:** 2
+
+> **Why:** The guided score is s_uncond + w·(s_cond − s_uncond). Both scores are needed at the same input, and the unconditional term is shared between them — so two evaluations, not three, however they are batched.
 
 #### Go and do it
 
@@ -9204,6 +9289,15 @@ The original paper fixed a dozen choices for convenience. Later work showed whic
 > **Answer:** 50
 
 > **Why:** Exactly 50. The number of steps is the only thing that matters for sampling cost, which is why deterministic samplers that can be run in few steps matter so much.
+
+**Q. Which of these are choices the original paper leaves fixed rather than learned? — multi-select *(hard)***
+
+- ✓ **The variance schedule β**
+- ✓ **The reverse process variance σ_t**
+- The reverse process mean
+- ✓ **The number of steps T**
+
+> **Why:** Only the reverse mean is learned. The paper fixes the schedule, the reverse variance and the chain length, and its ablation shows that learning the variance makes training unstable and samples worse.
 
 #### Go and do it
 
@@ -11033,10 +11127,10 @@ Sweep the contaminated fraction and watch the reported score drift. Open **What 
 
 **Q. Which of these are design decisions a benchmark author makes? — multi-select *(core)***
 
-- Which questions to ask
-- How the answers are scored
+- ✓ **Which questions to ask**
+- ✓ **How the answers are scored**
 - What the score is called
-- Which models are evaluated
+- ✓ **Which models are evaluated**
 
 > **Why:** The question set, the scoring procedure and the set of models under test are all choices. Each one is a claim about what matters, and each one can be argued for.
 
@@ -11181,9 +11275,9 @@ Compute how many questions a given difference needs, and watch the curve. Open *
 
 **Q. What should a leaderboard print next to every score? — multi-select *(hard)***
 
-- A confidence interval
-- The number of questions used
-- The provider of the model
+- ✓ **A confidence interval**
+- ✓ **The number of questions used**
+- ✓ **The provider of the model**
 - The logo of the organisation that ran it
 
 > **Why:** An interval, the question count, and enough about the protocol to reproduce it. The newest criticism of the field is that the last of these is often missing, and that the leaderboard has become the thing being optimised.
@@ -11608,6 +11702,17 @@ Compute the expected reward of a policy and check its gradient against a finite 
 
 > **Why:** ∇E_π[r] = E_π[r · ∇log π]. The model’s own log-probability stands in for the model’s derivative, which is what makes the estimator possible for a language model whose output layer is enormous.
 
+**Q. The score-function estimator needs the support of the policy to stay unchanged. What goes wrong for an action the policy would never sample? — multiple-choice *(core)***
+
+- ✓ **Its log-probability is undefined, so the action can never be sampled and never be credited**
+- The reward becomes negative
+- The variance doubles
+- The KL penalty stops applying
+
+> Correct — the estimator reweights what was actually drawn; an unsampled action contributes nothing, however good it is.
+
+> **Why:** The gradient identity ∇E_π[r] = E_π[r · ∇log π] reweights the actions the policy actually drew. Where π(a) = 0, ∇log π(a) does not exist, and no amount of training can move probability onto an action the estimator has never seen — which is why exploration has to come from somewhere else.
+
 #### Go and do it
 
 Compare the score-function estimator with the exact gradient of a finite problem. Open **The estimator against the exact gradient** in the rlhf-lab application.
@@ -11744,6 +11849,12 @@ PPO replaces the hard constraint with a clip: once the importance ratio passes a
 
 > **Why:** Exactly 1.2. The ratio is clipped to 1 + ε = 1.2, and the minimum of the two branches is the clipped one, because the advantage is positive.
 
+**Q. When the PPO clip is active, the gradient of the objective with respect to the policy is exactly zero. — boolean *(core)***
+
+> **Answer:** True
+
+> **Why:** The objective takes the minimum of the clipped and unclipped terms. On the segment where the clip is doing the work, the objective is locally constant, so its gradient vanishes — the policy is simply not pushed further in that direction, which is how the clip acts as a trust region.
+
 #### Go and do it
 
 Sweep the importance ratio and watch the objective and its gradient change. Open **Where the clip bites** in the rlhf-lab application.
@@ -11794,6 +11905,17 @@ Sweep the importance ratio and watch the objective and its gradient change. Open
 > Correct: unbiased, high variance.
 
 > **Why:** λ = 1 makes the geometric sum telescope into the discounted return. It is unbiased and noisy; λ = 0 is the one-step residual, which is tight and biased.
+
+**Q. In GAE, what does the estimator at λ = 1 recover? — multiple-choice *(warmup)***
+
+- The one-step TD error
+- ✓ **The Monte Carlo return**
+- The reward model’s raw score
+- Zero, whatever the data says
+
+> Correct — full lookahead, high variance, no bias from the value function.
+
+> **Why:** GAE sums the one-step residuals with a geometric discount. λ = 0 trusts the value function alone; λ = 1 trusts the sampled returns alone — the Monte Carlo estimate, with its variance.
 
 #### Go and do it
 
@@ -11859,6 +11981,17 @@ The penalty term is the KL divergence from the supervised reference policy, and 
 > **Answer:** 0.6931472 ± 0.0001
 
 > **Why:** log(0.5/0.25) = log 2 ≈ 0.693 nats. The k3 estimator on the same sample would be 2 − 1 − log 2 ≈ 0.307.
+
+**Q. The sample estimator of the KL that practitioners actually record is the third one. What is true of it? — multiple-choice *(hard)***
+
+- It is negative at almost every sample
+- ✓ **It is pointwise positive, and its expectation is the chi-square divergence minus the KL**
+- It equals the KL exactly, sample by sample
+- It needs the reward model to evaluate
+
+> Correct — a detail most write-ups leave out.
+
+> **Why:** The naive estimator can be negative sample by sample, and the squared replacement is positive but biased. The third estimator is pointwise positive, and its expectation is the chi-square divergence minus the KL — which is why curves drawn with it need that caveat read before them.
 
 #### Go and do it
 
@@ -11972,6 +12105,15 @@ Walk the three stages and see what each one contributes to the final behaviour. 
 > **Answer:** False
 
 > **Why:** No. Its contribution is an enumeration and a reproduction: twenty implementation details that the reported behaviour depended on, and a demonstration that most of them had to be in place for the pipeline to train at all.
+
+**Q. Which of these does the primary source’s enumeration treat as implementation details that a reproducible result must state? — multi-select *(core)***
+
+- ✓ **The reward model’s noise scale**
+- ✓ **The number of PPO epochs run per batch**
+- ✓ **How the KL penalty is managed while training proceeds**
+- Whether RLHF is the right paradigm at all
+
+> **Why:** The paper’s contribution is an enumeration, and most of it is about scale: the reward model’s noise, the learning rates, the epochs, the KL management. Whether the paradigm is right is not a detail of the pipeline — it is a different paper.
 
 #### Go and do it
 
@@ -15951,6 +16093,42 @@ Use Laboratory C to measure the seed-to-seed variance of the layer-wise kernel a
 - 2.0
 
 > **Why:** 2(ℓ−1)/n = 2·20/100 = 0.4. The depth-to-width ratio sets the size of the deviation from Gaussianity.
+
+**Q. How many distinct Wick pairings does the six-point function $\mathbb{E}[z_1 z_2 z_3 z_4 z_5 z_6]$ have? *(core)***
+
+- $9$
+- ✓ **$15$**
+- $12$
+- $45$
+
+> **Why:** Pair the first field with one of the five remaining, then pair the rest recursively: the count of pairings of 2n fields is (2n − 1)!!, which for six fields is 5 · 3 · 1 = 15. Every one of them is a product of three covariances.
+
+**Q. For $z \sim \mathcal{N}(0, K)$ with $K = 4$, what is $\mathbb{E}[z^4]$? *(warmup)***
+
+- $12$
+- $36$
+- ✓ **$48$**
+- $81$
+
+> **Why:** The fourth moment of a centred Gaussian is 3K², so 3 · 16 = 48. The Wick contraction of four fields gives three pairings, each contributing K.
+
+**Q. For an exactly Gaussian distribution, what is the connected four-point function $G^{(4)} - 3\,(G^{(2)})^2$? *(core)***
+
+- ✓ **$0$**
+- $K^2$
+- $3K^2$
+- It depends on $K$
+
+> **Why:** The connected part is what survives after every Wick pairing is subtracted. A Gaussian factorises exactly, so nothing survives — the connected four-point function vanishes identically, at every value of K.
+
+**Q. A distribution of network outputs has the same two-point function as a Gaussian, but a positive connected four-point correlator. What follows? *(hard)***
+
+- It is a Gaussian in a different parametrisation
+- ✓ **It is not Gaussian: the connected part measures interactions beyond Wick factorisation**
+- Its fourth moment does not exist
+- Its variance must be negative somewhere
+
+> **Why:** The two-point function fixes only Gaussian expectations. A nonzero connected four-point correlator is the signature that the fourth moment refuses to factorise — the direct measurement of interactions between neurons that the Gaussian approximation cannot see.
 
 #### Exercises
 

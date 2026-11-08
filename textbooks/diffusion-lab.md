@@ -176,6 +176,12 @@ Step a data point through the forward chain and watch the signal disappear. Open
 
 > **Why:** β_1 = 10⁻⁴ exactly. The schedule is linear in the step index, so the first and last values are the endpoints of the range.
 
+**Q. At some step t the cumulative product is ᾱ_t = 0.64. Given x_0, what is the standard deviation of the noise term in x_t? — numeric *(core)***
+
+> **Answer:** 0.6
+
+> **Why:** The closed form writes x_t = √ᾱ_t · x_0 + √(1 − ᾱ_t) · ε with ε ~ N(0, I), so the noise term is a standard normal scaled by √(1 − ᾱ_t) = √0.36 = 0.6.
+
 #### Go and do it
 
 Compare the two ways of reaching the same timestep. Open **Check the closed form against the chain** in the diffusion-lab application.
@@ -222,6 +228,12 @@ Compare the two ways of reaching the same timestep. Open **Check the closed form
 > Correct.
 
 > **Why:** The variational bound is a sum of KL divergences between the true posterior and the model’s reverse transition. If both are Gaussian, each term has a closed form instead of a high-variance Monte Carlo estimate.
+
+**Q. The mean of the posterior q(x_{t−1} | x_t, x_0) weighs x_t against x_0, and the weights are fixed by the schedule alone. — boolean *(core)***
+
+> **Answer:** True
+
+> **Why:** The posterior coefficients are functions of ᾱ_t, β_t and ᾱ_{t−1} — quantities the schedule fixes before training begins. Nothing learned decides where the weight sits; the network only has to reach the mean the posterior names.
 
 #### Go and do it
 
@@ -391,6 +403,17 @@ Take one network output and read it as ε, as x₀, and as v. Open **Convert a p
 > Correct.
 
 > **Why:** DDIM removes the fresh noise at each step, turning the reverse chain into a probability-flow ODE. The same latent then always gives the same sample, which is what allows the number of steps to be cut without collapsing diversity.
+
+**Q. One ancestral sample is being drawn. Which of these does the procedure never touch? — multiple-choice *(core)***
+
+- The trained reverse-process network
+- The variance schedule β_t
+- A fresh random noise vector
+- ✓ **The training data**
+
+> Correct — sampling starts from pure noise and never consults the dataset.
+
+> **Why:** Ancestral sampling starts from the standard normal prior and iterates the learned reverse step under the fixed schedule, drawing fresh noise as it goes. The training data was needed to train the network, not to sample from it.
 
 #### Go and do it
 
@@ -580,6 +603,17 @@ Rombach et al. did not improve the diffusion model; they moved it into an autoen
 
 > **Why:** The image has 256×256×3 = 196,608 elements; the latent has 32×32×4 = 4,096. The reduction factor is 48. The attention saving is larger still, because it is quadratic in the token count.
 
+**Q. Why does latent diffusion run the diffusion process in an autoencoder’s latent space? — multiple-choice *(core)***
+
+- To make the noise schedule linear
+- ✓ **Because perceptual detail compresses away, so the diffusion spends its capacity on semantics**
+- Because pixels cannot be noised
+- To avoid the variational bound
+
+> Correct — the autoencoder removes what the eye cannot resolve before the diffusion begins.
+
+> **Why:** Most of a natural image’s bits describe detail the eye cannot resolve. The autoencoder discards that detail up front, so the expensive diffusion process operates on the semantic content rather than on high-frequency pixels.
+
 #### Go and do it
 
 Train a real autoencoder and watch the reconstruction error against the compression ratio. Open **Measure the compression** in the diffusion-lab application.
@@ -654,6 +688,12 @@ Guidance is how a diffusion model is made to obey a prompt. This module derives 
 > Correct: sharper, but less diverse.
 
 > **Why:** Guidance tilts the distribution by p(c|x)^w, which sharpens the conditional but suppresses everything else. The result is better prompt adherence and worse coverage — the classic fidelity–diversity trade-off.
+
+**Q. With guidance weight w = 3, how many network forward passes does one guided step cost, counting the conditional and unconditional evaluations separately? — numeric *(core)***
+
+> **Answer:** 2
+
+> **Why:** The guided score is s_uncond + w·(s_cond − s_uncond). Both scores are needed at the same input, and the unconditional term is shared between them — so two evaluations, not three, however they are batched.
 
 #### Go and do it
 
@@ -758,6 +798,15 @@ The original paper fixed a dozen choices for convenience. Later work showed whic
 > **Answer:** 50
 
 > **Why:** Exactly 50. The number of steps is the only thing that matters for sampling cost, which is why deterministic samplers that can be run in few steps matter so much.
+
+**Q. Which of these are choices the original paper leaves fixed rather than learned? — multi-select *(hard)***
+
+- ✓ **The variance schedule β**
+- ✓ **The reverse process variance σ_t**
+- The reverse process mean
+- ✓ **The number of steps T**
+
+> **Why:** Only the reverse mean is learned. The paper fixes the schedule, the reverse variance and the chain length, and its ablation shows that learning the variance makes training unstable and samples worse.
 
 #### Go and do it
 

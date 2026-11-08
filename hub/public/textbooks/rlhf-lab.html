@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization — Shengyi Huang, Michael Noukhovitch, Arian Hosseini, Kashif Rasul, Weixun Wang, Lewis Tunstall (2024)">
+    <meta property="og:title" content="RLHF Lab — textbook">
+    <meta property="og:description" content="The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization — Shengyi Huang, Michael Noukhovitch, Arian Hosseini, Kashif Rasul, Weixun Wang, Lewis Tunstall (2024)">
 <title>RLHF Lab — textbook</title>
 
 <script>
@@ -192,6 +195,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The derivative of the model, with its own log-probability</strong></li><li>The reward, with the value function</li><li>The expectation, with a sample</li><li>The KL penalty, with a constraint</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> ∇E_π[r] = E_π[r · ∇log π]. The model’s own log-probability stands in for the model’s derivative, which is what makes the estimator possible for a language model whose output layer is enormous.</p></blockquote>
+<p>*<em>Q. The score-function estimator needs the support of the policy to stay unchanged. What goes wrong for an action the policy would never sample? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Its log-probability is undefined, so the action can never be sampled and never be credited</strong></li><li>The reward becomes negative</li><li>The variance doubles</li><li>The KL penalty stops applying</li></ul>
+<blockquote><p>Correct — the estimator reweights what was actually drawn; an unsampled action contributes nothing, however good it is.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The gradient identity ∇E_π[r] = E_π[r · ∇log π] reweights the actions the policy actually drew. Where π(a) = 0, ∇log π(a) does not exist, and no amount of training can move probability onto an action the estimator has never seen — which is why exploration has to come from somewhere else.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Compare the score-function estimator with the exact gradient of a finite problem. Open <strong>The estimator against the exact gradient</strong> in the rlhf-lab application.</p>
 <p><strong>Further reading</strong></p>
@@ -247,6 +254,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. With ε = 0.2, what is the clipped objective when the importance ratio is 2.0 and the advantage is 1? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 1.2</p></blockquote>
 <blockquote><p><strong>Why:</strong> Exactly 1.2. The ratio is clipped to 1 + ε = 1.2, and the minimum of the two branches is the clipped one, because the advantage is positive.</p></blockquote>
+<p>*<em>Q. When the PPO clip is active, the gradient of the objective with respect to the policy is exactly zero. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
+<blockquote><p><strong>Why:</strong> The objective takes the minimum of the clipped and unclipped terms. On the segment where the clip is doing the work, the objective is locally constant, so its gradient vanishes — the policy is simply not pushed further in that direction, which is how the clip acts as a trust region.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Sweep the importance ratio and watch the objective and its gradient change. Open <strong>Where the clip bites</strong> in the rlhf-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -268,6 +278,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The Monte Carlo return, minus the baseline</strong></li><li>The one-step temporal-difference residual</li><li>The importance ratio</li><li>Zero</li></ul>
 <blockquote><p>Correct: unbiased, high variance.</p></blockquote>
 <blockquote><p><strong>Why:</strong> λ = 1 makes the geometric sum telescope into the discounted return. It is unbiased and noisy; λ = 0 is the one-step residual, which is tight and biased.</p></blockquote>
+<p>*<em>Q. In GAE, what does the estimator at λ = 1 recover? — multiple-choice </em>(warmup)***</p>
+<ul><li>The one-step TD error</li><li>✓ <strong>The Monte Carlo return</strong></li><li>The reward model’s raw score</li><li>Zero, whatever the data says</li></ul>
+<blockquote><p>Correct — full lookahead, high variance, no bias from the value function.</p></blockquote>
+<blockquote><p><strong>Why:</strong> GAE sums the one-step residuals with a geometric discount. λ = 0 trusts the value function alone; λ = 1 trusts the sampled returns alone — the Monte Carlo estimate, with its variance.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Move λ and watch the advantage estimate move from the one-step residual to the Monte Carlo return. Open <strong>The bias–variance trade-off in λ</strong> in the rlhf-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -295,6 +309,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A policy puts probability 0.5 on an action and the reference puts 0.25 on it. What is the log-ratio, in nats? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 0.6931472 ± 0.0001</p></blockquote>
 <blockquote><p><strong>Why:</strong> log(0.5/0.25) = log 2 ≈ 0.693 nats. The k3 estimator on the same sample would be 2 − 1 − log 2 ≈ 0.307.</p></blockquote>
+<p>*<em>Q. The sample estimator of the KL that practitioners actually record is the third one. What is true of it? — multiple-choice </em>(hard)***</p>
+<ul><li>It is negative at almost every sample</li><li>✓ <strong>It is pointwise positive, and its expectation is the chi-square divergence minus the KL</strong></li><li>It equals the KL exactly, sample by sample</li><li>It needs the reward model to evaluate</li></ul>
+<blockquote><p>Correct — a detail most write-ups leave out.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The naive estimator can be negative sample by sample, and the squared replacement is positive but biased. The third estimator is pointwise positive, and its expectation is the chi-square divergence minus the KL — which is why curves drawn with it need that caveat read before them.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Estimate the KL three ways and compare each against the quantity it is actually unbiased for. Open <strong>The three estimators, measured</strong> in the rlhf-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -341,6 +359,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. The primary source’s main contribution is a new algorithm. — boolean </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. Its contribution is an enumeration and a reproduction: twenty implementation details that the reported behaviour depended on, and a demonstration that most of them had to be in place for the pipeline to train at all.</p></blockquote>
+<p>*<em>Q. Which of these does the primary source’s enumeration treat as implementation details that a reproducible result must state? — multi-select </em>(core)***</p>
+<ul><li>✓ <strong>The reward model’s noise scale</strong></li><li>✓ <strong>The number of PPO epochs run per batch</strong></li><li>✓ <strong>How the KL penalty is managed while training proceeds</strong></li><li>Whether RLHF is the right paradigm at all</li></ul>
+<blockquote><p><strong>Why:</strong> The paper’s contribution is an enumeration, and most of it is about scale: the reward model’s noise, the learning rates, the epochs, the KL management. Whether the paradigm is right is not a detail of the pipeline — it is a different paper.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The failure modes of each stage, and which detail guards against each one. Open <strong>The checklist</strong> in the rlhf-lab application.</p>
 <p><strong>Where this came from</strong></p>

@@ -92,6 +92,42 @@ Use Laboratory C to measure the seed-to-seed variance of the layer-wise kernel a
 
 > **Why:** 2(ℓ−1)/n = 2·20/100 = 0.4. The depth-to-width ratio sets the size of the deviation from Gaussianity.
 
+**Q. How many distinct Wick pairings does the six-point function $\mathbb{E}[z_1 z_2 z_3 z_4 z_5 z_6]$ have? *(core)***
+
+- $9$
+- ✓ **$15$**
+- $12$
+- $45$
+
+> **Why:** Pair the first field with one of the five remaining, then pair the rest recursively: the count of pairings of 2n fields is (2n − 1)!!, which for six fields is 5 · 3 · 1 = 15. Every one of them is a product of three covariances.
+
+**Q. For $z \sim \mathcal{N}(0, K)$ with $K = 4$, what is $\mathbb{E}[z^4]$? *(warmup)***
+
+- $12$
+- $36$
+- ✓ **$48$**
+- $81$
+
+> **Why:** The fourth moment of a centred Gaussian is 3K², so 3 · 16 = 48. The Wick contraction of four fields gives three pairings, each contributing K.
+
+**Q. For an exactly Gaussian distribution, what is the connected four-point function $G^{(4)} - 3\,(G^{(2)})^2$? *(core)***
+
+- ✓ **$0$**
+- $K^2$
+- $3K^2$
+- It depends on $K$
+
+> **Why:** The connected part is what survives after every Wick pairing is subtracted. A Gaussian factorises exactly, so nothing survives — the connected four-point function vanishes identically, at every value of K.
+
+**Q. A distribution of network outputs has the same two-point function as a Gaussian, but a positive connected four-point correlator. What follows? *(hard)***
+
+- It is a Gaussian in a different parametrisation
+- ✓ **It is not Gaussian: the connected part measures interactions beyond Wick factorisation**
+- Its fourth moment does not exist
+- Its variance must be negative somewhere
+
+> **Why:** The two-point function fixes only Gaussian expectations. A nonzero connected four-point correlator is the signature that the fourth moment refuses to factorise — the direct measurement of interactions between neurons that the Gaussian approximation cannot see.
+
 #### Exercises
 
 **For z ~ N(0, 2), compute E[z⁴] using Wick contraction.** *(numerical)*

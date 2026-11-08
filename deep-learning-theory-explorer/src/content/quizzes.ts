@@ -268,6 +268,55 @@ export const QUIZ: QuizQuestion[] = [
     explanation: 'Feature drift is a 1/n effect: wider networks behave more like kernel machines on the same training budget, so the representation moves less.',
     citations: ['§6.4.3', '§11.4'],
   },
+  {
+    id: 'q21',
+    lessonId: 'non-gaussianity',
+    difficulty: 'core',
+    prompt: 'How many distinct Wick pairings does the six-point function $\\mathbb{E}[z_1 z_2 z_3 z_4 z_5 z_6]$ have?',
+    options: ['$9$', '$15$', '$12$', '$45$'],
+    answerIndex: 1,
+    explanation:
+      'Pair the first field with one of the five remaining, then pair the rest recursively: the count of pairings of 2n fields is (2n \u2212 1)!!, which for six fields is 5 \u00b7 3 \u00b7 1 = 15. Every one of them is a product of three covariances.',
+    citations: ['\u00a71.1'],
+  },
+  {
+    id: 'q22',
+    lessonId: 'non-gaussianity',
+    difficulty: 'warmup',
+    prompt: 'For $z \\sim \\mathcal{N}(0, K)$ with $K = 4$, what is $\\mathbb{E}[z^4]$?',
+    options: ['$12$', '$36$', '$48$', '$81$'],
+    answerIndex: 2,
+    explanation: 'The fourth moment of a centred Gaussian is 3K\u00b2, so 3 \u00b7 16 = 48. The Wick contraction of four fields gives three pairings, each contributing K.',
+    numeric: { answer: 48, tolerance: 0 },
+    citations: ['\u00a71.1'],
+  },
+  {
+    id: 'q23',
+    lessonId: 'non-gaussianity',
+    difficulty: 'core',
+    prompt: 'For an exactly Gaussian distribution, what is the connected four-point function $G^{(4)} - 3\\,(G^{(2)})^2$?',
+    options: ['$0$', '$K^2$', '$3K^2$', 'It depends on $K$'],
+    answerIndex: 0,
+    explanation:
+      'The connected part is what survives after every Wick pairing is subtracted. A Gaussian factorises exactly, so nothing survives \u2014 the connected four-point function vanishes identically, at every value of K.',
+    citations: ['\u00a71.1'],
+  },
+  {
+    id: 'q24',
+    lessonId: 'non-gaussianity',
+    difficulty: 'hard',
+    prompt: 'A distribution of network outputs has the same two-point function as a Gaussian, but a positive connected four-point correlator. What follows?',
+    options: [
+      'It is a Gaussian in a different parametrisation',
+      'It is not Gaussian: the connected part measures interactions beyond Wick factorisation',
+      'Its fourth moment does not exist',
+      'Its variance must be negative somewhere',
+    ],
+    answerIndex: 1,
+    explanation:
+      'The two-point function fixes only Gaussian expectations. A nonzero connected four-point correlator is the signature that the fourth moment refuses to factorise \u2014 the direct measurement of interactions between neurons that the Gaussian approximation cannot see.',
+    citations: ['\u00a71.1'],
+  },
 ];
 
 export const QUIZ_BY_ID: Record<string, QuizQuestion> = Object.fromEntries(QUIZ.map((q) => [q.id, q]));

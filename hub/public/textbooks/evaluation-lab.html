@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena — Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric P. Xing, Hao Zhang, Joseph E. Gonzalez, Ion Stoica (2023)">
+    <meta property="og:title" content="Evaluation Lab — textbook">
+    <meta property="og:description" content="Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena — Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric P. Xing, Hao Zhang, Joseph E. Gonzalez, Ion Stoica (2023)">
 <title>Evaluation Lab — textbook</title>
 
 <script>
@@ -359,7 +362,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A benchmark has to be hard enough to separate models and easy enough to run.</li><li>A single number hides the trade-offs; a set of numbers shows them.</li><li>The question set is a claim about what matters, and it should be argued for.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. Which of these are design decisions a benchmark author makes? — multi-select </em>(core)***</p>
-<ul><li>Which questions to ask</li><li>How the answers are scored</li><li>What the score is called</li><li>Which models are evaluated</li></ul>
+<ul><li>✓ <strong>Which questions to ask</strong></li><li>✓ <strong>How the answers are scored</strong></li><li>What the score is called</li><li>✓ <strong>Which models are evaluated</strong></li></ul>
 <blockquote><p><strong>Why:</strong> The question set, the scoring procedure and the set of models under test are all choices. Each one is a claim about what matters, and each one can be argued for.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>See how the difficulty mix of a question set changes what the score measures. Open <strong>Build a question set</strong> in the evaluation-lab application.</p>
@@ -421,7 +424,7 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>A score without an interval is a claim, not a measurement.</li><li>A score without a question count cannot be compared with anything.</li><li>A score without the protocol cannot be reproduced.</li></ul>
 <h4 id="practice">Practice</h4>
 <p>*<em>Q. What should a leaderboard print next to every score? — multi-select </em>(hard)***</p>
-<ul><li>A confidence interval</li><li>The number of questions used</li><li>The provider of the model</li><li>The logo of the organisation that ran it</li></ul>
+<ul><li>✓ <strong>A confidence interval</strong></li><li>✓ <strong>The number of questions used</strong></li><li>✓ <strong>The provider of the model</strong></li><li>The logo of the organisation that ran it</li></ul>
 <blockquote><p><strong>Why:</strong> An interval, the question count, and enough about the protocol to reproduce it. The newest criticism of the field is that the last of these is often missing, and that the leaderboard has become the thing being optimised.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The same score, with and without its interval, and what a reader can conclude from each. Open <strong>What the interval looks like</strong> in the evaluation-lab application.</p>
