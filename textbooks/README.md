@@ -15,10 +15,10 @@ The same books are also rendered as a navigable HTML edition with the mathematic
 | [Mechanistic Interpretability Lab](mech-interp-lab.md) | 10 | 7,197 | Toy Models of Superposition (2023) |
 | [Data Lab](data-lab.md) | 10 | 7,169 | DataComp: In search of the next generation of multimodal datasets (2023) |
 | [Scaling Lab](scaling-lab.md) | 23 | 23,243 | Scaling Laws for Neural Language Models (2020) |
-| [Systems Lab](systems-lab.md) | 8 | 5,599 | FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (2022) |
-| [Reinforcement Learning Foundations](rl-foundations.md) | 8 | 4,823 | Reinforcement Learning: An Introduction (second edition) (2018) |
-| [Retrieval Lab](retrieval-lab.md) | 8 | 4,887 | Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (2020) |
-| [Agent Benchmark Lab](agent-bench-lab.md) | 8 | 4,629 | SWE-bench: Can Language Models Resolve Real-World GitHub Issues? (2023) |
+| [Systems Lab](systems-lab.md) | 8 | 6,105 | FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (2022) |
+| [Reinforcement Learning Foundations](rl-foundations.md) | 8 | 5,244 | Reinforcement Learning: An Introduction (second edition) (2018) |
+| [Retrieval Lab](retrieval-lab.md) | 8 | 5,481 | Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (2020) |
+| [Agent Benchmark Lab](agent-bench-lab.md) | 8 | 5,183 | SWE-bench: Can Language Models Resolve Real-World GitHub Issues? (2023) |
 | [Safety and Alignment Lab](safety-lab.md) | 14 | 8,052 | Constitutional AI: Harmlessness from AI Feedback (2022) |
 | [Multimodal Lab](multimodal-lab.md) | 9 | 5,578 | Learning Transferable Visual Models From Natural Language Supervision (2021) |
 | [LLM Foundations Lab](llm-foundations-lab.md) | 18 | 28,417 | Foundations of Large Language Models (2026) |

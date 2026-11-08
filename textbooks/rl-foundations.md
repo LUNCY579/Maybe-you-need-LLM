@@ -88,6 +88,23 @@ States, actions, rewards, transitions and returns. The Markov property, the disc
 
 > **Why:** 2 + 0.5×1 + 0.25×1 = 2.75. Each reward is weighted by a power of the discount.
 
+**Q. What does the Markov property actually require of an environment? — multiple-choice *(warmup)***
+
+- That nothing in the environment is random
+- ✓ **That the next state and reward depend only on the present state**
+- That rewards arrive immediately after each action
+- That every episode is short
+
+> Correct — and a state that carries the needed history inside itself keeps the property intact.
+
+> **Why:** The Markov property is a statement about the state definition, not about the absence of memory: the next state depends only on the present one. An environment whose past matters is still an MDP if the state is defined to carry that past.
+
+**Q. The discount factor exists because agents prefer immediate rewards to later ones. — boolean *(warmup)***
+
+> **Answer:** False
+
+> **Why:** The course is explicit: the discount is not a preference. It is what makes the infinite sum of future rewards converge, and what makes the problem finite enough to write a value function for.
+
 #### Go and do it
 
 The gridworld, its transition kernel, and the return of a trajectory. Open **Walk the grid** in the rl-foundations application.
@@ -146,6 +163,17 @@ The value of a state under a policy, the value of the best policy, and the two s
 > Correct.
 
 > **Why:** It is a fixed point: the value function is the one that satisfies it, and iterating it converges to that function.
+
+**Q. The Bellman equation writes the value of a state in terms of what? — multiple-choice *(core)***
+
+- The sum of all rewards the episode will ever pay
+- ✓ **The reward now plus the discounted value of the next state**
+- The maximum reward obtainable from the state
+- The average reward of the whole episode
+
+> Correct — one step of reward, then the recursion takes over.
+
+> **Why:** The value of a state is the expected return from it, and the Bellman equation decomposes that return one step at a time: the reward now, plus the discounted value of wherever the state goes next. Iterating the equation converges because it is a contraction.
 
 #### Go and do it
 
@@ -319,6 +347,12 @@ The baseline that removes the variance, the λ-return and the general advantage 
 
 > **Why:** The term is the score function times the baseline, and the score function has mean zero over the action distribution. So the baseline drops out of the expectation.
 
+**Q. Subtracting any baseline that depends only on the state changes the expected policy gradient by how much? — numeric *(core)***
+
+> **Answer:** 0
+
+> **Why:** Exactly zero. The baseline does not depend on the action, so its expected contribution to the gradient is zero — while in practice it removes most of the variance, because the part of the return that was going to happen anyway is most of the noise.
+
 #### Go and do it
 
 One estimator, two weights: the rewards still to come, and the whole episode’s return. The two means agree to the sampling noise of the batches, and the two spreads do not. Laboratory B holds the other half of the saving — the same comparison with the value of the state subtracted. Open **Reward-to-go, and the spread it leaves** in the rl-foundations application.
@@ -408,6 +442,12 @@ The n-step returns of a real trajectory, and the truth they are aiming at. Open 
 > **Answer:** True
 
 > **Why:** Yes. The bias comes from the truncation of the episode, so a short horizon wants a small λ and a long one can afford a large λ. The right λ is a function of the horizon you actually have.
+
+**Q. With λ = 0.5, what weight does the λ-return place on the 2-step return? — numeric *(core)***
+
+> **Answer:** 0.25 ± 0.001
+
+> **Why:** The λ-return weights the n-step return by (1 − λ)λ^(n−1): for n = 2 that is 0.5 × 0.5 = 0.25. λ = 0 is the one-step estimate, λ = 1 the Monte Carlo return, and everything between is the mixture.
 
 #### Go and do it
 

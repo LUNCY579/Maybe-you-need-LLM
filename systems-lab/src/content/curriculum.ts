@@ -208,7 +208,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-matrix-you-never-build'],
     glossaryTerms: ['tiling', 'online-softmax', 'recomputation'],
-    quizIds: ['q-attention-3'],
+    quizIds: ['q-attention-3', 'q-softmax-rescale'],
     sourceRefs: [
       {
         chapter: 3,
@@ -256,7 +256,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-matrix-you-never-build'],
     glossaryTerms: ['kv-cache', 'arithmetic-intensity', 'decode-step'],
-    quizIds: ['q-kv-1', 'q-kv-2'],
+    quizIds: ['q-kv-1', 'q-kv-2', 'q-decode-ops-byte'],
     sourceRefs: [
       {
         chapter: 1,
@@ -292,7 +292,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['decoding-is-memory-bound'],
     glossaryTerms: ['paging', 'fragmentation', 'block-size'],
-    quizIds: ['q-kv-3'],
+    quizIds: ['q-kv-3', 'q-paging-waste'],
     sourceRefs: [
       {
         chapter: 3,
@@ -334,7 +334,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: [],
     glossaryTerms: ['router', 'load-balance', 'capacity-factor'],
-    quizIds: ['q-moe-1'],
+    quizIds: ['q-moe-1', 'q-load-equals-prob'],
     sourceRefs: [
       {
         chapter: 1,
@@ -454,7 +454,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['proposing-and-checking'],
     glossaryTerms: ['speculation', 'acceptance-rate', 'draft-model'],
-    quizIds: ['q-speculative-3'],
+    quizIds: ['q-speculative-3', 'q-speculation-output'],
     sourceRefs: [
       {
         chapter: 4,

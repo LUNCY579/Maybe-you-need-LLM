@@ -7916,6 +7916,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>The running maximum and sum are rescaled whenever the maximum moves</strong></li><li>The blocks are small enough to be exact in floating point</li><li>The computation is done in a higher precision</li><li>The last block is computed again</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> When a larger value arrives, everything accumulated so far is divided by the factor by which the maximum grew. The rescaling is what keeps the sum exact, and it is why the tiled answer equals the naive one.</p></blockquote>
+<p>*<em>Q. During the online softmax, the running maximum of the row moves upward. What happens to the accumulated sum? — multiple-choice </em>(core)***</p>
+<ul><li>It is discarded and recomputed from the start</li><li>✓ <strong>It is rescaled by the exponential of the difference, and stays exact</strong></li><li>It is clamped to the new maximum</li><li>It is replaced by the new maximum</li></ul>
+<blockquote><p>Correct — the rescaling is what keeps the streaming result identical to the textbook one.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The softmax of a row can be accumulated as a running maximum and a running sum; when the maximum moves, the accumulator is rescaled by exp(old − new). The answer is identical to the offline softmax — only the memory footprint and the traffic differ.</p></blockquote>
 <h4 id="systems-lab--go-and-do-it">Go and do it</h4>
 <p>The same attention, tiled, and the difference in the memory it uses. Open <strong>Stream the blocks</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -7943,6 +7947,9 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. The arithmetic intensity of a decode step rises without limit as the batch size grows. — boolean </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. The weights are read once for the whole batch, so that part of the intensity rises with the batch; but the cache is read once per sequence, and its intensity is fixed. So the total rises and then saturates.</p></blockquote>
+<p>*<em>Q. A decode step is a matrix-vector product. How many arithmetic operations does it perform per byte of weights it reads? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 2</p></blockquote>
+<blockquote><p><strong>Why:</strong> Two operations per byte — one multiply, one add — while the whole step is dominated by reading the weights once. That ratio is why decode is memory-bound and why batching changes the economics rather than the arithmetic.</p></blockquote>
 <h4 id="systems-lab--go-and-do-it">Go and do it</h4>
 <p>The arithmetic intensity of a decode step, as the batch size and the context grow. Open <strong>Measure the intensity</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -7962,6 +7969,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>The tail of the last block of each sequence</strong></li><li>Nothing at all</li><li>The difference between the longest and the shortest sequence, for every sequence</li><li>A whole block for every sequence</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Paging replaces a per-sequence buffer as long as the longest sequence with whole blocks, so the waste is a fraction of a block per sequence rather than a fraction of the whole batch.</p></blockquote>
+<p>*<em>Q. How does paging the KV cache change the memory wasted on variable-length sequences? — multiple-choice </em>(core)***</p>
+<ul><li>It eliminates the waste entirely</li><li>✓ <strong>It moves the waste from a fraction of the longest sequence to a fraction of one block per sequence</strong></li><li>It makes the waste grow with the batch size</li><li>It spends the saved memory on longer contexts only</li></ul>
+<blockquote><p>Correct — the buffer becomes fixed-size blocks that can live anywhere.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A straightforward implementation gives every sequence a buffer as long as the longest one, so the waste scales with the batch. Paging replaces the buffer with fixed-size blocks, and the waste becomes a fraction of a block per sequence.</p></blockquote>
 <h4 id="systems-lab--go-and-do-it">Go and do it</h4>
 <p>A batch of sequences, and the memory each allocation scheme wastes. Open <strong>Fill the memory</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -7986,6 +7997,9 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>The experts that get fewer tokens are trained on less, and stay worse</strong></li><li>The router itself becomes the bottleneck</li><li>The tokens are dropped</li><li>The model loses capacity</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> An expert that sees a tenth of the tokens sees a tenth of the updates, so it stays closer to its initialisation than its neighbours do, and the model is carrying experts that are worse than useless.</p></blockquote>
+<p>*<em>Q. The auxiliary load-balancing loss is smallest when the experts’ actual load equals the router’s probability. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
+<blockquote><p><strong>Why:</strong> The loss is the number of tokens times the sum over experts of the product of the two fractions. That product is smallest when the load — what the experts actually got — and the probability — what the router wanted — agree, which is exactly the behaviour the loss pushes the router towards.</p></blockquote>
 <h4 id="systems-lab--go-and-do-it">Go and do it</h4>
 <p>A router here, on embeddings here, with the load it produces. Open <strong>Route the tokens</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8048,6 +8062,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>Nothing: the output distribution is the target model’s own</strong></li><li>It makes the output more likely</li><li>It makes the output less diverse</li><li>It truncates the output to what the draft proposed</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The accepted and the corrected tokens together give exactly the target’s distribution. The method buys time and nothing else, which is why it is safe to use.</p></blockquote>
+<p>*<em>Q. What does speculative decoding change about the model’s output distribution? — multiple-choice </em>(core)***</p>
+<ul><li>It sharpens the distribution, since bad drafts are rejected</li><li>✓ <strong>Nothing: the accepted and corrected terms add up to the target distribution</strong></li><li>It flattens the distribution, since drafts add noise</li><li>It depends on the drafter’s quality</li></ul>
+<blockquote><p>Correct — the method buys time, not a different answer.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A drafted token is accepted with probability min(1, p(x)/q(x)), and the correction step accounts for everything the drafter would have missed. The two terms add up to the target’s distribution exactly — which is why the only thing at stake is the speed-up: tokens per step, divided by the cost of the drafting.</p></blockquote>
 <h4 id="systems-lab--go-and-do-it">Go and do it</h4>
 <p>The speed-up, as the acceptance rate and the relative cost of the two models move. Open <strong>Price the speculation</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8159,6 +8177,13 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. A trajectory collects rewards 2, 1, 1 with a discount of 0.5. What is the return from the first step? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 2.75 ± 0.001</p></blockquote>
 <blockquote><p><strong>Why:</strong> 2 + 0.5×1 + 0.25×1 = 2.75. Each reward is weighted by a power of the discount.</p></blockquote>
+<p>*<em>Q. What does the Markov property actually require of an environment? — multiple-choice </em>(warmup)***</p>
+<ul><li>That nothing in the environment is random</li><li>✓ <strong>That the next state and reward depend only on the present state</strong></li><li>That rewards arrive immediately after each action</li><li>That every episode is short</li></ul>
+<blockquote><p>Correct — and a state that carries the needed history inside itself keeps the property intact.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The Markov property is a statement about the state definition, not about the absence of memory: the next state depends only on the present one. An environment whose past matters is still an MDP if the state is defined to carry that past.</p></blockquote>
+<p>*<em>Q. The discount factor exists because agents prefer immediate rewards to later ones. — boolean </em>(warmup)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
+<blockquote><p><strong>Why:</strong> The course is explicit: the discount is not a preference. It is what makes the infinite sum of future rewards converge, and what makes the problem finite enough to write a value function for.</p></blockquote>
 <h4 id="rl-foundations--go-and-do-it">Go and do it</h4>
 <p>The gridworld, its transition kernel, and the return of a trajectory. Open <strong>Walk the grid</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8182,6 +8207,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>The value of a state is the reward plus the discounted value of the next state</strong></li><li>The value of a state is the average reward from it</li><li>The value of a state is the value of the best action</li><li>The value of a state is the reward of the best action</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is a fixed point: the value function is the one that satisfies it, and iterating it converges to that function.</p></blockquote>
+<p>*<em>Q. The Bellman equation writes the value of a state in terms of what? — multiple-choice </em>(core)***</p>
+<ul><li>The sum of all rewards the episode will ever pay</li><li>✓ <strong>The reward now plus the discounted value of the next state</strong></li><li>The maximum reward obtainable from the state</li><li>The average reward of the whole episode</li></ul>
+<blockquote><p>Correct — one step of reward, then the recursion takes over.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The value of a state is the expected return from it, and the Bellman equation decomposes that return one step at a time: the reward now, plus the discounted value of wherever the state goes next. Iterating the equation converges because it is a contraction.</p></blockquote>
 <h4 id="rl-foundations--go-and-do-it">Go and do it</h4>
 <p>The value iteration, sweep by sweep, and the policy it produces. Open <strong>Sweep the values</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8251,6 +8280,9 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>The baseline does not depend on the action, so its expectation is zero</strong></li><li>The baseline is a constant</li><li>The gradient of the baseline is zero</li><li>The baseline is unbiased</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The term is the score function times the baseline, and the score function has mean zero over the action distribution. So the baseline drops out of the expectation.</p></blockquote>
+<p>*<em>Q. Subtracting any baseline that depends only on the state changes the expected policy gradient by how much? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 0</p></blockquote>
+<blockquote><p><strong>Why:</strong> Exactly zero. The baseline does not depend on the action, so its expected contribution to the gradient is zero — while in practice it removes most of the variance, because the part of the return that was going to happen anyway is most of the noise.</p></blockquote>
 <h4 id="rl-foundations--go-and-do-it">Go and do it</h4>
 <p>One estimator, two weights: the rewards still to come, and the whole episode’s return. The two means agree to the sampling noise of the batches, and the two spreads do not. Laboratory B holds the other half of the saving — the same comparison with the value of the state subtracted. Open <strong>Reward-to-go, and the spread it leaves</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8288,6 +8320,9 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. The best λ for an advantage estimate depends on how long the episodes are. — boolean </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. The bias comes from the truncation of the episode, so a short horizon wants a small λ and a long one can afford a large λ. The right λ is a function of the horizon you actually have.</p></blockquote>
+<p>*<em>Q. With λ = 0.5, what weight does the λ-return place on the 2-step return? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 0.25 ± 0.001</p></blockquote>
+<blockquote><p><strong>Why:</strong> The λ-return weights the n-step return by (1 − λ)λ^(n−1): for n = 2 that is 0.5 × 0.5 = 0.25. λ = 0 is the one-step estimate, λ = 1 the Monte Carlo return, and everything between is the mixture.</p></blockquote>
 <h4 id="rl-foundations--go-and-do-it">Go and do it</h4>
 <p>The bias and the variance of the estimator, measured, as λ moves. Open <strong>Sweep λ</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8437,6 +8472,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. A lexical retriever can find an answer that uses different words from the question. — boolean </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. It matches words, and it is blind to everything else. That blind spot is the whole reason the dense retriever exists.</p></blockquote>
+<p>*<em>Q. BM25 combines three ingredients. Which pairing of ingredient and question is right? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>Inverse document frequency — how rare the word is; saturation — how much of the match is coincidence; length normalisation — how much of the document had to be read</strong></li><li>Saturation — how rare the word is; length normalisation — how much of the match is coincidence; inverse document frequency — how much of the document had to be read</li><li>Length normalisation — how rare the word is; inverse document frequency — how much of the document had to be read; saturation — how much of the match is coincidence</li><li>Only the inverse document frequency matters; the other two are tuning knobs with no question behind them</li></ul>
+<blockquote><p>Correct — each factor answers one way a word match can mislead.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A word match can mislead three ways: the word may be everywhere (idf), one document may repeat it (saturation), and a long document matches more words simply by being long (length normalisation). BM25 is the correction for each.</p></blockquote>
 <h4 id="retrieval-lab--go-and-do-it">Go and do it</h4>
 <p>The BM25 score of every document, and the recall it achieves. Open <strong>Score the documents</strong> in the retrieval-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8461,6 +8500,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>Because the document is embedded without the question</strong></li><li>Because the embedding is low-dimensional</li><li>Because the documents are shorter than the questions</li><li>Because the index is stored on disk</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The document’s vector does not depend on what is being asked, so it can be computed once, and the search becomes a matrix product.</p></blockquote>
+<p>*<em>Q. Why does the learned retriever find answers that use none of the query’s words? — multiple-choice </em>(core)***</p>
+<ul><li>It expands the query with synonyms before searching</li><li>✓ <strong>Question and document are embedded separately into a shared space, trained so meaning rather than wording places them near each other</strong></li><li>It matches on word stems instead of whole words</li><li>It indexes the documents by meaning categories assigned in advance</li></ul>
+<blockquote><p>Correct — the comparison happens between vectors, not strings.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The retriever embeds the question and the document separately and compares the two vectors. Because the training objective places a question near its answer regardless of wording, the learned retriever wins exactly where the lexical one is blind: the mismatch of words.</p></blockquote>
 <h4 id="retrieval-lab--go-and-do-it">Go and do it</h4>
 <p>The embedding of a question and of a document, and the score between them. Open <strong>Embed and compare</strong> in the retrieval-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8480,6 +8523,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>They make one batch of questions into many training examples, almost for free</strong></li><li>They make the loss unbiased</li><li>They replace the positive examples</li><li>They reduce the size of the index</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A batch of B questions gives B×B pairs, of which B are correct. The other B²−B are negatives that cost nothing to obtain.</p></blockquote>
+<p>*<em>Q. What makes the contrastive training of the learned retriever cheap? — multiple-choice </em>(core)***</p>
+<ul><li>The questions are generated by a model rather than annotated</li><li>✓ <strong>The other answers in the batch serve as the negatives, so no separate negative collection is needed</strong></li><li>Only one document is embedded per training step</li><li>The objective is trained on unlabelled text alone</li></ul>
+<blockquote><p>Correct — the batch supplies its own hard examples.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The objective is that a question should be closer to its own answer than to the other answers in the batch. Those other answers are free negatives — every batch of pairs is a training signal with no extra labelling.</p></blockquote>
 <h4 id="retrieval-lab--go-and-do-it">Go and do it</h4>
 <p>The training curve, and the recall of the trained retriever against the lexical one. Open <strong>Train the retriever</strong> in the retrieval-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8507,6 +8554,9 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. The MaxSim score is larger for a longer document, all else equal. — boolean </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. The maximum is taken over more candidates in a longer document, and the score inherits that. It is a real bias, it is measurable, and the laboratory measures it.</p></blockquote>
+<p>*<em>Q. ColBERT stores one vector per document, exactly like the learned embedding retriever. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
+<blockquote><p><strong>Why:</strong> ColBERT keeps a vector per token. The document’s vectors can still be precomputed, so the search stays cheap — but there are far more of them, and the score is the sum over the question’s words of the best-matching document token, not one dot product.</p></blockquote>
 <h4 id="retrieval-lab--go-and-do-it">Go and do it</h4>
 <p>The MaxSim score of every document, and the length bias it carries. Open <strong>Compare word by word</strong> in the retrieval-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8531,6 +8581,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>The retriever supplies the facts and the reader does the reasoning</strong></li><li>The retriever does the reasoning and the reader supplies the facts</li><li>Both do both</li><li>The retriever trains the reader</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The facts come from the retriever, so that the parameters do not have to contain them, and the reader does what the parameters are good at.</p></blockquote>
+<p>*<em>Q. What limits how many retrieved passages the reader should be given? — multiple-choice </em>(core)***</p>
+<ul><li>The reader’s context window, and nothing else</li><li>✓ <strong>Beyond some point the noise in the passages costs more than the extra facts are worth</strong></li><li>The cost of the retrieval itself</li><li>The number of questions asked per document</li></ul>
+<blockquote><p>Correct — the evidence has to be used, not merely present.</p></blockquote>
+<blockquote><p><strong>Why:</strong> More passages help until the noise in them starts to cost more than the facts are worth. The retriever supplies the facts and the reader supplies the reasoning — and a reader drowning in near-misses stops reasoning well.</p></blockquote>
 <h4 id="retrieval-lab--go-and-do-it">Go and do it</h4>
 <p>The reader, with the evidence retrieved for it and with the evidence lost. Open <strong>Read with the evidence</strong> in the retrieval-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8690,6 +8744,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>What the score means: a set of easy tasks and a set of hard ones measure different things</strong></li><li>How long the benchmark takes to run</li><li>Whether the tasks are verified</li><li>The interval on the score</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Moving the mix moves the score, with nothing about the solver changing — which is why two benchmarks with different mixes are not comparable.</p></blockquote>
+<p>*<em>Q. What does “hard enough that the trivial strategies fail” buy a benchmark? — multiple-choice </em>(core)***</p>
+<ul><li>It makes the benchmark cheaper to run</li><li>✓ <strong>It makes the score meaningful: if the trivial strategy passes, the score measures the task design rather than the solver</strong></li><li>It makes the benchmark fair to smaller models</li><li>It removes the need for a verifier</li></ul>
+<blockquote><p>Correct — diversity, verification and difficulty are what let the score say something.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A task is a starting state, a goal, and something that decides whether the goal was reached. A good task set is diverse, verified, and hard enough that the trivial strategies fail — otherwise the number reports the tasks, not the systems.</p></blockquote>
 <h4 id="agent-bench-lab--go-and-do-it">Go and do it</h4>
 <p>The task set, its difficulty mix, and the interval on its score. Open <strong>Look at the tasks</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8707,6 +8765,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. A solver solves 12 of 200 tasks. Using the Wilson interval, is the score of 6% more likely to be near 6% or near 0%? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 0</p></blockquote>
 <blockquote><p><strong>Why:</strong> The answer is zero for the normal approximation being useless: with twelve successes the interval is asymmetric, and the normal approximation would give a lower bound below zero. The Wilson interval keeps it inside the unit interval.</p></blockquote>
+<p>*<em>Q. Why is the normal approximation to the interval nonsense near a solve rate of zero? — multiple-choice </em>(core)***</p>
+<ul><li>Because the interval becomes too wide to read</li><li>✓ <strong>Because a symmetric interval reaches below zero, while the true interval for a proportion is asymmetric</strong></li><li>Because zero solve rates cannot be estimated at all</li><li>Because the interval needs the population size, which is unknown</li></ul>
+<blockquote><p>Correct — near the boundary the sampling distribution is skewed, not bell-shaped.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The tasks are a sample and the score estimates a rate on the population. The interval on a proportion is not symmetric, and near zero the normal approximation happily assigns probability to solving fewer than no tasks. The noise also bounds what a difference between two systems can mean.</p></blockquote>
 <h4 id="agent-bench-lab--go-and-do-it">Go and do it</h4>
 <p>The interval on a score, and the number of tasks a difference needs. Open <strong>Size the uncertainty</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8753,6 +8815,9 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>The solver’s ability to satisfy the verifier, which may not be the ability the benchmark claims to measure</strong></li><li>Nothing at all</li><li>The verifier’s quality</li><li>The task set</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Gaming is not a moral failure: it is the correct response to a reward that is not the thing you wanted.</p></blockquote>
+<p>*<em>Q. A solver that edits the failing test so it passes trivially still satisfies the standard evaluation criterion, as long as the other tests keep passing. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
+<blockquote><p><strong>Why:</strong> The criterion has two conditions: the failing test must start failing and end passing, and the passing tests must keep passing. The second gives the first its meaning, and the criterion additionally distrusts a patch that touches a test — precisely because a solver that can change the test does not have to solve the task.</p></blockquote>
 <h4 id="agent-bench-lab--go-and-do-it">Go and do it</h4>
 <p>A solver that changes the test, and the score it would have got. Open <strong>Watch the cheat</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8796,6 +8861,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>Attempts, which are model calls</strong></li><li>Nothing</li><li>Only the score</li><li>The verifier</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> So the comparison is not between the two scores but between the two scores per attempt.</p></blockquote>
+<p>*<em>Q. The agent solves more tasks when it is allowed to try again. What is the honest comparison against the non-agent baseline? — multiple-choice </em>(core)***</p>
+<ul><li>The raw solve rates, whatever the number of attempts</li><li>✓ <strong>The same tasks, the same verifier, and the score read per attempt — the attempts are the cost, paid in model calls</strong></li><li>The agent’s best single attempt against the baseline’s average</li><li>There is no honest comparison; the two are different kinds of system</li></ul>
+<blockquote><p>Correct — the comparison is between the scores per attempt, not the scores.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Most of what an agent adds is the ability to try again, and that has a price: an agent that tries several times solves more tasks and makes more attempts. The comparison has to be on the same tasks, with the same verifier, and the cost has to appear in the units.</p></blockquote>
 <h4 id="agent-bench-lab--go-and-do-it">Go and do it</h4>
 <p>The agent, the attempts it makes, and the tasks it solves. Open <strong>Run the agent</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8846,6 +8915,9 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>Whether an edited copy is caught: a short n-gram survives the edit, a long one does not</strong></li><li>How fast the test runs</li><li>Whether the tasks are contaminated</li><li>The score</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> And a short n-gram also catches ordinary text, so the length trades a false-positive rate against a true-positive rate — which is why both are reported.</p></blockquote>
+<p>*<em>Q. A task that appears verbatim in the training data still measures what the benchmark claims. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
+<blockquote><p><strong>Why:</strong> If the answer is already in the weights, the score measures memory, not ability. This is why a benchmark has to ask what the model has seen — and why a contaminated task is removed rather than scored.</p></blockquote>
 <h4 id="agent-bench-lab--go-and-do-it">Go and do it</h4>
 <p>The overlap of every task’s solution with a training corpus, and the rates the test gives. Open <strong>Look for the leak</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>

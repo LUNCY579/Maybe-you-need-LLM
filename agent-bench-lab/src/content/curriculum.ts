@@ -160,7 +160,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: [],
     glossaryTerms: ['benchmark', 'task', 'difficulty-mix'],
-    quizIds: ['q-design-1', 'q-design-2'],
+    quizIds: ['q-design-1', 'q-design-2', 'q-task-signal'],
     sourceRefs: [
       {
         chapter: 3,
@@ -202,7 +202,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['what-a-task-is'],
     glossaryTerms: ['interval', 'sample', 'power'],
-    quizIds: ['q-design-3'],
+    quizIds: ['q-design-3', 'q-interval-zero'],
     sourceRefs: [
       {
         chapter: 5,
@@ -274,7 +274,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-evaluation-criterion'],
     glossaryTerms: ['verifier', 'gaming'],
-    quizIds: ['q-verify-3'],
+    quizIds: ['q-verify-3', 'q-cheat-edits'],
     sourceRefs: [
       {
         chapter: 3,
@@ -346,7 +346,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-agentless-baseline'],
     glossaryTerms: ['solver', 'pass-at-k'],
-    quizIds: ['q-baseline-2'],
+    quizIds: ['q-baseline-2', 'q-attempts-honest'],
     sourceRefs: [
       {
         chapter: 4,
@@ -424,7 +424,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['one-run-or-many'],
     glossaryTerms: ['contamination', 'overlap-test'],
-    quizIds: ['q-contamination-1', 'q-contamination-2'],
+    quizIds: ['q-contamination-1', 'q-contamination-2', 'q-seen-verbatim'],
     sourceRefs: [
       {
         chapter: 5,

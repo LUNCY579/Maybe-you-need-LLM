@@ -105,6 +105,17 @@ The tasks, the difficulty mix, and the number of them. What a score on a task se
 
 > **Why:** Moving the mix moves the score, with nothing about the solver changing — which is why two benchmarks with different mixes are not comparable.
 
+**Q. What does “hard enough that the trivial strategies fail” buy a benchmark? — multiple-choice *(core)***
+
+- It makes the benchmark cheaper to run
+- ✓ **It makes the score meaningful: if the trivial strategy passes, the score measures the task design rather than the solver**
+- It makes the benchmark fair to smaller models
+- It removes the need for a verifier
+
+> Correct — diversity, verification and difficulty are what let the score say something.
+
+> **Why:** A task is a starting state, a goal, and something that decides whether the goal was reached. A good task set is diverse, verified, and hard enough that the trivial strategies fail — otherwise the number reports the tasks, not the systems.
+
 #### Go and do it
 
 The task set, its difficulty mix, and the interval on its score. Open **Look at the tasks** in the agent-bench-lab application.
@@ -145,6 +156,17 @@ The task set, its difficulty mix, and the interval on its score. Open **Look at 
 > **Answer:** 0
 
 > **Why:** The answer is zero for the normal approximation being useless: with twelve successes the interval is asymmetric, and the normal approximation would give a lower bound below zero. The Wilson interval keeps it inside the unit interval.
+
+**Q. Why is the normal approximation to the interval nonsense near a solve rate of zero? — multiple-choice *(core)***
+
+- Because the interval becomes too wide to read
+- ✓ **Because a symmetric interval reaches below zero, while the true interval for a proportion is asymmetric**
+- Because zero solve rates cannot be estimated at all
+- Because the interval needs the population size, which is unknown
+
+> Correct — near the boundary the sampling distribution is skewed, not bell-shaped.
+
+> **Why:** The tasks are a sample and the score estimates a rate on the population. The interval on a proportion is not symmetric, and near zero the normal approximation happily assigns probability to solving fewer than no tasks. The noise also bounds what a difference between two systems can mean.
 
 #### Go and do it
 
@@ -258,6 +280,12 @@ The four kinds of patch, and the verdict each one gets. Open **Check the criteri
 
 > **Why:** Gaming is not a moral failure: it is the correct response to a reward that is not the thing you wanted.
 
+**Q. A solver that edits the failing test so it passes trivially still satisfies the standard evaluation criterion, as long as the other tests keep passing. — boolean *(core)***
+
+> **Answer:** False
+
+> **Why:** The criterion has two conditions: the failing test must start failing and end passing, and the passing tests must keep passing. The second gives the first its meaning, and the criterion additionally distrusts a patch that touches a test — precisely because a solver that can change the test does not have to solve the task.
+
 #### Go and do it
 
 A solver that changes the test, and the score it would have got. Open **Watch the cheat** in the agent-bench-lab application.
@@ -361,6 +389,17 @@ The agentless baseline, its score, and the interval on it. Open **Run the baseli
 > Correct.
 
 > **Why:** So the comparison is not between the two scores but between the two scores per attempt.
+
+**Q. The agent solves more tasks when it is allowed to try again. What is the honest comparison against the non-agent baseline? — multiple-choice *(core)***
+
+- The raw solve rates, whatever the number of attempts
+- ✓ **The same tasks, the same verifier, and the score read per attempt — the attempts are the cost, paid in model calls**
+- The agent’s best single attempt against the baseline’s average
+- There is no honest comparison; the two are different kinds of system
+
+> Correct — the comparison is between the scores per attempt, not the scores.
+
+> **Why:** Most of what an agent adds is the ability to try again, and that has a price: an agent that tries several times solves more tasks and makes more attempts. The comparison has to be on the same tasks, with the same verifier, and the cost has to appear in the units.
 
 #### Go and do it
 
@@ -484,6 +523,12 @@ The score across repeated runs, and the interval it implies. Open **Measure the 
 > Correct.
 
 > **Why:** And a short n-gram also catches ordinary text, so the length trades a false-positive rate against a true-positive rate — which is why both are reported.
+
+**Q. A task that appears verbatim in the training data still measures what the benchmark claims. — boolean *(core)***
+
+> **Answer:** False
+
+> **Why:** If the answer is already in the weights, the score measures memory, not ability. This is why a benchmark has to ask what the model has seen — and why a contaminated task is removed rather than scored.
 
 #### Go and do it
 

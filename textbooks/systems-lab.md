@@ -176,6 +176,17 @@ The naive attention, run here, with the memory and the traffic it uses. Open **B
 
 > **Why:** When a larger value arrives, everything accumulated so far is divided by the factor by which the maximum grew. The rescaling is what keeps the sum exact, and it is why the tiled answer equals the naive one.
 
+**Q. During the online softmax, the running maximum of the row moves upward. What happens to the accumulated sum? — multiple-choice *(core)***
+
+- It is discarded and recomputed from the start
+- ✓ **It is rescaled by the exponential of the difference, and stays exact**
+- It is clamped to the new maximum
+- It is replaced by the new maximum
+
+> Correct — the rescaling is what keeps the streaming result identical to the textbook one.
+
+> **Why:** The softmax of a row can be accumulated as a running maximum and a running sum; when the maximum moves, the accumulator is rescaled by exp(old − new). The answer is identical to the offline softmax — only the memory footprint and the traffic differ.
+
 #### Go and do it
 
 The same attention, tiled, and the difference in the memory it uses. Open **Stream the blocks** in the systems-lab application.
@@ -243,6 +254,12 @@ Decoding reads a model and grows a cache. This module is about the arithmetic in
 
 > **Why:** No. The weights are read once for the whole batch, so that part of the intensity rises with the batch; but the cache is read once per sequence, and its intensity is fixed. So the total rises and then saturates.
 
+**Q. A decode step is a matrix-vector product. How many arithmetic operations does it perform per byte of weights it reads? — numeric *(core)***
+
+> **Answer:** 2
+
+> **Why:** Two operations per byte — one multiply, one add — while the whole step is dominated by reading the weights once. That ratio is why decode is memory-bound and why batching changes the economics rather than the arithmetic.
+
 #### Go and do it
 
 The arithmetic intensity of a decode step, as the batch size and the context grow. Open **Measure the intensity** in the systems-lab application.
@@ -289,6 +306,17 @@ The arithmetic intensity of a decode step, as the batch size and the context gro
 > Correct.
 
 > **Why:** Paging replaces a per-sequence buffer as long as the longest sequence with whole blocks, so the waste is a fraction of a block per sequence rather than a fraction of the whole batch.
+
+**Q. How does paging the KV cache change the memory wasted on variable-length sequences? — multiple-choice *(core)***
+
+- It eliminates the waste entirely
+- ✓ **It moves the waste from a fraction of the longest sequence to a fraction of one block per sequence**
+- It makes the waste grow with the batch size
+- It spends the saved memory on longer contexts only
+
+> Correct — the buffer becomes fixed-size blocks that can live anywhere.
+
+> **Why:** A straightforward implementation gives every sequence a buffer as long as the longest one, so the waste scales with the batch. Paging replaces the buffer with fixed-size blocks, and the waste becomes a fraction of a block per sequence.
 
 #### Go and do it
 
@@ -349,6 +377,12 @@ A mixture of experts keeps many experts and activates few. This module is about 
 > Correct.
 
 > **Why:** An expert that sees a tenth of the tokens sees a tenth of the updates, so it stays closer to its initialisation than its neighbours do, and the model is carrying experts that are worse than useless.
+
+**Q. The auxiliary load-balancing loss is smallest when the experts’ actual load equals the router’s probability. — boolean *(core)***
+
+> **Answer:** True
+
+> **Why:** The loss is the number of tokens times the sum over experts of the product of the two fractions. That product is smallest when the load — what the experts actually got — and the probability — what the router wanted — agree, which is exactly the behaviour the loss pushes the router towards.
 
 #### Go and do it
 
@@ -501,6 +535,17 @@ The acceptance rate, measured by running the rule. Open **Measure the acceptance
 > Correct.
 
 > **Why:** The accepted and the corrected tokens together give exactly the target’s distribution. The method buys time and nothing else, which is why it is safe to use.
+
+**Q. What does speculative decoding change about the model’s output distribution? — multiple-choice *(core)***
+
+- It sharpens the distribution, since bad drafts are rejected
+- ✓ **Nothing: the accepted and corrected terms add up to the target distribution**
+- It flattens the distribution, since drafts add noise
+- It depends on the drafter’s quality
+
+> Correct — the method buys time, not a different answer.
+
+> **Why:** A drafted token is accepted with probability min(1, p(x)/q(x)), and the correction step accounts for everything the drafter would have missed. The two terms add up to the target’s distribution exactly — which is why the only thing at stake is the speed-up: tokens per step, divided by the cost of the drafting.
 
 #### Go and do it
 

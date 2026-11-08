@@ -149,7 +149,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: [],
     glossaryTerms: ['mdp', 'return', 'discount', 'policy'],
-    quizIds: ['q-mdp-1', 'q-mdp-2'],
+    quizIds: ['q-mdp-1', 'q-mdp-2', 'q-mdp-markov', 'q-discount-converge'],
     sourceRefs: [
       {
         chapter: 3,
@@ -191,7 +191,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['states-and-returns'],
     glossaryTerms: ['value-function', 'bellman-equation'],
-    quizIds: ['q-value-1'],
+    quizIds: ['q-value-1', 'q-bellman-shape'],
     sourceRefs: [
       {
         chapter: 4,
@@ -281,7 +281,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-likelihood-ratio-trick'],
     glossaryTerms: ['baseline', 'advantage', 'reward-to-go'],
-    quizIds: ['q-actor-1'],
+    quizIds: ['q-actor-1', 'q-baseline-exact'],
     sourceRefs: [
       {
         chapter: 13,
@@ -359,7 +359,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-n-step-return'],
     glossaryTerms: ['lambda-return', 'general-advantage'],
-    quizIds: ['q-actor-3'],
+    quizIds: ['q-actor-3', 'q-lambda-two-step'],
     sourceRefs: [
       {
         chapter: 1,

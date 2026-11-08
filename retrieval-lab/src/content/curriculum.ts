@@ -201,7 +201,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-lexical-index'],
     glossaryTerms: ['bm25', 'inverse-document-frequency', 'recall'],
-    quizIds: ['q-sparse-2', 'q-sparse-3'],
+    quizIds: ['q-sparse-2', 'q-sparse-3', 'q-bm25-three'],
     sourceRefs: [
       {
         chapter: 2,
@@ -237,7 +237,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['bm25'],
     glossaryTerms: ['dense-retrieval', 'dual-encoder', 'embedding'],
-    quizIds: ['q-dense-1'],
+    quizIds: ['q-dense-1', 'q-dpr-paraphrase'],
     sourceRefs: [
       {
         chapter: 3,
@@ -273,7 +273,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-learned-embedding'],
     glossaryTerms: ['contrastive-objective', 'negative-example', 'in-batch-negative'],
-    quizIds: ['q-dense-2'],
+    quizIds: ['q-dense-2', 'q-dpr-negatives'],
     sourceRefs: [
       {
         chapter: 4,
@@ -309,7 +309,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-learned-embedding'],
     glossaryTerms: ['late-interaction', 'maxsim', 'length-bias', 'multi-hop'],
-    quizIds: ['q-late-1', 'q-late-2'],
+    quizIds: ['q-late-1', 'q-late-2', 'q-colbert-per-token'],
     sourceRefs: [
       {
         chapter: 3,
@@ -351,7 +351,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-contrastive-objective'],
     glossaryTerms: ['reader', 'retrieval-augmented-generation', 'marginal-utility', 'parametric-memory', 'non-parametric-memory'],
-    quizIds: ['q-context-1'],
+    quizIds: ['q-context-1', 'q-reader-noise'],
     sourceRefs: [
       {
         chapter: 1,

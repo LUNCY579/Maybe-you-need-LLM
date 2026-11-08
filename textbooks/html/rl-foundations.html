@@ -164,6 +164,13 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A trajectory collects rewards 2, 1, 1 with a discount of 0.5. What is the return from the first step? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 2.75 ± 0.001</p></blockquote>
 <blockquote><p><strong>Why:</strong> 2 + 0.5×1 + 0.25×1 = 2.75. Each reward is weighted by a power of the discount.</p></blockquote>
+<p>*<em>Q. What does the Markov property actually require of an environment? — multiple-choice </em>(warmup)***</p>
+<ul><li>That nothing in the environment is random</li><li>✓ <strong>That the next state and reward depend only on the present state</strong></li><li>That rewards arrive immediately after each action</li><li>That every episode is short</li></ul>
+<blockquote><p>Correct — and a state that carries the needed history inside itself keeps the property intact.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The Markov property is a statement about the state definition, not about the absence of memory: the next state depends only on the present one. An environment whose past matters is still an MDP if the state is defined to carry that past.</p></blockquote>
+<p>*<em>Q. The discount factor exists because agents prefer immediate rewards to later ones. — boolean </em>(warmup)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
+<blockquote><p><strong>Why:</strong> The course is explicit: the discount is not a preference. It is what makes the infinite sum of future rewards converge, and what makes the problem finite enough to write a value function for.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The gridworld, its transition kernel, and the return of a trajectory. Open <strong>Walk the grid</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -187,6 +194,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The value of a state is the reward plus the discounted value of the next state</strong></li><li>The value of a state is the average reward from it</li><li>The value of a state is the value of the best action</li><li>The value of a state is the reward of the best action</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is a fixed point: the value function is the one that satisfies it, and iterating it converges to that function.</p></blockquote>
+<p>*<em>Q. The Bellman equation writes the value of a state in terms of what? — multiple-choice </em>(core)***</p>
+<ul><li>The sum of all rewards the episode will ever pay</li><li>✓ <strong>The reward now plus the discounted value of the next state</strong></li><li>The maximum reward obtainable from the state</li><li>The average reward of the whole episode</li></ul>
+<blockquote><p>Correct — one step of reward, then the recursion takes over.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The value of a state is the expected return from it, and the Bellman equation decomposes that return one step at a time: the reward now, plus the discounted value of wherever the state goes next. Iterating the equation converges because it is a contraction.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The value iteration, sweep by sweep, and the policy it produces. Open <strong>Sweep the values</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -256,6 +267,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The baseline does not depend on the action, so its expectation is zero</strong></li><li>The baseline is a constant</li><li>The gradient of the baseline is zero</li><li>The baseline is unbiased</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The term is the score function times the baseline, and the score function has mean zero over the action distribution. So the baseline drops out of the expectation.</p></blockquote>
+<p>*<em>Q. Subtracting any baseline that depends only on the state changes the expected policy gradient by how much? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 0</p></blockquote>
+<blockquote><p><strong>Why:</strong> Exactly zero. The baseline does not depend on the action, so its expected contribution to the gradient is zero — while in practice it removes most of the variance, because the part of the return that was going to happen anyway is most of the noise.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>One estimator, two weights: the rewards still to come, and the whole episode’s return. The two means agree to the sampling noise of the batches, and the two spreads do not. Laboratory B holds the other half of the saving — the same comparison with the value of the state subtracted. Open <strong>Reward-to-go, and the spread it leaves</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -293,6 +307,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. The best λ for an advantage estimate depends on how long the episodes are. — boolean </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. The bias comes from the truncation of the episode, so a short horizon wants a small λ and a long one can afford a large λ. The right λ is a function of the horizon you actually have.</p></blockquote>
+<p>*<em>Q. With λ = 0.5, what weight does the λ-return place on the 2-step return? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 0.25 ± 0.001</p></blockquote>
+<blockquote><p><strong>Why:</strong> The λ-return weights the n-step return by (1 − λ)λ^(n−1): for n = 2 that is 0.5 × 0.5 = 0.25. λ = 0 is the one-step estimate, λ = 1 the Monte Carlo return, and everything between is the mixture.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The bias and the variance of the estimator, measured, as λ moves. Open <strong>Sweep λ</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>

@@ -205,6 +205,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The running maximum and sum are rescaled whenever the maximum moves</strong></li><li>The blocks are small enough to be exact in floating point</li><li>The computation is done in a higher precision</li><li>The last block is computed again</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> When a larger value arrives, everything accumulated so far is divided by the factor by which the maximum grew. The rescaling is what keeps the sum exact, and it is why the tiled answer equals the naive one.</p></blockquote>
+<p>*<em>Q. During the online softmax, the running maximum of the row moves upward. What happens to the accumulated sum? — multiple-choice </em>(core)***</p>
+<ul><li>It is discarded and recomputed from the start</li><li>✓ <strong>It is rescaled by the exponential of the difference, and stays exact</strong></li><li>It is clamped to the new maximum</li><li>It is replaced by the new maximum</li></ul>
+<blockquote><p>Correct — the rescaling is what keeps the streaming result identical to the textbook one.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The softmax of a row can be accumulated as a running maximum and a running sum; when the maximum moves, the accumulator is rescaled by exp(old − new). The answer is identical to the offline softmax — only the memory footprint and the traffic differ.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The same attention, tiled, and the difference in the memory it uses. Open <strong>Stream the blocks</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -232,6 +236,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. The arithmetic intensity of a decode step rises without limit as the batch size grows. — boolean </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. The weights are read once for the whole batch, so that part of the intensity rises with the batch; but the cache is read once per sequence, and its intensity is fixed. So the total rises and then saturates.</p></blockquote>
+<p>*<em>Q. A decode step is a matrix-vector product. How many arithmetic operations does it perform per byte of weights it reads? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 2</p></blockquote>
+<blockquote><p><strong>Why:</strong> Two operations per byte — one multiply, one add — while the whole step is dominated by reading the weights once. That ratio is why decode is memory-bound and why batching changes the economics rather than the arithmetic.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The arithmetic intensity of a decode step, as the batch size and the context grow. Open <strong>Measure the intensity</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -251,6 +258,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The tail of the last block of each sequence</strong></li><li>Nothing at all</li><li>The difference between the longest and the shortest sequence, for every sequence</li><li>A whole block for every sequence</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Paging replaces a per-sequence buffer as long as the longest sequence with whole blocks, so the waste is a fraction of a block per sequence rather than a fraction of the whole batch.</p></blockquote>
+<p>*<em>Q. How does paging the KV cache change the memory wasted on variable-length sequences? — multiple-choice </em>(core)***</p>
+<ul><li>It eliminates the waste entirely</li><li>✓ <strong>It moves the waste from a fraction of the longest sequence to a fraction of one block per sequence</strong></li><li>It makes the waste grow with the batch size</li><li>It spends the saved memory on longer contexts only</li></ul>
+<blockquote><p>Correct — the buffer becomes fixed-size blocks that can live anywhere.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A straightforward implementation gives every sequence a buffer as long as the longest one, so the waste scales with the batch. Paging replaces the buffer with fixed-size blocks, and the waste becomes a fraction of a block per sequence.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>A batch of sequences, and the memory each allocation scheme wastes. Open <strong>Fill the memory</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -275,6 +286,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The experts that get fewer tokens are trained on less, and stay worse</strong></li><li>The router itself becomes the bottleneck</li><li>The tokens are dropped</li><li>The model loses capacity</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> An expert that sees a tenth of the tokens sees a tenth of the updates, so it stays closer to its initialisation than its neighbours do, and the model is carrying experts that are worse than useless.</p></blockquote>
+<p>*<em>Q. The auxiliary load-balancing loss is smallest when the experts’ actual load equals the router’s probability. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
+<blockquote><p><strong>Why:</strong> The loss is the number of tokens times the sum over experts of the product of the two fractions. That product is smallest when the load — what the experts actually got — and the probability — what the router wanted — agree, which is exactly the behaviour the loss pushes the router towards.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>A router here, on embeddings here, with the load it produces. Open <strong>Route the tokens</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -337,6 +351,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Nothing: the output distribution is the target model’s own</strong></li><li>It makes the output more likely</li><li>It makes the output less diverse</li><li>It truncates the output to what the draft proposed</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The accepted and the corrected tokens together give exactly the target’s distribution. The method buys time and nothing else, which is why it is safe to use.</p></blockquote>
+<p>*<em>Q. What does speculative decoding change about the model’s output distribution? — multiple-choice </em>(core)***</p>
+<ul><li>It sharpens the distribution, since bad drafts are rejected</li><li>✓ <strong>Nothing: the accepted and corrected terms add up to the target distribution</strong></li><li>It flattens the distribution, since drafts add noise</li><li>It depends on the drafter’s quality</li></ul>
+<blockquote><p>Correct — the method buys time, not a different answer.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A drafted token is accepted with probability min(1, p(x)/q(x)), and the correction step accounts for everything the drafter would have missed. The two terms add up to the target’s distribution exactly — which is why the only thing at stake is the speed-up: tokens per step, divided by the cost of the drafting.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The speed-up, as the acceptance rate and the relative cost of the two models move. Open <strong>Price the speculation</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>

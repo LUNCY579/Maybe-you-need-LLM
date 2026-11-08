@@ -17613,6 +17613,17 @@ The naive attention, run here, with the memory and the traffic it uses. Open **B
 
 > **Why:** When a larger value arrives, everything accumulated so far is divided by the factor by which the maximum grew. The rescaling is what keeps the sum exact, and it is why the tiled answer equals the naive one.
 
+**Q. During the online softmax, the running maximum of the row moves upward. What happens to the accumulated sum? — multiple-choice *(core)***
+
+- It is discarded and recomputed from the start
+- ✓ **It is rescaled by the exponential of the difference, and stays exact**
+- It is clamped to the new maximum
+- It is replaced by the new maximum
+
+> Correct — the rescaling is what keeps the streaming result identical to the textbook one.
+
+> **Why:** The softmax of a row can be accumulated as a running maximum and a running sum; when the maximum moves, the accumulator is rescaled by exp(old − new). The answer is identical to the offline softmax — only the memory footprint and the traffic differ.
+
 #### Go and do it
 
 The same attention, tiled, and the difference in the memory it uses. Open **Stream the blocks** in the systems-lab application.
@@ -17680,6 +17691,12 @@ Decoding reads a model and grows a cache. This module is about the arithmetic in
 
 > **Why:** No. The weights are read once for the whole batch, so that part of the intensity rises with the batch; but the cache is read once per sequence, and its intensity is fixed. So the total rises and then saturates.
 
+**Q. A decode step is a matrix-vector product. How many arithmetic operations does it perform per byte of weights it reads? — numeric *(core)***
+
+> **Answer:** 2
+
+> **Why:** Two operations per byte — one multiply, one add — while the whole step is dominated by reading the weights once. That ratio is why decode is memory-bound and why batching changes the economics rather than the arithmetic.
+
 #### Go and do it
 
 The arithmetic intensity of a decode step, as the batch size and the context grow. Open **Measure the intensity** in the systems-lab application.
@@ -17726,6 +17743,17 @@ The arithmetic intensity of a decode step, as the batch size and the context gro
 > Correct.
 
 > **Why:** Paging replaces a per-sequence buffer as long as the longest sequence with whole blocks, so the waste is a fraction of a block per sequence rather than a fraction of the whole batch.
+
+**Q. How does paging the KV cache change the memory wasted on variable-length sequences? — multiple-choice *(core)***
+
+- It eliminates the waste entirely
+- ✓ **It moves the waste from a fraction of the longest sequence to a fraction of one block per sequence**
+- It makes the waste grow with the batch size
+- It spends the saved memory on longer contexts only
+
+> Correct — the buffer becomes fixed-size blocks that can live anywhere.
+
+> **Why:** A straightforward implementation gives every sequence a buffer as long as the longest one, so the waste scales with the batch. Paging replaces the buffer with fixed-size blocks, and the waste becomes a fraction of a block per sequence.
 
 #### Go and do it
 
@@ -17786,6 +17814,12 @@ A mixture of experts keeps many experts and activates few. This module is about 
 > Correct.
 
 > **Why:** An expert that sees a tenth of the tokens sees a tenth of the updates, so it stays closer to its initialisation than its neighbours do, and the model is carrying experts that are worse than useless.
+
+**Q. The auxiliary load-balancing loss is smallest when the experts’ actual load equals the router’s probability. — boolean *(core)***
+
+> **Answer:** True
+
+> **Why:** The loss is the number of tokens times the sum over experts of the product of the two fractions. That product is smallest when the load — what the experts actually got — and the probability — what the router wanted — agree, which is exactly the behaviour the loss pushes the router towards.
 
 #### Go and do it
 
@@ -17938,6 +17972,17 @@ The acceptance rate, measured by running the rule. Open **Measure the acceptance
 > Correct.
 
 > **Why:** The accepted and the corrected tokens together give exactly the target’s distribution. The method buys time and nothing else, which is why it is safe to use.
+
+**Q. What does speculative decoding change about the model’s output distribution? — multiple-choice *(core)***
+
+- It sharpens the distribution, since bad drafts are rejected
+- ✓ **Nothing: the accepted and corrected terms add up to the target distribution**
+- It flattens the distribution, since drafts add noise
+- It depends on the drafter’s quality
+
+> Correct — the method buys time, not a different answer.
+
+> **Why:** A drafted token is accepted with probability min(1, p(x)/q(x)), and the correction step accounts for everything the drafter would have missed. The two terms add up to the target’s distribution exactly — which is why the only thing at stake is the speed-up: tokens per step, divided by the cost of the drafting.
 
 #### Go and do it
 
@@ -18213,6 +18258,23 @@ States, actions, rewards, transitions and returns. The Markov property, the disc
 
 > **Why:** 2 + 0.5×1 + 0.25×1 = 2.75. Each reward is weighted by a power of the discount.
 
+**Q. What does the Markov property actually require of an environment? — multiple-choice *(warmup)***
+
+- That nothing in the environment is random
+- ✓ **That the next state and reward depend only on the present state**
+- That rewards arrive immediately after each action
+- That every episode is short
+
+> Correct — and a state that carries the needed history inside itself keeps the property intact.
+
+> **Why:** The Markov property is a statement about the state definition, not about the absence of memory: the next state depends only on the present one. An environment whose past matters is still an MDP if the state is defined to carry that past.
+
+**Q. The discount factor exists because agents prefer immediate rewards to later ones. — boolean *(warmup)***
+
+> **Answer:** False
+
+> **Why:** The course is explicit: the discount is not a preference. It is what makes the infinite sum of future rewards converge, and what makes the problem finite enough to write a value function for.
+
 #### Go and do it
 
 The gridworld, its transition kernel, and the return of a trajectory. Open **Walk the grid** in the rl-foundations application.
@@ -18271,6 +18333,17 @@ The value of a state under a policy, the value of the best policy, and the two s
 > Correct.
 
 > **Why:** It is a fixed point: the value function is the one that satisfies it, and iterating it converges to that function.
+
+**Q. The Bellman equation writes the value of a state in terms of what? — multiple-choice *(core)***
+
+- The sum of all rewards the episode will ever pay
+- ✓ **The reward now plus the discounted value of the next state**
+- The maximum reward obtainable from the state
+- The average reward of the whole episode
+
+> Correct — one step of reward, then the recursion takes over.
+
+> **Why:** The value of a state is the expected return from it, and the Bellman equation decomposes that return one step at a time: the reward now, plus the discounted value of wherever the state goes next. Iterating the equation converges because it is a contraction.
 
 #### Go and do it
 
@@ -18444,6 +18517,12 @@ The baseline that removes the variance, the λ-return and the general advantage 
 
 > **Why:** The term is the score function times the baseline, and the score function has mean zero over the action distribution. So the baseline drops out of the expectation.
 
+**Q. Subtracting any baseline that depends only on the state changes the expected policy gradient by how much? — numeric *(core)***
+
+> **Answer:** 0
+
+> **Why:** Exactly zero. The baseline does not depend on the action, so its expected contribution to the gradient is zero — while in practice it removes most of the variance, because the part of the return that was going to happen anyway is most of the noise.
+
 #### Go and do it
 
 One estimator, two weights: the rewards still to come, and the whole episode’s return. The two means agree to the sampling noise of the batches, and the two spreads do not. Laboratory B holds the other half of the saving — the same comparison with the value of the state subtracted. Open **Reward-to-go, and the spread it leaves** in the rl-foundations application.
@@ -18533,6 +18612,12 @@ The n-step returns of a real trajectory, and the truth they are aiming at. Open 
 > **Answer:** True
 
 > **Why:** Yes. The bias comes from the truncation of the episode, so a short horizon wants a small λ and a long one can afford a large λ. The right λ is a function of the horizon you actually have.
+
+**Q. With λ = 0.5, what weight does the λ-return place on the 2-step return? — numeric *(core)***
+
+> **Answer:** 0.25 ± 0.001
+
+> **Why:** The λ-return weights the n-step return by (1 − λ)λ^(n−1): for n = 2 that is 0.5 × 0.5 = 0.25. λ = 0 is the one-step estimate, λ = 1 the Monte Carlo return, and everything between is the mixture.
 
 #### Go and do it
 
@@ -18877,6 +18962,17 @@ The postings of the corpus, and the size of the index. Open **Look at the index*
 
 > **Why:** No. It matches words, and it is blind to everything else. That blind spot is the whole reason the dense retriever exists.
 
+**Q. BM25 combines three ingredients. Which pairing of ingredient and question is right? — multiple-choice *(core)***
+
+- ✓ **Inverse document frequency — how rare the word is; saturation — how much of the match is coincidence; length normalisation — how much of the document had to be read**
+- Saturation — how rare the word is; length normalisation — how much of the match is coincidence; inverse document frequency — how much of the document had to be read
+- Length normalisation — how rare the word is; inverse document frequency — how much of the document had to be read; saturation — how much of the match is coincidence
+- Only the inverse document frequency matters; the other two are tuning knobs with no question behind them
+
+> Correct — each factor answers one way a word match can mislead.
+
+> **Why:** A word match can mislead three ways: the word may be everywhere (idf), one document may repeat it (saturation), and a long document matches more words simply by being long (length normalisation). BM25 is the correction for each.
+
 #### Go and do it
 
 The BM25 score of every document, and the recall it achieves. Open **Score the documents** in the retrieval-lab application.
@@ -18936,6 +19032,17 @@ The learned embedding: how a question and a document are put in the same space, 
 
 > **Why:** The document’s vector does not depend on what is being asked, so it can be computed once, and the search becomes a matrix product.
 
+**Q. Why does the learned retriever find answers that use none of the query’s words? — multiple-choice *(core)***
+
+- It expands the query with synonyms before searching
+- ✓ **Question and document are embedded separately into a shared space, trained so meaning rather than wording places them near each other**
+- It matches on word stems instead of whole words
+- It indexes the documents by meaning categories assigned in advance
+
+> Correct — the comparison happens between vectors, not strings.
+
+> **Why:** The retriever embeds the question and the document separately and compares the two vectors. Because the training objective places a question near its answer regardless of wording, the learned retriever wins exactly where the lexical one is blind: the mismatch of words.
+
 #### Go and do it
 
 The embedding of a question and of a document, and the score between them. Open **Embed and compare** in the retrieval-lab application.
@@ -18982,6 +19089,17 @@ The embedding of a question and of a document, and the score between them. Open 
 > Correct.
 
 > **Why:** A batch of B questions gives B×B pairs, of which B are correct. The other B²−B are negatives that cost nothing to obtain.
+
+**Q. What makes the contrastive training of the learned retriever cheap? — multiple-choice *(core)***
+
+- The questions are generated by a model rather than annotated
+- ✓ **The other answers in the batch serve as the negatives, so no separate negative collection is needed**
+- Only one document is embedded per training step
+- The objective is trained on unlabelled text alone
+
+> Correct — the batch supplies its own hard examples.
+
+> **Why:** The objective is that a question should be closer to its own answer than to the other answers in the batch. Those other answers are free negatives — every batch of pairs is a training signal with no extra labelling.
 
 #### Go and do it
 
@@ -19048,6 +19166,12 @@ The MaxSim score: a question and a document compared word by word, the price of 
 
 > **Why:** Yes. The maximum is taken over more candidates in a longer document, and the score inherits that. It is a real bias, it is measurable, and the laboratory measures it.
 
+**Q. ColBERT stores one vector per document, exactly like the learned embedding retriever. — boolean *(core)***
+
+> **Answer:** False
+
+> **Why:** ColBERT keeps a vector per token. The document’s vectors can still be precomputed, so the search stays cheap — but there are far more of them, and the score is the sum over the question’s words of the best-matching document token, not one dot product.
+
 #### Go and do it
 
 The MaxSim score of every document, and the length bias it carries. Open **Compare word by word** in the retrieval-lab application.
@@ -19108,6 +19232,17 @@ The retrieval-augmented reader, the position effect, and the argument that a lon
 > Correct.
 
 > **Why:** The facts come from the retriever, so that the parameters do not have to contain them, and the reader does what the parameters are good at.
+
+**Q. What limits how many retrieved passages the reader should be given? — multiple-choice *(core)***
+
+- The reader’s context window, and nothing else
+- ✓ **Beyond some point the noise in the passages costs more than the extra facts are worth**
+- The cost of the retrieval itself
+- The number of questions asked per document
+
+> Correct — the evidence has to be used, not merely present.
+
+> **Why:** More passages help until the noise in them starts to cost more than the facts are worth. The retriever supplies the facts and the reader supplies the reasoning — and a reader drowning in near-misses stops reasoning well.
 
 #### Go and do it
 
@@ -19484,6 +19619,17 @@ The tasks, the difficulty mix, and the number of them. What a score on a task se
 
 > **Why:** Moving the mix moves the score, with nothing about the solver changing — which is why two benchmarks with different mixes are not comparable.
 
+**Q. What does “hard enough that the trivial strategies fail” buy a benchmark? — multiple-choice *(core)***
+
+- It makes the benchmark cheaper to run
+- ✓ **It makes the score meaningful: if the trivial strategy passes, the score measures the task design rather than the solver**
+- It makes the benchmark fair to smaller models
+- It removes the need for a verifier
+
+> Correct — diversity, verification and difficulty are what let the score say something.
+
+> **Why:** A task is a starting state, a goal, and something that decides whether the goal was reached. A good task set is diverse, verified, and hard enough that the trivial strategies fail — otherwise the number reports the tasks, not the systems.
+
 #### Go and do it
 
 The task set, its difficulty mix, and the interval on its score. Open **Look at the tasks** in the agent-bench-lab application.
@@ -19524,6 +19670,17 @@ The task set, its difficulty mix, and the interval on its score. Open **Look at 
 > **Answer:** 0
 
 > **Why:** The answer is zero for the normal approximation being useless: with twelve successes the interval is asymmetric, and the normal approximation would give a lower bound below zero. The Wilson interval keeps it inside the unit interval.
+
+**Q. Why is the normal approximation to the interval nonsense near a solve rate of zero? — multiple-choice *(core)***
+
+- Because the interval becomes too wide to read
+- ✓ **Because a symmetric interval reaches below zero, while the true interval for a proportion is asymmetric**
+- Because zero solve rates cannot be estimated at all
+- Because the interval needs the population size, which is unknown
+
+> Correct — near the boundary the sampling distribution is skewed, not bell-shaped.
+
+> **Why:** The tasks are a sample and the score estimates a rate on the population. The interval on a proportion is not symmetric, and near zero the normal approximation happily assigns probability to solving fewer than no tasks. The noise also bounds what a difference between two systems can mean.
 
 #### Go and do it
 
@@ -19637,6 +19794,12 @@ The four kinds of patch, and the verdict each one gets. Open **Check the criteri
 
 > **Why:** Gaming is not a moral failure: it is the correct response to a reward that is not the thing you wanted.
 
+**Q. A solver that edits the failing test so it passes trivially still satisfies the standard evaluation criterion, as long as the other tests keep passing. — boolean *(core)***
+
+> **Answer:** False
+
+> **Why:** The criterion has two conditions: the failing test must start failing and end passing, and the passing tests must keep passing. The second gives the first its meaning, and the criterion additionally distrusts a patch that touches a test — precisely because a solver that can change the test does not have to solve the task.
+
 #### Go and do it
 
 A solver that changes the test, and the score it would have got. Open **Watch the cheat** in the agent-bench-lab application.
@@ -19740,6 +19903,17 @@ The agentless baseline, its score, and the interval on it. Open **Run the baseli
 > Correct.
 
 > **Why:** So the comparison is not between the two scores but between the two scores per attempt.
+
+**Q. The agent solves more tasks when it is allowed to try again. What is the honest comparison against the non-agent baseline? — multiple-choice *(core)***
+
+- The raw solve rates, whatever the number of attempts
+- ✓ **The same tasks, the same verifier, and the score read per attempt — the attempts are the cost, paid in model calls**
+- The agent’s best single attempt against the baseline’s average
+- There is no honest comparison; the two are different kinds of system
+
+> Correct — the comparison is between the scores per attempt, not the scores.
+
+> **Why:** Most of what an agent adds is the ability to try again, and that has a price: an agent that tries several times solves more tasks and makes more attempts. The comparison has to be on the same tasks, with the same verifier, and the cost has to appear in the units.
 
 #### Go and do it
 
@@ -19863,6 +20037,12 @@ The score across repeated runs, and the interval it implies. Open **Measure the 
 > Correct.
 
 > **Why:** And a short n-gram also catches ordinary text, so the length trades a false-positive rate against a true-positive rate — which is why both are reported.
+
+**Q. A task that appears verbatim in the training data still measures what the benchmark claims. — boolean *(core)***
+
+> **Answer:** False
+
+> **Why:** If the answer is already in the weights, the score measures memory, not ability. This is why a benchmark has to ask what the model has seen — and why a contaminated task is removed rather than scored.
 
 #### Go and do it
 

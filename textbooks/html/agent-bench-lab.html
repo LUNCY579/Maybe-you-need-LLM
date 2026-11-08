@@ -172,6 +172,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>What the score means: a set of easy tasks and a set of hard ones measure different things</strong></li><li>How long the benchmark takes to run</li><li>Whether the tasks are verified</li><li>The interval on the score</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Moving the mix moves the score, with nothing about the solver changing — which is why two benchmarks with different mixes are not comparable.</p></blockquote>
+<p>*<em>Q. What does “hard enough that the trivial strategies fail” buy a benchmark? — multiple-choice </em>(core)***</p>
+<ul><li>It makes the benchmark cheaper to run</li><li>✓ <strong>It makes the score meaningful: if the trivial strategy passes, the score measures the task design rather than the solver</strong></li><li>It makes the benchmark fair to smaller models</li><li>It removes the need for a verifier</li></ul>
+<blockquote><p>Correct — diversity, verification and difficulty are what let the score say something.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A task is a starting state, a goal, and something that decides whether the goal was reached. A good task set is diverse, verified, and hard enough that the trivial strategies fail — otherwise the number reports the tasks, not the systems.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The task set, its difficulty mix, and the interval on its score. Open <strong>Look at the tasks</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -189,6 +193,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A solver solves 12 of 200 tasks. Using the Wilson interval, is the score of 6% more likely to be near 6% or near 0%? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 0</p></blockquote>
 <blockquote><p><strong>Why:</strong> The answer is zero for the normal approximation being useless: with twelve successes the interval is asymmetric, and the normal approximation would give a lower bound below zero. The Wilson interval keeps it inside the unit interval.</p></blockquote>
+<p>*<em>Q. Why is the normal approximation to the interval nonsense near a solve rate of zero? — multiple-choice </em>(core)***</p>
+<ul><li>Because the interval becomes too wide to read</li><li>✓ <strong>Because a symmetric interval reaches below zero, while the true interval for a proportion is asymmetric</strong></li><li>Because zero solve rates cannot be estimated at all</li><li>Because the interval needs the population size, which is unknown</li></ul>
+<blockquote><p>Correct — near the boundary the sampling distribution is skewed, not bell-shaped.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The tasks are a sample and the score estimates a rate on the population. The interval on a proportion is not symmetric, and near zero the normal approximation happily assigns probability to solving fewer than no tasks. The noise also bounds what a difference between two systems can mean.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The interval on a score, and the number of tasks a difference needs. Open <strong>Size the uncertainty</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -235,6 +243,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The solver’s ability to satisfy the verifier, which may not be the ability the benchmark claims to measure</strong></li><li>Nothing at all</li><li>The verifier’s quality</li><li>The task set</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Gaming is not a moral failure: it is the correct response to a reward that is not the thing you wanted.</p></blockquote>
+<p>*<em>Q. A solver that edits the failing test so it passes trivially still satisfies the standard evaluation criterion, as long as the other tests keep passing. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
+<blockquote><p><strong>Why:</strong> The criterion has two conditions: the failing test must start failing and end passing, and the passing tests must keep passing. The second gives the first its meaning, and the criterion additionally distrusts a patch that touches a test — precisely because a solver that can change the test does not have to solve the task.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>A solver that changes the test, and the score it would have got. Open <strong>Watch the cheat</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -278,6 +289,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Attempts, which are model calls</strong></li><li>Nothing</li><li>Only the score</li><li>The verifier</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> So the comparison is not between the two scores but between the two scores per attempt.</p></blockquote>
+<p>*<em>Q. The agent solves more tasks when it is allowed to try again. What is the honest comparison against the non-agent baseline? — multiple-choice </em>(core)***</p>
+<ul><li>The raw solve rates, whatever the number of attempts</li><li>✓ <strong>The same tasks, the same verifier, and the score read per attempt — the attempts are the cost, paid in model calls</strong></li><li>The agent’s best single attempt against the baseline’s average</li><li>There is no honest comparison; the two are different kinds of system</li></ul>
+<blockquote><p>Correct — the comparison is between the scores per attempt, not the scores.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Most of what an agent adds is the ability to try again, and that has a price: an agent that tries several times solves more tasks and makes more attempts. The comparison has to be on the same tasks, with the same verifier, and the cost has to appear in the units.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The agent, the attempts it makes, and the tasks it solves. Open <strong>Run the agent</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -328,6 +343,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Whether an edited copy is caught: a short n-gram survives the edit, a long one does not</strong></li><li>How fast the test runs</li><li>Whether the tasks are contaminated</li><li>The score</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> And a short n-gram also catches ordinary text, so the length trades a false-positive rate against a true-positive rate — which is why both are reported.</p></blockquote>
+<p>*<em>Q. A task that appears verbatim in the training data still measures what the benchmark claims. — boolean </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> False</p></blockquote>
+<blockquote><p><strong>Why:</strong> If the answer is already in the weights, the score measures memory, not ability. This is why a benchmark has to ask what the model has seen — and why a contaminated task is removed rather than scored.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The overlap of every task’s solution with a training corpus, and the rates the test gives. Open <strong>Look for the leak</strong> in the agent-bench-lab application.</p>
 <p><strong>Where this came from</strong></p>
