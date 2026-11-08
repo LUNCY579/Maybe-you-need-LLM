@@ -95,7 +95,7 @@ and label themselves as such: their numbers are computed exactly from stated rul
 
 ### The rest of the course
 
-- **Practice** — 17 questions with per-option feedback, worked explanations and source citations.
+- **Practice** — 21 questions with per-option feedback, worked explanations and source citations.
 - **Checkpoints** — each lesson asks its own questions where the idea was taught, graded by the same engine as the
   practice bank, with the explanation after the attempt and a second attempt always allowed.
 - **Glossary** — 19 terms, each with a plain-language definition and the terms that should be understood first. The

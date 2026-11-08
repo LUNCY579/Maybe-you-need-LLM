@@ -164,6 +164,17 @@ Take a raw corpus through the filters and watch what each stage removes. Open **
 
 > **Why:** Ten billion tokens, of which 40% are duplicates: 10 × (1 − 0.4) = 6 billion tokens of distinct text.
 
+**Q. A fixed filtering budget is spent on a corpus. What trade does it force, and when does the smaller side win? — multiple-choice *(core)***
+
+- Tokens against parameters; more tokens always win
+- ✓ **Quantity against quality: filtering discards tokens, and a smaller, cleaner set beats a larger, noisier one once the noise dominates**
+- Language coverage against code coverage
+- There is no trade; filtering only ever helps
+
+> Correct — the effective tokens are what the budget actually buys.
+
+> **Why:** A fixed compute budget buys a fixed number of effective tokens. Filtering trades raw quantity for quality: compute the effective number of tokens a budget actually buys, and the smaller cleaner dataset wins exactly when the removed noise was costing more than the removed signal.
+
 #### Go and do it
 
 Five rows trained under the same token and compute budget — the raw corpus, the filtered one at full and at half budget, the control with the same documents and the same steps, and an oracle nobody can run. Open **Spend one budget five ways** in the data-lab application.
@@ -269,6 +280,17 @@ The pipeline reports what each stage removed; the laboratory recomputes it from 
 > **Answer:** 99.484 ± 0.01
 
 > **Why:** The mean negative log-likelihood per token is 460/100 = 4.6, and the perplexity is exp(4.6) ≈ 99.48.
+
+**Q. Why does the reference model have to be an n-gram model rather than a unigram one, for filtering boilerplate? — multiple-choice *(core)***
+
+- Because unigram models cannot count words
+- ✓ **Because boilerplate is ordinary in its word frequencies but unusual in its sequences, and only an n-gram model sees the order**
+- Because n-gram models are smaller to store
+- Because a unigram model cannot be evaluated in perplexity
+
+> Correct — stupid backoff scores the sequence, not the bag.
+
+> **Why:** Perplexity under the reference model is the filter’s score. A unigram model finds boilerplate perfectly probable — its words are all common. An n-gram model with stupid backoff notices that the sequences never vary, and prices the page accordingly.
 
 #### Go and do it
 
@@ -383,6 +405,15 @@ The corpus is deduplicated here, with the candidate pairs the index proposed sho
 
 > **Why:** Deduplication is about wasting compute; decontamination is about whether the score means anything.
 
+**Q. A decontamination procedure can be wrong in two directions. Which are they? — multi-select *(hard)***
+
+- ✓ **It misses contaminated documents, and the benchmark keeps measuring memory**
+- ✓ **It removes innocent documents that merely resemble the benchmark, and the training corpus loses good data**
+- It deduplicates exact copies, which is the same thing as decontamination
+- It cannot be wrong in more than one direction
+
+> **Why:** The n-gram overlap test between a corpus and a benchmark has two failure modes: leave contamination in and the benchmark measures memory; strip too broadly and the corpus loses legitimate text. A benchmark the model has seen is not a measurement.
+
 #### Go and do it
 
 Documents are copied into the corpus and the filter has to find them. Open **Contaminate the benchmark** in the data-lab application.
@@ -443,6 +474,17 @@ How the proportions of a training set are chosen: the worst-domain objective, th
 > Correct.
 
 > **Why:** The mixture is a distribution over domains, and it is a decision about which capability the model buys with its compute.
+
+**Q. What does choosing a data mixture decide? — multiple-choice *(core)***
+
+- Only the average loss across all domains
+- ✓ **Which capability the training buys: the mixture is a distribution over domains, and each domain is a purchase**
+- The speed of the training run
+- Nothing; models learn everything from any mixture
+
+> Correct — the per-domain losses show what was bought and what was traded.
+
+> **Why:** A mixture is a probability distribution over domains, and a decision about which capability to buy. Measure the per-domain loss of a model trained under a mixture and the trade is visible: the domains you fed are the ones the model got good at.
 
 #### Go and do it
 

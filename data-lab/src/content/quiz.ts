@@ -244,4 +244,88 @@ export const QUIZ: QuizQuestion[] = [
     citation: RECURSION,
     lessonId: 'the-refinement-loop',
   },
+  {
+    id: 'q-frontier-trade',
+    kind: 'multiple-choice',
+    prompt: 'A fixed filtering budget is spent on a corpus. What trade does it force, and when does the smaller side win?',
+    topic: 'The quality frontier',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'Tokens against parameters; more tokens always win', feedback: 'The frontier is inside the data budget, not between data and parameters.' },
+      {
+        id: 'b',
+        label: 'Quantity against quality: filtering discards tokens, and a smaller, cleaner set beats a larger, noisier one once the noise dominates',
+        feedback: 'Correct — the effective tokens are what the budget actually buys.',
+      },
+      { id: 'c', label: 'Language coverage against code coverage', feedback: 'A mixture question, not the filtering frontier.' },
+      { id: 'd', label: 'There is no trade; filtering only ever helps', feedback: 'Filtering costs tokens, and over-filtering discards signal.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'A fixed compute budget buys a fixed number of effective tokens. Filtering trades raw quantity for quality: compute the effective number of tokens a budget actually buys, and the smaller cleaner dataset wins exactly when the removed noise was costing more than the removed signal.',
+    citation: DATACOMP,
+    lessonId: 'the-quality-frontier',
+  },
+  {
+    id: 'q-unigram-boiler',
+    kind: 'multiple-choice',
+    prompt: 'Why does the reference model have to be an n-gram model rather than a unigram one, for filtering boilerplate?',
+    topic: 'The reference model',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'Because unigram models cannot count words', feedback: 'A unigram model is a word counter — that is precisely its weakness.' },
+      {
+        id: 'b',
+        label: 'Because boilerplate is ordinary in its word frequencies but unusual in its sequences, and only an n-gram model sees the order',
+        feedback: 'Correct — stupid backoff scores the sequence, not the bag.',
+      },
+      { id: 'c', label: 'Because n-gram models are smaller to store', feedback: 'They are larger, and worth it.' },
+      { id: 'd', label: 'Because a unigram model cannot be evaluated in perplexity', feedback: 'It can — that is the trouble: its perplexity likes boilerplate.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'Perplexity under the reference model is the filter\u2019s score. A unigram model finds boilerplate perfectly probable — its words are all common. An n-gram model with stupid backoff notices that the sequences never vary, and prices the page accordingly.',
+    citation: DATACOMP,
+    lessonId: 'the-reference-model',
+  },
+  {
+    id: 'q-decontam-wrong',
+    kind: 'multi-select',
+    prompt: 'A decontamination procedure can be wrong in two directions. Which are they?',
+    topic: 'Decontamination',
+    difficulty: 'hard',
+    options: [
+      { id: 'a', label: 'It misses contaminated documents, and the benchmark keeps measuring memory', feedback: 'Correct — the silent failure that inflates scores.' },
+      { id: 'b', label: 'It removes innocent documents that merely resemble the benchmark, and the training corpus loses good data', feedback: 'Correct — the overaggressive failure.' },
+      { id: 'c', label: 'It deduplicates exact copies, which is the same thing as decontamination', feedback: 'Deduplication and decontamination are different tests with different targets.' },
+      { id: 'd', label: 'It cannot be wrong in more than one direction', feedback: 'It can fail open and fail closed — the two directions above.' },
+    ],
+    correctOptionIds: ['a', 'b'],
+    explanation:
+      'The n-gram overlap test between a corpus and a benchmark has two failure modes: leave contamination in and the benchmark measures memory; strip too broadly and the corpus loses legitimate text. A benchmark the model has seen is not a measurement.',
+    citation: DATACOMP,
+    lessonId: 'decontamination',
+  },
+  {
+    id: 'q-mixture-capability',
+    kind: 'multiple-choice',
+    prompt: 'What does choosing a data mixture decide?',
+    topic: 'A mixture is a policy',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'Only the average loss across all domains', feedback: 'The average hides exactly what the mixture is choosing.' },
+      {
+        id: 'b',
+        label: 'Which capability the training buys: the mixture is a distribution over domains, and each domain is a purchase',
+        feedback: 'Correct — the per-domain losses show what was bought and what was traded.',
+      },
+      { id: 'c', label: 'The speed of the training run', feedback: 'Domain proportions do not set the step cost.' },
+      { id: 'd', label: 'Nothing; models learn everything from any mixture', feedback: 'The per-domain losses move with the mixture — measurably.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'A mixture is a probability distribution over domains, and a decision about which capability to buy. Measure the per-domain loss of a model trained under a mixture and the trade is visible: the domains you fed are the ones the model got good at.',
+    citation: DOREMI,
+    lessonId: 'a-mixture-is-a-policy',
+  },
 ]

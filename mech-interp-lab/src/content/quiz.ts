@@ -83,4 +83,44 @@ export const QUIZ: QuizQuestion[] = [
     { id: 'd', label: 'Because scores have to increase monotonically', feedback: 'They do not, and that is not the reason.' },
   ], correctOptionId: 'a', explanation: 'A key path and the query path that reads it only work together: each looks essential while both are present, and one becomes free the moment the other goes. A single ranking would delete the wrong edge first.', citation: CIRCUITS, lessonId: 'automating-the-search' },
   { id: 'q-circuits-4', kind: 'boolean', prompt: 'A pruned graph that is faithful but not complete names every component the behaviour depends on.', topic: 'Automated circuit discovery', difficulty: 'hard', truth: false, explanation: 'No. Faithfulness says the graph reproduces the behaviour on its own; completeness says nothing outside it is needed. A faithful-but-incomplete graph is an explanation that still leans on a component it has never named — which is why the two criteria are reported as a pair.', citation: CIRCUITS, lessonId: 'automating-the-search' },
+  {
+    id: 'q-threshold-drops',
+    kind: 'multiple-choice',
+    prompt: 'A feature sits below the importance threshold the model enforces. What happens to it, and to the interference?',
+    topic: 'The importance threshold',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'The feature is represented more sharply, and interference rises', feedback: 'The opposite: below the threshold the feature is the one that goes.' },
+      { id: 'b', label: 'The model drops the feature, and the interference it was causing goes with it', feedback: 'Correct — dropping the tail is what the threshold is for.' },
+      { id: 'c', label: 'The feature stays but its direction is rotated away from the others', feedback: 'Rotation is superposition\u2019s trick for kept features; the dropped ones simply go.' },
+      { id: 'd', label: 'The threshold rises to keep the feature', feedback: 'The threshold is set by the importance distribution, not by any one feature.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'When a feature is not worth representing, the model drops it — and the interference it was contributing goes with it. The threshold is measurable: it is where a feature starts being worth a direction of its own.',
+    citation: SAE,
+    lessonId: 'the-importance-threshold',
+  },
+  {
+    id: 'q-poly-why',
+    kind: 'multiple-choice',
+    prompt: 'Why does superposition make polysemantic neurons unavoidable rather than accidental?',
+    topic: 'Polysemanticity',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'Because neurons are randomly initialised', feedback: 'Initialisation washes out in training; the economics stay.' },
+      {
+        id: 'b',
+        label: 'Because representing more features than there are directions is the cheap option, and sharing directions is how that is done',
+        feedback: 'Correct — polysemanticity is the visible cost of superposition.',
+      },
+      { id: 'c', label: 'Because models are trained on too little data', feedback: 'More data does not remove the pressure to share.' },
+      { id: 'd', label: 'Because ReLU units cannot represent negatives', feedback: 'The phenomenon appears across activations.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'A model has more features worth representing than directions to put them in. Superposition — several nearly-orthogonal directions packed into one space — is the cheap way out, and a neuron that responds to several things is what that looks like from outside. A monosemantic neuron is the luxury the width has to pay for.',
+    citation: SAE,
+    lessonId: 'polysemanticity',
+  },
 ]

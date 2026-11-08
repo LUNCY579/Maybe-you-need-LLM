@@ -11,16 +11,16 @@ The same books are also rendered as a navigable HTML edition with the mathematic
 | [Diffusion Lab](diffusion-lab.md) | 12 | 7,933 | Denoising Diffusion Probabilistic Models (2020) |
 | [Evaluation Lab](evaluation-lab.md) | 12 | 7,224 | Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena (2023) |
 | [RLHF Lab](rlhf-lab.md) | 11 | 7,233 | The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization (2024) |
-| [Language Model from Scratch](lm-from-scratch.md) | 11 | 6,648 | CS336: Language Modeling from Scratch (2026) |
-| [Mechanistic Interpretability Lab](mech-interp-lab.md) | 10 | 7,197 | Toy Models of Superposition (2023) |
-| [Data Lab](data-lab.md) | 10 | 7,169 | DataComp: In search of the next generation of multimodal datasets (2023) |
+| [Language Model from Scratch](lm-from-scratch.md) | 11 | 7,035 | CS336: Language Modeling from Scratch (2026) |
+| [Mechanistic Interpretability Lab](mech-interp-lab.md) | 10 | 7,508 | Toy Models of Superposition (2023) |
+| [Data Lab](data-lab.md) | 10 | 7,646 | DataComp: In search of the next generation of multimodal datasets (2023) |
 | [Scaling Lab](scaling-lab.md) | 23 | 23,243 | Scaling Laws for Neural Language Models (2020) |
 | [Systems Lab](systems-lab.md) | 8 | 6,105 | FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (2022) |
 | [Reinforcement Learning Foundations](rl-foundations.md) | 8 | 5,244 | Reinforcement Learning: An Introduction (second edition) (2018) |
 | [Retrieval Lab](retrieval-lab.md) | 8 | 5,481 | Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (2020) |
 | [Agent Benchmark Lab](agent-bench-lab.md) | 8 | 5,183 | SWE-bench: Can Language Models Resolve Real-World GitHub Issues? (2023) |
 | [Safety and Alignment Lab](safety-lab.md) | 14 | 8,052 | Constitutional AI: Harmlessness from AI Feedback (2022) |
-| [Multimodal Lab](multimodal-lab.md) | 9 | 5,578 | Learning Transferable Visual Models From Natural Language Supervision (2021) |
+| [Multimodal Lab](multimodal-lab.md) | 9 | 6,148 | Learning Transferable Visual Models From Natural Language Supervision (2021) |
 | [LLM Foundations Lab](llm-foundations-lab.md) | 18 | 28,417 | Foundations of Large Language Models (2026) |
 | [Agentic AI Academy](agentic-ai-academy.md) | 12 | 43,904 | Agentic Large Language Models (2026) |
 | [Deep Learning Theory Explorer](deep-learning-theory-explorer.md) | 11 | 11,706 | The Principles of Deep Learning Theory (2022) |

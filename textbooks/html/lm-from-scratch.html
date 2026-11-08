@@ -204,6 +204,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Because the embedding and output matrices get larger</strong></li><li>Because the sequences get longer, so the attention cost grows</li><li>Because the optimiser has more states to carry</li><li>It does make training cheaper</li></ul>
 <blockquote><p>Correct — that is half of it.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A larger vocabulary shortens the sequence but enlarges the two vocabulary-sized matrices. The two effects pull in opposite directions, which is why the vocabulary and the width have to be chosen together.</p></blockquote>
+<p>*<em>Q. A model with d_model = 512 uses a vocabulary of 100,000 tokens. How many parameters do the token embeddings alone require, in millions? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 51.2 ± 0.01</p></blockquote>
+<blockquote><p><strong>Why:</strong> The embedding matrix is vocabulary × d_model: 100,000 × 512 = 51.2 million parameters before a single layer is built. Every token saved from the vocabulary is a parameter that can be spent elsewhere — which is why the vocabulary size is an economic decision, not a natural constant.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Watch the embedding parameters and the corpus length move against each other. Open <strong>The cost of a vocabulary</strong> in the lm-from-scratch application.</p>
 <p><strong>Where this came from</strong></p>
@@ -249,6 +252,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A model has a vocabulary of 32,000, a width of 768 and 12 layers, and it ties its output projection to the embedding. How many parameters does the embedding account for, in millions? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 24.576 ± 0.001 million parameters</p></blockquote>
 <blockquote><p><strong>Why:</strong> 32,000 × 768 = 24,576,000, which is 24.576 million. With the output tied, the vocabulary-sized parameters are paid for once instead of twice.</p></blockquote>
+<p>*<em>Q. What does tying the output projection to the input embedding do to the parameter budget? — multiple-choice </em>(core)***</p>
+<ul><li>It halves the embedding matrix</li><li>✓ <strong>It removes a separate vocabulary × d_model output matrix, whose cost grows with the vocabulary</strong></li><li>It makes the model train faster without changing the count</li><li>It removes the positional encoding</li></ul>
+<blockquote><p>Correct — the same matrix reads the logits out.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The output projection is another vocabulary × d_model matrix — at large vocabularies it rivals the embedding itself. Tying shares one matrix for both roles, and for small models the embedding can dominate the entire parameter count, which is exactly when the tie matters most.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The parameter breakdown as the width, the depth and the vocabulary move. Open <strong>The budget</strong> in the lm-from-scratch application.</p>
 <p><strong>Where this came from</strong></p>
@@ -399,6 +406,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>It is computed on data the model never trained on</strong></li><li>It is computed with a different tokeniser</li><li>It is the training loss, averaged</li><li>It uses a different loss function</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The training loss is a diagnostic of the optimiser; the validation loss is a measurement of the model. The gap between them is the overfitting.</p></blockquote>
+<p>*<em>Q. A model evaluates a document at a cross-entropy loss of 2.0 nats per token. What is its perplexity on that document? — numeric </em>(warmup)***</p>
+<blockquote><p><strong>Answer:</strong> 7.39 ± 0.02</p></blockquote>
+<blockquote><p><strong>Why:</strong> Perplexity is e^loss: e^2.0 ≈ 7.39. The number is the effective size of the fair coin the model is flipping per token — and it inherits every assumption the loss made about the distribution.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Read the perplexity alongside the loss and the validation number. Open <strong>The number and what is behind it</strong> in the lm-from-scratch application.</p>
 <p><strong>Where this came from</strong></p>
@@ -418,6 +428,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The model size that minimises the loss for a fixed compute budget</strong></li><li>The largest model the hardware can hold</li><li>The number of epochs before overfitting</li><li>The learning rate schedule</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> For each model size, find the data that uses the same compute, and read the best point off the curve. Chinchilla used it to find the compute-optimal allocation.</p></blockquote>
+<p>*<em>Q. What can a scaling law tell you before any expensive run is spent? — multiple-choice </em>(core)***</p>
+<ul><li>The exact loss the final model will reach</li><li>✓ <strong>The shape of the loss curve, and therefore what the next budget is likely to buy</strong></li><li>Whether the model will generalise to a new language</li><li>The optimal architecture</li></ul>
+<blockquote><p>Correct — that is what the law is for, and also where it stops.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A power law lets you say what the next doubling buys while it is still cheap to measure the curve. What it cannot tell you is what capabilities the scaling will produce — the shape of a loss is not a map of what the model learns.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Trace the compute-optimal frontier and read the optimal allocation off it. Open <strong>The IsoFLOP picture</strong> in the lm-from-scratch application.</p>
 <p><strong>Where this came from</strong></p>

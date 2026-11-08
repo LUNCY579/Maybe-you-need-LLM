@@ -250,7 +250,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-toy-model'],
     glossaryTerms: ['importance', 'interference', 'polysemanticity'],
-    quizIds: ['q-superposition-3'],
+    quizIds: ['q-superposition-3', 'q-threshold-drops'],
     sourceRefs: [
       {
         chapter: 2,
@@ -287,7 +287,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-importance-threshold'],
     glossaryTerms: ['polysemanticity', 'monosemanticity', 'feature'],
-    quizIds: ['q-features-1'],
+    quizIds: ['q-features-1', 'q-poly-why'],
     sourceRefs: [
       {
         chapter: 1,
@@ -476,7 +476,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-workflow'],
     glossaryTerms: ['induction-head', 'previous-token-head', 'composition', 'in-context-learning'],
-    quizIds: ['q-induction-1', 'q-induction-2'],
+    quizIds: ['q-induction-1', 'q-induction-2', 'q-induction-3'],
     sourceRefs: [
       {
         chapter: 1,

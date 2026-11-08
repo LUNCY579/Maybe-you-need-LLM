@@ -105,7 +105,7 @@ which is the honest statement of what an automated discovery method reports.
 
 ### The rest of the course
 
-- **Practice** — 19 questions with per-option feedback, worked explanations and source
+- **Practice** — 21 questions with per-option feedback, worked explanations and source
   citations. The numeric questions have tolerances tight enough that a plausible guess
   fails.
 - **Glossary** — 31 terms, each with a plain-language definition and the terms that

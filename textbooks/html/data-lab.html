@@ -203,6 +203,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A corpus holds 10 billion tokens, and deduplication shows that 40% of the documents are near-duplicates of another document. How many tokens of distinct text are there? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 6</p></blockquote>
 <blockquote><p><strong>Why:</strong> Ten billion tokens, of which 40% are duplicates: 10 × (1 − 0.4) = 6 billion tokens of distinct text.</p></blockquote>
+<p>*<em>Q. A fixed filtering budget is spent on a corpus. What trade does it force, and when does the smaller side win? — multiple-choice </em>(core)***</p>
+<ul><li>Tokens against parameters; more tokens always win</li><li>✓ <strong>Quantity against quality: filtering discards tokens, and a smaller, cleaner set beats a larger, noisier one once the noise dominates</strong></li><li>Language coverage against code coverage</li><li>There is no trade; filtering only ever helps</li></ul>
+<blockquote><p>Correct — the effective tokens are what the budget actually buys.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A fixed compute budget buys a fixed number of effective tokens. Filtering trades raw quantity for quality: compute the effective number of tokens a budget actually buys, and the smaller cleaner dataset wins exactly when the removed noise was costing more than the removed signal.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Five rows trained under the same token and compute budget — the raw corpus, the filtered one at full and at half budget, the control with the same documents and the same steps, and an oracle nobody can run. Open <strong>Spend one budget five ways</strong> in the data-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -248,6 +252,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A document has 100 tokens and the model assigns it a total log-likelihood of −460. What is its perplexity? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 99.484 ± 0.01</p></blockquote>
 <blockquote><p><strong>Why:</strong> The mean negative log-likelihood per token is 460/100 = 4.6, and the perplexity is exp(4.6) ≈ 99.48.</p></blockquote>
+<p>*<em>Q. Why does the reference model have to be an n-gram model rather than a unigram one, for filtering boilerplate? — multiple-choice </em>(core)***</p>
+<ul><li>Because unigram models cannot count words</li><li>✓ <strong>Because boilerplate is ordinary in its word frequencies but unusual in its sequences, and only an n-gram model sees the order</strong></li><li>Because n-gram models are smaller to store</li><li>Because a unigram model cannot be evaluated in perplexity</li></ul>
+<blockquote><p>Correct — stupid backoff scores the sequence, not the bag.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Perplexity under the reference model is the filter’s score. A unigram model finds boilerplate perfectly probable — its words are all common. An n-gram model with stupid backoff notices that the sequences never vary, and prices the page accordingly.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The same corpus scored under references fitted on different pools — the crawl, one domain, another — and the two rules that use them: the near-duplicate clusters MIDAS keeps, and the perplexity cut taken at a quantile. Open <strong>Cut at a quantile of the reference model</strong> in the data-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -294,6 +302,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Deduplication removes copies of each other; decontamination removes copies of the evaluation set</strong></li><li>They are two names for the same procedure</li><li>Deduplication is exact and decontamination is fuzzy</li><li>Decontamination is applied before deduplication</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Deduplication is about wasting compute; decontamination is about whether the score means anything.</p></blockquote>
+<p>*<em>Q. A decontamination procedure can be wrong in two directions. Which are they? — multi-select </em>(hard)***</p>
+<ul><li>✓ <strong>It misses contaminated documents, and the benchmark keeps measuring memory</strong></li><li>✓ <strong>It removes innocent documents that merely resemble the benchmark, and the training corpus loses good data</strong></li><li>It deduplicates exact copies, which is the same thing as decontamination</li><li>It cannot be wrong in more than one direction</li></ul>
+<blockquote><p><strong>Why:</strong> The n-gram overlap test between a corpus and a benchmark has two failure modes: leave contamination in and the benchmark measures memory; strip too broadly and the corpus loses legitimate text. A benchmark the model has seen is not a measurement.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Documents are copied into the corpus and the filter has to find them. Open <strong>Contaminate the benchmark</strong> in the data-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -320,6 +331,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The proportion of training tokens each domain receives</strong></li><li>Which documents are duplicates</li><li>The learning rate schedule</li><li>The tokeniser</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The mixture is a distribution over domains, and it is a decision about which capability the model buys with its compute.</p></blockquote>
+<p>*<em>Q. What does choosing a data mixture decide? — multiple-choice </em>(core)***</p>
+<ul><li>Only the average loss across all domains</li><li>✓ <strong>Which capability the training buys: the mixture is a distribution over domains, and each domain is a purchase</strong></li><li>The speed of the training run</li><li>Nothing; models learn everything from any mixture</li></ul>
+<blockquote><p>Correct — the per-domain losses show what was bought and what was traded.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A mixture is a probability distribution over domains, and a decision about which capability to buy. Measure the per-domain loss of a model trained under a mixture and the trade is visible: the domains you fed are the ones the model got good at.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The mixture the corpus proposes, and the per-domain loss of the model trained on it. Open <strong>See the natural mixture</strong> in the data-lab application.</p>
 <p><strong>Where this came from</strong></p>

@@ -263,4 +263,88 @@ export const QUIZ: QuizQuestion[] = [
     citation: COURSE,
     lessonId: 'the-resampler',
   },
+  {
+    id: 'q-batch-negatives',
+    kind: 'multiple-choice',
+    prompt: 'In the contrastive image\u2013text training, what does a larger batch buy?',
+    topic: 'The data and the batch',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'A longer context for the text encoder', feedback: 'The text encoder sees one caption per pair; the batch size is unrelated to its context.' },
+      { id: 'b', label: 'More negatives, and therefore a better estimate of what the model must tell apart', feedback: 'Correct — the batch is the discrimination task.' },
+      { id: 'c', label: 'A smaller embedding space', feedback: 'The embedding dimension is an architecture choice.' },
+      { id: 'd', label: 'Less precomputation for the index', feedback: 'The index precomputation is an inference-time matter.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The training asks each image to find its own caption among the batch\u2019s candidates. A larger batch gives more negatives and a better estimate of the discrimination the model is being asked to learn — and the scale of the pretraining data is what makes the estimate worth having.',
+    citation: CLIP,
+    lessonId: 'the-data-and-the-batch',
+  },
+  {
+    id: 'q-gap-defined',
+    kind: 'multiple-choice',
+    prompt: 'What is the modality gap in a trained contrastive image\u2013text model?',
+    topic: 'The modality gap',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'The difference in dimensionality between the image and text encoders', feedback: 'Both encoders emit into the same dimension; that is the point of the space.' },
+      {
+        id: 'b',
+        label: 'Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it',
+        feedback: 'Correct — close spaces, not the same space.',
+      },
+      { id: 'c', label: 'The distance between an image and its own caption, which training drives to zero', feedback: 'Training pulls matched pairs together; the gap is between the two clouds, not the pairs.' },
+      { id: 'd', label: 'A bug in the normalisation of the embeddings', feedback: 'The gap appears in well-normalised, well-trained models.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.',
+    citation: CLIP,
+    lessonId: 'the-modality-gap',
+  },
+  {
+    id: 'q-zero-shot-prompt',
+    kind: 'multiple-choice',
+    prompt: 'In the zero-shot classifier, what part does the prompt play?',
+    topic: 'Zero-shot',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'None; the class names alone determine everything', feedback: 'The wrapper sentence around the class name measurably changes the accuracy.' },
+      {
+        id: 'b',
+        label: 'The class names are embedded as captions — and the wording wrapped around them changes the embedding, measurably',
+        feedback: 'Correct — the prompt is doing retrieval\u2019s job in classification\u2019s clothing.',
+      },
+      { id: 'c', label: 'It provides the gradients that adapt the encoder', feedback: 'No gradients move: the encoder is frozen.' },
+      { id: 'd', label: 'It selects which encoder layer to read out', feedback: 'The readout is the same for every class.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The zero-shot classifier embeds each class name as if it were a caption and takes the nearest image embedding — the connection to the retrieval the model was trained for. The part the prompt plays is measurable: the wrapper sentence is worth real accuracy.',
+    citation: CLIP,
+    lessonId: 'zero-shot',
+  },
+  {
+    id: 'q-tax-fact',
+    kind: 'multiple-choice',
+    prompt: 'What is the honest reading of the alignment tax?',
+    topic: 'The alignment tax',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'A defect of the instruction-tuning method, removable with better code', feedback: 'It appears across methods — it is a fact about training.' },
+      {
+        id: 'b',
+        label: 'A fact about training: tuning on instructions makes the model better at instructions and slightly worse at what it was good at',
+        feedback: 'Correct — the tax is measured on the original benchmark, and the gain is measured on the new one.',
+      },
+      { id: 'c', label: 'Evidence that the base model was badly trained', feedback: 'The base model is not the problem; the reallocation is.' },
+      { id: 'd', label: 'An artefact of evaluating with the wrong metric', feedback: 'Both sides of the ratio are measured honestly \u2014 that is how the tax got its name.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The tax is a ratio: the gain on the instructed task against the loss on the original one. It is a fact about training — the model\u2019s capacity is being reallocated — and the honest report states both numbers and the ratio between them.',
+    citation: LLAVA,
+    lessonId: 'the-alignment-tax',
+  },
 ]

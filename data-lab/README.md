@@ -94,7 +94,7 @@ download and nothing is fetched.
 
 ### The rest of the course
 
-- **Practice** — 16 questions with per-option feedback, worked explanations and source citations. The numeric
+- **Practice** — 20 questions with per-option feedback, worked explanations and source citations. The numeric
   questions have tolerances tight enough that a plausible guess fails.
 - **Glossary** — 22 terms, each with a plain-language definition and the terms that should be understood first. The
   dependency graph is checked for cycles.

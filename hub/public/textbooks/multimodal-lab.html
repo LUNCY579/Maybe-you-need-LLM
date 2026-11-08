@@ -175,6 +175,13 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. The in-batch negatives are free: they are the other pairs the batch already contains. — boolean </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. A batch of B pairs gives B² pairs of which B are correct, and the rest cost nothing — which is why the method scales with the size of the batch.</p></blockquote>
+<p>*<em>Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice </em>(core)***</p>
+<ul><li>The difference in dimensionality between the image and text encoders</li><li>✓ <strong>Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it</strong></li><li>The distance between an image and its own caption, which training drives to zero</li><li>A bug in the normalisation of the embeddings</li></ul>
+<blockquote><p>Correct — close spaces, not the same space.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.</p></blockquote>
+<p>*<em>Q. A batch of 32 pairs gives how many image–caption pairs, of which how many are correct? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 1024</p></blockquote>
+<blockquote><p><strong>Why:</strong> 32 squared is 1,024 pairs, of which 32 are the correct ones and 992 are negatives — free, because the batch already contained them.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The loss, the gradient, and the retrieval, with the temperature and the batch size exposed. Open <strong>Train the contrastive model</strong> in the multimodal-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -193,6 +200,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Because a document’s embedding does not depend on what is being retrieved</strong></li><li>Because the encoder is small</li><li>Because the training has finished</li><li>Because the index is approximate</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> So the index is a matrix and the search is a matrix product — which is what makes a corpus of billions affordable.</p></blockquote>
+<p>*<em>Q. In the contrastive image–text training, what does a larger batch buy? — multiple-choice </em>(core)***</p>
+<ul><li>A longer context for the text encoder</li><li>✓ <strong>More negatives, and therefore a better estimate of what the model must tell apart</strong></li><li>A smaller embedding space</li><li>Less precomputation for the index</li></ul>
+<blockquote><p>Correct — the batch is the discrimination task.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The training asks each image to find its own caption among the batch’s candidates. A larger batch gives more negatives and a better estimate of the discrimination the model is being asked to learn — and the scale of the pretraining data is what makes the estimate worth having.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The retrieval against the batch size and against the number of pairs. Open <strong>Scale the batch and the data</strong> in the multimodal-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -236,6 +247,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Because a class name is a caption, and the model was trained to match captions to images</strong></li><li>Because the model was trained to classify</li><li>Because the embeddings are normalised</li><li>Because the batch contained the classes</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The classifier is a retrieval against a set of captions that happen to be the class names.</p></blockquote>
+<p>*<em>Q. In the zero-shot classifier, what part does the prompt play? — multiple-choice </em>(core)***</p>
+<ul><li>None; the class names alone determine everything</li><li>✓ <strong>The class names are embedded as captions — and the wording wrapped around them changes the embedding, measurably</strong></li><li>It provides the gradients that adapt the encoder</li><li>It selects which encoder layer to read out</li></ul>
+<blockquote><p>Correct — the prompt is doing retrieval’s job in classification’s clothing.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The zero-shot classifier embeds each class name as if it were a caption and takes the nearest image embedding — the connection to the retrieval the model was trained for. The part the prompt plays is measurable: the wrapper sentence is worth real accuracy.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The zero-shot accuracy, and what each prompt template is worth. Open <strong>Classify with the names</strong> in the multimodal-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -263,6 +278,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A 1024-wide vision token is projected to 4096 dimensions by a linear layer with a bias. How many parameters does the layer have? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 4198400</p></blockquote>
 <blockquote><p><strong>Why:</strong> 1024 × 4096 = 4,194,304 entries in the matrix, plus 4096 bias terms, is 4,198,400. The number of tokens does not appear: the same matrix projects 576 tokens or four.</p></blockquote>
+<p>*<em>Q. Few-shot learning puts the examples in the context rather than in the weights. — boolean </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
+<blockquote><p><strong>Why:</strong> Yes — a different mechanism from fine-tuning, and a different bill, which is why the two are reported separately.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The gain on the instructions and the tax on everything else, as the tuning is strengthened. Open <strong>Run the recipe</strong> in the multimodal-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -282,6 +300,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The accuracy the model gives up on its original task, measured before and after the tuning</strong></li><li>The cost of running the tuning</li><li>The size of the instruction dataset</li><li>A failure of the method</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is a measurement on the original task, and the ratio between the gain and the tax is the number a practitioner is shopping for.</p></blockquote>
+<p>*<em>Q. What is the honest reading of the alignment tax? — multiple-choice </em>(core)***</p>
+<ul><li>A defect of the instruction-tuning method, removable with better code</li><li>✓ <strong>A fact about training: tuning on instructions makes the model better at instructions and slightly worse at what it was good at</strong></li><li>Evidence that the base model was badly trained</li><li>An artefact of evaluating with the wrong metric</li></ul>
+<blockquote><p>Correct — the tax is measured on the original benchmark, and the gain is measured on the new one.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The tax is a ratio: the gain on the instructed task against the loss on the original one. It is a fact about training — the model’s capacity is being reallocated — and the honest report states both numbers and the ratio between them.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The gain, the tax, and the ratio between them. Open <strong>Pay the tax</strong> in the multimodal-lab application.</p>
 <p><strong>Where this came from</strong></p>

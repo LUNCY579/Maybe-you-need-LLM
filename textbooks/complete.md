@@ -4152,6 +4152,12 @@ Train a byte-pair encoding on a generated corpus and watch the merges accumulate
 
 > **Why:** A larger vocabulary shortens the sequence but enlarges the two vocabulary-sized matrices. The two effects pull in opposite directions, which is why the vocabulary and the width have to be chosen together.
 
+**Q. A model with d_model = 512 uses a vocabulary of 100,000 tokens. How many parameters do the token embeddings alone require, in millions? — numeric *(core)***
+
+> **Answer:** 51.2 ± 0.01
+
+> **Why:** The embedding matrix is vocabulary × d_model: 100,000 × 512 = 51.2 million parameters before a single layer is built. Every token saved from the vocabulary is a parameter that can be spent elsewhere — which is why the vocabulary size is an economic decision, not a natural constant.
+
 #### Go and do it
 
 Watch the embedding parameters and the corpus length move against each other. Open **The cost of a vocabulary** in the lm-from-scratch application.
@@ -4260,6 +4266,17 @@ Count every parameter of a model and see which part of it dominates. Open **Coun
 > **Answer:** 24.576 ± 0.001 million parameters
 
 > **Why:** 32,000 × 768 = 24,576,000, which is 24.576 million. With the output tied, the vocabulary-sized parameters are paid for once instead of twice.
+
+**Q. What does tying the output projection to the input embedding do to the parameter budget? — multiple-choice *(core)***
+
+- It halves the embedding matrix
+- ✓ **It removes a separate vocabulary × d_model output matrix, whose cost grows with the vocabulary**
+- It makes the model train faster without changing the count
+- It removes the positional encoding
+
+> Correct — the same matrix reads the logits out.
+
+> **Why:** The output projection is another vocabulary × d_model matrix — at large vocabularies it rivals the embedding itself. Tying shares one matrix for both roles, and for small models the embedding can dominate the entire parameter count, which is exactly when the tie matters most.
 
 #### Go and do it
 
@@ -4636,6 +4653,12 @@ Train a real transformer in the browser and watch the loss fall. Open **Run a tr
 
 > **Why:** The training loss is a diagnostic of the optimiser; the validation loss is a measurement of the model. The gap between them is the overfitting.
 
+**Q. A model evaluates a document at a cross-entropy loss of 2.0 nats per token. What is its perplexity on that document? — numeric *(warmup)***
+
+> **Answer:** 7.39 ± 0.02
+
+> **Why:** Perplexity is e^loss: e^2.0 ≈ 7.39. The number is the effective size of the fair coin the model is flipping per token — and it inherits every assumption the loss made about the distribution.
+
 #### Go and do it
 
 Read the perplexity alongside the loss and the validation number. Open **The number and what is behind it** in the lm-from-scratch application.
@@ -4683,6 +4706,17 @@ Read the perplexity alongside the loss and the validation number. Open **The num
 > Correct.
 
 > **Why:** For each model size, find the data that uses the same compute, and read the best point off the curve. Chinchilla used it to find the compute-optimal allocation.
+
+**Q. What can a scaling law tell you before any expensive run is spent? — multiple-choice *(core)***
+
+- The exact loss the final model will reach
+- ✓ **The shape of the loss curve, and therefore what the next budget is likely to buy**
+- Whether the model will generalise to a new language
+- The optimal architecture
+
+> Correct — that is what the law is for, and also where it stops.
+
+> **Why:** A power law lets you say what the next doubling buys while it is still cheap to measure the curve. What it cannot tell you is what capabilities the scaling will produce — the shape of a loss is not a map of what the model learns.
 
 #### Go and do it
 
@@ -7823,6 +7857,17 @@ Take a raw corpus through the filters and watch what each stage removes. Open **
 
 > **Why:** Ten billion tokens, of which 40% are duplicates: 10 × (1 − 0.4) = 6 billion tokens of distinct text.
 
+**Q. A fixed filtering budget is spent on a corpus. What trade does it force, and when does the smaller side win? — multiple-choice *(core)***
+
+- Tokens against parameters; more tokens always win
+- ✓ **Quantity against quality: filtering discards tokens, and a smaller, cleaner set beats a larger, noisier one once the noise dominates**
+- Language coverage against code coverage
+- There is no trade; filtering only ever helps
+
+> Correct — the effective tokens are what the budget actually buys.
+
+> **Why:** A fixed compute budget buys a fixed number of effective tokens. Filtering trades raw quantity for quality: compute the effective number of tokens a budget actually buys, and the smaller cleaner dataset wins exactly when the removed noise was costing more than the removed signal.
+
 #### Go and do it
 
 Five rows trained under the same token and compute budget — the raw corpus, the filtered one at full and at half budget, the control with the same documents and the same steps, and an oracle nobody can run. Open **Spend one budget five ways** in the data-lab application.
@@ -7928,6 +7973,17 @@ The pipeline reports what each stage removed; the laboratory recomputes it from 
 > **Answer:** 99.484 ± 0.01
 
 > **Why:** The mean negative log-likelihood per token is 460/100 = 4.6, and the perplexity is exp(4.6) ≈ 99.48.
+
+**Q. Why does the reference model have to be an n-gram model rather than a unigram one, for filtering boilerplate? — multiple-choice *(core)***
+
+- Because unigram models cannot count words
+- ✓ **Because boilerplate is ordinary in its word frequencies but unusual in its sequences, and only an n-gram model sees the order**
+- Because n-gram models are smaller to store
+- Because a unigram model cannot be evaluated in perplexity
+
+> Correct — stupid backoff scores the sequence, not the bag.
+
+> **Why:** Perplexity under the reference model is the filter’s score. A unigram model finds boilerplate perfectly probable — its words are all common. An n-gram model with stupid backoff notices that the sequences never vary, and prices the page accordingly.
 
 #### Go and do it
 
@@ -8042,6 +8098,15 @@ The corpus is deduplicated here, with the candidate pairs the index proposed sho
 
 > **Why:** Deduplication is about wasting compute; decontamination is about whether the score means anything.
 
+**Q. A decontamination procedure can be wrong in two directions. Which are they? — multi-select *(hard)***
+
+- ✓ **It misses contaminated documents, and the benchmark keeps measuring memory**
+- ✓ **It removes innocent documents that merely resemble the benchmark, and the training corpus loses good data**
+- It deduplicates exact copies, which is the same thing as decontamination
+- It cannot be wrong in more than one direction
+
+> **Why:** The n-gram overlap test between a corpus and a benchmark has two failure modes: leave contamination in and the benchmark measures memory; strip too broadly and the corpus loses legitimate text. A benchmark the model has seen is not a measurement.
+
 #### Go and do it
 
 Documents are copied into the corpus and the filter has to find them. Open **Contaminate the benchmark** in the data-lab application.
@@ -8102,6 +8167,17 @@ How the proportions of a training set are chosen: the worst-domain objective, th
 > Correct.
 
 > **Why:** The mixture is a distribution over domains, and it is a decision about which capability the model buys with its compute.
+
+**Q. What does choosing a data mixture decide? — multiple-choice *(core)***
+
+- Only the average loss across all domains
+- ✓ **Which capability the training buys: the mixture is a distribution over domains, and each domain is a purchase**
+- The speed of the training run
+- Nothing; models learn everything from any mixture
+
+> Correct — the per-domain losses show what was bought and what was traded.
+
+> **Why:** A mixture is a probability distribution over domains, and a decision about which capability to buy. Measure the per-domain loss of a model trained under a mixture and the trade is visible: the domains you fed are the ones the model got good at.
 
 #### Go and do it
 
@@ -9764,6 +9840,17 @@ Fit the toy model at a given number of dimensions and read the interference. Ope
 
 > **Why:** Hosting a feature costs the host the interference; dropping it costs the feature its own importance. The threshold is where those cross.
 
+**Q. A feature sits below the importance threshold the model enforces. What happens to it, and to the interference? — multiple-choice *(core)***
+
+- The feature is represented more sharply, and interference rises
+- ✓ **The model drops the feature, and the interference it was causing goes with it**
+- The feature stays but its direction is rotated away from the others
+- The threshold rises to keep the feature
+
+> Correct — dropping the tail is what the threshold is for.
+
+> **Why:** When a feature is not worth representing, the model drops it — and the interference it was contributing goes with it. The threshold is measurable: it is where a feature starts being worth a direction of its own.
+
 #### Go and do it
 
 Sweep a feature’s importance and watch the model decide whether to keep it. Open **Find the threshold** in the mech-interp-lab application.
@@ -9817,6 +9904,17 @@ The central observation of mechanistic interpretability: individual neurons are 
 > **Answer:** True
 
 > **Why:** Yes. Superposition is what makes it cheap for one neuron to respond to several things, so polysemantic neurons are the cheap option rather than a failure.
+
+**Q. Why does superposition make polysemantic neurons unavoidable rather than accidental? — multiple-choice *(core)***
+
+- Because neurons are randomly initialised
+- ✓ **Because representing more features than there are directions is the cheap option, and sharing directions is how that is done**
+- Because models are trained on too little data
+- Because ReLU units cannot represent negatives
+
+> Correct — polysemanticity is the visible cost of superposition.
+
+> **Why:** A model has more features worth representing than directions to put them in. Superposition — several nearly-orthogonal directions packed into one space — is the cheap way out, and a neuron that responds to several things is what that looks like from outside. A monosemantic neuron is the luxury the width has to pay for.
 
 #### Go and do it
 
@@ -10206,6 +10304,12 @@ A single attention head can only match what is written at a position. Most of wh
 > **Answer:** False
 
 > **Why:** Without the shift, its keys are the tokens themselves, so it matches the earlier occurrence of the current token and copies that token — not the one that followed it. The laboratory’s ablation measures exactly this collapse.
+
+**Q. A block of 6 distinct tokens is repeated 3 times. How many positions have a next token and an earlier occurrence to match? — numeric *(hard)***
+
+> **Answer:** 11
+
+> **Why:** There are 18 positions. The first copy’s 6 positions have no earlier occurrence, and the last position of the third copy has no next token, so 18 − 6 − 1 = 11.
 
 #### Go and do it
 
@@ -21299,6 +21403,23 @@ The loss that says a pair should be closer than the other pairs in the batch, th
 
 > **Why:** Yes. A batch of B pairs gives B² pairs of which B are correct, and the rest cost nothing — which is why the method scales with the size of the batch.
 
+**Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice *(core)***
+
+- The difference in dimensionality between the image and text encoders
+- ✓ **Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it**
+- The distance between an image and its own caption, which training drives to zero
+- A bug in the normalisation of the embeddings
+
+> Correct — close spaces, not the same space.
+
+> **Why:** The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.
+
+**Q. A batch of 32 pairs gives how many image–caption pairs, of which how many are correct? — numeric *(core)***
+
+> **Answer:** 1024
+
+> **Why:** 32 squared is 1,024 pairs, of which 32 are the correct ones and 992 are negatives — free, because the batch already contained them.
+
 #### Go and do it
 
 The loss, the gradient, and the retrieval, with the temperature and the batch size exposed. Open **Train the contrastive model** in the multimodal-lab application.
@@ -21343,6 +21464,17 @@ The loss, the gradient, and the retrieval, with the temperature and the batch si
 > Correct.
 
 > **Why:** So the index is a matrix and the search is a matrix product — which is what makes a corpus of billions affordable.
+
+**Q. In the contrastive image–text training, what does a larger batch buy? — multiple-choice *(core)***
+
+- A longer context for the text encoder
+- ✓ **More negatives, and therefore a better estimate of what the model must tell apart**
+- A smaller embedding space
+- Less precomputation for the index
+
+> Correct — the batch is the discrimination task.
+
+> **Why:** The training asks each image to find its own caption among the batch’s candidates. A larger batch gives more negatives and a better estimate of the discrimination the model is being asked to learn — and the scale of the pretraining data is what makes the estimate worth having.
 
 #### Go and do it
 
@@ -21448,6 +21580,17 @@ The within-modal and the between-modal similarities, and the gap between them. O
 
 > **Why:** The classifier is a retrieval against a set of captions that happen to be the class names.
 
+**Q. In the zero-shot classifier, what part does the prompt play? — multiple-choice *(core)***
+
+- None; the class names alone determine everything
+- ✓ **The class names are embedded as captions — and the wording wrapped around them changes the embedding, measurably**
+- It provides the gradients that adapt the encoder
+- It selects which encoder layer to read out
+
+> Correct — the prompt is doing retrieval’s job in classification’s clothing.
+
+> **Why:** The zero-shot classifier embeds each class name as if it were a caption and takes the nearest image embedding — the connection to the retrieval the model was trained for. The part the prompt plays is measurable: the wrapper sentence is worth real accuracy.
+
 #### Go and do it
 
 The zero-shot accuracy, and what each prompt template is worth. Open **Classify with the names** in the multimodal-lab application.
@@ -21514,6 +21657,12 @@ The recipe that turns a model into an assistant, and the tax it pays on everythi
 
 > **Why:** 1024 × 4096 = 4,194,304 entries in the matrix, plus 4096 bias terms, is 4,198,400. The number of tokens does not appear: the same matrix projects 576 tokens or four.
 
+**Q. Few-shot learning puts the examples in the context rather than in the weights. — boolean *(hard)***
+
+> **Answer:** True
+
+> **Why:** Yes — a different mechanism from fine-tuning, and a different bill, which is why the two are reported separately.
+
 #### Go and do it
 
 The gain on the instructions and the tax on everything else, as the tuning is strengthened. Open **Run the recipe** in the multimodal-lab application.
@@ -21559,6 +21708,17 @@ The gain on the instructions and the tax on everything else, as the tuning is st
 > Correct.
 
 > **Why:** It is a measurement on the original task, and the ratio between the gain and the tax is the number a practitioner is shopping for.
+
+**Q. What is the honest reading of the alignment tax? — multiple-choice *(core)***
+
+- A defect of the instruction-tuning method, removable with better code
+- ✓ **A fact about training: tuning on instructions makes the model better at instructions and slightly worse at what it was good at**
+- Evidence that the base model was badly trained
+- An artefact of evaluating with the wrong metric
+
+> Correct — the tax is measured on the original benchmark, and the gain is measured on the new one.
+
+> **Why:** The tax is a ratio: the gain on the instructed task against the loss on the original one. It is a fact about training — the model’s capacity is being reallocated — and the honest report states both numbers and the ratio between them.
 
 #### Go and do it
 

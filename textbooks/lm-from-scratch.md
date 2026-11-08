@@ -164,6 +164,12 @@ Train a byte-pair encoding on a generated corpus and watch the merges accumulate
 
 > **Why:** A larger vocabulary shortens the sequence but enlarges the two vocabulary-sized matrices. The two effects pull in opposite directions, which is why the vocabulary and the width have to be chosen together.
 
+**Q. A model with d_model = 512 uses a vocabulary of 100,000 tokens. How many parameters do the token embeddings alone require, in millions? — numeric *(core)***
+
+> **Answer:** 51.2 ± 0.01
+
+> **Why:** The embedding matrix is vocabulary × d_model: 100,000 × 512 = 51.2 million parameters before a single layer is built. Every token saved from the vocabulary is a parameter that can be spent elsewhere — which is why the vocabulary size is an economic decision, not a natural constant.
+
 #### Go and do it
 
 Watch the embedding parameters and the corpus length move against each other. Open **The cost of a vocabulary** in the lm-from-scratch application.
@@ -272,6 +278,17 @@ Count every parameter of a model and see which part of it dominates. Open **Coun
 > **Answer:** 24.576 ± 0.001 million parameters
 
 > **Why:** 32,000 × 768 = 24,576,000, which is 24.576 million. With the output tied, the vocabulary-sized parameters are paid for once instead of twice.
+
+**Q. What does tying the output projection to the input embedding do to the parameter budget? — multiple-choice *(core)***
+
+- It halves the embedding matrix
+- ✓ **It removes a separate vocabulary × d_model output matrix, whose cost grows with the vocabulary**
+- It makes the model train faster without changing the count
+- It removes the positional encoding
+
+> Correct — the same matrix reads the logits out.
+
+> **Why:** The output projection is another vocabulary × d_model matrix — at large vocabularies it rivals the embedding itself. Tying shares one matrix for both roles, and for small models the embedding can dominate the entire parameter count, which is exactly when the tie matters most.
 
 #### Go and do it
 
@@ -648,6 +665,12 @@ Train a real transformer in the browser and watch the loss fall. Open **Run a tr
 
 > **Why:** The training loss is a diagnostic of the optimiser; the validation loss is a measurement of the model. The gap between them is the overfitting.
 
+**Q. A model evaluates a document at a cross-entropy loss of 2.0 nats per token. What is its perplexity on that document? — numeric *(warmup)***
+
+> **Answer:** 7.39 ± 0.02
+
+> **Why:** Perplexity is e^loss: e^2.0 ≈ 7.39. The number is the effective size of the fair coin the model is flipping per token — and it inherits every assumption the loss made about the distribution.
+
 #### Go and do it
 
 Read the perplexity alongside the loss and the validation number. Open **The number and what is behind it** in the lm-from-scratch application.
@@ -695,6 +718,17 @@ Read the perplexity alongside the loss and the validation number. Open **The num
 > Correct.
 
 > **Why:** For each model size, find the data that uses the same compute, and read the best point off the curve. Chinchilla used it to find the compute-optimal allocation.
+
+**Q. What can a scaling law tell you before any expensive run is spent? — multiple-choice *(core)***
+
+- The exact loss the final model will reach
+- ✓ **The shape of the loss curve, and therefore what the next budget is likely to buy**
+- Whether the model will generalise to a new language
+- The optimal architecture
+
+> Correct — that is what the law is for, and also where it stops.
+
+> **Why:** A power law lets you say what the next doubling buys while it is still cheap to measure the curve. What it cannot tell you is what capabilities the scaling will produce — the shape of a loss is not a map of what the model learns.
 
 #### Go and do it
 

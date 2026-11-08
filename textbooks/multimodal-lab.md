@@ -107,6 +107,23 @@ The loss that says a pair should be closer than the other pairs in the batch, th
 
 > **Why:** Yes. A batch of B pairs gives B² pairs of which B are correct, and the rest cost nothing — which is why the method scales with the size of the batch.
 
+**Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice *(core)***
+
+- The difference in dimensionality between the image and text encoders
+- ✓ **Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it**
+- The distance between an image and its own caption, which training drives to zero
+- A bug in the normalisation of the embeddings
+
+> Correct — close spaces, not the same space.
+
+> **Why:** The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.
+
+**Q. A batch of 32 pairs gives how many image–caption pairs, of which how many are correct? — numeric *(core)***
+
+> **Answer:** 1024
+
+> **Why:** 32 squared is 1,024 pairs, of which 32 are the correct ones and 992 are negatives — free, because the batch already contained them.
+
 #### Go and do it
 
 The loss, the gradient, and the retrieval, with the temperature and the batch size exposed. Open **Train the contrastive model** in the multimodal-lab application.
@@ -151,6 +168,17 @@ The loss, the gradient, and the retrieval, with the temperature and the batch si
 > Correct.
 
 > **Why:** So the index is a matrix and the search is a matrix product — which is what makes a corpus of billions affordable.
+
+**Q. In the contrastive image–text training, what does a larger batch buy? — multiple-choice *(core)***
+
+- A longer context for the text encoder
+- ✓ **More negatives, and therefore a better estimate of what the model must tell apart**
+- A smaller embedding space
+- Less precomputation for the index
+
+> Correct — the batch is the discrimination task.
+
+> **Why:** The training asks each image to find its own caption among the batch’s candidates. A larger batch gives more negatives and a better estimate of the discrimination the model is being asked to learn — and the scale of the pretraining data is what makes the estimate worth having.
 
 #### Go and do it
 
@@ -256,6 +284,17 @@ The within-modal and the between-modal similarities, and the gap between them. O
 
 > **Why:** The classifier is a retrieval against a set of captions that happen to be the class names.
 
+**Q. In the zero-shot classifier, what part does the prompt play? — multiple-choice *(core)***
+
+- None; the class names alone determine everything
+- ✓ **The class names are embedded as captions — and the wording wrapped around them changes the embedding, measurably**
+- It provides the gradients that adapt the encoder
+- It selects which encoder layer to read out
+
+> Correct — the prompt is doing retrieval’s job in classification’s clothing.
+
+> **Why:** The zero-shot classifier embeds each class name as if it were a caption and takes the nearest image embedding — the connection to the retrieval the model was trained for. The part the prompt plays is measurable: the wrapper sentence is worth real accuracy.
+
 #### Go and do it
 
 The zero-shot accuracy, and what each prompt template is worth. Open **Classify with the names** in the multimodal-lab application.
@@ -322,6 +361,12 @@ The recipe that turns a model into an assistant, and the tax it pays on everythi
 
 > **Why:** 1024 × 4096 = 4,194,304 entries in the matrix, plus 4096 bias terms, is 4,198,400. The number of tokens does not appear: the same matrix projects 576 tokens or four.
 
+**Q. Few-shot learning puts the examples in the context rather than in the weights. — boolean *(hard)***
+
+> **Answer:** True
+
+> **Why:** Yes — a different mechanism from fine-tuning, and a different bill, which is why the two are reported separately.
+
 #### Go and do it
 
 The gain on the instructions and the tax on everything else, as the tuning is strengthened. Open **Run the recipe** in the multimodal-lab application.
@@ -367,6 +412,17 @@ The gain on the instructions and the tax on everything else, as the tuning is st
 > Correct.
 
 > **Why:** It is a measurement on the original task, and the ratio between the gain and the tax is the number a practitioner is shopping for.
+
+**Q. What is the honest reading of the alignment tax? — multiple-choice *(core)***
+
+- A defect of the instruction-tuning method, removable with better code
+- ✓ **A fact about training: tuning on instructions makes the model better at instructions and slightly worse at what it was good at**
+- Evidence that the base model was badly trained
+- An artefact of evaluating with the wrong metric
+
+> Correct — the tax is measured on the original benchmark, and the gain is measured on the new one.
+
+> **Why:** The tax is a ratio: the gain on the instructed task against the loss on the original one. It is a fact about training — the model’s capacity is being reallocated — and the honest report states both numbers and the ratio between them.
 
 #### Go and do it
 

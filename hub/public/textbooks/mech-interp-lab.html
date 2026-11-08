@@ -199,6 +199,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Because hosting them would cost the host more than dropping them costs them</strong></li><li>Because they do not fit</li><li>Because they are noisy</li><li>It never does</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Hosting a feature costs the host the interference; dropping it costs the feature its own importance. The threshold is where those cross.</p></blockquote>
+<p>*<em>Q. A feature sits below the importance threshold the model enforces. What happens to it, and to the interference? — multiple-choice </em>(core)***</p>
+<ul><li>The feature is represented more sharply, and interference rises</li><li>✓ <strong>The model drops the feature, and the interference it was causing goes with it</strong></li><li>The feature stays but its direction is rotated away from the others</li><li>The threshold rises to keep the feature</li></ul>
+<blockquote><p>Correct — dropping the tail is what the threshold is for.</p></blockquote>
+<blockquote><p><strong>Why:</strong> When a feature is not worth representing, the model drops it — and the interference it was contributing goes with it. The threshold is measurable: it is where a feature starts being worth a direction of its own.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Sweep a feature’s importance and watch the model decide whether to keep it. Open <strong>Find the threshold</strong> in the mech-interp-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -222,6 +226,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A neuron in a superposed model is usually polysemantic. — boolean </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. Superposition is what makes it cheap for one neuron to respond to several things, so polysemantic neurons are the cheap option rather than a failure.</p></blockquote>
+<p>*<em>Q. Why does superposition make polysemantic neurons unavoidable rather than accidental? — multiple-choice </em>(core)***</p>
+<ul><li>Because neurons are randomly initialised</li><li>✓ <strong>Because representing more features than there are directions is the cheap option, and sharing directions is how that is done</strong></li><li>Because models are trained on too little data</li><li>Because ReLU units cannot represent negatives</li></ul>
+<blockquote><p>Correct — polysemanticity is the visible cost of superposition.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A model has more features worth representing than directions to put them in. Superposition — several nearly-orthogonal directions packed into one space — is the cheap way out, and a neuron that responds to several things is what that looks like from outside. A monosemantic neuron is the luxury the width has to pay for.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Count how many features each direction is carrying. Open <strong>How many features per direction</strong> in the mech-interp-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -376,6 +384,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. An induction head with no previous-token head can still find the token that followed the previous occurrence. — boolean </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> Without the shift, its keys are the tokens themselves, so it matches the earlier occurrence of the current token and copies that token — not the one that followed it. The laboratory’s ablation measures exactly this collapse.</p></blockquote>
+<p>*<em>Q. A block of 6 distinct tokens is repeated 3 times. How many positions have a next token and an earlier occurrence to match? — numeric </em>(hard)***</p>
+<blockquote><p><strong>Answer:</strong> 11</p></blockquote>
+<blockquote><p><strong>Why:</strong> There are 18 positions. The first copy’s 6 positions have no earlier occurrence, and the last position of the third copy has no next token, so 18 − 6 − 1 = 11.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>A hand-wired two-head circuit on a repeated sequence, with both attention patterns and the ablation. Open <strong>Complete the pattern</strong> in the mech-interp-lab application.</p>
 <p><strong>Where this came from</strong></p>

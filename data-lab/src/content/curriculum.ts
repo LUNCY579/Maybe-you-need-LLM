@@ -230,7 +230,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['what-a-crawl-gives-you'],
     glossaryTerms: ['compute-budget', 'ablation'],
-    quizIds: ['q-sources-3'],
+    quizIds: ['q-sources-3', 'q-frontier-trade'],
     sourceRefs: [
       {
         chapter: 4,
@@ -315,7 +315,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-filtering-pipeline'],
     glossaryTerms: ['perplexity', 'reference-model', 'boilerplate'],
-    quizIds: ['q-filtering-3'],
+    quizIds: ['q-filtering-3', 'q-unigram-boiler'],
     sourceRefs: [
       {
         chapter: 2,
@@ -393,7 +393,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['exact-and-fuzzy'],
     glossaryTerms: ['decontamination', 'benchmark-contamination'],
-    quizIds: ['q-dedup-3'],
+    quizIds: ['q-dedup-3', 'q-decontam-wrong'],
     sourceRefs: [
       {
         chapter: 2,
@@ -435,7 +435,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-filtering-pipeline'],
     glossaryTerms: ['mixture', 'domain', 'group-dro'],
-    quizIds: ['q-mixtures-1'],
+    quizIds: ['q-mixtures-1', 'q-mixture-capability'],
     sourceRefs: [
       {
         chapter: 1,

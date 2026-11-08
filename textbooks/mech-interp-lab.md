@@ -158,6 +158,17 @@ Fit the toy model at a given number of dimensions and read the interference. Ope
 
 > **Why:** Hosting a feature costs the host the interference; dropping it costs the feature its own importance. The threshold is where those cross.
 
+**Q. A feature sits below the importance threshold the model enforces. What happens to it, and to the interference? — multiple-choice *(core)***
+
+- The feature is represented more sharply, and interference rises
+- ✓ **The model drops the feature, and the interference it was causing goes with it**
+- The feature stays but its direction is rotated away from the others
+- The threshold rises to keep the feature
+
+> Correct — dropping the tail is what the threshold is for.
+
+> **Why:** When a feature is not worth representing, the model drops it — and the interference it was contributing goes with it. The threshold is measurable: it is where a feature starts being worth a direction of its own.
+
 #### Go and do it
 
 Sweep a feature’s importance and watch the model decide whether to keep it. Open **Find the threshold** in the mech-interp-lab application.
@@ -211,6 +222,17 @@ The central observation of mechanistic interpretability: individual neurons are 
 > **Answer:** True
 
 > **Why:** Yes. Superposition is what makes it cheap for one neuron to respond to several things, so polysemantic neurons are the cheap option rather than a failure.
+
+**Q. Why does superposition make polysemantic neurons unavoidable rather than accidental? — multiple-choice *(core)***
+
+- Because neurons are randomly initialised
+- ✓ **Because representing more features than there are directions is the cheap option, and sharing directions is how that is done**
+- Because models are trained on too little data
+- Because ReLU units cannot represent negatives
+
+> Correct — polysemanticity is the visible cost of superposition.
+
+> **Why:** A model has more features worth representing than directions to put them in. Superposition — several nearly-orthogonal directions packed into one space — is the cheap way out, and a neuron that responds to several things is what that looks like from outside. A monosemantic neuron is the luxury the width has to pay for.
 
 #### Go and do it
 
@@ -600,6 +622,12 @@ A single attention head can only match what is written at a position. Most of wh
 > **Answer:** False
 
 > **Why:** Without the shift, its keys are the tokens themselves, so it matches the earlier occurrence of the current token and copies that token — not the one that followed it. The laboratory’s ablation measures exactly this collapse.
+
+**Q. A block of 6 distinct tokens is repeated 3 times. How many positions have a next token and an earlier occurrence to match? — numeric *(hard)***
+
+> **Answer:** 11
+
+> **Why:** There are 18 positions. The first copy’s 6 positions have no earlier occurrence, and the last position of the third copy has no next token, so 18 − 6 − 1 = 11.
 
 #### Go and do it
 

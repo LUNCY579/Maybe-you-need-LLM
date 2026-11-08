@@ -215,7 +215,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: [],
     glossaryTerms: ['contrastive-loss', 'in-batch-negative', 'temperature'],
-    quizIds: ['q-clip-1', 'q-clip-2'],
+    quizIds: ['q-clip-1', 'q-clip-2', 'q-gap-defined', 'q-clip-4'],
     sourceRefs: [
       {
         chapter: 2,
@@ -251,7 +251,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-contrastive-objective'],
     glossaryTerms: ['in-batch-negative', 'retrieval'],
-    quizIds: ['q-clip-3'],
+    quizIds: ['q-clip-3', 'q-batch-negatives'],
     sourceRefs: [
       {
         chapter: 3,
@@ -323,7 +323,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-modality-gap'],
     glossaryTerms: ['zero-shot', 'prompt-template'],
-    quizIds: ['q-gap-2'],
+    quizIds: ['q-gap-2', 'q-zero-shot-prompt'],
     sourceRefs: [
       {
         chapter: 3,
@@ -361,7 +361,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['zero-shot'],
     glossaryTerms: ['instruction-tuning', 'alignment-tax'],
-    quizIds: ['q-instruction-1', 'q-llava-projection'],
+    quizIds: ['q-instruction-1', 'q-llava-projection', 'q-instruction-3'],
     sourceRefs: [
       {
         chapter: 2,
@@ -397,7 +397,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-instruction-recipe'],
     glossaryTerms: ['alignment-tax', 'instruction-tuning'],
-    quizIds: ['q-instruction-2'],
+    quizIds: ['q-instruction-2', 'q-tax-fact'],
     sourceRefs: [
       {
         chapter: 3,

@@ -298,7 +298,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-tokeniser'],
     glossaryTerms: ['vocabulary', 'embedding', 'context-length'],
-    quizIds: ['q-tokenisation-3'],
+    quizIds: ['q-tokenisation-3', 'q-vocab-embed'],
     sourceRefs: [
       {
         chapter: 1,
@@ -374,7 +374,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-decoder-block'],
     glossaryTerms: ['parameter-count', 'weight-tying'],
-    quizIds: ['q-architecture-3'],
+    quizIds: ['q-architecture-3', 'q-budget-tie'],
     sourceRefs: [
       {
         chapter: 3,
@@ -633,7 +633,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-training-loop'],
     glossaryTerms: ['perplexity', 'validation-loss', 'overfitting'],
-    quizIds: ['q-training-3'],
+    quizIds: ['q-training-3', 'q-ppl-convert'],
     sourceRefs: [
       {
         chapter: 10,
@@ -677,7 +677,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-flops'],
     glossaryTerms: ['scaling-law', 'isoflop', 'compute-optimal'],
-    quizIds: ['q-training-4'],
+    quizIds: ['q-training-4', 'q-scaling-shape'],
     sourceRefs: [
       {
         chapter: 8,
