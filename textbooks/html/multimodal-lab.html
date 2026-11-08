@@ -175,10 +175,6 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. The in-batch negatives are free: they are the other pairs the batch already contains. — boolean </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. A batch of B pairs gives B² pairs of which B are correct, and the rest cost nothing — which is why the method scales with the size of the batch.</p></blockquote>
-<p>*<em>Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice </em>(core)***</p>
-<ul><li>The difference in dimensionality between the image and text encoders</li><li>✓ <strong>Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it</strong></li><li>The distance between an image and its own caption, which training drives to zero</li><li>A bug in the normalisation of the embeddings</li></ul>
-<blockquote><p>Correct — close spaces, not the same space.</p></blockquote>
-<blockquote><p><strong>Why:</strong> The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.</p></blockquote>
 <p>*<em>Q. A batch of 32 pairs gives how many image–caption pairs, of which how many are correct? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 1024</p></blockquote>
 <blockquote><p><strong>Why:</strong> 32 squared is 1,024 pairs, of which 32 are the correct ones and 992 are negatives — free, because the batch already contained them.</p></blockquote>
@@ -228,6 +224,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The two modalities are further apart in the shared space than either is from itself</strong></li><li>The two encoders have different numbers of parameters</li><li>The training data has more images than captions</li><li>The retrieval is inaccurate</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A retrieval works anyway, because the <em>pairs</em> are close even though the two <em>spaces</em> are not.</p></blockquote>
+<p>*<em>Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice </em>(core)***</p>
+<ul><li>The difference in dimensionality between the image and text encoders</li><li>✓ <strong>Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it</strong></li><li>The distance between an image and its own caption, which training drives to zero</li><li>A bug in the normalisation of the embeddings</li></ul>
+<blockquote><p>Correct — close spaces, not the same space.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The within-modal and the between-modal similarities, and the gap between them. Open <strong>Measure the gap</strong> in the multimodal-lab application.</p>
 <p><strong>Where this came from</strong></p>

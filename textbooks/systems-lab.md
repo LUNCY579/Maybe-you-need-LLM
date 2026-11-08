@@ -425,6 +425,12 @@ A router here, on embeddings here, with the load it produces. Open **Route the t
 
 > **Why:** The auxiliary loss is N times the sum of the products: 100 × (0.75 × 0.5 + 0.25 × 0.5) = 100 × 0.5 = 50.
 
+**Q. The auxiliary loss is the number of tokens times the sum over experts of load-fraction × probability-fraction. With two experts whose loads are 0.75 and 0.25, router probabilities 0.5 and 0.5, and 100 tokens, what is the loss? — numeric *(core)***
+
+> **Answer:** 50
+
+> **Why:** The products are 0.75 × 0.5 and 0.25 × 0.5, summing to 0.5; times 100 tokens the loss is 50. It would be smallest — zero — when the load equalled the probability, which is exactly the behaviour the loss pushes the router towards.
+
 #### Go and do it
 
 A biased router, the auxiliary loss it produces, and the tokens that overflow. Open **Break the balance** in the systems-lab application.

@@ -317,7 +317,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-baseline'],
     glossaryTerms: ['n-step-return', 'bootstrap', 'lambda-return'],
-    quizIds: ['q-actor-2'],
+    quizIds: ['q-actor-2', 'q-nstep-ends'],
     sourceRefs: [
       {
         chapter: 5,
@@ -395,7 +395,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-lambda-return'],
     glossaryTerms: ['actor-critic', 'temporal-difference', 'advantage'],
-    quizIds: ['q-actor-4'],
+    quizIds: ['q-actor-4', 'q-ac-roles'],
     sourceRefs: [
       {
         chapter: 4,
@@ -431,7 +431,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-value-function'],
     glossaryTerms: ['optimal-policy', 'value-iteration'],
-    quizIds: ['q-value-2'],
+    quizIds: ['q-value-2', 'q-greedy-off-value'],
     sourceRefs: [
       {
         chapter: 9,

@@ -538,7 +538,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-overoptimisation-result'],
     glossaryTerms: ['overoptimisation', 'best-of-n', 'functional-form'],
-    quizIds: ['q-overopt-3'],
+    quizIds: ['q-overopt-3', 'q-bon-shape'],
     sourceRefs: [
       {
         chapter: 5,
@@ -575,7 +575,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-functional-forms'],
     glossaryTerms: ['kl-coefficient', 'overoptimisation'],
-    quizIds: ['q-overopt-4'],
+    quizIds: ['q-overopt-4', 'q-kl-stopping'],
     sourceRefs: [],
     furtherReading: [],
   },

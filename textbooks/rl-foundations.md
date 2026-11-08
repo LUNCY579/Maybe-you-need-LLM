@@ -217,6 +217,17 @@ The value iteration, sweep by sweep, and the policy it produces. Open **Sweep th
 
 > **Why:** Yes. One sweep of the optimality operator gives the greedy policy with respect to the current values, and repeating the sweep converges to the optimal pair. A policy evaluation is not needed anywhere in it.
 
+**Q. How does the optimal policy relate to the optimal value function? — multiple-choice *(core)***
+
+- It is the value function renormalised over actions
+- ✓ **It is read off greedily: the optimal value is the largest value any policy achieves, and acting greedily on it is optimal**
+- It is unrelated; the two are computed by separate algorithms
+- It is the value function evaluated at the final state
+
+> Correct — and a policy gradient method is trying to find the same thing without the dynamic programming.
+
+> **Why:** The optimal value function is the largest value any policy achieves, and it satisfies its own Bellman equation. Reading the greedy action off it gives the optimal policy — and what a policy gradient is trying to find, in these terms, is the same object by a different route.
+
 #### Go and do it
 
 The optimal policy and the value of reaching the goal, computed exactly. Open **See the optimum** in the rl-foundations application.
@@ -400,6 +411,17 @@ One estimator, two weights: the rewards still to come, and the whole episode’s
 
 > **Why:** The bootstrap is what biases an estimate, and the Monte Carlo return has no bootstrap. The sample is what makes an estimate noisy, and the one-step return has almost no sample in it.
 
+**Q. Along the n-step range, which end is biased and which is noisy? — multiple-choice *(core)***
+
+- ✓ **The one-step return is the most biased and the least noisy; the Monte Carlo return is the reverse**
+- The one-step return is unbiased and noisy; the Monte Carlo return is biased and stable
+- Both ends are unbiased; only the middle is biased
+- Neither end is noisy, because returns are deterministic
+
+> Correct — the bootstrap is the bias, the sampling is the noise.
+
+> **Why:** The n-step return bootstraps after n steps: the bootstrap is the source of bias, the sampling the source of noise. The one-step return is the least noisy and the most biased; the Monte Carlo return is the reverse — and the λ-return is the mixture between them.
+
 #### Go and do it
 
 The n-step returns of a real trajectory, and the truth they are aiming at. Open **Count the steps** in the rl-foundations application.
@@ -494,6 +516,17 @@ The bias and the variance of the estimator, measured, as λ moves. Open **Sweep 
 > Correct.
 
 > **Why:** The critic turns the return into the advantage, which is a smaller and less noisy signal, and the actor follows the advantage rather than the return.
+
+**Q. In the actor–critic loop, what does the critic do? — multiple-choice *(core)***
+
+- It samples the actions the actor will take
+- ✓ **It estimates the value, so the actor can follow the advantage the critic makes available**
+- It scores the reward model’s outputs
+- It chooses the learning rate
+
+> Correct — and its update is a temporal-difference update.
+
+> **Why:** The critic estimates the value; the actor follows the advantage the critic makes available. The critic’s update is the temporal-difference update, and the loop is what turns the two into a learning curve you can read.
 
 #### Go and do it
 

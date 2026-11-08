@@ -376,7 +376,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-router'],
     glossaryTerms: ['auxiliary-loss', 'load-balance', 'capacity-factor'],
-    quizIds: ['q-moe-2'],
+    quizIds: ['q-moe-2', 'q-aux-loss-compute'],
     sourceRefs: [
       {
         chapter: 3,

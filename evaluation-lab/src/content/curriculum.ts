@@ -243,7 +243,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['what-a-judge-is'],
     glossaryTerms: ['consistency', 'position-bias'],
-    quizIds: ['q-judging-3'],
+    quizIds: ['q-judging-3', 'q-consistency-swap'],
     sourceRefs: [
       {
         chapter: 2,
@@ -448,7 +448,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['bradley-terry'],
     glossaryTerms: ['bootstrap', 'confidence-interval', 'elo'],
-    quizIds: ['q-arena-3'],
+    quizIds: ['q-arena-3', 'q-elo-bootstrap'],
     sourceRefs: [
       {
         chapter: 3,
@@ -537,7 +537,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['contamination'],
     glossaryTerms: ['benchmark', 'holistic-evaluation'],
-    quizIds: ['q-benchmark-3'],
+    quizIds: ['q-benchmark-3', 'q-bench-two'],
     sourceRefs: [],
     furtherReading: [
       {
@@ -617,7 +617,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['standard-error'],
     glossaryTerms: ['power', 'standard-error'],
-    quizIds: ['q-measurement-3'],
+    quizIds: ['q-measurement-3', 'q-questions-square'],
     sourceRefs: [],
     furtherReading: [],
   },
@@ -646,7 +646,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['how-many-questions'],
     glossaryTerms: ['confidence-interval', 'human-baseline'],
-    quizIds: ['q-measurement-4'],
+    quizIds: ['q-measurement-4', 'q-leaderboard-print'],
     sourceRefs: [],
     furtherReading: [],
   },

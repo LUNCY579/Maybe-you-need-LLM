@@ -452,4 +452,62 @@ export const QUIZ: QuizQuestion[] = [
     citation: CFG,
     lessonId: 'classifier-free-guidance',
   },
+  {
+    id: 'q-param-convert',
+    kind: 'multiple-choice',
+    prompt: 'What actually changes between the \u03b5-, the x\u2080- and the v-parameterisation of the reverse process?',
+    topic: 'Parameterisations',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'The reverse process itself', feedback: 'The three describe the same process; only the target changes.' },
+      { id: 'b', label: 'Only what the network is trained to predict \u2014 the forms convert into one another', feedback: 'Correct \u2014 which is why the choice is about training dynamics, not about the model\u2019s reach.' },
+      { id: 'c', label: 'The variance schedule the process uses', feedback: 'The schedule is fixed before the parameterisation is chosen.' },
+      { id: 'd', label: 'The number of sampling steps', feedback: 'The chain length is a separate decision.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The three parameterisations describe the same reverse process; only the network target changes, and a prediction in one form converts into another in closed form. What the choice moves is the weighting the loss gives each noise level \u2014 the paper found the \u03b5-form best for that reason.',
+    citation: DDPM,
+    lessonId: 'parameterisations',
+  },
+  {
+    id: 'q-weight-drop',
+    kind: 'multiple-choice',
+    prompt: 'What does the paper give up when it trains on the simplified objective instead of the true variational bound?',
+    topic: 'The training objective',
+    difficulty: 'hard',
+    options: [
+      { id: 'a', label: 'The reverse process entirely', feedback: 'The process stays; only the loss\u2019s weighting changes.' },
+      {
+        id: 'b',
+        label: 'The per-timestep weight \u03b2_t\u00b2 / (2\u03c3_t\u00b2\u03b1_t(1 \u2212 \u1d69f_t)) \u2014 every timestep is weighted equally instead',
+        feedback: 'Correct \u2014 the simplified objective is the true bound with the weights removed.',
+      },
+      { id: 'c', label: 'The KL terms above the last step', feedback: 'The bound\u2019s decomposition is untouched; the weighting of its terms is what goes.' },
+      { id: 'd', label: 'Nothing \u2014 the two objectives are identical', feedback: 'They differ by exactly the weights, and the ablation shows the difference matters.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The true bound weights each timestep\u2019s loss by \u03b2_t\u00b2 / (2\u03c3_t\u00b2\u03b1_t(1 \u2212 \u1d69f_t)); the simplified objective drops that weight and trains every step equally. What the paper gives up is theoretical tightness, and what it reports gaining is sample quality \u2014 an ablated trade, not an oversight.',
+    citation: DDPM,
+    lessonId: 'the-weighting',
+  },
+  {
+    id: 'q-guidance-mode',
+    kind: 'multiple-choice',
+    prompt: 'What does a very large guidance weight do to the samples?',
+    topic: 'Guidance',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'They spread out, because the conditioning gets louder', feedback: 'The distribution narrows rather than spreads.' },
+      { id: 'b', label: 'They move to the mode and stop spreading \u2014 fidelity up, diversity down', feedback: 'Correct \u2014 the trade-off is quantifiable, and the weight is its dial.' },
+      { id: 'c', label: 'They become more diverse while staying on-manifold', feedback: 'Diversity is what is being spent.' },
+      { id: 'd', label: 'Nothing; the weight only changes speed', feedback: 'The weight changes the distribution\u2019s shape, not the sampler\u2019s cost.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'Guidance narrows the distribution: the samples move to the mode and stop spreading. The relationship between the weight and the effective temperature is measurable, which is what makes the fidelity\u2013diversity trade-off a quantity rather than a vibe.',
+    citation: CFG,
+    lessonId: 'the-price-of-guidance',
+  },
 ]

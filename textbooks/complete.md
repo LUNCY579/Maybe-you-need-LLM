@@ -9035,6 +9035,17 @@ Compare the weight of the true bound with the flat weight of the simplified obje
 
 > **Why:** The three parameterisations are algebraically equivalent views of p_θ(x_{t−1}|x_t). What changes is the regression target, and therefore how stable training is and how the loss is weighted.
 
+**Q. What actually changes between the ε-, the x₀- and the v-parameterisation of the reverse process? — multiple-choice *(core)***
+
+- The reverse process itself
+- ✓ **Only what the network is trained to predict — the forms convert into one another**
+- The variance schedule the process uses
+- The number of sampling steps
+
+> Correct — which is why the choice is about training dynamics, not about the model’s reach.
+
+> **Why:** The three parameterisations describe the same reverse process; only the network target changes, and a prediction in one form converts into another in closed form. What the choice moves is the weighting the loss gives each noise level — the paper found the ε-form best for that reason.
+
 #### Go and do it
 
 Take one network output and read it as ε, as x₀, and as v. Open **Convert a prediction** in the diffusion-lab application.
@@ -9220,6 +9231,17 @@ Put the linear and cosine schedules side by side and read the signal-to-noise ra
 > Correct.
 
 > **Why:** The true weight β_t²/(2σ_t²α_t(1−ᾱ_t)) is very large at small t and very small at large t. Flattening it to 1 therefore removes most of the gradient signal from the easy, small-t end of the chain — which the paper reports improves sample quality.
+
+**Q. What does the paper give up when it trains on the simplified objective instead of the true variational bound? — multiple-choice *(hard)***
+
+- The reverse process entirely
+- ✓ **The per-timestep weight β_t² / (2σ_t²α_t(1 − ᵩf_t)) — every timestep is weighted equally instead**
+- The KL terms above the last step
+- Nothing — the two objectives are identical
+
+> Correct — the simplified objective is the true bound with the weights removed.
+
+> **Why:** The true bound weights each timestep’s loss by β_t² / (2σ_t²α_t(1 − ᵩf_t)); the simplified objective drops that weight and trains every step equally. What the paper gives up is theoretical tightness, and what it reports gaining is sample quality — an ablated trade, not an oversight.
 
 #### Go and do it
 
@@ -9421,6 +9443,17 @@ Measure fidelity and diversity against the guidance weight, with an exact score.
 > **Answer:** 1
 
 > **Why:** w = 1. Since p(x)·p(c|x) = p(x|c)·p(c), and p(c) is a constant, the tilted distribution is proportional to the true conditional. Any w above 1 over-shoots it.
+
+**Q. What does a very large guidance weight do to the samples? — multiple-choice *(core)***
+
+- They spread out, because the conditioning gets louder
+- ✓ **They move to the mode and stop spreading — fidelity up, diversity down**
+- They become more diverse while staying on-manifold
+- Nothing; the weight only changes speed
+
+> Correct — the trade-off is quantifiable, and the weight is its dial.
+
+> **Why:** Guidance narrows the distribution: the samples move to the mode and stop spreading. The relationship between the weight and the effective temperature is measurable, which is what makes the fidelity–diversity trade-off a quantity rather than a vibe.
 
 #### Go and do it
 
@@ -10940,6 +10973,17 @@ Measure how often a judge agrees with the human, and how often it agrees with it
 
 > **Why:** Consistency is measured against the judge itself: the same pair, presented in both orders, should produce the same preference. A failure to do so means the judge answered a different question.
 
+**Q. What does a consistency failure tell you that a low agreement with humans does not? — multiple-choice *(core)***
+
+- That the judge is weak compared with humans
+- ✓ **That the judge is not even a function of the answers — its verdict flips when the order is swapped**
+- That the question set is too small
+- That humans disagree with each other
+
+> Correct — the swap test measures the judge against itself.
+
+> **Why:** Agreement is measured against a human; consistency is measured against the judge itself — the swap test reorders the two answers and asks again. A consistency failure means the verdicts are not a function of the answers alone, which no amount of agreement can repair.
+
 #### Go and do it
 
 Judge the same pair twice, with the positions swapped, and count the flips. Open **The swap test** in the evaluation-lab application.
@@ -11241,6 +11285,17 @@ Collect the votes and fit a Bradley–Terry model to them. Open **Fit a ranking 
 
 > **Why:** A bootstrap interval resamples the votes and refits, and it means the same thing whatever order they arrived in. An online rating carries the path with it.
 
+**Q. Why is an Elo rating alone not an interval? — multiple-choice *(core)***
+
+- Because Elo is only defined for chess
+- ✓ **Because the rating is a point estimate from one fit — resampling the votes and refitting is what produces the interval**
+- Because Elo cannot be computed from pairwise votes
+- Because the interval would be too wide to publish
+
+> Correct — the bootstrap is what turns the ranking into a measurement with width.
+
+> **Why:** Resampling the votes and refitting gives an interval on the ranking — which is what separates two models whose ratings differ. And the number of votes needed to separate them grows with how close they are, which is the cost half of the lesson.
+
 #### Go and do it
 
 Watch the confidence interval on the top two models shrink as the votes accumulate. Open **How many votes to tell them apart** in the evaluation-lab application.
@@ -11355,6 +11410,17 @@ Sweep the contaminated fraction and watch the reported score drift. Open **What 
 
 > **Why:** The question set, the scoring procedure and the set of models under test are all choices. Each one is a claim about what matters, and each one can be argued for.
 
+**Q. What two things does a benchmark have to do at once? — multiple-choice *(warmup)***
+
+- Be cheap to run and easy to cite
+- ✓ **Be hard enough to separate models and easy enough to run**
+- Be fully automatic and fully adversarial
+- Cover every capability and reject every bad model
+
+> Correct — the tension between breadth and depth lives between them.
+
+> **Why:** A benchmark has to be hard enough to separate models and easy enough to run. The question set lives in that tension: breadth buys coverage, depth buys discrimination, and the holistic framing is what a single score adds to the pair.
+
 #### Go and do it
 
 See how the difficulty mix of a question set changes what the score measures. Open **Build a question set** in the evaluation-lab application.
@@ -11463,6 +11529,12 @@ Plot the width of the confidence interval against the number of questions. Open 
 
 > **Why:** Yes. If the test cannot detect the difference, the difference does not appear — and a leaderboard that reports a tie there is reporting an artefact of the question count.
 
+**Q. The number of questions needed grows as the square of the inverse of the difference. If the difference you care about doubles, by what factor does the required question count fall? — numeric *(core)***
+
+> **Answer:** 0.25 ± 0.001
+
+> **Why:** The count scales as 1/difference², so doubling the difference divides the required count by four. And when the difference you care about is smaller than the noise, no affordable question count answers it — which is the finding, not a failure to produce one.
+
 #### Go and do it
 
 Compute how many questions a given difference needs, and watch the curve. Open **The cost of detecting a small difference** in the evaluation-lab application.
@@ -11502,6 +11574,15 @@ Compute how many questions a given difference needs, and watch the curve. Open *
 - The logo of the organisation that ran it
 
 > **Why:** An interval, the question count, and enough about the protocol to reproduce it. The newest criticism of the field is that the last of these is often missing, and that the leaderboard has become the thing being optimised.
+
+**Q. Which of these should a leaderboard print next to every score? — multi-select *(core)***
+
+- ✓ **The interval on the score**
+- ✓ **The number of questions the score was computed on**
+- ✓ **The judge’s agreement with a human baseline**
+- The judge’s own self-evaluation score
+
+> **Why:** A score without an interval is a claim, not a measurement; the question count is where the width comes from; and the judge’s agreement with a human baseline is the number that says what the whole instrument is worth.
 
 #### Go and do it
 
@@ -12458,6 +12539,17 @@ Push the policy further and watch the proxy rise while the true reward turns ove
 
 > **Why:** Best-of-n: a downward parabola through the origin, R(d) = d(α − βd). Reinforcement learning: R(d) = d(α − β log d), which turns over more slowly because the policy moves rather than the sample.
 
+**Q. In the overoptimisation paper’s functional forms, what shape does best-of-n’s reward take as a function of the sample count d? — multiple-choice *(hard)***
+
+- Exponential growth that saturates
+- ✓ **A downward parabola through the origin: R(d) = d(α − β d)**
+- A straight line with slope α
+- A step function at the gold answer
+
+> Correct — rising at first, then falling as the proxy reward diverges from the true one.
+
+> **Why:** For best-of-n: R(d) = d(α − β d), a downward parabola through the origin — the proxy reward rises, peaks, and falls as d grows. Fitting both functional forms in a controlled setting is how the paper reads the fit and compares RL against best-of-n on the same proxy.
+
 #### Go and do it
 
 Fit both functional forms to the measured curve and compare the two methods. Open **Fitting the forms** in the rlhf-lab application.
@@ -12504,6 +12596,17 @@ Fit both functional forms to the measured curve and compare the two methods. Ope
 > Correct.
 
 > **Why:** It is the optimal stopping point for a fixed budget, and it is what the KL coefficient is set to reach. Past it, the run is spending compute to make the true outcome worse.
+
+**Q. In operational terms, what does the KL coefficient decide? — multiple-choice *(core)***
+
+- How fast the policy learns per step
+- ✓ **How far the policy is allowed to travel — the dial that sets the stopping point**
+- How many PPO epochs run per batch
+- How the advantage estimator is initialised
+
+> Correct — which is why the distance travelled belongs next to the score in every report.
+
+> **Why:** The KL coefficient is the dial that decides how far the policy is allowed to travel — and the operational lesson is to report the distance travelled alongside the score, because a score without its KL budget says nothing about what was bought or at what price.
 
 #### Go and do it
 
@@ -18083,6 +18186,12 @@ A router here, on embeddings here, with the load it produces. Open **Route the t
 
 > **Why:** The auxiliary loss is N times the sum of the products: 100 × (0.75 × 0.5 + 0.25 × 0.5) = 100 × 0.5 = 50.
 
+**Q. The auxiliary loss is the number of tokens times the sum over experts of load-fraction × probability-fraction. With two experts whose loads are 0.75 and 0.25, router probabilities 0.5 and 0.5, and 100 tokens, what is the loss? — numeric *(core)***
+
+> **Answer:** 50
+
+> **Why:** The products are 0.75 × 0.5 and 0.25 × 0.5, summing to 0.5; times 100 tokens the loss is 50. It would be smallest — zero — when the load equalled the probability, which is exactly the behaviour the loss pushes the router towards.
+
 #### Go and do it
 
 A biased router, the auxiliary loss it produces, and the tokens that overflow. Open **Break the balance** in the systems-lab application.
@@ -18608,6 +18717,17 @@ The value iteration, sweep by sweep, and the policy it produces. Open **Sweep th
 
 > **Why:** Yes. One sweep of the optimality operator gives the greedy policy with respect to the current values, and repeating the sweep converges to the optimal pair. A policy evaluation is not needed anywhere in it.
 
+**Q. How does the optimal policy relate to the optimal value function? — multiple-choice *(core)***
+
+- It is the value function renormalised over actions
+- ✓ **It is read off greedily: the optimal value is the largest value any policy achieves, and acting greedily on it is optimal**
+- It is unrelated; the two are computed by separate algorithms
+- It is the value function evaluated at the final state
+
+> Correct — and a policy gradient method is trying to find the same thing without the dynamic programming.
+
+> **Why:** The optimal value function is the largest value any policy achieves, and it satisfies its own Bellman equation. Reading the greedy action off it gives the optimal policy — and what a policy gradient is trying to find, in these terms, is the same object by a different route.
+
 #### Go and do it
 
 The optimal policy and the value of reaching the goal, computed exactly. Open **See the optimum** in the rl-foundations application.
@@ -18791,6 +18911,17 @@ One estimator, two weights: the rewards still to come, and the whole episode’s
 
 > **Why:** The bootstrap is what biases an estimate, and the Monte Carlo return has no bootstrap. The sample is what makes an estimate noisy, and the one-step return has almost no sample in it.
 
+**Q. Along the n-step range, which end is biased and which is noisy? — multiple-choice *(core)***
+
+- ✓ **The one-step return is the most biased and the least noisy; the Monte Carlo return is the reverse**
+- The one-step return is unbiased and noisy; the Monte Carlo return is biased and stable
+- Both ends are unbiased; only the middle is biased
+- Neither end is noisy, because returns are deterministic
+
+> Correct — the bootstrap is the bias, the sampling is the noise.
+
+> **Why:** The n-step return bootstraps after n steps: the bootstrap is the source of bias, the sampling the source of noise. The one-step return is the least noisy and the most biased; the Monte Carlo return is the reverse — and the λ-return is the mixture between them.
+
 #### Go and do it
 
 The n-step returns of a real trajectory, and the truth they are aiming at. Open **Count the steps** in the rl-foundations application.
@@ -18885,6 +19016,17 @@ The bias and the variance of the estimator, measured, as λ moves. Open **Sweep 
 > Correct.
 
 > **Why:** The critic turns the return into the advantage, which is a smaller and less noisy signal, and the actor follows the advantage rather than the return.
+
+**Q. In the actor–critic loop, what does the critic do? — multiple-choice *(core)***
+
+- It samples the actions the actor will take
+- ✓ **It estimates the value, so the actor can follow the advantage the critic makes available**
+- It scores the reward model’s outputs
+- It chooses the learning rate
+
+> Correct — and its update is a temporal-difference update.
+
+> **Why:** The critic estimates the value; the actor follows the advantage the critic makes available. The critic’s update is the temporal-difference update, and the loop is what turns the two into a learning curve you can read.
 
 #### Go and do it
 
@@ -19131,6 +19273,17 @@ The lexical index: what it stores, what it scores, and where it fails when the q
 > Correct.
 
 > **Why:** The postings are the whole of the index, and their number is what a lexical search really costs.
+
+**Q. Why can the lexical index be precomputed while the query work cannot? — multiple-choice *(core)***
+
+- Because queries are too short to optimise
+- ✓ **Because the documents are known in advance: the index maps each word to the documents that contain it, and its size — the number of postings — is what a lexical search really spends**
+- Because the index is small enough to keep in memory
+- Because queries are answered by the model instead
+
+> Correct — and the query’s terms are only known when it arrives.
+
+> **Why:** The index maps each word to the documents that contain it; its size is the number of postings, and that is what a lexical search really spends. The documents are known before any query arrives — the query’s own terms are not, which is why its work cannot be precomputed.
 
 #### Go and do it
 
@@ -19569,6 +19722,17 @@ A document in a context, moved from the beginning to the end, and the attention 
 > Correct.
 
 > **Why:** Everything can be present in a long context and a good deal of it can still be ignored. Retrieval is what puts the evidence where the reader will look.
+
+**Q. What does a long context change, and what does it not? — multiple-choice *(core)***
+
+- It removes the need for a reader that uses the evidence
+- ✓ **It raises the ceiling on what can be answered and lowers the floor on what is answered well**
+- It makes the retriever unnecessary at any length
+- It changes the cost model of the retriever’s index
+
+> Correct — which is why the retrieval-against-long-context comparison is measured on the same questions.
+
+> **Why:** A long context raises the ceiling on what can be answered and lowers the floor on what is answered well — the retriever finds the facts and the reader has to use them, and the case is measured by putting retrieval against a long context on the same questions.
 
 #### Go and do it
 
@@ -20572,6 +20736,17 @@ The critiques, the revisions, and the harm that is left. Open **Run the loop** i
 
 > **Why:** Every harmlessness number is what a judge believes, measured on a sample. The agreement is what makes that number mean anything.
 
+**Q. What are the two errors a harmlessness judge makes? — multiple-choice *(core)***
+
+- Under- and over-refusal, in the generation stage
+- ✓ **False positives — flagging harmless answers — and false negatives — passing harmful ones**
+- Position and verbosity bias, as in any LLM judge
+- It makes no errors if it is the same model that produced the answers
+
+> Correct — and the agreement with the labels is the number to report, because the score is what a judge believes.
+
+> **Why:** A harmlessness score is what a judge believes, and the judge is a model — so it makes false positives and false negatives. The agreement with the labels is the number to report, because that is what says how much the score can be believed.
+
 #### Go and do it
 
 The agreement of a judge with the labels, and the errors it makes. Open **Check the judge** in the safety-lab application.
@@ -20618,6 +20793,17 @@ The agreement of a judge with the labels, and the errors it makes. Open **Check 
 > Correct.
 
 > **Why:** It is a measurement on a sample against a taxonomy, by a judge. Everything outside those three is a claim about the model rather than a measurement of it.
+
+**Q. What is a harmlessness number actually a measurement of? — multiple-choice *(core)***
+
+- The safety of the model
+- ✓ **The opinion of a judge, measured on a sample, against a taxonomy**
+- The agreement between two judges
+- The model’s refusal rate on benign queries
+
+> Correct — and everything a safety claim leaves out follows from those three qualifiers.
+
+> **Why:** A harmlessness score is the opinion of a judge, measured on a sample, against a taxonomy. Each qualifier names something a safety claim leaves out — the judge’s calibration, the sample’s size and representativeness, the taxonomy’s coverage — and the evidence a claim needs before it is believed is the list of those things stated.
 
 #### Go and do it
 
@@ -20719,6 +20905,17 @@ Where each round lands, how far the second one moves, and what the weighting cha
 > Correct.
 
 > **Why:** A claim about what a critic cannot see in its own answer is a claim about the cases it got wrong, and finding those needs a verdict that is right for reasons of its own.
+
+**Q. Why does a critique written by the model that wrote the answer share that answer’s blind spots? — multiple-choice *(hard)***
+
+- Because the critique is copied from the answer
+- ✓ **Because the model cannot see what it cannot see — the same limits that shaped the answer shape the critique of it**
+- Because the critique uses a smaller context window
+- Because critiques are sampled at a higher temperature
+
+> Correct — which is why comparing two critics needs a verdict that is right.
+
+> **Why:** A critique written by the model that wrote the answer shares that answer’s blind spots — the model cannot see what it cannot see. Measuring what each critic misses, and the cost of each, is why the comparison of two critics needs a verdict that is right rather than merely fluent.
 
 #### Go and do it
 
@@ -20833,6 +21030,17 @@ The attacks, the failures, and the coverage of the taxonomy. Open **Run the red 
 
 > **Why:** Without a taxonomy a red team produces anecdotes. With one, it produces a coverage that can be compared between teams and between models.
 
+**Q. What does a harm taxonomy add to a red-team set? — multiple-choice *(core)***
+
+- A longer list of prompts
+- ✓ **Coverage that can be measured: the set becomes a measurement rather than an anecdote**
+- A licence to skip the held-out test set
+- Automatic scoring of the attacks
+
+> Correct — and the difference between a red-team set and a test set is what it is drawn from.
+
+> **Why:** A taxonomy is what makes a red-team set a measurement rather than an anecdote: the coverage of a red team against the taxonomy is measurable, and a red-team set differs from a test set in that it is drawn from attacks rather than from the behaviour being certified.
+
 #### Go and do it
 
 A model-driven red team against a random one, on the same budget. Open **Compare the two red teams** in the safety-lab application.
@@ -20874,6 +21082,17 @@ A model-driven red team against a random one, on the same budget. Open **Compare
 > **Answer:** 0.68359375 ± 0.001
 
 > **Why:** One minus the chance it is missed four times: 1 − 0.75⁴ = 0.6836. This is the arithmetic the ceiling curve is made of, and it is the same whether the attempts were asked for or stumbled into.
+
+**Q. Why is spending the attack budget evenly over the known failures a ceiling rather than a strategy? — multiple-choice *(hard)***
+
+- Because even spending wastes the budget on duplicates
+- ✓ **Because the question is how many attacks it takes to find a given share of the failures — the discovery rate is measured against the budget, and the marginal value of the last attack is read off that curve**
+- Because attacks are free, so spending evenly costs nothing
+- Because the taxonomy forbids uneven spending
+
+> Correct — which is why the curve, not the count, is what a red-team report should show.
+
+> **Why:** The question is not whether this many attacks work, but how many it takes to find a given share of the failures. The discovery rate is what a search budget is measured against, spending evenly over the failures is the ceiling, and the marginal value of the last attack is read off the curve.
 
 #### Go and do it
 
@@ -21050,6 +21269,17 @@ The answers under pressure, and the ones that flip. Open **Measure the flip rate
 > Correct.
 
 > **Why:** It is a mitigation in the prompt, though, and so it depends on the system message being there — which is not the same as a fix in the training.
+
+**Q. Telling the model that the user may be wrong moves the flip rate by a measurable amount. Why is that not a fix? — multiple-choice *(core)***
+
+- Because the effect is too small to measure
+- ✓ **Because the behaviour remains and the prompt is doing work the model should — remove the prompt and the flip returns**
+- Because prompts cannot be evaluated
+- Because it makes the model refuse everything
+
+> Correct — a mitigation that lives in the prompt is a configuration, not a property of the model.
+
+> **Why:** Telling the model the user may be wrong moves the flip rate, and by a measurable amount — but a mitigation that lives in the prompt is not a fix: it is doing work the model itself should do, and the behaviour returns when the prompt does.
 
 #### Go and do it
 
@@ -21520,17 +21750,6 @@ The loss that says a pair should be closer than the other pairs in the batch, th
 
 > **Why:** Yes. A batch of B pairs gives B² pairs of which B are correct, and the rest cost nothing — which is why the method scales with the size of the batch.
 
-**Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice *(core)***
-
-- The difference in dimensionality between the image and text encoders
-- ✓ **Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it**
-- The distance between an image and its own caption, which training drives to zero
-- A bug in the normalisation of the embeddings
-
-> Correct — close spaces, not the same space.
-
-> **Why:** The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.
-
 **Q. A batch of 32 pairs gives how many image–caption pairs, of which how many are correct? — numeric *(core)***
 
 > **Answer:** 1024
@@ -21650,6 +21869,17 @@ The images and the captions end up in one space, and the space is not quite symm
 > Correct.
 
 > **Why:** A retrieval works anyway, because the *pairs* are close even though the two *spaces* are not.
+
+**Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice *(core)***
+
+- The difference in dimensionality between the image and text encoders
+- ✓ **Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it**
+- The distance between an image and its own caption, which training drives to zero
+- A bug in the normalisation of the embeddings
+
+> Correct — close spaces, not the same space.
+
+> **Why:** The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.
 
 #### Go and do it
 

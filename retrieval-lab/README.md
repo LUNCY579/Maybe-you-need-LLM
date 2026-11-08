@@ -83,7 +83,7 @@ Every retriever is trained **in the browser, from scratch**, every time a settin
 
 ### The rest of the course
 
-- **Practice** — 16 questions with per-option feedback, worked explanations and source citations.
+- **Practice** — 18 questions with per-option feedback, worked explanations and source citations.
 - **Glossary** — 21 terms, each with a plain-language definition and the terms that should be understood first. The
   dependency graph is checked for cycles.
 - **Equations** — 8 results with the source, the plain-language meaning, every symbol, the assumptions, a derivation

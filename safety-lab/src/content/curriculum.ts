@@ -250,7 +250,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-critique-and-revise-loop'],
     glossaryTerms: ['judge', 'agreement', 'false-positive'],
-    quizIds: ['q-harm-3'],
+    quizIds: ['q-harm-3', 'q-judge-errors'],
     sourceRefs: [
       {
         chapter: 6,
@@ -322,7 +322,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-attack'],
     glossaryTerms: ['taxonomy', 'coverage', 'red-team'],
-    quizIds: ['q-red-3'],
+    quizIds: ['q-red-3', 'q-taxonomy-measure'],
     sourceRefs: [
       {
         chapter: 2,
@@ -394,7 +394,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['agreeing-with-the-user'],
     glossaryTerms: ['sycophancy', 'flip-rate', 'mitigation'],
-    quizIds: ['q-syc-3'],
+    quizIds: ['q-syc-3', 'q-prompt-not-fix'],
     sourceRefs: [
       {
         chapter: 4,
@@ -472,7 +472,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-judge', 'the-taxonomy'],
     glossaryTerms: ['claim', 'judge', 'coverage'],
-    quizIds: ['q-harm-4'],
+    quizIds: ['q-harm-4', 'q-claim-measures'],
     sourceRefs: [
       {
         chapter: 5,
@@ -550,7 +550,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-critique-and-revise-loop', 'the-judge'],
     glossaryTerms: ['critique', 'judge', 'agreement'],
-    quizIds: ['q-critic-1'],
+    quizIds: ['q-critic-1', 'q-critic-blind'],
     sourceRefs: [
       {
         chapter: 3,
@@ -592,7 +592,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-attack'],
     glossaryTerms: ['red-team', 'coverage', 'taxonomy'],
-    quizIds: ['q-budget-1'],
+    quizIds: ['q-budget-1', 'q-search-ceiling'],
     sourceRefs: [
       {
         chapter: 3,

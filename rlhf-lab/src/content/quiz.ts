@@ -395,4 +395,48 @@ export const QUIZ: QuizQuestion[] = [
     citation: NPLUS,
     lessonId: 'the-checklist',
   },
+  {
+    id: 'q-bon-shape',
+    kind: 'multiple-choice',
+    prompt: 'In the overoptimisation paper\u2019s functional forms, what shape does best-of-n\u2019s reward take as a function of the sample count d?',
+    topic: 'The functional forms',
+    difficulty: 'hard',
+    options: [
+      { id: 'a', label: 'Exponential growth that saturates', feedback: 'That is closer to the RL curve\u2019s shape; best-of-n turns over.' },
+      {
+        id: 'b',
+        label: 'A downward parabola through the origin: R(d) = d(\u03b1 \u2212 \u03b2 d)',
+        feedback: 'Correct \u2014 rising at first, then falling as the proxy reward diverges from the true one.',
+      },
+      { id: 'c', label: 'A straight line with slope \u03b1', feedback: 'A line never turns over, and best-of-n demonstrably does.' },
+      { id: 'd', label: 'A step function at the gold answer', feedback: 'Nothing in the fit is a step.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+    'For best-of-n: R(d) = d(\u03b1 \u2212 \u03b2 d), a downward parabola through the origin \u2014 the proxy reward rises, peaks, and falls as d grows. Fitting both functional forms in a controlled setting is how the paper reads the fit and compares RL against best-of-n on the same proxy.',
+    citation: OVEROPT,
+    lessonId: 'the-functional-forms',
+  },
+  {
+    id: 'q-kl-stopping',
+    kind: 'multiple-choice',
+    prompt: 'In operational terms, what does the KL coefficient decide?',
+    topic: 'The operational lesson',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'How fast the policy learns per step', feedback: 'The learning rate lives elsewhere; the coefficient is a leash, not an accelerator.' },
+      {
+        id: 'b',
+        label: 'How far the policy is allowed to travel \u2014 the dial that sets the stopping point',
+        feedback: 'Correct \u2014 which is why the distance travelled belongs next to the score in every report.',
+      },
+      { id: 'c', label: 'How many PPO epochs run per batch', feedback: 'That is one of the enumerated details, not the coefficient\u2019s role.' },
+      { id: 'd', label: 'How the advantage estimator is initialised', feedback: 'GAE\u2019s parameters are unrelated to the KL budget.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The KL coefficient is the dial that decides how far the policy is allowed to travel \u2014 and the operational lesson is to report the distance travelled alongside the score, because a score without its KL budget says nothing about what was bought or at what price.',
+    citation: OVEROPT,
+    lessonId: 'the-operational-lesson',
+  },
 ]

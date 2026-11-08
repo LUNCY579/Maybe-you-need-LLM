@@ -164,6 +164,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>For each word, the documents that contain it</strong></li><li>For each document, its words</li><li>A vector for each document</li><li>The answer to every question</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The postings are the whole of the index, and their number is what a lexical search really costs.</p></blockquote>
+<p>*<em>Q. Why can the lexical index be precomputed while the query work cannot? — multiple-choice </em>(core)***</p>
+<ul><li>Because queries are too short to optimise</li><li>✓ <strong>Because the documents are known in advance: the index maps each word to the documents that contain it, and its size — the number of postings — is what a lexical search really spends</strong></li><li>Because the index is small enough to keep in memory</li><li>Because queries are answered by the model instead</li></ul>
+<blockquote><p>Correct — and the query’s terms are only known when it arrives.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The index maps each word to the documents that contain it; its size is the number of postings, and that is what a lexical search really spends. The documents are known before any query arrives — the query’s own terms are not, which is why its work cannot be precomputed.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The postings of the corpus, and the size of the index. Open <strong>Look at the index</strong> in the retrieval-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -339,6 +343,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>No: a long context raises the ceiling, and the position effect lowers the floor</strong></li><li>Yes: put everything in and the model will find it</li><li>Yes, for tasks with a single document</li><li>No, because retrieval is always cheaper</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Everything can be present in a long context and a good deal of it can still be ignored. Retrieval is what puts the evidence where the reader will look.</p></blockquote>
+<p>*<em>Q. What does a long context change, and what does it not? — multiple-choice </em>(core)***</p>
+<ul><li>It removes the need for a reader that uses the evidence</li><li>✓ <strong>It raises the ceiling on what can be answered and lowers the floor on what is answered well</strong></li><li>It makes the retriever unnecessary at any length</li><li>It changes the cost model of the retriever’s index</li></ul>
+<blockquote><p>Correct — which is why the retrieval-against-long-context comparison is measured on the same questions.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A long context raises the ceiling on what can be answered and lowers the floor on what is answered well — the retriever finds the facts and the reader has to use them, and the case is measured by putting retrieval against a long context on the same questions.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The long-context reader against the retrieval-augmented one, on the same questions. Open <strong>Compare the two</strong> in the retrieval-lab application.</p>
 <p><strong>Where this came from</strong></p>

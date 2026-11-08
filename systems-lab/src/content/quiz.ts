@@ -258,4 +258,17 @@ export const QUIZ: QuizQuestion[] = [
     citation: SPECINFER,
     lessonId: 'when-speculation-pays',
   },
+  {
+    id: 'q-aux-loss-compute',
+    kind: 'numeric',
+    prompt: 'The auxiliary loss is the number of tokens times the sum over experts of load-fraction \u00d7 probability-fraction. With two experts whose loads are 0.75 and 0.25, router probabilities 0.5 and 0.5, and 100 tokens, what is the loss?',
+    topic: 'The auxiliary loss',
+    difficulty: 'core',
+    answer: 50,
+    tolerance: 0,
+    explanation:
+      'The products are 0.75 \u00d7 0.5 and 0.25 \u00d7 0.5, summing to 0.5; times 100 tokens the loss is 50. It would be smallest \u2014 zero \u2014 when the load equalled the probability, which is exactly the behaviour the loss pushes the router towards.',
+    citation: GSHARD,
+    lessonId: 'the-auxiliary-loss',
+  },
 ]

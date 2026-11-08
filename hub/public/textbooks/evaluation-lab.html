@@ -195,6 +195,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>How often the judge agrees with a human</li><li>✓ <strong>How often the judge gives the same answer when the order is changed</strong></li><li>How good the judge is at explaining itself</li><li>How expensive the judge is to run</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Consistency is measured against the judge itself: the same pair, presented in both orders, should produce the same preference. A failure to do so means the judge answered a different question.</p></blockquote>
+<p>*<em>Q. What does a consistency failure tell you that a low agreement with humans does not? — multiple-choice </em>(core)***</p>
+<ul><li>That the judge is weak compared with humans</li><li>✓ <strong>That the judge is not even a function of the answers — its verdict flips when the order is swapped</strong></li><li>That the question set is too small</li><li>That humans disagree with each other</li></ul>
+<blockquote><p>Correct — the swap test measures the judge against itself.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Agreement is measured against a human; consistency is measured against the judge itself — the swap test reorders the two answers and asks again. A consistency failure means the verdicts are not a function of the answers alone, which no amount of agreement can repair.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Judge the same pair twice, with the positions swapped, and count the flips. Open <strong>The swap test</strong> in the evaluation-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -318,6 +322,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Elo ratings are not computed from votes</li><li>✓ <strong>Elo is an online update, so its result depends on the order the votes arrived in</strong></li><li>Elo assumes the models are equally good to start</li><li>Elo cannot handle draws</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A bootstrap interval resamples the votes and refits, and it means the same thing whatever order they arrived in. An online rating carries the path with it.</p></blockquote>
+<p>*<em>Q. Why is an Elo rating alone not an interval? — multiple-choice </em>(core)***</p>
+<ul><li>Because Elo is only defined for chess</li><li>✓ <strong>Because the rating is a point estimate from one fit — resampling the votes and refitting is what produces the interval</strong></li><li>Because Elo cannot be computed from pairwise votes</li><li>Because the interval would be too wide to publish</li></ul>
+<blockquote><p>Correct — the bootstrap is what turns the ranking into a measurement with width.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Resampling the votes and refitting gives an interval on the ranking — which is what separates two models whose ratings differ. And the number of votes needed to separate them grows with how close they are, which is the cost half of the lesson.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Watch the confidence interval on the top two models shrink as the votes accumulate. Open <strong>How many votes to tell them apart</strong> in the evaluation-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -364,6 +372,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. Which of these are design decisions a benchmark author makes? — multi-select </em>(core)***</p>
 <ul><li>✓ <strong>Which questions to ask</strong></li><li>✓ <strong>How the answers are scored</strong></li><li>What the score is called</li><li>✓ <strong>Which models are evaluated</strong></li></ul>
 <blockquote><p><strong>Why:</strong> The question set, the scoring procedure and the set of models under test are all choices. Each one is a claim about what matters, and each one can be argued for.</p></blockquote>
+<p>*<em>Q. What two things does a benchmark have to do at once? — multiple-choice </em>(warmup)***</p>
+<ul><li>Be cheap to run and easy to cite</li><li>✓ <strong>Be hard enough to separate models and easy enough to run</strong></li><li>Be fully automatic and fully adversarial</li><li>Cover every capability and reject every bad model</li></ul>
+<blockquote><p>Correct — the tension between breadth and depth lives between them.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A benchmark has to be hard enough to separate models and easy enough to run. The question set lives in that tension: breadth buys coverage, depth buys discrimination, and the holistic framing is what a single score adds to the pair.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>See how the difficulty mix of a question set changes what the score measures. Open <strong>Build a question set</strong> in the evaluation-lab application.</p>
 <p><strong>Further reading</strong></p>
@@ -410,6 +422,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A benchmark with very low power will report real differences as ties. — boolean </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. If the test cannot detect the difference, the difference does not appear — and a leaderboard that reports a tie there is reporting an artefact of the question count.</p></blockquote>
+<p>*<em>Q. The number of questions needed grows as the square of the inverse of the difference. If the difference you care about doubles, by what factor does the required question count fall? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 0.25 ± 0.001</p></blockquote>
+<blockquote><p><strong>Why:</strong> The count scales as 1/difference², so doubling the difference divides the required count by four. And when the difference you care about is smaller than the noise, no affordable question count answers it — which is the finding, not a failure to produce one.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Compute how many questions a given difference needs, and watch the curve. Open <strong>The cost of detecting a small difference</strong> in the evaluation-lab application.</p>
 <p><strong>The words this lesson uses</strong></p>
@@ -426,6 +441,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. What should a leaderboard print next to every score? — multi-select </em>(hard)***</p>
 <ul><li>✓ <strong>A confidence interval</strong></li><li>✓ <strong>The number of questions used</strong></li><li>✓ <strong>The provider of the model</strong></li><li>The logo of the organisation that ran it</li></ul>
 <blockquote><p><strong>Why:</strong> An interval, the question count, and enough about the protocol to reproduce it. The newest criticism of the field is that the last of these is often missing, and that the leaderboard has become the thing being optimised.</p></blockquote>
+<p>*<em>Q. Which of these should a leaderboard print next to every score? — multi-select </em>(core)***</p>
+<ul><li>✓ <strong>The interval on the score</strong></li><li>✓ <strong>The number of questions the score was computed on</strong></li><li>✓ <strong>The judge’s agreement with a human baseline</strong></li><li>The judge’s own self-evaluation score</li></ul>
+<blockquote><p><strong>Why:</strong> A score without an interval is a claim, not a measurement; the question count is where the width comes from; and the judge’s agreement with a human baseline is the number that says what the whole instrument is worth.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The same score, with and without its interval, and what a reader can conclude from each. Open <strong>What the interval looks like</strong> in the evaluation-lab application.</p>
 <p><strong>The words this lesson uses</strong></p>

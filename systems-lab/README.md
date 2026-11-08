@@ -83,7 +83,7 @@ Every algorithm in every laboratory runs **in the browser, from scratch**, every
 
 ### The rest of the course
 
-- **Practice** — 16 questions with per-option feedback, worked explanations and source citations.
+- **Practice** — 17 questions with per-option feedback, worked explanations and source citations.
 - **Glossary** — 20 terms, each with a plain-language definition and the terms that should be understood first. The
   dependency graph is checked for cycles.
 - **Equations** — 8 results with the source, the plain-language meaning, every symbol, the assumptions, a derivation

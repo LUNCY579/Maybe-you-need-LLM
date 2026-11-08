@@ -411,6 +411,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>R(d) = d(α − β d)</strong></li><li>R(d) = d(α − β log d)</li><li>R(d) = α e^(−β d)</li><li>R(d) = α d² + β</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Best-of-n: a downward parabola through the origin, R(d) = d(α − βd). Reinforcement learning: R(d) = d(α − β log d), which turns over more slowly because the policy moves rather than the sample.</p></blockquote>
+<p>*<em>Q. In the overoptimisation paper’s functional forms, what shape does best-of-n’s reward take as a function of the sample count d? — multiple-choice </em>(hard)***</p>
+<ul><li>Exponential growth that saturates</li><li>✓ <strong>A downward parabola through the origin: R(d) = d(α − β d)</strong></li><li>A straight line with slope α</li><li>A step function at the gold answer</li></ul>
+<blockquote><p>Correct — rising at first, then falling as the proxy reward diverges from the true one.</p></blockquote>
+<blockquote><p><strong>Why:</strong> For best-of-n: R(d) = d(α − β d), a downward parabola through the origin — the proxy reward rises, peaks, and falls as d grows. Fitting both functional forms in a controlled setting is how the paper reads the fit and compares RL against best-of-n on the same proxy.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Fit both functional forms to the measured curve and compare the two methods. Open <strong>Fitting the forms</strong> in the rlhf-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -430,6 +434,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The distance at which the marginal proxy reward equals the marginal true reward</strong></li><li>The point at which the reward model stops working</li><li>The number of training steps to stop at</li><li>That the KL penalty should be removed</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is the optimal stopping point for a fixed budget, and it is what the KL coefficient is set to reach. Past it, the run is spending compute to make the true outcome worse.</p></blockquote>
+<p>*<em>Q. In operational terms, what does the KL coefficient decide? — multiple-choice </em>(core)***</p>
+<ul><li>How fast the policy learns per step</li><li>✓ <strong>How far the policy is allowed to travel — the dial that sets the stopping point</strong></li><li>How many PPO epochs run per batch</li><li>How the advantage estimator is initialised</li></ul>
+<blockquote><p>Correct — which is why the distance travelled belongs next to the score in every report.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The KL coefficient is the dial that decides how far the policy is allowed to travel — and the operational lesson is to report the distance travelled alongside the score, because a score without its KL budget says nothing about what was bought or at what price.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Read the turning point off the curve and the KL coefficient that reaches it. Open <strong>Where to stop</strong> in the rlhf-lab application.</p>
 <p><strong>The words this lesson uses</strong></p>

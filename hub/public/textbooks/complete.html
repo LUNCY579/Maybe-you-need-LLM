@@ -4322,6 +4322,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>They define three different reverse processes</li><li>✓ <strong>They describe the same reverse process but train the network on different targets</strong></li><li>Only ε-prediction is mathematically valid</li><li>x₀-prediction is always better</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The three parameterisations are algebraically equivalent views of p_θ(x_{t−1}|x_t). What changes is the regression target, and therefore how stable training is and how the loss is weighted.</p></blockquote>
+<p>*<em>Q. What actually changes between the ε-, the x₀- and the v-parameterisation of the reverse process? — multiple-choice </em>(core)***</p>
+<ul><li>The reverse process itself</li><li>✓ <strong>Only what the network is trained to predict — the forms convert into one another</strong></li><li>The variance schedule the process uses</li><li>The number of sampling steps</li></ul>
+<blockquote><p>Correct — which is why the choice is about training dynamics, not about the model’s reach.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The three parameterisations describe the same reverse process; only the network target changes, and a prediction in one form converts into another in closed form. What the choice moves is the weighting the loss gives each noise level — the paper found the ε-form best for that reason.</p></blockquote>
 <h4 id="diffusion-lab--go-and-do-it">Go and do it</h4>
 <p>Take one network output and read it as ε, as x₀, and as v. Open <strong>Convert a prediction</strong> in the diffusion-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -4398,6 +4402,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Small t are effectively ignored, because the true weight there is enormous</strong></li><li>Large t are ignored</li><li>The objective becomes a different likelihood bound</li><li>Nothing changes, because the weight is constant</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The true weight β_t²/(2σ_t²α_t(1−ᾱ_t)) is very large at small t and very small at large t. Flattening it to 1 therefore removes most of the gradient signal from the easy, small-t end of the chain — which the paper reports improves sample quality.</p></blockquote>
+<p>*<em>Q. What does the paper give up when it trains on the simplified objective instead of the true variational bound? — multiple-choice </em>(hard)***</p>
+<ul><li>The reverse process entirely</li><li>✓ <strong>The per-timestep weight β_t² / (2σ_t²α_t(1 − ᵩf_t)) — every timestep is weighted equally instead</strong></li><li>The KL terms above the last step</li><li>Nothing — the two objectives are identical</li></ul>
+<blockquote><p>Correct — the simplified objective is the true bound with the weights removed.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The true bound weights each timestep’s loss by β_t² / (2σ_t²α_t(1 − ᵩf_t)); the simplified objective drops that weight and trains every step equally. What the paper gives up is theoretical tightness, and what it reports gaining is sample quality — an ablated trade, not an oversight.</p></blockquote>
 <h4 id="diffusion-lab--go-and-do-it">Go and do it</h4>
 <p>Break the bound into its per-step KL terms and see where the cost sits. Open <strong>Decompose the bound</strong> in the diffusion-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -4480,6 +4488,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A guided model samples from a distribution proportional to p(x) · p(c | x)^w. For what value of w is this distribution exactly p(x | c)? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 1</p></blockquote>
 <blockquote><p><strong>Why:</strong> w = 1. Since p(x)·p(c|x) = p(x|c)·p(c), and p(c) is a constant, the tilted distribution is proportional to the true conditional. Any w above 1 over-shoots it.</p></blockquote>
+<p>*<em>Q. What does a very large guidance weight do to the samples? — multiple-choice </em>(core)***</p>
+<ul><li>They spread out, because the conditioning gets louder</li><li>✓ <strong>They move to the mode and stop spreading — fidelity up, diversity down</strong></li><li>They become more diverse while staying on-manifold</li><li>Nothing; the weight only changes speed</li></ul>
+<blockquote><p>Correct — the trade-off is quantifiable, and the weight is its dial.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Guidance narrows the distribution: the samples move to the mode and stop spreading. The relationship between the weight and the effective temperature is measurable, which is what makes the fidelity–diversity trade-off a quantity rather than a vibe.</p></blockquote>
 <h4 id="diffusion-lab--go-and-do-it">Go and do it</h4>
 <p>Put fidelity against diversity and mark where the sweet spot is. Open <strong>Plot the trade-off</strong> in the diffusion-lab application.</p>
 <p><strong>The words this lesson uses</strong></p>
@@ -5120,6 +5132,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>How often the judge agrees with a human</li><li>✓ <strong>How often the judge gives the same answer when the order is changed</strong></li><li>How good the judge is at explaining itself</li><li>How expensive the judge is to run</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Consistency is measured against the judge itself: the same pair, presented in both orders, should produce the same preference. A failure to do so means the judge answered a different question.</p></blockquote>
+<p>*<em>Q. What does a consistency failure tell you that a low agreement with humans does not? — multiple-choice </em>(core)***</p>
+<ul><li>That the judge is weak compared with humans</li><li>✓ <strong>That the judge is not even a function of the answers — its verdict flips when the order is swapped</strong></li><li>That the question set is too small</li><li>That humans disagree with each other</li></ul>
+<blockquote><p>Correct — the swap test measures the judge against itself.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Agreement is measured against a human; consistency is measured against the judge itself — the swap test reorders the two answers and asks again. A consistency failure means the verdicts are not a function of the answers alone, which no amount of agreement can repair.</p></blockquote>
 <h4 id="evaluation-lab--go-and-do-it">Go and do it</h4>
 <p>Judge the same pair twice, with the positions swapped, and count the flips. Open <strong>The swap test</strong> in the evaluation-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -5243,6 +5259,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>Elo ratings are not computed from votes</li><li>✓ <strong>Elo is an online update, so its result depends on the order the votes arrived in</strong></li><li>Elo assumes the models are equally good to start</li><li>Elo cannot handle draws</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A bootstrap interval resamples the votes and refits, and it means the same thing whatever order they arrived in. An online rating carries the path with it.</p></blockquote>
+<p>*<em>Q. Why is an Elo rating alone not an interval? — multiple-choice </em>(core)***</p>
+<ul><li>Because Elo is only defined for chess</li><li>✓ <strong>Because the rating is a point estimate from one fit — resampling the votes and refitting is what produces the interval</strong></li><li>Because Elo cannot be computed from pairwise votes</li><li>Because the interval would be too wide to publish</li></ul>
+<blockquote><p>Correct — the bootstrap is what turns the ranking into a measurement with width.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Resampling the votes and refitting gives an interval on the ranking — which is what separates two models whose ratings differ. And the number of votes needed to separate them grows with how close they are, which is the cost half of the lesson.</p></blockquote>
 <h4 id="evaluation-lab--go-and-do-it">Go and do it</h4>
 <p>Watch the confidence interval on the top two models shrink as the votes accumulate. Open <strong>How many votes to tell them apart</strong> in the evaluation-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -5289,6 +5309,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. Which of these are design decisions a benchmark author makes? — multi-select </em>(core)***</p>
 <ul><li>✓ <strong>Which questions to ask</strong></li><li>✓ <strong>How the answers are scored</strong></li><li>What the score is called</li><li>✓ <strong>Which models are evaluated</strong></li></ul>
 <blockquote><p><strong>Why:</strong> The question set, the scoring procedure and the set of models under test are all choices. Each one is a claim about what matters, and each one can be argued for.</p></blockquote>
+<p>*<em>Q. What two things does a benchmark have to do at once? — multiple-choice </em>(warmup)***</p>
+<ul><li>Be cheap to run and easy to cite</li><li>✓ <strong>Be hard enough to separate models and easy enough to run</strong></li><li>Be fully automatic and fully adversarial</li><li>Cover every capability and reject every bad model</li></ul>
+<blockquote><p>Correct — the tension between breadth and depth lives between them.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A benchmark has to be hard enough to separate models and easy enough to run. The question set lives in that tension: breadth buys coverage, depth buys discrimination, and the holistic framing is what a single score adds to the pair.</p></blockquote>
 <h4 id="evaluation-lab--go-and-do-it">Go and do it</h4>
 <p>See how the difficulty mix of a question set changes what the score measures. Open <strong>Build a question set</strong> in the evaluation-lab application.</p>
 <p><strong>Further reading</strong></p>
@@ -5335,6 +5359,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A benchmark with very low power will report real differences as ties. — boolean </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. If the test cannot detect the difference, the difference does not appear — and a leaderboard that reports a tie there is reporting an artefact of the question count.</p></blockquote>
+<p>*<em>Q. The number of questions needed grows as the square of the inverse of the difference. If the difference you care about doubles, by what factor does the required question count fall? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 0.25 ± 0.001</p></blockquote>
+<blockquote><p><strong>Why:</strong> The count scales as 1/difference², so doubling the difference divides the required count by four. And when the difference you care about is smaller than the noise, no affordable question count answers it — which is the finding, not a failure to produce one.</p></blockquote>
 <h4 id="evaluation-lab--go-and-do-it">Go and do it</h4>
 <p>Compute how many questions a given difference needs, and watch the curve. Open <strong>The cost of detecting a small difference</strong> in the evaluation-lab application.</p>
 <p><strong>The words this lesson uses</strong></p>
@@ -5351,6 +5378,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. What should a leaderboard print next to every score? — multi-select </em>(hard)***</p>
 <ul><li>✓ <strong>A confidence interval</strong></li><li>✓ <strong>The number of questions used</strong></li><li>✓ <strong>The provider of the model</strong></li><li>The logo of the organisation that ran it</li></ul>
 <blockquote><p><strong>Why:</strong> An interval, the question count, and enough about the protocol to reproduce it. The newest criticism of the field is that the last of these is often missing, and that the leaderboard has become the thing being optimised.</p></blockquote>
+<p>*<em>Q. Which of these should a leaderboard print next to every score? — multi-select </em>(core)***</p>
+<ul><li>✓ <strong>The interval on the score</strong></li><li>✓ <strong>The number of questions the score was computed on</strong></li><li>✓ <strong>The judge’s agreement with a human baseline</strong></li><li>The judge’s own self-evaluation score</li></ul>
+<blockquote><p><strong>Why:</strong> A score without an interval is a claim, not a measurement; the question count is where the width comes from; and the judge’s agreement with a human baseline is the number that says what the whole instrument is worth.</p></blockquote>
 <h4 id="evaluation-lab--go-and-do-it">Go and do it</h4>
 <p>The same score, with and without its interval, and what a reader can conclude from each. Open <strong>What the interval looks like</strong> in the evaluation-lab application.</p>
 <p><strong>The words this lesson uses</strong></p>
@@ -5751,6 +5781,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>R(d) = d(α − β d)</strong></li><li>R(d) = d(α − β log d)</li><li>R(d) = α e^(−β d)</li><li>R(d) = α d² + β</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Best-of-n: a downward parabola through the origin, R(d) = d(α − βd). Reinforcement learning: R(d) = d(α − β log d), which turns over more slowly because the policy moves rather than the sample.</p></blockquote>
+<p>*<em>Q. In the overoptimisation paper’s functional forms, what shape does best-of-n’s reward take as a function of the sample count d? — multiple-choice </em>(hard)***</p>
+<ul><li>Exponential growth that saturates</li><li>✓ <strong>A downward parabola through the origin: R(d) = d(α − β d)</strong></li><li>A straight line with slope α</li><li>A step function at the gold answer</li></ul>
+<blockquote><p>Correct — rising at first, then falling as the proxy reward diverges from the true one.</p></blockquote>
+<blockquote><p><strong>Why:</strong> For best-of-n: R(d) = d(α − β d), a downward parabola through the origin — the proxy reward rises, peaks, and falls as d grows. Fitting both functional forms in a controlled setting is how the paper reads the fit and compares RL against best-of-n on the same proxy.</p></blockquote>
 <h4 id="rlhf-lab--go-and-do-it">Go and do it</h4>
 <p>Fit both functional forms to the measured curve and compare the two methods. Open <strong>Fitting the forms</strong> in the rlhf-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -5770,6 +5804,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The distance at which the marginal proxy reward equals the marginal true reward</strong></li><li>The point at which the reward model stops working</li><li>The number of training steps to stop at</li><li>That the KL penalty should be removed</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is the optimal stopping point for a fixed budget, and it is what the KL coefficient is set to reach. Past it, the run is spending compute to make the true outcome worse.</p></blockquote>
+<p>*<em>Q. In operational terms, what does the KL coefficient decide? — multiple-choice </em>(core)***</p>
+<ul><li>How fast the policy learns per step</li><li>✓ <strong>How far the policy is allowed to travel — the dial that sets the stopping point</strong></li><li>How many PPO epochs run per batch</li><li>How the advantage estimator is initialised</li></ul>
+<blockquote><p>Correct — which is why the distance travelled belongs next to the score in every report.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The KL coefficient is the dial that decides how far the policy is allowed to travel — and the operational lesson is to report the distance travelled alongside the score, because a score without its KL budget says nothing about what was bought or at what price.</p></blockquote>
 <h4 id="rlhf-lab--go-and-do-it">Go and do it</h4>
 <p>Read the turning point off the curve and the KL coefficient that reaches it. Open <strong>Where to stop</strong> in the rlhf-lab application.</p>
 <p><strong>The words this lesson uses</strong></p>
@@ -8102,6 +8140,9 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. A router sends every token to one of two experts. The load fractions are 0.75 and 0.25, and the probability fractions are 0.5 and 0.5. What is the auxiliary loss for 100 tokens? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 50</p></blockquote>
 <blockquote><p><strong>Why:</strong> The auxiliary loss is N times the sum of the products: 100 × (0.75 × 0.5 + 0.25 × 0.5) = 100 × 0.5 = 50.</p></blockquote>
+<p>*<em>Q. The auxiliary loss is the number of tokens times the sum over experts of load-fraction × probability-fraction. With two experts whose loads are 0.75 and 0.25, router probabilities 0.5 and 0.5, and 100 tokens, what is the loss? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 50</p></blockquote>
+<blockquote><p><strong>Why:</strong> The products are 0.75 × 0.5 and 0.25 × 0.5, summing to 0.5; times 100 tokens the loss is 50. It would be smallest — zero — when the load equalled the probability, which is exactly the behaviour the loss pushes the router towards.</p></blockquote>
 <h4 id="systems-lab--go-and-do-it">Go and do it</h4>
 <p>A biased router, the auxiliary loss it produces, and the tokens that overflow. Open <strong>Break the balance</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8314,6 +8355,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. Value iteration finds the optimal policy without ever evaluating a policy. — boolean </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. One sweep of the optimality operator gives the greedy policy with respect to the current values, and repeating the sweep converges to the optimal pair. A policy evaluation is not needed anywhere in it.</p></blockquote>
+<p>*<em>Q. How does the optimal policy relate to the optimal value function? — multiple-choice </em>(core)***</p>
+<ul><li>It is the value function renormalised over actions</li><li>✓ <strong>It is read off greedily: the optimal value is the largest value any policy achieves, and acting greedily on it is optimal</strong></li><li>It is unrelated; the two are computed by separate algorithms</li><li>It is the value function evaluated at the final state</li></ul>
+<blockquote><p>Correct — and a policy gradient method is trying to find the same thing without the dynamic programming.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The optimal value function is the largest value any policy achieves, and it satisfies its own Bellman equation. Reading the greedy action off it gives the optimal policy — and what a policy gradient is trying to find, in these terms, is the same object by a different route.</p></blockquote>
 <h4 id="rl-foundations--go-and-do-it">Go and do it</h4>
 <p>The optimal policy and the value of reaching the goal, computed exactly. Open <strong>See the optimum</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8387,6 +8432,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>Both, in opposite ways: the one-step return is biased and the Monte Carlo return is noisy</strong></li><li>Neither</li><li>Only the one-step return</li><li>Only the Monte Carlo return</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The bootstrap is what biases an estimate, and the Monte Carlo return has no bootstrap. The sample is what makes an estimate noisy, and the one-step return has almost no sample in it.</p></blockquote>
+<p>*<em>Q. Along the n-step range, which end is biased and which is noisy? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The one-step return is the most biased and the least noisy; the Monte Carlo return is the reverse</strong></li><li>The one-step return is unbiased and noisy; the Monte Carlo return is biased and stable</li><li>Both ends are unbiased; only the middle is biased</li><li>Neither end is noisy, because returns are deterministic</li></ul>
+<blockquote><p>Correct — the bootstrap is the bias, the sampling is the noise.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The n-step return bootstraps after n steps: the bootstrap is the source of bias, the sampling the source of noise. The one-step return is the least noisy and the most biased; the Monte Carlo return is the reverse — and the λ-return is the mixture between them.</p></blockquote>
 <h4 id="rl-foundations--go-and-do-it">Go and do it</h4>
 <p>The n-step returns of a real trajectory, and the truth they are aiming at. Open <strong>Count the steps</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8427,6 +8476,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>An estimate of the value, and through it the advantage the actor follows</strong></li><li>The parameters the actor starts from</li><li>The reward function</li><li>The discount</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The critic turns the return into the advantage, which is a smaller and less noisy signal, and the actor follows the advantage rather than the return.</p></blockquote>
+<p>*<em>Q. In the actor–critic loop, what does the critic do? — multiple-choice </em>(core)***</p>
+<ul><li>It samples the actions the actor will take</li><li>✓ <strong>It estimates the value, so the actor can follow the advantage the critic makes available</strong></li><li>It scores the reward model’s outputs</li><li>It chooses the learning rate</li></ul>
+<blockquote><p>Correct — and its update is a temporal-difference update.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The critic estimates the value; the actor follows the advantage the critic makes available. The critic’s update is the temporal-difference update, and the loop is what turns the two into a learning curve you can read.</p></blockquote>
 <h4 id="rl-foundations--go-and-do-it">Go and do it</h4>
 <p>The actor–critic loop, run here, with its learning curves. Open <strong>Run the loop</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8536,6 +8589,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>For each word, the documents that contain it</strong></li><li>For each document, its words</li><li>A vector for each document</li><li>The answer to every question</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The postings are the whole of the index, and their number is what a lexical search really costs.</p></blockquote>
+<p>*<em>Q. Why can the lexical index be precomputed while the query work cannot? — multiple-choice </em>(core)***</p>
+<ul><li>Because queries are too short to optimise</li><li>✓ <strong>Because the documents are known in advance: the index maps each word to the documents that contain it, and its size — the number of postings — is what a lexical search really spends</strong></li><li>Because the index is small enough to keep in memory</li><li>Because queries are answered by the model instead</li></ul>
+<blockquote><p>Correct — and the query’s terms are only known when it arrives.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The index maps each word to the documents that contain it; its size is the number of postings, and that is what a lexical search really spends. The documents are known before any query arrives — the query’s own terms are not, which is why its work cannot be precomputed.</p></blockquote>
 <h4 id="retrieval-lab--go-and-do-it">Go and do it</h4>
 <p>The postings of the corpus, and the size of the index. Open <strong>Look at the index</strong> in the retrieval-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -8711,6 +8768,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>No: a long context raises the ceiling, and the position effect lowers the floor</strong></li><li>Yes: put everything in and the model will find it</li><li>Yes, for tasks with a single document</li><li>No, because retrieval is always cheaper</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Everything can be present in a long context and a good deal of it can still be ignored. Retrieval is what puts the evidence where the reader will look.</p></blockquote>
+<p>*<em>Q. What does a long context change, and what does it not? — multiple-choice </em>(core)***</p>
+<ul><li>It removes the need for a reader that uses the evidence</li><li>✓ <strong>It raises the ceiling on what can be answered and lowers the floor on what is answered well</strong></li><li>It makes the retriever unnecessary at any length</li><li>It changes the cost model of the retriever’s index</li></ul>
+<blockquote><p>Correct — which is why the retrieval-against-long-context comparison is measured on the same questions.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A long context raises the ceiling on what can be answered and lowers the floor on what is answered well — the retriever finds the facts and the reader has to use them, and the case is measured by putting retrieval against a long context on the same questions.</p></blockquote>
 <h4 id="retrieval-lab--go-and-do-it">Go and do it</h4>
 <p>The long-context reader against the retrieval-augmented one, on the same questions. Open <strong>Compare the two</strong> in the retrieval-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -9131,6 +9192,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>The part of a harmlessness score that makes it worth anything</strong></li><li>An optional extra</li><li>The accuracy of the model being tested</li><li>The size of the preference dataset</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Every harmlessness number is what a judge believes, measured on a sample. The agreement is what makes that number mean anything.</p></blockquote>
+<p>*<em>Q. What are the two errors a harmlessness judge makes? — multiple-choice </em>(core)***</p>
+<ul><li>Under- and over-refusal, in the generation stage</li><li>✓ <strong>False positives — flagging harmless answers — and false negatives — passing harmful ones</strong></li><li>Position and verbosity bias, as in any LLM judge</li><li>It makes no errors if it is the same model that produced the answers</li></ul>
+<blockquote><p>Correct — and the agreement with the labels is the number to report, because the score is what a judge believes.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A harmlessness score is what a judge believes, and the judge is a model — so it makes false positives and false negatives. The agreement with the labels is the number to report, because that is what says how much the score can be believed.</p></blockquote>
 <h4 id="safety-lab--go-and-do-it">Go and do it</h4>
 <p>The agreement of a judge with the labels, and the errors it makes. Open <strong>Check the judge</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -9150,6 +9215,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>What the model does outside the sample the score was measured on</strong></li><li>What the judge believed</li><li>The size of the sample</li><li>The taxonomy</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is a measurement on a sample against a taxonomy, by a judge. Everything outside those three is a claim about the model rather than a measurement of it.</p></blockquote>
+<p>*<em>Q. What is a harmlessness number actually a measurement of? — multiple-choice </em>(core)***</p>
+<ul><li>The safety of the model</li><li>✓ <strong>The opinion of a judge, measured on a sample, against a taxonomy</strong></li><li>The agreement between two judges</li><li>The model’s refusal rate on benign queries</li></ul>
+<blockquote><p>Correct — and everything a safety claim leaves out follows from those three qualifiers.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A harmlessness score is the opinion of a judge, measured on a sample, against a taxonomy. Each qualifier names something a safety claim leaves out — the judge’s calibration, the sample’s size and representativeness, the taxonomy’s coverage — and the evidence a claim needs before it is believed is the list of those things stated.</p></blockquote>
 <h4 id="safety-lab--go-and-do-it">Go and do it</h4>
 <p>The parts of a harmlessness claim, and the measurement behind each. Open <strong>Read the claim</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -9191,6 +9260,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>Because the question is which critiques were right, and neither critic can be the judge of that</strong></li><li>Because the two critics are the same model</li><li>Because the critics write different numbers of words</li><li>It does not; the two rates can be compared directly</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A claim about what a critic cannot see in its own answer is a claim about the cases it got wrong, and finding those needs a verdict that is right for reasons of its own.</p></blockquote>
+<p>*<em>Q. Why does a critique written by the model that wrote the answer share that answer’s blind spots? — multiple-choice </em>(hard)***</p>
+<ul><li>Because the critique is copied from the answer</li><li>✓ <strong>Because the model cannot see what it cannot see — the same limits that shaped the answer shape the critique of it</strong></li><li>Because the critique uses a smaller context window</li><li>Because critiques are sampled at a higher temperature</li></ul>
+<blockquote><p>Correct — which is why comparing two critics needs a verdict that is right.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A critique written by the model that wrote the answer shares that answer’s blind spots — the model cannot see what it cannot see. Measuring what each critic misses, and the cost of each, is why the comparison of two critics needs a verdict that is right rather than merely fluent.</p></blockquote>
 <h4 id="safety-lab--go-and-do-it">Go and do it</h4>
 <p>The same cases, two critics, and the verdicts each one reaches. Open <strong>Compare the two critics</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -9237,6 +9310,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>Turning a pile of failures into a measurement that can be compared</strong></li><li>Listing every possible failure</li><li>Deciding which failures matter</li><li>Replacing the red team</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Without a taxonomy a red team produces anecdotes. With one, it produces a coverage that can be compared between teams and between models.</p></blockquote>
+<p>*<em>Q. What does a harm taxonomy add to a red-team set? — multiple-choice </em>(core)***</p>
+<ul><li>A longer list of prompts</li><li>✓ <strong>Coverage that can be measured: the set becomes a measurement rather than an anecdote</strong></li><li>A licence to skip the held-out test set</li><li>Automatic scoring of the attacks</li></ul>
+<blockquote><p>Correct — and the difference between a red-team set and a test set is what it is drawn from.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A taxonomy is what makes a red-team set a measurement rather than an anecdote: the coverage of a red team against the taxonomy is measurable, and a red-team set differs from a test set in that it is drawn from attacks rather than from the behaviour being certified.</p></blockquote>
 <h4 id="safety-lab--go-and-do-it">Go and do it</h4>
 <p>A model-driven red team against a random one, on the same budget. Open <strong>Compare the two red teams</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -9255,6 +9332,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. One attempt reaches a particular failure with probability 0.25. Spending four attempts on it, what is the chance the failure has been found at least once? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 0.68359375 ± 0.001</p></blockquote>
 <blockquote><p><strong>Why:</strong> One minus the chance it is missed four times: 1 − 0.75⁴ = 0.6836. This is the arithmetic the ceiling curve is made of, and it is the same whether the attempts were asked for or stumbled into.</p></blockquote>
+<p>*<em>Q. Why is spending the attack budget evenly over the known failures a ceiling rather than a strategy? — multiple-choice </em>(hard)***</p>
+<ul><li>Because even spending wastes the budget on duplicates</li><li>✓ <strong>Because the question is how many attacks it takes to find a given share of the failures — the discovery rate is measured against the budget, and the marginal value of the last attack is read off that curve</strong></li><li>Because attacks are free, so spending evenly costs nothing</li><li>Because the taxonomy forbids uneven spending</li></ul>
+<blockquote><p>Correct — which is why the curve, not the count, is what a red-team report should show.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The question is not whether this many attacks work, but how many it takes to find a given share of the failures. The discovery rate is what a search budget is measured against, spending evenly over the failures is the ceiling, and the marginal value of the last attack is read off the curve.</p></blockquote>
 <h4 id="safety-lab--go-and-do-it">Go and do it</h4>
 <p>The discovery rate against the number of attacks, and where the wasted ones went. Open <strong>Spend the budget</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -9327,6 +9408,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>Telling the model the user may be wrong, which moves the flip rate by a measurable amount</strong></li><li>Training the model on the right answers</li><li>Removing the model’s access to the user’s message</li><li>There is no mitigation</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is a mitigation in the prompt, though, and so it depends on the system message being there — which is not the same as a fix in the training.</p></blockquote>
+<p>*<em>Q. Telling the model that the user may be wrong moves the flip rate by a measurable amount. Why is that not a fix? — multiple-choice </em>(core)***</p>
+<ul><li>Because the effect is too small to measure</li><li>✓ <strong>Because the behaviour remains and the prompt is doing work the model should — remove the prompt and the flip returns</strong></li><li>Because prompts cannot be evaluated</li><li>Because it makes the model refuse everything</li></ul>
+<blockquote><p>Correct — a mitigation that lives in the prompt is a configuration, not a property of the model.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Telling the model the user may be wrong moves the flip rate, and by a measurable amount — but a mitigation that lives in the prompt is not a fix: it is doing work the model itself should do, and the behaviour returns when the prompt does.</p></blockquote>
 <h4 id="safety-lab--go-and-do-it">Go and do it</h4>
 <p>The flip rate with and without the challenge, and the difference. Open <strong>Try the mitigation</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -9527,10 +9612,6 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <p>*<em>Q. The in-batch negatives are free: they are the other pairs the batch already contains. — boolean </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. A batch of B pairs gives B² pairs of which B are correct, and the rest cost nothing — which is why the method scales with the size of the batch.</p></blockquote>
-<p>*<em>Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice </em>(core)***</p>
-<ul><li>The difference in dimensionality between the image and text encoders</li><li>✓ <strong>Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it</strong></li><li>The distance between an image and its own caption, which training drives to zero</li><li>A bug in the normalisation of the embeddings</li></ul>
-<blockquote><p>Correct — close spaces, not the same space.</p></blockquote>
-<blockquote><p><strong>Why:</strong> The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.</p></blockquote>
 <p>*<em>Q. A batch of 32 pairs gives how many image–caption pairs, of which how many are correct? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 1024</p></blockquote>
 <blockquote><p><strong>Why:</strong> 32 squared is 1,024 pairs, of which 32 are the correct ones and 992 are negatives — free, because the batch already contained them.</p></blockquote>
@@ -9580,6 +9661,10 @@ agent = initialize_agent(tools=[is_prime], llm=llm, agent=ZERO_SHOT_REACT)</code
 <ul><li>✓ <strong>The two modalities are further apart in the shared space than either is from itself</strong></li><li>The two encoders have different numbers of parameters</li><li>The training data has more images than captions</li><li>The retrieval is inaccurate</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A retrieval works anyway, because the <em>pairs</em> are close even though the two <em>spaces</em> are not.</p></blockquote>
+<p>*<em>Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice </em>(core)***</p>
+<ul><li>The difference in dimensionality between the image and text encoders</li><li>✓ <strong>Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it</strong></li><li>The distance between an image and its own caption, which training drives to zero</li><li>A bug in the normalisation of the embeddings</li></ul>
+<blockquote><p>Correct — close spaces, not the same space.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.</p></blockquote>
 <h4 id="multimodal-lab--go-and-do-it">Go and do it</h4>
 <p>The within-modal and the between-modal similarities, and the gap between them. Open <strong>Measure the gap</strong> in the multimodal-lab application.</p>
 <p><strong>Where this came from</strong></p>

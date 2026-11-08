@@ -278,4 +278,48 @@ export const QUIZ: QuizQuestion[] = [
     citation: RAG,
     lessonId: 'the-retrieval-augmented-reader',
   },
+  {
+    id: 'q-index-precompute',
+    kind: 'multiple-choice',
+    prompt: 'Why can the lexical index be precomputed while the query work cannot?',
+    topic: 'The lexical index',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'Because queries are too short to optimise', feedback: 'Length is not the reason.' },
+      {
+        id: 'b',
+        label: 'Because the documents are known in advance: the index maps each word to the documents that contain it, and its size \u2014 the number of postings \u2014 is what a lexical search really spends',
+        feedback: 'Correct \u2014 and the query\u2019s terms are only known when it arrives.',
+      },
+      { id: 'c', label: 'Because the index is small enough to keep in memory', feedback: 'The index can be enormous; precomputation is about when the work happens.' },
+      { id: 'd', label: 'Because queries are answered by the model instead', feedback: 'The retriever is the subject here; no model is involved.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The index maps each word to the documents that contain it; its size is the number of postings, and that is what a lexical search really spends. The documents are known before any query arrives \u2014 the query\u2019s own terms are not, which is why its work cannot be precomputed.',
+    citation: COURSE,
+    lessonId: 'the-lexical-index',
+  },
+  {
+    id: 'q-long-context',
+    kind: 'multiple-choice',
+    prompt: 'What does a long context change, and what does it not?',
+    topic: 'What retrieval is for',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'It removes the need for a reader that uses the evidence', feedback: 'The evidence still has to be used, not merely present.' },
+      {
+        id: 'b',
+        label: 'It raises the ceiling on what can be answered and lowers the floor on what is answered well',
+        feedback: 'Correct \u2014 which is why the retrieval-against-long-context comparison is measured on the same questions.',
+      },
+      { id: 'c', label: 'It makes the retriever unnecessary at any length', feedback: 'The comparison exists precisely because retrieval still pays.' },
+      { id: 'd', label: 'It changes the cost model of the retriever\u2019s index', feedback: 'The index\u2019s economics are upstream of the context length.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'A long context raises the ceiling on what can be answered and lowers the floor on what is answered well \u2014 the retriever finds the facts and the reader has to use them, and the case is measured by putting retrieval against a long context on the same questions.',
+    citation: RAG,
+    lessonId: 'what-retrieval-is-for',
+  },
 ]

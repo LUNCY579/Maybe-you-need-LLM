@@ -88,6 +88,17 @@ The lexical index: what it stores, what it scores, and where it fails when the q
 
 > **Why:** The postings are the whole of the index, and their number is what a lexical search really costs.
 
+**Q. Why can the lexical index be precomputed while the query work cannot? — multiple-choice *(core)***
+
+- Because queries are too short to optimise
+- ✓ **Because the documents are known in advance: the index maps each word to the documents that contain it, and its size — the number of postings — is what a lexical search really spends**
+- Because the index is small enough to keep in memory
+- Because queries are answered by the model instead
+
+> Correct — and the query’s terms are only known when it arrives.
+
+> **Why:** The index maps each word to the documents that contain it; its size is the number of postings, and that is what a lexical search really spends. The documents are known before any query arrives — the query’s own terms are not, which is why its work cannot be precomputed.
+
 #### Go and do it
 
 The postings of the corpus, and the size of the index. Open **Look at the index** in the retrieval-lab application.
@@ -525,6 +536,17 @@ A document in a context, moved from the beginning to the end, and the attention 
 > Correct.
 
 > **Why:** Everything can be present in a long context and a good deal of it can still be ignored. Retrieval is what puts the evidence where the reader will look.
+
+**Q. What does a long context change, and what does it not? — multiple-choice *(core)***
+
+- It removes the need for a reader that uses the evidence
+- ✓ **It raises the ceiling on what can be answered and lowers the floor on what is answered well**
+- It makes the retriever unnecessary at any length
+- It changes the cost model of the retriever’s index
+
+> Correct — which is why the retrieval-against-long-context comparison is measured on the same questions.
+
+> **Why:** A long context raises the ceiling on what can be answered and lowers the floor on what is answered well — the retriever finds the facts and the reader has to use them, and the case is measured by putting retrieval against a long context on the same questions.
 
 #### Go and do it
 

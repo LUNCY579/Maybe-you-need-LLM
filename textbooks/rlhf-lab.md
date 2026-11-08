@@ -686,6 +686,17 @@ Push the policy further and watch the proxy rise while the true reward turns ove
 
 > **Why:** Best-of-n: a downward parabola through the origin, R(d) = d(α − βd). Reinforcement learning: R(d) = d(α − β log d), which turns over more slowly because the policy moves rather than the sample.
 
+**Q. In the overoptimisation paper’s functional forms, what shape does best-of-n’s reward take as a function of the sample count d? — multiple-choice *(hard)***
+
+- Exponential growth that saturates
+- ✓ **A downward parabola through the origin: R(d) = d(α − β d)**
+- A straight line with slope α
+- A step function at the gold answer
+
+> Correct — rising at first, then falling as the proxy reward diverges from the true one.
+
+> **Why:** For best-of-n: R(d) = d(α − β d), a downward parabola through the origin — the proxy reward rises, peaks, and falls as d grows. Fitting both functional forms in a controlled setting is how the paper reads the fit and compares RL against best-of-n on the same proxy.
+
 #### Go and do it
 
 Fit both functional forms to the measured curve and compare the two methods. Open **Fitting the forms** in the rlhf-lab application.
@@ -732,6 +743,17 @@ Fit both functional forms to the measured curve and compare the two methods. Ope
 > Correct.
 
 > **Why:** It is the optimal stopping point for a fixed budget, and it is what the KL coefficient is set to reach. Past it, the run is spending compute to make the true outcome worse.
+
+**Q. In operational terms, what does the KL coefficient decide? — multiple-choice *(core)***
+
+- How fast the policy learns per step
+- ✓ **How far the policy is allowed to travel — the dial that sets the stopping point**
+- How many PPO epochs run per batch
+- How the advantage estimator is initialised
+
+> Correct — which is why the distance travelled belongs next to the score in every report.
+
+> **Why:** The KL coefficient is the dial that decides how far the policy is allowed to travel — and the operational lesson is to report the distance travelled alongside the score, because a score without its KL budget says nothing about what was bought or at what price.
 
 #### Go and do it
 

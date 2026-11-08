@@ -306,6 +306,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A router sends every token to one of two experts. The load fractions are 0.75 and 0.25, and the probability fractions are 0.5 and 0.5. What is the auxiliary loss for 100 tokens? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 50</p></blockquote>
 <blockquote><p><strong>Why:</strong> The auxiliary loss is N times the sum of the products: 100 × (0.75 × 0.5 + 0.25 × 0.5) = 100 × 0.5 = 50.</p></blockquote>
+<p>*<em>Q. The auxiliary loss is the number of tokens times the sum over experts of load-fraction × probability-fraction. With two experts whose loads are 0.75 and 0.25, router probabilities 0.5 and 0.5, and 100 tokens, what is the loss? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 50</p></blockquote>
+<blockquote><p><strong>Why:</strong> The products are 0.75 × 0.5 and 0.25 × 0.5, summing to 0.5; times 100 tokens the loss is 50. It would be smallest — zero — when the load equalled the probability, which is exactly the behaviour the loss pushes the router towards.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>A biased router, the auxiliary loss it produces, and the tokens that overflow. Open <strong>Break the balance</strong> in the systems-lab application.</p>
 <p><strong>Where this came from</strong></p>

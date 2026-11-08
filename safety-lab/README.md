@@ -116,7 +116,7 @@ failed and a measurement that was never run is the whole lesson.
 
 ### The rest of the course
 
-- **Practice** — 22 questions with per-option feedback, worked explanations and source citations.
+- **Practice** — 28 questions with per-option feedback, worked explanations and source citations.
 - **Glossary** — 23 terms, each with a plain-language definition and the terms that should be understood first. The
   dependency graph is checked for cycles.
 - **Equations** — 13 results with the source, the plain-language meaning, every symbol, the assumptions, a derivation

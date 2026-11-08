@@ -216,6 +216,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. Value iteration finds the optimal policy without ever evaluating a policy. — boolean </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> True</p></blockquote>
 <blockquote><p><strong>Why:</strong> Yes. One sweep of the optimality operator gives the greedy policy with respect to the current values, and repeating the sweep converges to the optimal pair. A policy evaluation is not needed anywhere in it.</p></blockquote>
+<p>*<em>Q. How does the optimal policy relate to the optimal value function? — multiple-choice </em>(core)***</p>
+<ul><li>It is the value function renormalised over actions</li><li>✓ <strong>It is read off greedily: the optimal value is the largest value any policy achieves, and acting greedily on it is optimal</strong></li><li>It is unrelated; the two are computed by separate algorithms</li><li>It is the value function evaluated at the final state</li></ul>
+<blockquote><p>Correct — and a policy gradient method is trying to find the same thing without the dynamic programming.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The optimal value function is the largest value any policy achieves, and it satisfies its own Bellman equation. Reading the greedy action off it gives the optimal policy — and what a policy gradient is trying to find, in these terms, is the same object by a different route.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The optimal policy and the value of reaching the goal, computed exactly. Open <strong>See the optimum</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -289,6 +293,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Both, in opposite ways: the one-step return is biased and the Monte Carlo return is noisy</strong></li><li>Neither</li><li>Only the one-step return</li><li>Only the Monte Carlo return</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The bootstrap is what biases an estimate, and the Monte Carlo return has no bootstrap. The sample is what makes an estimate noisy, and the one-step return has almost no sample in it.</p></blockquote>
+<p>*<em>Q. Along the n-step range, which end is biased and which is noisy? — multiple-choice </em>(core)***</p>
+<ul><li>✓ <strong>The one-step return is the most biased and the least noisy; the Monte Carlo return is the reverse</strong></li><li>The one-step return is unbiased and noisy; the Monte Carlo return is biased and stable</li><li>Both ends are unbiased; only the middle is biased</li><li>Neither end is noisy, because returns are deterministic</li></ul>
+<blockquote><p>Correct — the bootstrap is the bias, the sampling is the noise.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The n-step return bootstraps after n steps: the bootstrap is the source of bias, the sampling the source of noise. The one-step return is the least noisy and the most biased; the Monte Carlo return is the reverse — and the λ-return is the mixture between them.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The n-step returns of a real trajectory, and the truth they are aiming at. Open <strong>Count the steps</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>
@@ -329,6 +337,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>An estimate of the value, and through it the advantage the actor follows</strong></li><li>The parameters the actor starts from</li><li>The reward function</li><li>The discount</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The critic turns the return into the advantage, which is a smaller and less noisy signal, and the actor follows the advantage rather than the return.</p></blockquote>
+<p>*<em>Q. In the actor–critic loop, what does the critic do? — multiple-choice </em>(core)***</p>
+<ul><li>It samples the actions the actor will take</li><li>✓ <strong>It estimates the value, so the actor can follow the advantage the critic makes available</strong></li><li>It scores the reward model’s outputs</li><li>It chooses the learning rate</li></ul>
+<blockquote><p>Correct — and its update is a temporal-difference update.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The critic estimates the value; the actor follows the advantage the critic makes available. The critic’s update is the temporal-difference update, and the loop is what turns the two into a learning curve you can read.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The actor–critic loop, run here, with its learning curves. Open <strong>Run the loop</strong> in the rl-foundations application.</p>
 <p><strong>Where this came from</strong></p>

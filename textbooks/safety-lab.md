@@ -158,6 +158,17 @@ The critiques, the revisions, and the harm that is left. Open **Run the loop** i
 
 > **Why:** Every harmlessness number is what a judge believes, measured on a sample. The agreement is what makes that number mean anything.
 
+**Q. What are the two errors a harmlessness judge makes? — multiple-choice *(core)***
+
+- Under- and over-refusal, in the generation stage
+- ✓ **False positives — flagging harmless answers — and false negatives — passing harmful ones**
+- Position and verbosity bias, as in any LLM judge
+- It makes no errors if it is the same model that produced the answers
+
+> Correct — and the agreement with the labels is the number to report, because the score is what a judge believes.
+
+> **Why:** A harmlessness score is what a judge believes, and the judge is a model — so it makes false positives and false negatives. The agreement with the labels is the number to report, because that is what says how much the score can be believed.
+
 #### Go and do it
 
 The agreement of a judge with the labels, and the errors it makes. Open **Check the judge** in the safety-lab application.
@@ -204,6 +215,17 @@ The agreement of a judge with the labels, and the errors it makes. Open **Check 
 > Correct.
 
 > **Why:** It is a measurement on a sample against a taxonomy, by a judge. Everything outside those three is a claim about the model rather than a measurement of it.
+
+**Q. What is a harmlessness number actually a measurement of? — multiple-choice *(core)***
+
+- The safety of the model
+- ✓ **The opinion of a judge, measured on a sample, against a taxonomy**
+- The agreement between two judges
+- The model’s refusal rate on benign queries
+
+> Correct — and everything a safety claim leaves out follows from those three qualifiers.
+
+> **Why:** A harmlessness score is the opinion of a judge, measured on a sample, against a taxonomy. Each qualifier names something a safety claim leaves out — the judge’s calibration, the sample’s size and representativeness, the taxonomy’s coverage — and the evidence a claim needs before it is believed is the list of those things stated.
 
 #### Go and do it
 
@@ -305,6 +327,17 @@ Where each round lands, how far the second one moves, and what the weighting cha
 > Correct.
 
 > **Why:** A claim about what a critic cannot see in its own answer is a claim about the cases it got wrong, and finding those needs a verdict that is right for reasons of its own.
+
+**Q. Why does a critique written by the model that wrote the answer share that answer’s blind spots? — multiple-choice *(hard)***
+
+- Because the critique is copied from the answer
+- ✓ **Because the model cannot see what it cannot see — the same limits that shaped the answer shape the critique of it**
+- Because the critique uses a smaller context window
+- Because critiques are sampled at a higher temperature
+
+> Correct — which is why comparing two critics needs a verdict that is right.
+
+> **Why:** A critique written by the model that wrote the answer shares that answer’s blind spots — the model cannot see what it cannot see. Measuring what each critic misses, and the cost of each, is why the comparison of two critics needs a verdict that is right rather than merely fluent.
 
 #### Go and do it
 
@@ -419,6 +452,17 @@ The attacks, the failures, and the coverage of the taxonomy. Open **Run the red 
 
 > **Why:** Without a taxonomy a red team produces anecdotes. With one, it produces a coverage that can be compared between teams and between models.
 
+**Q. What does a harm taxonomy add to a red-team set? — multiple-choice *(core)***
+
+- A longer list of prompts
+- ✓ **Coverage that can be measured: the set becomes a measurement rather than an anecdote**
+- A licence to skip the held-out test set
+- Automatic scoring of the attacks
+
+> Correct — and the difference between a red-team set and a test set is what it is drawn from.
+
+> **Why:** A taxonomy is what makes a red-team set a measurement rather than an anecdote: the coverage of a red team against the taxonomy is measurable, and a red-team set differs from a test set in that it is drawn from attacks rather than from the behaviour being certified.
+
 #### Go and do it
 
 A model-driven red team against a random one, on the same budget. Open **Compare the two red teams** in the safety-lab application.
@@ -460,6 +504,17 @@ A model-driven red team against a random one, on the same budget. Open **Compare
 > **Answer:** 0.68359375 ± 0.001
 
 > **Why:** One minus the chance it is missed four times: 1 − 0.75⁴ = 0.6836. This is the arithmetic the ceiling curve is made of, and it is the same whether the attempts were asked for or stumbled into.
+
+**Q. Why is spending the attack budget evenly over the known failures a ceiling rather than a strategy? — multiple-choice *(hard)***
+
+- Because even spending wastes the budget on duplicates
+- ✓ **Because the question is how many attacks it takes to find a given share of the failures — the discovery rate is measured against the budget, and the marginal value of the last attack is read off that curve**
+- Because attacks are free, so spending evenly costs nothing
+- Because the taxonomy forbids uneven spending
+
+> Correct — which is why the curve, not the count, is what a red-team report should show.
+
+> **Why:** The question is not whether this many attacks work, but how many it takes to find a given share of the failures. The discovery rate is what a search budget is measured against, spending evenly over the failures is the ceiling, and the marginal value of the last attack is read off the curve.
 
 #### Go and do it
 
@@ -636,6 +691,17 @@ The answers under pressure, and the ones that flip. Open **Measure the flip rate
 > Correct.
 
 > **Why:** It is a mitigation in the prompt, though, and so it depends on the system message being there — which is not the same as a fix in the training.
+
+**Q. Telling the model that the user may be wrong moves the flip rate by a measurable amount. Why is that not a fix? — multiple-choice *(core)***
+
+- Because the effect is too small to measure
+- ✓ **Because the behaviour remains and the prompt is doing work the model should — remove the prompt and the flip returns**
+- Because prompts cannot be evaluated
+- Because it makes the model refuse everything
+
+> Correct — a mitigation that lives in the prompt is a configuration, not a property of the model.
+
+> **Why:** Telling the model the user may be wrong moves the flip rate, and by a measurable amount — but a mitigation that lives in the prompt is not a fix: it is doing work the model itself should do, and the behaviour returns when the prompt does.
 
 #### Go and do it
 

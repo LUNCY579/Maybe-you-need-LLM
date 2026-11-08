@@ -215,7 +215,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: [],
     glossaryTerms: ['contrastive-loss', 'in-batch-negative', 'temperature'],
-    quizIds: ['q-clip-1', 'q-clip-2', 'q-gap-defined', 'q-clip-4'],
+    quizIds: ['q-clip-1', 'q-clip-2', 'q-clip-4'],
     sourceRefs: [
       {
         chapter: 2,
@@ -287,7 +287,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-contrastive-objective'],
     glossaryTerms: ['modality-gap', 'embedding-space'],
-    quizIds: ['q-gap-1'],
+    quizIds: ['q-gap-1', 'q-gap-defined'],
     sourceRefs: [
       {
         chapter: 2,

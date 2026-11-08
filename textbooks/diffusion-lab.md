@@ -351,6 +351,17 @@ Compare the weight of the true bound with the flat weight of the simplified obje
 
 > **Why:** The three parameterisations are algebraically equivalent views of p_θ(x_{t−1}|x_t). What changes is the regression target, and therefore how stable training is and how the loss is weighted.
 
+**Q. What actually changes between the ε-, the x₀- and the v-parameterisation of the reverse process? — multiple-choice *(core)***
+
+- The reverse process itself
+- ✓ **Only what the network is trained to predict — the forms convert into one another**
+- The variance schedule the process uses
+- The number of sampling steps
+
+> Correct — which is why the choice is about training dynamics, not about the model’s reach.
+
+> **Why:** The three parameterisations describe the same reverse process; only the network target changes, and a prediction in one form converts into another in closed form. What the choice moves is the weighting the loss gives each noise level — the paper found the ε-form best for that reason.
+
 #### Go and do it
 
 Take one network output and read it as ε, as x₀, and as v. Open **Convert a prediction** in the diffusion-lab application.
@@ -536,6 +547,17 @@ Put the linear and cosine schedules side by side and read the signal-to-noise ra
 > Correct.
 
 > **Why:** The true weight β_t²/(2σ_t²α_t(1−ᾱ_t)) is very large at small t and very small at large t. Flattening it to 1 therefore removes most of the gradient signal from the easy, small-t end of the chain — which the paper reports improves sample quality.
+
+**Q. What does the paper give up when it trains on the simplified objective instead of the true variational bound? — multiple-choice *(hard)***
+
+- The reverse process entirely
+- ✓ **The per-timestep weight β_t² / (2σ_t²α_t(1 − ᵩf_t)) — every timestep is weighted equally instead**
+- The KL terms above the last step
+- Nothing — the two objectives are identical
+
+> Correct — the simplified objective is the true bound with the weights removed.
+
+> **Why:** The true bound weights each timestep’s loss by β_t² / (2σ_t²α_t(1 − ᵩf_t)); the simplified objective drops that weight and trains every step equally. What the paper gives up is theoretical tightness, and what it reports gaining is sample quality — an ablated trade, not an oversight.
 
 #### Go and do it
 
@@ -737,6 +759,17 @@ Measure fidelity and diversity against the guidance weight, with an exact score.
 > **Answer:** 1
 
 > **Why:** w = 1. Since p(x)·p(c|x) = p(x|c)·p(c), and p(c) is a constant, the tilted distribution is proportional to the true conditional. Any w above 1 over-shoots it.
+
+**Q. What does a very large guidance weight do to the samples? — multiple-choice *(core)***
+
+- They spread out, because the conditioning gets louder
+- ✓ **They move to the mode and stop spreading — fidelity up, diversity down**
+- They become more diverse while staying on-manifold
+- Nothing; the weight only changes speed
+
+> Correct — the trade-off is quantifiable, and the weight is its dial.
+
+> **Why:** Guidance narrows the distribution: the samples move to the mode and stop spreading. The relationship between the weight and the effective temperature is measurable, which is what makes the fidelity–diversity trade-off a quantity rather than a vibe.
 
 #### Go and do it
 

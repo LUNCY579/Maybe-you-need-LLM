@@ -154,6 +154,17 @@ Measure how often a judge agrees with the human, and how often it agrees with it
 
 > **Why:** Consistency is measured against the judge itself: the same pair, presented in both orders, should produce the same preference. A failure to do so means the judge answered a different question.
 
+**Q. What does a consistency failure tell you that a low agreement with humans does not? — multiple-choice *(core)***
+
+- That the judge is weak compared with humans
+- ✓ **That the judge is not even a function of the answers — its verdict flips when the order is swapped**
+- That the question set is too small
+- That humans disagree with each other
+
+> Correct — the swap test measures the judge against itself.
+
+> **Why:** Agreement is measured against a human; consistency is measured against the judge itself — the swap test reorders the two answers and asks again. A consistency failure means the verdicts are not a function of the answers alone, which no amount of agreement can repair.
+
 #### Go and do it
 
 Judge the same pair twice, with the positions swapped, and count the flips. Open **The swap test** in the evaluation-lab application.
@@ -455,6 +466,17 @@ Collect the votes and fit a Bradley–Terry model to them. Open **Fit a ranking 
 
 > **Why:** A bootstrap interval resamples the votes and refits, and it means the same thing whatever order they arrived in. An online rating carries the path with it.
 
+**Q. Why is an Elo rating alone not an interval? — multiple-choice *(core)***
+
+- Because Elo is only defined for chess
+- ✓ **Because the rating is a point estimate from one fit — resampling the votes and refitting is what produces the interval**
+- Because Elo cannot be computed from pairwise votes
+- Because the interval would be too wide to publish
+
+> Correct — the bootstrap is what turns the ranking into a measurement with width.
+
+> **Why:** Resampling the votes and refitting gives an interval on the ranking — which is what separates two models whose ratings differ. And the number of votes needed to separate them grows with how close they are, which is the cost half of the lesson.
+
 #### Go and do it
 
 Watch the confidence interval on the top two models shrink as the votes accumulate. Open **How many votes to tell them apart** in the evaluation-lab application.
@@ -569,6 +591,17 @@ Sweep the contaminated fraction and watch the reported score drift. Open **What 
 
 > **Why:** The question set, the scoring procedure and the set of models under test are all choices. Each one is a claim about what matters, and each one can be argued for.
 
+**Q. What two things does a benchmark have to do at once? — multiple-choice *(warmup)***
+
+- Be cheap to run and easy to cite
+- ✓ **Be hard enough to separate models and easy enough to run**
+- Be fully automatic and fully adversarial
+- Cover every capability and reject every bad model
+
+> Correct — the tension between breadth and depth lives between them.
+
+> **Why:** A benchmark has to be hard enough to separate models and easy enough to run. The question set lives in that tension: breadth buys coverage, depth buys discrimination, and the holistic framing is what a single score adds to the pair.
+
 #### Go and do it
 
 See how the difficulty mix of a question set changes what the score measures. Open **Build a question set** in the evaluation-lab application.
@@ -677,6 +710,12 @@ Plot the width of the confidence interval against the number of questions. Open 
 
 > **Why:** Yes. If the test cannot detect the difference, the difference does not appear — and a leaderboard that reports a tie there is reporting an artefact of the question count.
 
+**Q. The number of questions needed grows as the square of the inverse of the difference. If the difference you care about doubles, by what factor does the required question count fall? — numeric *(core)***
+
+> **Answer:** 0.25 ± 0.001
+
+> **Why:** The count scales as 1/difference², so doubling the difference divides the required count by four. And when the difference you care about is smaller than the noise, no affordable question count answers it — which is the finding, not a failure to produce one.
+
 #### Go and do it
 
 Compute how many questions a given difference needs, and watch the curve. Open **The cost of detecting a small difference** in the evaluation-lab application.
@@ -716,6 +755,15 @@ Compute how many questions a given difference needs, and watch the curve. Open *
 - The logo of the organisation that ran it
 
 > **Why:** An interval, the question count, and enough about the protocol to reproduce it. The newest criticism of the field is that the last of these is often missing, and that the leaderboard has become the thing being optimised.
+
+**Q. Which of these should a leaderboard print next to every score? — multi-select *(core)***
+
+- ✓ **The interval on the score**
+- ✓ **The number of questions the score was computed on**
+- ✓ **The judge’s agreement with a human baseline**
+- The judge’s own self-evaluation score
+
+> **Why:** A score without an interval is a claim, not a measurement; the question count is where the width comes from; and the judge’s agreement with a human baseline is the number that says what the whole instrument is worth.
 
 #### Go and do it
 

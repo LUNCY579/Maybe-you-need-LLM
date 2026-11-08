@@ -279,6 +279,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>They define three different reverse processes</li><li>✓ <strong>They describe the same reverse process but train the network on different targets</strong></li><li>Only ε-prediction is mathematically valid</li><li>x₀-prediction is always better</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The three parameterisations are algebraically equivalent views of p_θ(x_{t−1}|x_t). What changes is the regression target, and therefore how stable training is and how the loss is weighted.</p></blockquote>
+<p>*<em>Q. What actually changes between the ε-, the x₀- and the v-parameterisation of the reverse process? — multiple-choice </em>(core)***</p>
+<ul><li>The reverse process itself</li><li>✓ <strong>Only what the network is trained to predict — the forms convert into one another</strong></li><li>The variance schedule the process uses</li><li>The number of sampling steps</li></ul>
+<blockquote><p>Correct — which is why the choice is about training dynamics, not about the model’s reach.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The three parameterisations describe the same reverse process; only the network target changes, and a prediction in one form converts into another in closed form. What the choice moves is the weighting the loss gives each noise level — the paper found the ε-form best for that reason.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Take one network output and read it as ε, as x₀, and as v. Open <strong>Convert a prediction</strong> in the diffusion-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -355,6 +359,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Small t are effectively ignored, because the true weight there is enormous</strong></li><li>Large t are ignored</li><li>The objective becomes a different likelihood bound</li><li>Nothing changes, because the weight is constant</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The true weight β_t²/(2σ_t²α_t(1−ᾱ_t)) is very large at small t and very small at large t. Flattening it to 1 therefore removes most of the gradient signal from the easy, small-t end of the chain — which the paper reports improves sample quality.</p></blockquote>
+<p>*<em>Q. What does the paper give up when it trains on the simplified objective instead of the true variational bound? — multiple-choice </em>(hard)***</p>
+<ul><li>The reverse process entirely</li><li>✓ <strong>The per-timestep weight β_t² / (2σ_t²α_t(1 − ᵩf_t)) — every timestep is weighted equally instead</strong></li><li>The KL terms above the last step</li><li>Nothing — the two objectives are identical</li></ul>
+<blockquote><p>Correct — the simplified objective is the true bound with the weights removed.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The true bound weights each timestep’s loss by β_t² / (2σ_t²α_t(1 − ᵩf_t)); the simplified objective drops that weight and trains every step equally. What the paper gives up is theoretical tightness, and what it reports gaining is sample quality — an ablated trade, not an oversight.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Break the bound into its per-step KL terms and see where the cost sits. Open <strong>Decompose the bound</strong> in the diffusion-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -437,6 +445,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A guided model samples from a distribution proportional to p(x) · p(c | x)^w. For what value of w is this distribution exactly p(x | c)? — numeric </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> 1</p></blockquote>
 <blockquote><p><strong>Why:</strong> w = 1. Since p(x)·p(c|x) = p(x|c)·p(c), and p(c) is a constant, the tilted distribution is proportional to the true conditional. Any w above 1 over-shoots it.</p></blockquote>
+<p>*<em>Q. What does a very large guidance weight do to the samples? — multiple-choice </em>(core)***</p>
+<ul><li>They spread out, because the conditioning gets louder</li><li>✓ <strong>They move to the mode and stop spreading — fidelity up, diversity down</strong></li><li>They become more diverse while staying on-manifold</li><li>Nothing; the weight only changes speed</li></ul>
+<blockquote><p>Correct — the trade-off is quantifiable, and the weight is its dial.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Guidance narrows the distribution: the samples move to the mode and stop spreading. The relationship between the weight and the effective temperature is measurable, which is what makes the fidelity–diversity trade-off a quantity rather than a vibe.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>Put fidelity against diversity and mark where the sweet spot is. Open <strong>Plot the trade-off</strong> in the diffusion-lab application.</p>
 <p><strong>The words this lesson uses</strong></p>

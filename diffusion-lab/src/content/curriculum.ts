@@ -395,7 +395,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-objective'],
     glossaryTerms: ['v-prediction', 'x0-prediction'],
-    quizIds: ['q-reverse-3'],
+    quizIds: ['q-reverse-3', 'q-param-convert'],
     sourceRefs: [
       {
         chapter: 3,
@@ -541,7 +541,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['the-objective', 'the-schedule'],
     glossaryTerms: ['variational-bound', 'simplified-objective'],
-    quizIds: ['q-schedules-3'],
+    quizIds: ['q-schedules-3', 'q-weight-drop'],
     sourceRefs: [
       {
         chapter: 3,
@@ -667,7 +667,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['classifier-free-guidance'],
     glossaryTerms: ['mode-collapse', 'guidance'],
-    quizIds: ['q-guidance-3'],
+    quizIds: ['q-guidance-3', 'q-guidance-mode'],
     sourceRefs: [],
     furtherReading: [],
   },

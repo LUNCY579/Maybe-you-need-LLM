@@ -234,4 +234,62 @@ export const QUIZ: QuizQuestion[] = [
     citation: GAE,
     lessonId: 'the-lambda-return',
   },
+  {
+    id: 'q-nstep-ends',
+    kind: 'multiple-choice',
+    prompt: 'Along the n-step range, which end is biased and which is noisy?',
+    topic: 'The n-step return',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'The one-step return is the most biased and the least noisy; the Monte Carlo return is the reverse', feedback: 'Correct \u2014 the bootstrap is the bias, the sampling is the noise.' },
+      { id: 'b', label: 'The one-step return is unbiased and noisy; the Monte Carlo return is biased and stable', feedback: 'Exactly backwards.' },
+      { id: 'c', label: 'Both ends are unbiased; only the middle is biased', feedback: 'Bias enters through the bootstrap, which the one-step end uses most.' },
+      { id: 'd', label: 'Neither end is noisy, because returns are deterministic', feedback: 'Returns are sampled from a stochastic environment.' },
+    ],
+    correctOptionId: 'a',
+    explanation:
+      'The n-step return bootstraps after n steps: the bootstrap is the source of bias, the sampling the source of noise. The one-step return is the least noisy and the most biased; the Monte Carlo return is the reverse \u2014 and the \u03bb-return is the mixture between them.',
+    citation: SUTTON,
+    lessonId: 'the-n-step-return',
+  },
+  {
+    id: 'q-ac-roles',
+    kind: 'multiple-choice',
+    prompt: 'In the actor\u2013critic loop, what does the critic do?',
+    topic: 'The actor-critic loop',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'It samples the actions the actor will take', feedback: 'Sampling is the environment\u2019s and the policy\u2019s job.' },
+      { id: 'b', label: 'It estimates the value, so the actor can follow the advantage the critic makes available', feedback: 'Correct \u2014 and its update is a temporal-difference update.' },
+      { id: 'c', label: 'It scores the reward model\u2019s outputs', feedback: 'There is no reward model in the bare actor\u2013critic loop.' },
+      { id: 'd', label: 'It chooses the learning rate', feedback: 'No scheduling role \u2014 the critic is a value estimate.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The critic estimates the value; the actor follows the advantage the critic makes available. The critic\u2019s update is the temporal-difference update, and the loop is what turns the two into a learning curve you can read.',
+    citation: SUTTON,
+    lessonId: 'the-actor-critic-loop',
+  },
+  {
+    id: 'q-greedy-off-value',
+    kind: 'multiple-choice',
+    prompt: 'How does the optimal policy relate to the optimal value function?',
+    topic: 'The optimal policy',
+    difficulty: 'core',
+    options: [
+      { id: 'a', label: 'It is the value function renormalised over actions', feedback: 'A policy is not a rescaled value function.' },
+      {
+        id: 'b',
+        label: 'It is read off greedily: the optimal value is the largest value any policy achieves, and acting greedily on it is optimal',
+        feedback: 'Correct \u2014 and a policy gradient method is trying to find the same thing without the dynamic programming.',
+      },
+      { id: 'c', label: 'It is unrelated; the two are computed by separate algorithms', feedback: 'The greedy reading is exactly the connection.' },
+      { id: 'd', label: 'It is the value function evaluated at the final state', feedback: 'Values are per state; the policy is a rule over actions.' },
+    ],
+    correctOptionId: 'b',
+    explanation:
+      'The optimal value function is the largest value any policy achieves, and it satisfies its own Bellman equation. Reading the greedy action off it gives the optimal policy \u2014 and what a policy gradient is trying to find, in these terms, is the same object by a different route.',
+    citation: SUTTON,
+    lessonId: 'the-optimal-policy',
+  },
 ]

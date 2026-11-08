@@ -165,7 +165,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: [],
     glossaryTerms: ['retrieval', 'inverted-index', 'lexical-match'],
-    quizIds: ['q-sparse-1'],
+    quizIds: ['q-sparse-1', 'q-index-precompute'],
     sourceRefs: [
       {
         chapter: 2,
@@ -437,7 +437,7 @@ export const LESSONS: LessonMeta[] = [
     },
     prerequisites: ['lost-in-the-middle'],
     glossaryTerms: ['retrieval-augmented-generation', 'position-effect'],
-    quizIds: ['q-context-4'],
+    quizIds: ['q-context-4', 'q-long-context'],
     sourceRefs: [
       {
         chapter: 3,

@@ -107,17 +107,6 @@ The loss that says a pair should be closer than the other pairs in the batch, th
 
 > **Why:** Yes. A batch of B pairs gives B² pairs of which B are correct, and the rest cost nothing — which is why the method scales with the size of the batch.
 
-**Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice *(core)***
-
-- The difference in dimensionality between the image and text encoders
-- ✓ **Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it**
-- The distance between an image and its own caption, which training drives to zero
-- A bug in the normalisation of the embeddings
-
-> Correct — close spaces, not the same space.
-
-> **Why:** The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.
-
 **Q. A batch of 32 pairs gives how many image–caption pairs, of which how many are correct? — numeric *(core)***
 
 > **Answer:** 1024
@@ -237,6 +226,17 @@ The images and the captions end up in one space, and the space is not quite symm
 > Correct.
 
 > **Why:** A retrieval works anyway, because the *pairs* are close even though the two *spaces* are not.
+
+**Q. What is the modality gap in a trained contrastive image–text model? — multiple-choice *(core)***
+
+- The difference in dimensionality between the image and text encoders
+- ✓ **Image embeddings and text embeddings occupy one shared space, but cluster in two separable regions of it**
+- The distance between an image and its own caption, which training drives to zero
+- A bug in the normalisation of the embeddings
+
+> Correct — close spaces, not the same space.
+
+> **Why:** The images and the captions end up in one space, and the space is not quite symmetric: the two modalities cluster in separable regions. The gap is measurable — and the zero-shot classifier works anyway, which is the interesting part.
 
 #### Go and do it
 

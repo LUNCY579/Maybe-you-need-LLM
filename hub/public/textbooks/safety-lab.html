@@ -201,6 +201,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The part of a harmlessness score that makes it worth anything</strong></li><li>An optional extra</li><li>The accuracy of the model being tested</li><li>The size of the preference dataset</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Every harmlessness number is what a judge believes, measured on a sample. The agreement is what makes that number mean anything.</p></blockquote>
+<p>*<em>Q. What are the two errors a harmlessness judge makes? — multiple-choice </em>(core)***</p>
+<ul><li>Under- and over-refusal, in the generation stage</li><li>✓ <strong>False positives — flagging harmless answers — and false negatives — passing harmful ones</strong></li><li>Position and verbosity bias, as in any LLM judge</li><li>It makes no errors if it is the same model that produced the answers</li></ul>
+<blockquote><p>Correct — and the agreement with the labels is the number to report, because the score is what a judge believes.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A harmlessness score is what a judge believes, and the judge is a model — so it makes false positives and false negatives. The agreement with the labels is the number to report, because that is what says how much the score can be believed.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The agreement of a judge with the labels, and the errors it makes. Open <strong>Check the judge</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -220,6 +224,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>What the model does outside the sample the score was measured on</strong></li><li>What the judge believed</li><li>The size of the sample</li><li>The taxonomy</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is a measurement on a sample against a taxonomy, by a judge. Everything outside those three is a claim about the model rather than a measurement of it.</p></blockquote>
+<p>*<em>Q. What is a harmlessness number actually a measurement of? — multiple-choice </em>(core)***</p>
+<ul><li>The safety of the model</li><li>✓ <strong>The opinion of a judge, measured on a sample, against a taxonomy</strong></li><li>The agreement between two judges</li><li>The model’s refusal rate on benign queries</li></ul>
+<blockquote><p>Correct — and everything a safety claim leaves out follows from those three qualifiers.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A harmlessness score is the opinion of a judge, measured on a sample, against a taxonomy. Each qualifier names something a safety claim leaves out — the judge’s calibration, the sample’s size and representativeness, the taxonomy’s coverage — and the evidence a claim needs before it is believed is the list of those things stated.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The parts of a harmlessness claim, and the measurement behind each. Open <strong>Read the claim</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -261,6 +269,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Because the question is which critiques were right, and neither critic can be the judge of that</strong></li><li>Because the two critics are the same model</li><li>Because the critics write different numbers of words</li><li>It does not; the two rates can be compared directly</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> A claim about what a critic cannot see in its own answer is a claim about the cases it got wrong, and finding those needs a verdict that is right for reasons of its own.</p></blockquote>
+<p>*<em>Q. Why does a critique written by the model that wrote the answer share that answer’s blind spots? — multiple-choice </em>(hard)***</p>
+<ul><li>Because the critique is copied from the answer</li><li>✓ <strong>Because the model cannot see what it cannot see — the same limits that shaped the answer shape the critique of it</strong></li><li>Because the critique uses a smaller context window</li><li>Because critiques are sampled at a higher temperature</li></ul>
+<blockquote><p>Correct — which is why comparing two critics needs a verdict that is right.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A critique written by the model that wrote the answer shares that answer’s blind spots — the model cannot see what it cannot see. Measuring what each critic misses, and the cost of each, is why the comparison of two critics needs a verdict that is right rather than merely fluent.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The same cases, two critics, and the verdicts each one reaches. Open <strong>Compare the two critics</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -307,6 +319,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Turning a pile of failures into a measurement that can be compared</strong></li><li>Listing every possible failure</li><li>Deciding which failures matter</li><li>Replacing the red team</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Without a taxonomy a red team produces anecdotes. With one, it produces a coverage that can be compared between teams and between models.</p></blockquote>
+<p>*<em>Q. What does a harm taxonomy add to a red-team set? — multiple-choice </em>(core)***</p>
+<ul><li>A longer list of prompts</li><li>✓ <strong>Coverage that can be measured: the set becomes a measurement rather than an anecdote</strong></li><li>A licence to skip the held-out test set</li><li>Automatic scoring of the attacks</li></ul>
+<blockquote><p>Correct — and the difference between a red-team set and a test set is what it is drawn from.</p></blockquote>
+<blockquote><p><strong>Why:</strong> A taxonomy is what makes a red-team set a measurement rather than an anecdote: the coverage of a red team against the taxonomy is measurable, and a red-team set differs from a test set in that it is drawn from attacks rather than from the behaviour being certified.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>A model-driven red team against a random one, on the same budget. Open <strong>Compare the two red teams</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -325,6 +341,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. One attempt reaches a particular failure with probability 0.25. Spending four attempts on it, what is the chance the failure has been found at least once? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 0.68359375 ± 0.001</p></blockquote>
 <blockquote><p><strong>Why:</strong> One minus the chance it is missed four times: 1 − 0.75⁴ = 0.6836. This is the arithmetic the ceiling curve is made of, and it is the same whether the attempts were asked for or stumbled into.</p></blockquote>
+<p>*<em>Q. Why is spending the attack budget evenly over the known failures a ceiling rather than a strategy? — multiple-choice </em>(hard)***</p>
+<ul><li>Because even spending wastes the budget on duplicates</li><li>✓ <strong>Because the question is how many attacks it takes to find a given share of the failures — the discovery rate is measured against the budget, and the marginal value of the last attack is read off that curve</strong></li><li>Because attacks are free, so spending evenly costs nothing</li><li>Because the taxonomy forbids uneven spending</li></ul>
+<blockquote><p>Correct — which is why the curve, not the count, is what a red-team report should show.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The question is not whether this many attacks work, but how many it takes to find a given share of the failures. The discovery rate is what a search budget is measured against, spending evenly over the failures is the ceiling, and the marginal value of the last attack is read off the curve.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The discovery rate against the number of attacks, and where the wasted ones went. Open <strong>Spend the budget</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -397,6 +417,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Telling the model the user may be wrong, which moves the flip rate by a measurable amount</strong></li><li>Training the model on the right answers</li><li>Removing the model’s access to the user’s message</li><li>There is no mitigation</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> It is a mitigation in the prompt, though, and so it depends on the system message being there — which is not the same as a fix in the training.</p></blockquote>
+<p>*<em>Q. Telling the model that the user may be wrong moves the flip rate by a measurable amount. Why is that not a fix? — multiple-choice </em>(core)***</p>
+<ul><li>Because the effect is too small to measure</li><li>✓ <strong>Because the behaviour remains and the prompt is doing work the model should — remove the prompt and the flip returns</strong></li><li>Because prompts cannot be evaluated</li><li>Because it makes the model refuse everything</li></ul>
+<blockquote><p>Correct — a mitigation that lives in the prompt is a configuration, not a property of the model.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Telling the model the user may be wrong moves the flip rate, and by a measurable amount — but a mitigation that lives in the prompt is not a fix: it is doing work the model itself should do, and the behaviour returns when the prompt does.</p></blockquote>
 <h4 id="go-and-do-it">Go and do it</h4>
 <p>The flip rate with and without the challenge, and the difference. Open <strong>Try the mitigation</strong> in the safety-lab application.</p>
 <p><strong>Where this came from</strong></p>
