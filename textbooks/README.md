@@ -14,7 +14,7 @@ The same books are also rendered as a navigable HTML edition with the mathematic
 | [Language Model from Scratch](lm-from-scratch.md) | 11 | 7,035 | CS336: Language Modeling from Scratch (2026) |
 | [Mechanistic Interpretability Lab](mech-interp-lab.md) | 10 | 7,508 | Toy Models of Superposition (2023) |
 | [Data Lab](data-lab.md) | 10 | 7,646 | DataComp: In search of the next generation of multimodal datasets (2023) |
-| [Scaling Lab](scaling-lab.md) | 23 | 23,243 | Scaling Laws for Neural Language Models (2020) |
+| [Scaling Lab](scaling-lab.md) | 23 | 24,773 | Scaling Laws for Neural Language Models (2020) |
 | [Systems Lab](systems-lab.md) | 8 | 6,105 | FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (2022) |
 | [Reinforcement Learning Foundations](rl-foundations.md) | 8 | 5,244 | Reinforcement Learning: An Introduction (second edition) (2018) |
 | [Retrieval Lab](retrieval-lab.md) | 8 | 5,481 | Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (2020) |

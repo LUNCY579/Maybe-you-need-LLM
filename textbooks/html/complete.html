@@ -2805,6 +2805,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A power law fitted with an R² of 0.999 over two orders of magnitude is guaranteed to hold for another order. — boolean </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> No. R² says the points are close to a line over the range you fitted; it says nothing about a range you did not. That is why a fitted exponent is quoted together with the range it was fitted over.</p></blockquote>
+<p>*<em>Q. What does a high R² on a log–log fit actually certify? — multiple-choice </em>(core)***</p>
+<ul><li>That the exponent is universal across scales</li><li>✓ <strong>That the points sit close to a line within the fitted range — and nothing about any other range</strong></li><li>That the underlying mechanism is a power law</li><li>That the residuals are independent</li></ul>
+<blockquote><p>Correct — which is why the fitted exponent changes with the range.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The fit is ordinary least squares in log–log space, and the R² says the points sit close to a line where the data was. The fitted exponent changes when the range changes — quoting an exponent without its range is quoting half a result.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>The same runs, fitted over different ranges, and the exponent that comes out. Open <strong>Change the range</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -2852,6 +2856,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Because it fixes the product of the parameters and the tokens, so more of one means less of the other</strong></li><li>Because it fixes the loss</li><li>Because it fixes the model architecture</li><li>Because it fixes the number of epochs</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The cost is proportional to parameters times tokens. Under a fixed budget they trade against each other, and the question becomes where to put them.</p></blockquote>
+<p>*<em>Q. Training compute is C ≈ 6ND. For a run with N = 10⁹ parameters and D = 10¹¹ tokens, what is C, in units of 10²⁰ FLOP? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 6</p></blockquote>
+<blockquote><p><strong>Why:</strong> C ≈ 6 × 10⁹ × 10¹¹ = 6 × 10²⁰ FLOP. The budget is the constraint that turns "how big" into "big in what way" — the same number of FLOP can buy a bigger model or more tokens, and the allocation is the question.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>The loss along a fixed compute budget, as the allocation slides from all data to all parameters. Open <strong>Walk the budget</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3158,6 +3165,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. At R★ = 15.39, after how many extra passes is one more worth half a fresh epoch? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 10.666 ± 0.01</p></blockquote>
 <blockquote><p><strong>Why:</strong> The marginal epoch is e^(−R/R★), so R = −R★·ln(0.5) = 10.67. It is the paper’s own constant answering the paper’s own question, and the measured dominance epoch on screen E is the independent check.</p></blockquote>
+<p>*<em>Q. What does it mean for repetition to dominate? — multiple-choice </em>(core)***</p>
+<ul><li>That the repeated run’s loss starts rising</li><li>✓ <strong>That the next epoch of the pool is worth so little that the compute would have been better spent on fresh rows</strong></li><li>That the model has memorised every unique row</li><li>That the repeated run overtakes a fresh run of the same wall-clock time</li></ul>
+<blockquote><p>Correct — and the criterion is a fraction of the fresh run’s gain, so the reported epoch depends on the fraction chosen.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Repetition dominates when the next epoch is worth so little that the compute would have been better spent on new rows. The criterion is a fraction of the fresh run’s gain — which is why the honest version is a table of fractions, not a single number.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>What one more epoch buys against what one more fresh epoch buys, and the dominance epoch at five different fractions. Open <strong>Price the epochs</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3198,6 +3209,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>The pool has its own optimum — a fit to the noise in the pool — and the descent is still aimed at it</strong></li><li>The learning rate has grown too large</li><li>The held-out set is too small to be reliable</li><li>The repeated run has fewer parameters</li></ul>
 <blockquote><p>Correct. Nothing changed in the optimiser; the target it is aiming at stopped being the task.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The training curve is a measurement of the fit to the pool, and a fit to the pool’s planted noise is still a better fit to the pool. Only the held-out set can tell you that the two have come apart, which is the content of early stopping.</p></blockquote>
+<p>*<em>Q. After the held-out loss has turned upward, the loss on the training pool keeps falling. Why? — multiple-choice </em>(core)***</p>
+<ul><li>A bug in the evaluation loop</li><li>✓ <strong>The pool has its own optimum — a fit to the noise planted in it — and past the shared optimum the two losses come apart</strong></li><li>The learning rate schedule resumed decaying</li><li>The held-out set was too small to evaluate</li></ul>
+<blockquote><p>Correct — the third phase is the same descent aimed at a target that is not the task.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The pool has its own optimum, which is a fit to the noise planted in the pool; past the shared optimum the two come apart. The compute already spent is not a reason to keep going, and the loss that is visibly falling is not the loss being bought — which is what the early-stopping epoch reads off the held-out curve.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>The loss on the pool against the held-out loss, the turn, and the epoch the run should have stopped at. Open <strong>Watch the two curves part</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3281,6 +3296,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Fresh rows keep improving the model and repeated rows do not, so the gap is the price of repetition</strong></li><li>They are the same, so repetition is free</li><li>The repeated run is better, because it sees the data more often</li><li>Nothing can be compared without a different model</li></ul>
 <blockquote><p>Correct.</p></blockquote>
 <blockquote><p><strong>Why:</strong> Every fresh row is new information; a repeated row is not. The gap between the two curves, measured on the same held-out set, is the price.</p></blockquote>
+<p>*<em>Q. At one epoch, a repeated run and a fresh run of the same token count are the same run. — boolean </em>(warmup)***</p>
+<blockquote><p><strong>Answer:</strong> True</p></blockquote>
+<blockquote><p><strong>Why:</strong> At one epoch the two runs have read the same rows, so they are the same run — the warmup is arithmetic, not behaviour. The comparison only becomes informative as the repeats accumulate, and the gap grows with the number of repeats.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>The two curves, and the gap between them, as the number of repeats grows. Open <strong>Watch the gap open</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3320,6 +3338,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. With the paper’s fitted constant R★ = 15.387756, a pool of 10 billion unique tokens is worth at most U·(1 + R★) effective tokens however many times it is read. What is that ceiling, in billions of tokens? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 163.87756 ± 0.01</p></blockquote>
 <blockquote><p><strong>Why:</strong> 10 × (1 + 15.387756) = 163.87756 billion. The constant is a multiplier on the pool, and the ceiling is reached only in the limit of infinitely many passes.</p></blockquote>
+<p>*<em>Q. The effective-data law is D′ = U·(1 + R★·(1 − e^(−R/R★))). As the number of repeats R grows without bound, what does D′ converge to? — multiple-choice </em>(core)***</p>
+<ul><li>Infinity — enough epochs are worth any amount of fresh data</li><li>✓ <strong>U(1 + R★) — a finite ceiling the pool is never worth more than</strong></li><li>U, the number of unique rows</li><li>U · R, the total rows actually trained on</li></ul>
+<blockquote><p>Correct — however many epochs you run, the pool caps what they are worth.</p></blockquote>
+<blockquote><p><strong>Why:</strong> E repeats of U unique rows is E·U rows of training and U rows of information. The law prices the difference: D′ saturates at U(1 + R★), the ceiling a pool is ever worth — and half of that ceiling’s benefit arrives by R★·ln 2 epochs.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>The effective data and the marginal value of a pass over a pool, at the paper’s constant and at any other. Open <strong>Evaluate the law</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3364,6 +3386,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. A pool of 400 rows has 4 tail directions and needs 3 rare rows per direction. What keep fraction does the percolation argument predict? — numeric </em>(core)***</p>
 <blockquote><p><strong>Answer:</strong> 0.03 ± 0.001</p></blockquote>
 <blockquote><p><strong>Why:</strong> 12 rows out of 400 is 3%. The prediction is a count of rows, not a property of the loss; the screen compares it with the fraction at which the trained runs actually break.</p></blockquote>
+<p>*<em>Q. Why is the percolation threshold a property of the metric’s queue rather than of the pool alone? — multiple-choice </em>(hard)***</p>
+<ul><li>Because the threshold changes with the training learning rate</li><li>✓ <strong>Because the cut removes the rows that outrank it only if the metric scores them correctly — the survival of a queue with error in it depends on the metric’s error</strong></li><li>Because percolation only applies to deduplicated pools</li><li>Because the threshold equals the keep fraction at which the loss is best</li></ul>
+<blockquote><p>Correct — the same pool under a noisier metric percolates earlier.</p></blockquote>
+<blockquote><p><strong>Why:</strong> Volume laws say a smaller corpus is a worse corpus in a fixed way. Percolation says that past some fraction the loss goes faster, because what is being removed are the rows nothing else can replace — and which rows those are depends on the metric’s error as much as on the pool.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>The loss as the pool shrinks, against a random subset of the same size, with the threshold and the cliff edge marked. Open <strong>Break the curve</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3437,6 +3463,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>One: a rare row survives a cut exactly as often as a bulk row does, so there is nothing to prune</strong></li><li>Zero: the metric gets braver as its error grows</li><li>The share of the pool that is rare</li><li>It does not move: the threshold is a property of the pool</li></ul>
 <blockquote><p>Correct — the ranking has become a shuffle.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The prediction is a survival calculation on the metric’s queue. Once the noise on the score exceeds the difference between the groups, the queue is random, the rare rows are lost at the same rate as everything else, and the honest answer is that no fraction is safe.</p></blockquote>
+<p>*<em>Q. What distinguishes the predicted keep-fraction threshold from a fitted one? — multiple-choice </em>(hard)***</p>
+<ul><li>It is fitted to the measured curve and then checked on a held-out pool</li><li>✓ <strong>It is computed from the structure of the pool — how many rare rows per direction the metric’s error lets through — with no free parameter, then compared against the measured fraction</strong></li><li>It is chosen to make the pruning curve look smooth</li><li>It is the keep fraction at which the corpus size halves</li></ul>
+<blockquote><p>Correct — a survival calculation, not a fit.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The prediction is a survival calculation: how many rare rows are expected to outrank the cut at each keep fraction, against the number the tail directly needs — computed with no free parameter, and then compared with the measured fraction on the same pool.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>The rare rows surviving each cut, the requirement the tail needs, and the prediction against the measurement. Open <strong>Make the prediction</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3472,6 +3502,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>That the measured score is flat and then steep</strong></li><li>That the model’s capability is flat and then steep</li><li>That the task is impossible below a size</li><li>That the training run failed</li></ul>
 <blockquote><p>Correct — and that is a statement about the score.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The curve is a fact about the metric applied to the model. Whether the model itself changed discontinuously is a separate question, and the answer depends on the metric.</p></blockquote>
+<p>*<em>Q. A benchmark curve is flat, then steep. What does computing the same capability under a second, continuous metric establish? — multiple-choice </em>(core)***</p>
+<ul><li>Whether the model was trained long enough</li><li>✓ <strong>Whether the steepness lives in the model or in the metric</strong></li><li>Whether the benchmark was contaminated</li><li>Whether the capability is useful in practice</li></ul>
+<blockquote><p>Correct — the flat-then-steep shape can be manufactured by a threshold in the scoring.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The curve is flat, then steep, and the steep part is where the attention goes. Computing the same capability under a continuous metric tells you whether the emergence is a fact about the model or an artefact of the scoring — an emergent curve alone does not establish that the model gained a new capability.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>One capability, two metrics, and the two curves they produce. Open <strong>Look at the cliff</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3502,6 +3536,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>Move the floor and the claimed discovery moves, with nothing changed in the model</strong></li><li>The floor is arbitrary, so the whole measurement is worthless</li><li>The underlying accuracy moves with the floor too</li><li>A lower floor makes the ability more real</li></ul>
 <blockquote><p>Correct — and the screen names the floor it made the choice at.</p></blockquote>
 <blockquote><p><strong>Why:</strong> An onset read against a reporting floor is a property of the reporting rule as much as of the model. The gap column is widest mid-climb, where “the model cannot do this” and “the model gets most tokens right” are simultaneously true.</p></blockquote>
+<p>*<em>Q. The reported onset of a capability is the first point above a chosen reporting floor. What follows from that definition? — multiple-choice </em>(core)***</p>
+<ul><li>The onset is a property of the model, independent of how it is read</li><li>✓ <strong>The claimed onset moves when the floor moves — and the floor is a defensible choice, so the onset is partly a fact about the floor</strong></li><li>The onset is the steepest point of the curve</li><li>The floor only matters for very small models</li></ul>
+<blockquote><p>Correct — which is why the widest gap between two readings of one sweep is the honest measurement.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The onset is the first point above a chosen floor, so the claimed discovery moves when the floor moves — and the floor is a defensible choice. Finding the widest gap between the per-token accuracy and the whole-sequence score on one sweep is how the artefact is measured rather than argued about.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>Forty points over three decades of compute: the accuracy, the score, the difference, and the floor that decides where the cliff began. Open <strong>Measure the gap</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3630,6 +3668,9 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <p>*<em>Q. Run on a series that is exactly one straight line in log space, a break detector should report a change of slope. — boolean </em>(hard)***</p>
 <blockquote><p><strong>Answer:</strong> False</p></blockquote>
 <blockquote><p><strong>Why:</strong> It should report nothing. A split always improves the fit slightly, so a break only counts when the two sides disagree by more than the noise — otherwise the answer is whichever year the rounding favours.</p></blockquote>
+<p>*<em>Q. In the split search, a detected break pays a penalty of two log n. How many extra fitted parameters does a single break introduce? — numeric </em>(core)***</p>
+<blockquote><p><strong>Answer:</strong> 2</p></blockquote>
+<blockquote><p><strong>Why:</strong> Two — the second slope, and the location of the split. Every split is tried, both sides are fitted, and the smallest residual sum of squares is kept only once the split has paid for its two extra parameters; a series that is exactly straight must not report a change of slope.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>A planted change of slope, the split the detector finds, and the single fit it replaces. Open <strong>Find the break</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>
@@ -3670,6 +3711,10 @@ footer.pager { max-width: 78rem; margin: 0 auto; padding: 1rem 1.25rem 3rem;
 <ul><li>✓ <strong>A capability trend and the wall-clock a run is allowed</strong></li><li>Nothing: the law gives a date</li><li>The number of parameters</li><li>The size of the corpus</li></ul>
 <blockquote><p>Correct — FLOPs per second times hours is what a run can actually spend.</p></blockquote>
 <blockquote><p><strong>Why:</strong> The bridge from a law to a date is a rate: what the hardware of the year could do in the hours a run takes. The screen makes that bridge a slider, because it is the assumption the answer depends on most.</p></blockquote>
+<p>*<em>Q. From a loss target to a year, the three steps are: — multiple-choice </em>(core)***</p>
+<ul><li>Fit the frontier, fit the wall-clock trend, extrapolate the loss directly</li><li>✓ <strong>Invert the frontier for the compute the loss costs, divide by the run’s rate, and read the series at that rate</strong></li><li>Count the parameters, read the price of hardware, subtract the years</li><li>Ask when the loss floor was last crossed, halve the tokens, double the parameters</li></ul>
+<blockquote><p>Correct — and the flag that says whether the answer was interpolated inside the series or projected outside it travels with the result.</p></blockquote>
+<blockquote><p><strong>Why:</strong> The frontier inverted gives the budget a loss costs, the budget over the run’s hours gives the rate, and the series read at the rate gives the year. Each step assumes its fitted trend continues — and a target at or below the fitted floor cannot be bought at any price, which is reported as an answer rather than hidden.</p></blockquote>
 <h4 id="scaling-lab--go-and-do-it">Go and do it</h4>
 <p>The whole chain in one table: the loss, its budget, the rate it needs, the year the series reaches it. Open <strong>Price a loss in years</strong> in the scaling-lab application.</p>
 <p><strong>Where this came from</strong></p>

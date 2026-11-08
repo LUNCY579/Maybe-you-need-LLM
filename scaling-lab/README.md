@@ -99,7 +99,7 @@ Every model in every laboratory is trained **in the browser, from scratch**, eve
 
 ### The rest of the course
 
-- **Practice** — 40 questions with per-option feedback, worked explanations and source citations.
+- **Practice** — 52 questions with per-option feedback, worked explanations and source citations.
 - **Glossary** — 27 terms, each with a plain-language definition and the terms that should be understood first. The
   dependency graph is checked for cycles.
 - **Equations** — 17 results with the source, the plain-language meaning, every symbol, the assumptions, a derivation

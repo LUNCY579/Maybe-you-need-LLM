@@ -305,7 +305,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['log-log-fit', 'scaling-law'],
     prerequisites: ['what-a-power-law-says'],
     glossaryTerms: ['exponent', 'r-squared'],
-    quizIds: ['q-power-3'],
+    quizIds: ['q-power-3', 'q-r2-certify'],
     sourceRefs: [
       {
         chapter: 2,
@@ -354,7 +354,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['compute-cost', 'loss-surface'],
     prerequisites: ['what-a-power-law-says'],
     glossaryTerms: ['compute-budget', 'allocation'],
-    quizIds: ['q-compute-1'],
+    quizIds: ['q-compute-1', 'q-budget-6nd'],
     sourceRefs: [
       {
         chapter: 1,
@@ -649,7 +649,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['repetition-law'],
     prerequisites: ['three-phases-of-a-repeated-run'],
     glossaryTerms: ['dominance-epoch', 'epoch', 'effective-data'],
-    quizIds: ['q-epoch-2'],
+    quizIds: ['q-epoch-2', 'q-dominance-meaning'],
     sourceRefs: [
       {
         chapter: 3,
@@ -692,7 +692,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['repetition-law', 'effective-data'],
     prerequisites: ['three-phases-of-a-repeated-run', 'how-many-epochs'],
     glossaryTerms: ['epoch', 'dominance-epoch', 'unique-pool'],
-    quizIds: ['q-memorise-1'],
+    quizIds: ['q-memorise-1', 'q-turn-pool-optimum'],
     sourceRefs: [
       {
         chapter: 3,
@@ -778,7 +778,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['effective-data', 'repetition-law'],
     prerequisites: ['when-the-data-runs-out'],
     glossaryTerms: ['effective-data', 'repeats'],
-    quizIds: ['q-data-3'],
+    quizIds: ['q-data-3', 'q-repeat-one-epoch'],
     sourceRefs: [
       {
         chapter: 5,
@@ -815,7 +815,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['repetition-law', 'effective-data'],
     prerequisites: ['when-the-data-runs-out', 'the-turn-upward'],
     glossaryTerms: ['effective-data', 'repeats', 'dominance-epoch', 'unique-pool'],
-    quizIds: ['q-law-1'],
+    quizIds: ['q-law-1', 'q-law-ceiling'],
     sourceRefs: [
       {
         chapter: 3,
@@ -858,7 +858,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['percolation-threshold', 'row-information'],
     prerequisites: ['what-a-power-law-says', 'when-the-data-runs-out'],
     glossaryTerms: ['percolation-threshold', 'rare-rows', 'pruning-metric', 'unique-pool'],
-    quizIds: ['q-perc-1'],
+    quizIds: ['q-perc-1', 'q-percolation-queue'],
     sourceRefs: [
       {
         chapter: 1,
@@ -944,7 +944,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['percolation-threshold', 'row-information'],
     prerequisites: ['the-percolation-threshold', 'benchmarking-the-pruning-metrics'],
     glossaryTerms: ['percolation-threshold', 'rare-rows', 'pruning-metric', 'cliff'],
-    quizIds: ['q-pred-1'],
+    quizIds: ['q-pred-1', 'q-cliff-noparam'],
     sourceRefs: [
       {
         chapter: 3,
@@ -987,7 +987,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['whole-sequence-score'],
     prerequisites: ['what-a-power-law-says'],
     glossaryTerms: ['emergence', 'metric'],
-    quizIds: ['q-emergence-1'],
+    quizIds: ['q-emergence-1', 'q-emergence-second'],
     sourceRefs: [
       {
         chapter: 1,
@@ -1024,7 +1024,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['whole-sequence-score'],
     prerequisites: ['what-emergence-looks-like'],
     glossaryTerms: ['per-token-accuracy', 'metric', 'cliff', 'emergence'],
-    quizIds: ['q-artefact-1'],
+    quizIds: ['q-artefact-1', 'q-floor-onset'],
     sourceRefs: [
       {
         chapter: 3,
@@ -1153,7 +1153,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['compute-trend', 'log-log-fit'],
     prerequisites: ['three-eras-of-compute'],
     glossaryTerms: ['trend-break', 'log-linear-trend', 'r-squared'],
-    quizIds: ['q-hardware-3'],
+    quizIds: ['q-hardware-3', 'q-break-two-params'],
     sourceRefs: [
       {
         chapter: 3,
@@ -1196,7 +1196,7 @@ export const LESSONS: LessonMeta[] = [
     formulaIds: ['compute-trend', 'frontier-law'],
     prerequisites: ['the-isoflop-frontier', 'three-eras-of-compute'],
     glossaryTerms: ['feasible-compute', 'log-linear-trend', 'irreducible-loss', 'frontier'],
-    quizIds: ['q-feasible-1'],
+    quizIds: ['q-feasible-1', 'q-trend-steps'],
     sourceRefs: [
       {
         chapter: 1,
