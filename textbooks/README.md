@@ -23,4 +23,4 @@ The same books are also rendered as a navigable HTML edition with the mathematic
 | [Multimodal Lab](multimodal-lab.md) | 9 | 5,578 | Learning Transferable Visual Models From Natural Language Supervision (2021) |
 | [LLM Foundations Lab](llm-foundations-lab.md) | 18 | 28,417 | Foundations of Large Language Models (2026) |
 | [Agentic AI Academy](agentic-ai-academy.md) | 12 | 43,904 | Agentic Large Language Models (2026) |
-| [Deep Learning Theory Explorer](deep-learning-theory-explorer.md) | 10 | 10,356 | The Principles of Deep Learning Theory (2022) |
+| [Deep Learning Theory Explorer](deep-learning-theory-explorer.md) | 11 | 11,706 | The Principles of Deep Learning Theory (2022) |

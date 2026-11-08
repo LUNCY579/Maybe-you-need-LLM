@@ -36,7 +36,7 @@ printed page numbers of the monograph.
 
 ---
 
-## The ten lessons
+## The eleven lessons
 
 Each lesson follows the same shape: **intuition → formal definition → experiment →
 verification exercise**. The `prerequisites` field is a real DAG (checked by the
@@ -45,7 +45,7 @@ all required and checked.
 
 ### The lessons carry their own experiments
 
-All ten lessons contain a **live figure**: a computation next to the sentence
+Ten of the eleven lessons contain a **live figure**: a computation next to the sentence
 that makes the claim, not an illustration. Each figure is produced by the same
 quadrature and recursion code the laboratories use, so the picture and the
 numbers in the laboratory can never disagree.
@@ -65,7 +65,7 @@ numbers in the laboratory can never disagree.
 
 ### The exercises are computed, not quoted
 
-There are 17 exercises across the ten lessons. Nine of them are *guided
+There are 21 exercises across the eleven lessons. Twelve of them are *guided
 numerical* exercises: the value the learner is asked to reproduce is computed at
 run time by the same numerical code the laboratories use
 (`src/lib/exercises.ts`), and the learner's own answer is checked against that
@@ -78,6 +78,9 @@ are conceptual or code exercises with written derivations.
 | `A²` for `a₊ = 1, a₋ = 0.1` | 2 | eq. (5.61) |
 | `G^(40)` for a 40-layer linear network | 3 | eq. (3.15) |
 | `sd[O^(20)]` at width 256 | 4 | eq. (3.33) |
+| `c₄(8)` | 5 | eq. (3.46) |
+| `e^{2r} − 1` at r = 1/2 | 5 | eq. (3.56) |
+| `e^{6r} − 3e^{2r} + 2` at r = 1/4 | 5 | eq. (3.57) |
 | `K₁₁K₂₂ + 2K₁₂²` for a quadratic activation | 5 | Wick contraction |
 | The ReLU critical `C_W` | 6 | eq. (5.67), cross-checked against the §5.3.1 scanner |
 | The unphysical sigmoid `C_b` | 6 | §5.3.2 |

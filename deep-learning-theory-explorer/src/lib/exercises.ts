@@ -261,6 +261,37 @@ const registry: ComputedExercise[] = [
     tolerance: 0.001,
     digits: 6,
   },
+  {
+    id: 'chaos-c4-width-8',
+    method: 'c₄(n) = (1 + 2/n)(1 + 4/n), the combinatorial factor of the four-point recursion (book eq. (3.46)), at width n = 8.',
+    compute: () => {
+      const n = 8;
+      return (1 + 2 / n) * (1 + 4 / n);
+    },
+    tolerance: 0.001,
+    digits: 4,
+  },
+  {
+    id: 'chaos-four-point-r-half',
+    method: 'The connected four-point function at criticality, (e^{2r} − 1)(G⁽²⁾(0))², at aspect ratio r = 1/2 (book eq. (3.56)).',
+    compute: () => {
+      const r = 0.5;
+      return Math.exp(2 * r) - 1;
+    },
+    tolerance: 0.001,
+    digits: 4,
+  },
+  {
+    id: 'chaos-six-point-r-quarter',
+    method: 'The connected six-point function at criticality, (e^{6r} − 3e^{2r} + 2)(G⁽²⁾(0))³, at aspect ratio r = 1/4 (book eq. (3.57)).',
+    compute: () => {
+      const r = 0.25;
+      return Math.exp(6 * r) - 3 * Math.exp(2 * r) + 2;
+    },
+    tolerance: 0.001,
+    digits: 4,
+  },
+
 ];
 
 export const COMPUTED_EXERCISES: Record<string, ComputedExercise> = Object.fromEntries(

@@ -78,7 +78,7 @@ end-to-end suite (`npx playwright install chromium`).
 | --- | --- | --- |
 | `/#/` | Course overview | What the app computes, what it verifies, where it stops, a live panel that opens a configured experiment in two clicks, and where to read next in the collection |
 | `/#/prerequisites` | Prerequisite navigator | The mathematical toolkit, the notation the course uses, and self-checks |
-| `/#/lessons` | Lesson reader | Ten lessons mapped to the source chapters, with guided numerical exercises whose answers are computed live |
+| `/#/lessons` | Lesson reader | Eleven lessons mapped to the source chapters, with guided numerical exercises whose answers are computed live |
 | `/#/gallery` | Experiment gallery | Eleven preset experiments with a hypothesis, a seed and a stated expectation |
 | `/#/equations` | Equation explorer | Sixteen results with symbol glossaries, assumptions, derivations, and a worked example computed live for every one of them |
 | `/#/quiz` | Assessment | Twenty original questions with explanations and numeric tolerances |

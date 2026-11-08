@@ -352,8 +352,138 @@ export const LESSONS: Lesson[] = [
     ],
   },
   {
-    id: 'rg-flow',
+    id: 'chaos',
     order: 5,
+    title: 'Chaos: how deep a deep linear network can be',
+    chapter: 'Chapter 3.4',
+    minutes: 35,
+    tier: 'core',
+    summary:
+      'The higher-point correlators obey the same layer-by-layer recursion as the variance, multiplied by a combinatorial factor that grows with the order and shrinks with the width. Infinite width restores exact Gaussianity; infinite depth at fixed width blows every higher correlator up — even at criticality. The aspect ratio interpolates, and the connected four-point function runs with it.',
+    objectives: [
+      'Write the recursion for the 2m-point correlator and its combinatorial factor',
+      'Show that infinite width restores exact Gaussianity, and that infinite depth at fixed width destroys it even at criticality',
+      'Explain why the two limits do not commute and what the aspect ratio interpolates between',
+      'Read the connected four- and six-point functions as the running of the couplings with L/n',
+    ],
+    prerequisites: ['linear-criticality', 'non-gaussianity'],
+    sections: [
+      {
+        heading: 'The higher-point recursion',
+        blocks: [
+          {
+            kind: 'p',
+            text: 'Everything so far followed from the two-point function and one four-point correction. The full distribution p(z) needs every correlator, and Wick contraction delivers them the same way. For six fields the first contraction count is already [[four-point]] arithmetic grown up: there are fifteen distinct ways to pair six weights, and after the neural indices are summed the layer dependence collapses onto a single scalar per order.',
+          },
+          {
+            kind: 'eq',
+            tex: 'G^{(2m)}_{\\ell+1} = c_{2m}(n)\\, \\mathrm{C_W}^{m}\\, G^{(2m)}_{\\ell}, \\qquad c_{2m}(n) = \\prod_{s=1}^{m-1}\\left(1 + \\frac{2s}{n}\\right)',
+            caption:
+              'The full correlator recurses like the variance, with one extra factor per layer: c_{2m}, a product of m−1 width corrections. For six fields it is (1 + 2/n)(1 + 4/n); the book derives it by sorting the index sums into three classes.',
+            ref: 'eqs. (3.45), (3.46)',
+          },
+          {
+            kind: 'p',
+            text: 'The solution is a product of these factors times the Gaussian value built from the two-point function. Nothing new can happen to the distribution except through this factor — which is why the whole physics of the section lives in how c_{2m} behaves as the width and the depth are taken to their limits.',
+          },
+        ],
+      },
+      {
+        heading: 'Two limits that do not commute',
+        blocks: [
+          {
+            kind: 'p',
+            text: 'Send the width to infinity at fixed depth and every c_{2m} becomes one: all the higher correlators collapse to their Gaussian values, and the output distribution is exactly Gaussian, with the covariance of a single wide layer. The book’s verdict is blunt — such networks are not really deep after all.',
+          },
+          {
+            kind: 'p',
+            text: 'Send the depth to infinity at fixed width and the combinatorial factors stay fixed and greater than one. Every higher correlator then grows exponentially with depth — and this survives [[criticality]]: setting [[cw]] = 1 pins the two-point function but does nothing to c_{2m}. The implied distribution is violently non-Gaussian, the outputs fluctuate chaotically from instantiation to instantiation, and the network is unusable.',
+          },
+          {
+            kind: 'callout',
+            tone: 'warning',
+            title: 'Chaos is not a failure of criticality',
+            text: 'Criticality tames the two-point function and nothing else. The combinatorial factors c_{2m} do not care what [[cw]] is — they are counting Wick contractions, not signals. A network can be perfectly critical and still be too deep for its width, which is why the finite-width analysis carried a cutoff at all.',
+          },
+        ],
+      },
+      {
+        heading: 'The aspect ratio interpolates',
+        blocks: [
+          {
+            kind: 'p',
+            text: 'The limits do not commute, and the parameter that resolves them is the one the whole course already turns on: [[aspect-ratio]], now taken with depth and width going to infinity together. Expanding the combinatorial factors and exponentiating gives the correlators at fixed r.',
+          },
+          {
+            kind: 'eq',
+            tex: 'G^{(2m)}_L \\approx e^{m(m-1)r}\\,\\big(G^{(2)}_L\\big)^m',
+            caption:
+              'At fixed aspect ratio r = L/n. r → 0 recovers the Gaussian limit; r → ∞ recovers the chaotic blow-up. The non-Gaussianity is now a dial, not a cliff.',
+            ref: 'eq. (3.55)',
+          },
+          {
+            kind: 'eq',
+            tex: 'G^{(4)}_L - \\big(G^{(2)}_L\\big)^2 = \\big(e^{2r} - 1\\big)\\,\\big(G^{(2)}(0)\\big)^2 \\approx 2r\\,\\big(G^{(2)}(0)\\big)^2',
+            caption:
+              'At criticality the connected four-point function runs linearly with the aspect ratio — the same 2ℓ/n growth the fluctuation lesson measured, now recognised as the running of the quartic coupling.',
+            ref: 'eq. (3.56)',
+          },
+          {
+            kind: 'eq',
+            tex: 'G^{(6)}_L - 3\\,G^{(2)}_L G^{(4)}_L + 2\\,\\big(G^{(2)}_L\\big)^3 = \\big(e^{6r} - 3e^{2r} + 2\\big)\\,\\big(G^{(2)}(0)\\big)^3 \\approx 12 r^2\\,\\big(G^{(2)}(0)\\big)^3',
+            caption:
+              'The connected six-point function enters at order r² — one higher power than the four-point, exactly as a cumulant expansion should.',
+            ref: 'eq. (3.57)',
+          },
+          {
+            kind: 'p',
+            text: 'This is the moment the course’s two threads meet. The kernel picture says a wide network is a Gaussian process; the connected correlators say how fast that statement decays as the network gets deeper for its width. The effective theory of [[kernel]] learning is credible precisely while r stays small — and every laboratory panel that plots a fluctuation against L/n has been measuring this running all along.',
+          },
+        ],
+      },
+    ],
+    experiment: {
+      route: '/labs/initialization',
+      note: 'Push the depth up at fixed width and watch the layer statistics leave their infinite-width predictions.',
+    },
+    exercises: [
+      {
+        kind: 'numerical',
+        prompt: 'Width n = 8. What is the combinatorial factor c₄(8) by which the full four-point correlator grows per layer?',
+        answer:
+          'c₄(8) = (1 + 2/8)(1 + 4/8) = 1.25 × 1.5 = 1.875 — an 87.5% amplification of the four-point structure at every layer, at a width that would look comfortably large to the eye.',
+        computed: 'chaos-c4-width-8',
+      },
+      {
+        kind: 'numerical',
+        prompt: 'At criticality with aspect ratio r = 0.5 and G⁽²⁾(0) = 1, evaluate the connected four-point function (e²ʳ − 1)(G⁽²⁾(0))².',
+        answer:
+          'e^{2r} − 1 at r = 1/2 is e − 1 ≈ 1.718. The leading-order estimate 2r = 1 already misses by more than 70% — the exponential matters as soon as r is not tiny.',
+        computed: 'chaos-four-point-r-half',
+      },
+      {
+        kind: 'numerical',
+        prompt: 'At criticality with r = 0.25 and G⁽²⁾(0) = 1, evaluate the connected six-point function (e⁶ʳ − 3e²ʳ + 2)(G⁽²⁾(0))³.',
+        answer:
+          'e^{1.5} − 3e^{0.5} + 2 ≈ 4.482 − 4.946 + 2 = 1.535. The leading small-r estimate 12r² = 0.75 is within a factor of two — the expansion is working, barely, at this aspect ratio.',
+        computed: 'chaos-six-point-r-quarter',
+      },
+      {
+        kind: 'conceptual',
+        prompt: 'The two limits of Chapter 3 do not commute. State what each limit gives, and what parameter interpolates between them.',
+        answer:
+          'Width to infinity at fixed depth gives an exactly Gaussian network whose depth is effectively wasted — it behaves like a single wide layer. Depth to infinity at fixed width makes every higher correlator grow exponentially even at criticality, and the outputs fluctuate chaotically. The interpolating parameter is the aspect ratio r = L/n: at fixed r the 2m-point correlator is e^{m(m−1)r} times its Gaussian value.',
+      },
+    ],
+    citations: [
+      { label: '§3.4', note: 'recursions for the higher-point correlators, the two limits, and the interpolating solution' },
+      { label: 'eq. (3.46)', note: 'the combinatorial factor and its width expansion' },
+      { label: 'eq. (3.55)', note: 'the correlators at fixed aspect ratio' },
+    ],
+  },
+  {
+    id: 'rg-flow',
+    order: 6,
     title: 'Representation group flow: how the preactivation distribution evolves',
     chapter: 'Chapter 4',
     minutes: 50,
@@ -452,7 +582,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'criticality',
-    order: 6,
+    order: 7,
     title: 'Criticality for general activations: two conditions and the Kaiming initialization',
     chapter: 'Chapter 5.1-5.2',
     minutes: 55,
@@ -547,7 +677,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'universality',
-    order: 7,
+    order: 8,
     title: 'Universality classes: tanh, sin, sigmoid and friends',
     chapter: 'Chapter 5.3, 5.5',
     minutes: 55,
@@ -655,7 +785,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'bayesian',
-    order: 8,
+    order: 9,
     title: 'Bayesian learning: what infinite width can and cannot do',
     chapter: 'Chapter 6',
     minutes: 50,
@@ -733,7 +863,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'ntk',
-    order: 9,
+    order: 10,
     title: 'Gradient descent and the neural tangent kernel',
     chapter: 'Chapters 7-9',
     minutes: 60,
@@ -833,7 +963,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: 'representation-learning',
-    order: 10,
+    order: 11,
     title: 'Representation learning at finite width',
     chapter: 'Chapters 10-11',
     minutes: 55,

@@ -21,12 +21,13 @@
 - [Lesson 2. Neural networks as random functions: activation functions and ensembles](#lesson-2-neural-networks-as-random-functions-activation-functions-and-ensembles) *(foundation, Chapter 2)*
 - [Lesson 3. Deep linear networks: exact criticality and the exploding/vanishing problem](#lesson-3-deep-linear-networks-exact-criticality-and-the-explodingvanishing-problem) *(core, Chapter 3)*
 - [Lesson 4. Finite width: fluctuations and the depth-to-width ratio](#lesson-4-finite-width-fluctuations-and-the-depth-to-width-ratio) *(core, Chapter 3.3, 5.4)*
-- [Lesson 5. Representation group flow: how the preactivation distribution evolves](#lesson-5-representation-group-flow-how-the-preactivation-distribution-evolves) *(advanced, Chapter 4)*
-- [Lesson 6. Criticality for general activations: two conditions and the Kaiming initialization](#lesson-6-criticality-for-general-activations-two-conditions-and-the-kaiming-initialization) *(core, Chapter 5.1-5.2)*
-- [Lesson 7. Universality classes: tanh, sin, sigmoid and friends](#lesson-7-universality-classes-tanh-sin-sigmoid-and-friends) *(advanced, Chapter 5.3, 5.5)*
-- [Lesson 8. Bayesian learning: what infinite width can and cannot do](#lesson-8-bayesian-learning-what-infinite-width-can-and-cannot-do) *(advanced, Chapter 6)*
-- [Lesson 9. Gradient descent and the neural tangent kernel](#lesson-9-gradient-descent-and-the-neural-tangent-kernel) *(advanced, Chapters 7-9)*
-- [Lesson 10. Representation learning at finite width](#lesson-10-representation-learning-at-finite-width) *(advanced, Chapters 10-11)*
+- [Lesson 5. Chaos: how deep a deep linear network can be](#lesson-5-chaos-how-deep-a-deep-linear-network-can-be) *(core, Chapter 3.4)*
+- [Lesson 6. Representation group flow: how the preactivation distribution evolves](#lesson-6-representation-group-flow-how-the-preactivation-distribution-evolves) *(advanced, Chapter 4)*
+- [Lesson 7. Criticality for general activations: two conditions and the Kaiming initialization](#lesson-7-criticality-for-general-activations-two-conditions-and-the-kaiming-initialization) *(core, Chapter 5.1-5.2)*
+- [Lesson 8. Universality classes: tanh, sin, sigmoid and friends](#lesson-8-universality-classes-tanh-sin-sigmoid-and-friends) *(advanced, Chapter 5.3, 5.5)*
+- [Lesson 9. Bayesian learning: what infinite width can and cannot do](#lesson-9-bayesian-learning-what-infinite-width-can-and-cannot-do) *(advanced, Chapter 6)*
+- [Lesson 10. Gradient descent and the neural tangent kernel](#lesson-10-gradient-descent-and-the-neural-tangent-kernel) *(advanced, Chapters 7-9)*
+- [Lesson 11. Representation learning at finite width](#lesson-11-representation-learning-at-finite-width) *(advanced, Chapters 10-11)*
 - [Appendix A — Equation reference](#appendix-a-equation-reference)
 - [Appendix B — Notation](#appendix-b-notation)
 - [Appendix C — The laboratories](#appendix-c-the-laboratories)
@@ -366,7 +367,111 @@ Depth brings two opposing effects: deeper networks can develop nontrivial correl
 - eq. (3.33) — variance of the layer observable
 - §5.4 — fluctuations for general activations, with grading by L/n
 
-### Lesson 5. Representation group flow: how the preactivation distribution evolves
+### Lesson 5. Chaos: how deep a deep linear network can be
+
+*The higher-point correlators obey the same layer-by-layer recursion as the variance, multiplied by a combinatorial factor that grows with the order and shrinks with the width. Infinite width restores exact Gaussianity; infinite depth at fixed width blows every higher correlator up — even at criticality. The aspect ratio interpolates, and the connected four-point function runs with it.*
+
+*Estimated study time:* 35 minutes · tier: core · built on: Chapter 3.4
+
+**What you will learn**
+
+- Write the recursion for the 2m-point correlator and its combinatorial factor
+- Show that infinite width restores exact Gaussianity, and that infinite depth at fixed width destroys it even at criticality
+- Explain why the two limits do not commute and what the aspect ratio interpolates between
+- Read the connected four- and six-point functions as the running of the couplings with L/n
+
+*Read first:* Deep linear networks: exact criticality and the exploding/vanishing problem, Gaussians, Wick contraction and why the Gaussian world is not enough
+
+#### The higher-point recursion
+
+Everything so far followed from the two-point function and one four-point correction. The full distribution p(z) needs every correlator, and Wick contraction delivers them the same way. For six fields the first contraction count is already [[four-point]] arithmetic grown up: there are fifteen distinct ways to pair six weights, and after the neural indices are summed the layer dependence collapses onto a single scalar per order.
+
+$$G^{(2m)}_{\ell+1} = c_{2m}(n)\, \mathrm{C_W}^{m}\, G^{(2m)}_{\ell}, \qquad c_{2m}(n) = \prod_{s=1}^{m-1}\left(1 + \frac{2s}{n}\right)$$
+*The full correlator recurses like the variance, with one extra factor per layer: c_{2m}, a product of m−1 width corrections. For six fields it is (1 + 2/n)(1 + 4/n); the book derives it by sorting the index sums into three classes.*
+
+The solution is a product of these factors times the Gaussian value built from the two-point function. Nothing new can happen to the distribution except through this factor — which is why the whole physics of the section lives in how c_{2m} behaves as the width and the depth are taken to their limits.
+
+#### Two limits that do not commute
+
+Send the width to infinity at fixed depth and every c_{2m} becomes one: all the higher correlators collapse to their Gaussian values, and the output distribution is exactly Gaussian, with the covariance of a single wide layer. The book’s verdict is blunt — such networks are not really deep after all.
+
+Send the depth to infinity at fixed width and the combinatorial factors stay fixed and greater than one. Every higher correlator then grows exponentially with depth — and this survives [[criticality]]: setting [[cw]] = 1 pins the two-point function but does nothing to c_{2m}. The implied distribution is violently non-Gaussian, the outputs fluctuate chaotically from instantiation to instantiation, and the network is unusable.
+
+> **Chaos is not a failure of criticality** (warning)
+>
+> Criticality tames the two-point function and nothing else. The combinatorial factors c_{2m} do not care what [[cw]] is — they are counting Wick contractions, not signals. A network can be perfectly critical and still be too deep for its width, which is why the finite-width analysis carried a cutoff at all.
+
+#### The aspect ratio interpolates
+
+The limits do not commute, and the parameter that resolves them is the one the whole course already turns on: [[aspect-ratio]], now taken with depth and width going to infinity together. Expanding the combinatorial factors and exponentiating gives the correlators at fixed r.
+
+$$G^{(2m)}_L \approx e^{m(m-1)r}\,\big(G^{(2)}_L\big)^m$$
+*At fixed aspect ratio r = L/n. r → 0 recovers the Gaussian limit; r → ∞ recovers the chaotic blow-up. The non-Gaussianity is now a dial, not a cliff.*
+
+$$G^{(4)}_L - \big(G^{(2)}_L\big)^2 = \big(e^{2r} - 1\big)\,\big(G^{(2)}(0)\big)^2 \approx 2r\,\big(G^{(2)}(0)\big)^2$$
+*At criticality the connected four-point function runs linearly with the aspect ratio — the same 2ℓ/n growth the fluctuation lesson measured, now recognised as the running of the quartic coupling.*
+
+$$G^{(6)}_L - 3\,G^{(2)}_L G^{(4)}_L + 2\,\big(G^{(2)}_L\big)^3 = \big(e^{6r} - 3e^{2r} + 2\big)\,\big(G^{(2)}(0)\big)^3 \approx 12 r^2\,\big(G^{(2)}(0)\big)^3$$
+*The connected six-point function enters at order r² — one higher power than the four-point, exactly as a cumulant expansion should.*
+
+This is the moment the course’s two threads meet. The kernel picture says a wide network is a Gaussian process; the connected correlators say how fast that statement decays as the network gets deeper for its width. The effective theory of [[kernel]] learning is credible precisely while r stays small — and every laboratory panel that plots a fluctuation against L/n has been measuring this running all along.
+
+#### Practice
+
+**Q. At criticality ($C_W = 1$) and fixed width, what happens to the six-point correlator as the depth grows? *(core)***
+
+- It stays at its initialization value, like the two-point function
+- ✓ **It grows exponentially, multiplied by the combinatorial factor $c_6(n)$ at every layer**
+- It decays to zero with depth
+- It oscillates between its initialization value and zero
+
+> **Why:** Criticality pins the two-point function because $C_W = 1$ makes its recursion neutral. The combinatorial factors $c_{2m}$ are counting contractions, not signals — they exceed one at any finite width, so every higher correlator blows up even on the critical line. That is the chaos the section is named for.
+
+**Q. The four-point combinatorial factor is $c_4(n) = (1 + 2/n)(1 + 4/n)$. What is it at width $n = 8$? *(core)***
+
+- $1.25$
+- $1.5$
+- ✓ **$1.875$**
+- $2.0$
+
+> **Why:** $(1 + 2/8)(1 + 4/8) = 1.25 · 1.5 = 1.875$. Already at width 8 the four-point structure is amplified by 87.5% per layer — finite-width effects are not small corrections at practical depths.
+
+**Q. At criticality, what does the fixed-aspect-ratio solution give for the connected four-point function, to leading order in $r = L/n$? *(hard)***
+
+- ✓ **$2r\,(G^{(2)}(0))^2$**
+- $r^2\,(G^{(2)}(0))^2$
+- $e^{2r}\,(G^{(2)}(0))^2$
+- It vanishes for every $r$
+
+> **Why:** The connected four-point function is $(e^{2r} − 1)(G^{(2)}(0))^2$, whose leading expansion is $2r$. This is the same $2(ℓ−1)/n$ growth the finite-width analysis found — now recognised as the running of the quartic coupling with the aspect ratio.
+
+#### Exercises
+
+**Width n = 8. What is the combinatorial factor c₄(8) by which the full four-point correlator grows per layer?** *(numerical)*
+
+> **Answer:** c₄(8) = (1 + 2/8)(1 + 4/8) = 1.25 × 1.5 = 1.875 — an 87.5% amplification of the four-point structure at every layer, at a width that would look comfortably large to the eye.
+
+**At criticality with aspect ratio r = 0.5 and G⁽²⁾(0) = 1, evaluate the connected four-point function (e²ʳ − 1)(G⁽²⁾(0))².** *(numerical)*
+
+> **Answer:** e^{2r} − 1 at r = 1/2 is e − 1 ≈ 1.718. The leading-order estimate 2r = 1 already misses by more than 70% — the exponential matters as soon as r is not tiny.
+
+**At criticality with r = 0.25 and G⁽²⁾(0) = 1, evaluate the connected six-point function (e⁶ʳ − 3e²ʳ + 2)(G⁽²⁾(0))³.** *(numerical)*
+
+> **Answer:** e^{1.5} − 3e^{0.5} + 2 ≈ 4.482 − 4.946 + 2 = 1.535. The leading small-r estimate 12r² = 0.75 is within a factor of two — the expansion is working, barely, at this aspect ratio.
+
+**The two limits of Chapter 3 do not commute. State what each limit gives, and what parameter interpolates between them.** *(conceptual)*
+
+> **Answer:** Width to infinity at fixed depth gives an exactly Gaussian network whose depth is effectively wasted — it behaves like a single wide layer. Depth to infinity at fixed width makes every higher correlator grow exponentially even at criticality, and the outputs fluctuate chaotically. The interpolating parameter is the aspect ratio r = L/n: at fixed r the 2m-point correlator is e^{m(m−1)r} times its Gaussian value.
+
+> **Laboratory:** Push the depth up at fixed width and watch the layer statistics leave their infinite-width predictions. (route: `/labs/initialization`)
+
+**Citations**
+
+- §3.4 — recursions for the higher-point correlators, the two limits, and the interpolating solution
+- eq. (3.46) — the combinatorial factor and its width expansion
+- eq. (3.55) — the correlators at fixed aspect ratio
+
+### Lesson 6. Representation group flow: how the preactivation distribution evolves
 
 *Marginalizing one layer at a time turns the network into a flow of distributions. At infinite width the flow is Gaussian and described by the kernel recursion; away from infinite width, non-Gaussianities accumulate layer by layer.*
 
@@ -449,7 +554,7 @@ Then open Laboratory C and look at the depth-to-width ratio panel: it is the qua
 - §4.5 — subleading corrections
 - eqs. (5.1), (5.44) — the two-input kernel recursion
 
-### Lesson 6. Criticality for general activations: two conditions and the Kaiming initialization
+### Lesson 7. Criticality for general activations: two conditions and the Kaiming initialization
 
 *Criticality requires two susceptibilities to equal one: one controls magnitude perturbations, the other controls angular ones. For scale-invariant activations both conditions are solved exactly and reproduce He/Kaiming initialization.*
 
@@ -539,7 +644,7 @@ $$(C_b, C_W)^{\text{critical}} = \left(0,\; \frac{1}{A^2}\right), \qquad A^2 = \
 - §5.2 — scale-invariant activations, eq. (5.67)
 - §5.3.2 — activations without criticality
 
-### Lesson 7. Universality classes: tanh, sin, sigmoid and friends
+### Lesson 8. Universality classes: tanh, sin, sigmoid and friends
 
 *Numerically solving the second criticality condition sorts activations into classes with distinct deep behaviour: exact preservation, power-law decay, exponential failure, or a repulsive fixed point.*
 
@@ -626,7 +731,7 @@ $$K^{(\ell)} = \frac{1}{(-a_1)\,\ell} + \cdots , \qquad a_1 = \gamma_1\gamma_3 +
 - §5.3.4 — half-stable classes
 - §5.5 — finite-angle analysis for non-smooth activations
 
-### Lesson 8. Bayesian learning: what infinite width can and cannot do
+### Lesson 9. Bayesian learning: what infinite width can and cannot do
 
 *Treated Bayesianly, an infinite-width network is exactly a Gaussian process whose predictions depend on the data only through the kernel. Its posterior cannot move the kernel, which is a precise statement of the absence of representation learning at infinite width.*
 
@@ -690,7 +795,7 @@ Two structural facts follow. Correlation functions are delta-correlated across n
 - §6.3 — infinite-width Bayesian inference, evidence for criticality
 - §6.4 — finite-width Bayesian inference, Hebbian learning
 
-### Lesson 9. Gradient descent and the neural tangent kernel
+### Lesson 10. Gradient descent and the neural tangent kernel
 
 *Gradient descent changes any observable through the NTK. At infinite width the NTK is deterministic and frozen, which turns training into kernel learning with closed-form dynamics; at finite width it fluctuates and defrosts.*
 
@@ -770,7 +875,7 @@ $$\upsilon^{(W)}_{\ell} = \frac{\eta\, \lambda^{(W)}_{\ell}}{n_{\ell-1}} , \qqua
 - §9.1-9.3 — effective theory of the frozen NTK at initialization
 - §10.2 — kernel learning dynamics
 
-### Lesson 10. Representation learning at finite width
+### Lesson 11. Representation learning at finite width
 
 *The difference between a kernel method and a neural network is the movement of the kernel. Measuring that movement — feature drift, kernel drift, class separation — shows it is a finite-width effect whose size shrinks as the network widens.*
 

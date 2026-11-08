@@ -317,6 +317,50 @@ export const QUIZ: QuizQuestion[] = [
       'The two-point function fixes only Gaussian expectations. A nonzero connected four-point correlator is the signature that the fourth moment refuses to factorise \u2014 the direct measurement of interactions between neurons that the Gaussian approximation cannot see.',
     citations: ['\u00a71.1'],
   },
+  {
+    id: 'q25',
+    lessonId: 'chaos',
+    difficulty: 'core',
+    prompt: 'At criticality ($C_W = 1$) and fixed width, what happens to the six-point correlator as the depth grows?',
+    options: [
+      'It stays at its initialization value, like the two-point function',
+      'It grows exponentially, multiplied by the combinatorial factor $c_6(n)$ at every layer',
+      'It decays to zero with depth',
+      'It oscillates between its initialization value and zero',
+    ],
+    answerIndex: 1,
+    explanation:
+      'Criticality pins the two-point function because $C_W = 1$ makes its recursion neutral. The combinatorial factors $c_{2m}$ are counting contractions, not signals — they exceed one at any finite width, so every higher correlator blows up even on the critical line. That is the chaos the section is named for.',
+    citations: ['§3.4', 'eq. (3.45)'],
+  },
+  {
+    id: 'q26',
+    lessonId: 'chaos',
+    difficulty: 'core',
+    prompt: 'The four-point combinatorial factor is $c_4(n) = (1 + 2/n)(1 + 4/n)$. What is it at width $n = 8$?',
+    options: ['$1.25$', '$1.5$', '$1.875$', '$2.0$'],
+    answerIndex: 2,
+    explanation: '$(1 + 2/8)(1 + 4/8) = 1.25 · 1.5 = 1.875$. Already at width 8 the four-point structure is amplified by 87.5% per layer — finite-width effects are not small corrections at practical depths.',
+    numeric: { answer: 1.875, tolerance: 0.001 },
+    citations: ['eq. (3.46)'],
+  },
+  {
+    id: 'q27',
+    lessonId: 'chaos',
+    difficulty: 'hard',
+    prompt: 'At criticality, what does the fixed-aspect-ratio solution give for the connected four-point function, to leading order in $r = L/n$?',
+    options: [
+      '$2r\\,(G^{(2)}(0))^2$',
+      '$r^2\\,(G^{(2)}(0))^2$',
+      '$e^{2r}\\,(G^{(2)}(0))^2$',
+      'It vanishes for every $r$',
+    ],
+    answerIndex: 0,
+    explanation:
+      'The connected four-point function is $(e^{2r} − 1)(G^{(2)}(0))^2$, whose leading expansion is $2r$. This is the same $2(ℓ−1)/n$ growth the finite-width analysis found — now recognised as the running of the quartic coupling with the aspect ratio.',
+    citations: ['eq. (3.56)'],
+  },
+
 ];
 
 export const QUIZ_BY_ID: Record<string, QuizQuestion> = Object.fromEntries(QUIZ.map((q) => [q.id, q]));
